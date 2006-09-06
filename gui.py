@@ -54,12 +54,12 @@ class EmergeQueue:
 			if self.unmergeIt: # update tree
 				self.tree.append(self.unmergeIt, [sth])
 
-	def _emerge (self, options):
+	def _emerge (self, options, it):
 		"""Calls emerge and updates the terminal."""
 		# open pty
 		(master, slave) = pty.openpty()
 		Popen("emerge "+options, stdout = slave, stderr = STDOUT, shell = True)
-		self.removeAll(self.emergeIt)
+		self.removeAll(it)
 		self.console.set_pty(master)
 
 	def emerge (self, force = False):
@@ -68,11 +68,12 @@ class EmergeQueue:
 
 		list = ""
 		for k in self.mergequeue.keys():
-			list += " '='"+k+"'"
+			list += " '="+k+"'"
 		
 		s = ""
+		print list
 		if not force: s = "-pv "
-		self._emerge(s+list)
+		self._emerge(s+list, self.emergeIt)
 
 	def unmerge (self, force = False):
 		"""Unmerges everything in the umerge-queue. If force is 'False' (default) only "emerge -pv -C" is called."""
@@ -81,7 +82,7 @@ class EmergeQueue:
 		list = " ".join(self.unmergequeue)
 		s = ""
 		if not force: s = "-pv "
-		self._emerge("-C "+s+list)
+		self._emerge("-C "+s+list, self.unmergeIt)
 
 	def removeAll (self, parentIt):
 		"""Removes all children of a given parent TreeIter."""
