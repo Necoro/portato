@@ -385,7 +385,6 @@ class MainWindow:
 	def create_pkg_list (self, name = None):
 		"""Creates the package list. Gets the name of the category."""
 		self.selCatName = name # actual category
-		
 		store = gtk.ListStore(str)
 
 		# calculate packages
@@ -441,6 +440,14 @@ class MainWindow:
 
 		return True
 
+	def cb_search_clicked (self, button, data = None):
+		if self.searchEntry.get_text() != "":
+			packages = geneticone.find_all_packages(self.searchEntry.get_text())
+			packages = unique_array([p.get_cp() for p in packages])
+			dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, str(packages))
+			dialog.run()
+			dialog.destroy()
+
 	def __init__ (self):
 		"""Build up window"""
 
@@ -461,6 +468,15 @@ class MainWindow:
 		menubar = self.create_main_menu()
 		vb.pack_start(menubar, False)
 		
+		# search
+		self.searchEntry = gtk.Entry()
+		self.searchBtn = gtk.Button("_Search")
+		self.searchBtn.connect("clicked", self.cb_search_clicked)
+		hbSearch = gtk.HBox(False, 5)
+		hbSearch.pack_start(self.searchEntry, True, True)
+		hbSearch.pack_start(self.searchBtn, False, False)
+		vb.pack_start(hbSearch, False, False, 5)
+
 		# VPaned holding the lists and the Terminal
 		vpaned = gtk.VPaned()
 		vpaned.set_position(400)
@@ -487,7 +503,6 @@ class MainWindow:
 		# create pkg list
 		self.pkgList = self.create_pkg_list()
 		self.scroll_2.add(self.pkgList)
-		
 		# queue list
 		queueVB = gtk.VBox(False, 0)
 		hb.pack_start(queueVB, True, True)
