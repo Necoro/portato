@@ -457,7 +457,7 @@ class MainWindow:
 		self.window.connect("delete_event", self.cb_delete)
 		self.window.connect("destroy", self.cb_destroy)
 		self.window.set_border_width(2)
-		self.window.set_geometry_hints (self.window, min_width = 600, min_height = 700, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
+		self.window.set_geometry_hints (self.window, min_width = 600, min_height = 800, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
 		self.window.set_resizable(True)
 
 		# main vb
@@ -556,7 +556,3 @@ def blocked_dialog (blocked, blocks):
 	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, blocked+" is blocked by "+blocks+".\nPlease unmerge the blocking package.")
 	dialog.run()
 	dialog.destroy()
-
-if __name__ == "__main__":
-	m = MainWindow()
-	m.main()
