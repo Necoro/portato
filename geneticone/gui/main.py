@@ -94,6 +94,7 @@ class EmergeQueue:
 			self.remove(temp)
 	
 	def remove (self, it):
+		"""Removes a specific item in the tree."""
 		if self.tree.iter_parent(it): # NEVER remove our top stuff
 			if self.tree.get_string_from_iter(it).split(":")[0] == self.tree.get_string_from_iter(self.emergeIt):
 				del self.mergequeue[self.tree.get_value(it,0)]
@@ -210,16 +211,6 @@ class PackageWindow:
 			view.set_child_visible(True)
 		return view
 
-	def cb_size_check (self, event, data = None):
-		if self.useListScroll:
-			width, height = self.window.get_size()
-			if height > gtk.gdk.screen_height():
-				self.window.set_default_size(width, gtk.gdk.screen_height())
-				self.window.resize(width, gtk.gdk.screen_height())
-				self.useListScroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-
-		return False
-
 	def __init__ (self, parent, cp, queue = None, version = None):
 		"""Build up window contents."""
 		self.parent = parent # parent window
@@ -309,6 +300,41 @@ class PackageWindow:
 		# show
 		self.window.show_all()
 
+class SearchWindow:
+	"""A window showing the results of a search process."""
+	def cb_ok_btn_clicked (self, button, data = None):
+		self.window.destroy()
+		self.jump_to(self.list[self.combo.get_active()])
+	
+	def __init__ (self, parent, list, jump_to):
+		# window
+		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		self.window.set_title("Search results")
+		self.window.set_modal(True)
+		self.window.set_transient_for(parent)
+		self.window.set_destroy_with_parent(True)
+		self.window.set_resizable(False)
+		self.window.set_default_size(1,1)
+		self.list = list
+		self.jump_to = jump_to
+
+		box = gtk.HBox(False)
+		self.window.add(box)
+
+		self.combo = gtk.combo_box_new_text()
+		for x in list:
+			self.combo.append_text(x)
+		self.combo.set_active(0)
+
+		box.pack_start(self.combo)
+
+		okBtn = gtk.Button("OK")
+		okBtn.connect("clicked", self.cb_ok_btn_clicked)
+		box.pack_start(okBtn)
+
+		self.window.show_all()
+
+
 class MainWindow:
 	"""Application main window."""
 	
@@ -321,7 +347,7 @@ class MainWindow:
 		gtk.main_quit()
 
 	def create_main_menu (self):
-		"""Creates the main menu."""
+		"""Creates the main menu. XXX: Rebuild to use UIManager"""
 		# the menu-list
 		mainMenuDesc = [
 				( "/_File", None, None, 0, "<Branch>"),
@@ -412,6 +438,7 @@ class MainWindow:
 		return pkgList
 
 	def cb_remove_clicked (self, button, data = None):
+		"""Removes a selected item in the (un)emerge-queue if possible."""
 		selected = self.emergeView.get_selection()
 
 		if selected:
@@ -433,6 +460,7 @@ class MainWindow:
 		return True
 
 	def cb_emerge_clicked (self, button, data = None):
+		"""Do emerge or unemerge."""
 		if button == self.emergeBtn:
 			self.queue.emerge(force=True)
 		elif button == self.unmergeBtn:
@@ -441,12 +469,25 @@ class MainWindow:
 		return True
 
 	def cb_search_clicked (self, button, data = None):
+		"""Do a search."""
 		if self.searchEntry.get_text() != "":
 			packages = geneticone.find_all_packages(self.searchEntry.get_text())
-			packages = unique_array([p.get_cp() for p in packages])
-			dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, str(packages))
-			dialog.run()
-			dialog.destroy()
+
+			if packages == []:
+				dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, "Package not found!")
+				dialog.run()
+				dialog.destroy()
+			else:
+				packages = unique_array([p.get_cp() for p in packages])
+				
+				if len(packages) == 1:
+					self.jump_to(packages[0])
+				else:
+					SearchWindow(self.window, packages, self.jump_to)
+
+	def jump_to (self, cp):
+		"""Is called when we want to jump to a specific package."""
+		PackageWindow(self.window, cp, self.queue)
 
 	def __init__ (self):
 		"""Build up window"""
