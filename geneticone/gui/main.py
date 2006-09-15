@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import geneticone
+from geneticone.modules import geneticthread
 
 import pygtk
 pygtk.require("2.0")
@@ -18,12 +19,13 @@ from portage_util import unique_array
 class EmergeQueue:
 	"""This class manages the emerge queue."""
 
-	def __init__ (self, tree = None, console = None):
+	def __init__ (self, tree = None, console = None, packages = None):
 		""""tree" is a gtk.TreeStore to show the queue in; "console" is a vte.Terminal to print the output to."""
 		self.mergequeue = {}
 		self.unmergequeue = []
 		self.tree = tree
 		self.console = console
+		self.packages = packages
 
 		if self.tree:
 			self.emergeIt = self.tree.append(None, ["Emerge"])
@@ -53,36 +55,50 @@ class EmergeQueue:
 			self.unmergequeue.append(sth)
 			if self.unmergeIt: # update tree
 				self.tree.append(self.unmergeIt, [sth])
+	
+	def __emerge(self):
+		self.process.wait()
+		for p in self.ps:
+			try:
+				cat = geneticone.split_package_name(p)[0]
+				while cat[0] in ["=",">","<","!"]:
+					cat = cat[1:]
+				print cat
+				del self.packages[cat]
+				print "deleted"
+			except KeyError:
+				pass
 
-	def _emerge (self, options, it):
+	def _emerge (self, options, packages, it):
 		"""Calls emerge and updates the terminal."""
-		# open pty
 		(master, slave) = pty.openpty()
 		self.console.set_pty(master)
-		self.process = Popen("emerge "+options, stdout = slave, stderr = STDOUT, shell = True)
+		self.process = Popen(["/usr/bin/python","/usr/bin/emerge"]+options+packages, stdout = slave, stderr = STDOUT, shell = False)
+		self.ps = packages
+		geneticthread.thread_start(self.__emerge)
 		self.remove_all(it)
 
 	def emerge (self, force = False):
 		"""Emerges everything in the merge-queue. If force is 'False' (default) only 'emerge -pv' is called."""
 		if len(self.mergequeue) == 0: return
 
-		list = ""
+		list = []
 		for k in self.mergequeue.keys():
-			list += " '="+k+"'"
+			list += ["="+k]
 		
-		s = ""
-		print list
-		if not force: s = "-pv "
-		self._emerge(s+list, self.emergeIt)
+		s = []
+		if not force: s = ["-pv"]
+		self._emerge(s,list, self.emergeIt)
 
 	def unmerge (self, force = False):
 		"""Unmerges everything in the umerge-queue. If force is 'False' (default) only "emerge -pv -C" is called."""
 		if len(self.unmergequeue) == 0: return
 
-		list = " ".join(self.unmergequeue)
-		s = ""
-		if not force: s = "-pv "
-		self._emerge("-C "+s+list, self.unmergeIt)
+		#list = " ".join(self.unmergequeue)
+		list = self.unmergequeue[:]
+		s = ["-C"]
+		if not force: s = ["-Cpv"]
+		self._emerge(s,list, self.unmergeIt)
 
 	def remove_all (self, parentIt):
 		"""Removes all children of a given parent TreeIter."""
@@ -351,13 +367,18 @@ class MainWindow:
 		# the menu-list
 		mainMenuDesc = [
 				( "/_File", None, None, 0, "<Branch>"),
-				( "/File/_Close", None, self.cb_destroy, 0, "")
+				( "/File/_Close", None, self.cb_destroy, 0, ""),
+				( "/_Emerge", None, None, 0, "<Branch>"),
+				( "/Emerge/_Emerge", None, self.cb_emerge_clicked, 0, ""),
+				( "/Emerge/_Unmerge", None, self.cb_emerge_clicked, 0, ""),
+				( "/_?", None, None, 0, "<Branch>"),
+				( "/?/_About", None, None, 0, "")
 				]
 		self.itemFactory = gtk.ItemFactory(gtk.MenuBar, "<main>", None)
 		self.itemFactory.create_items(mainMenuDesc)
 		return self.itemFactory.get_widget("<main>")
 
-	def cb_cat_list_selection (self, view, data = None):
+	def cb_cat_list_selection (self, view, data = None, force = False):
 		"""Callback for a category-list selection. Updates the package list with these packages in the category."""
 		if view == self.catList: # be sure it is the catList
 			# get the selected category
@@ -367,9 +388,8 @@ class MainWindow:
 			if it:
 				# remove old one
 				self.scroll_2.remove(self.pkgList)
-				
 				# create new package list
-				self.pkgList = self.create_pkg_list(store.get_value(it,0))
+				self.pkgList = self.create_pkg_list(store.get_value(it,0), force)
 				self.scroll_2.add(self.pkgList)
 				self.scroll_2.show_all()
 		return False
@@ -408,14 +428,14 @@ class MainWindow:
 		return view
 
 	packages = {} # directory category -> [packages]
-	def create_pkg_list (self, name = None):
+	def create_pkg_list (self, name = None, force = False):
 		"""Creates the package list. Gets the name of the category."""
 		self.selCatName = name # actual category
 		store = gtk.ListStore(str)
 
 		# calculate packages
 		if name:
-			if name not in self.packages: # only calc packages if not already done
+			if name not in self.packages and not force: # only calc packages if not already done
 				self.packages[name] = []
 				for p in unique_array([x.get_name() for x in geneticone.find_all_packages(name+"/")]):
 					if geneticone.find_installed_packages(name+"/"+p, masked=True) != []:
@@ -573,6 +593,9 @@ class MainWindow:
 		term = vte.Terminal()
 		term.set_scrollback_lines(1024)
 		term.set_scroll_on_output(True)
+		# XXX why is this not working with the colors
+		term.set_color_background(gtk.gdk.color_parse("white"))
+		term.set_color_foreground(gtk.gdk.color_parse("black"))
 		termBox = gtk.HBox(False, 0)
 		termScroll = gtk.VScrollbar(term.get_adjustment())
 		termBox.pack_start(term, True, True)
@@ -587,7 +610,7 @@ class MainWindow:
 		self.window.show_all()
 
 		# set emerge queue
-		self.queue = EmergeQueue(console=term, tree = emergeStore)
+		self.queue = EmergeQueue(console=term, tree = emergeStore, packages = self.packages)
 	
 	def main (self):
 		"""Main."""
