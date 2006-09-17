@@ -1,19 +1,25 @@
 #!/usr/bin/python
 
+# our backend stuff
 import geneticone
-from geneticone.modules import geneticthread
 
+# gtk stuff
 import pygtk
 pygtk.require("2.0")
 import gtk
+import gobject
 
 # for doing emerge
 from subprocess import *
+
+# threading
+from threading import Thread
 
 # for the terminal
 import pty
 import vte
 
+# other
 from portage_util import unique_array
 
 class EmergeQueue:
@@ -56,9 +62,10 @@ class EmergeQueue:
 			if self.unmergeIt: # update tree
 				self.tree.append(self.unmergeIt, [sth])
 	
-	def __emerge(self):
-		self.process.wait()
-		for p in self.ps:
+	def update_packages(self, process, packages):
+		"""This updates the packages-list. It simply removes all affected categories so they have to be rebuilt."""
+		process.wait()
+		for p in packages:
 			try:
 				cat = geneticone.split_package_name(p)[0]
 				while cat[0] in ["=",">","<","!"]:
@@ -73,9 +80,8 @@ class EmergeQueue:
 		"""Calls emerge and updates the terminal."""
 		(master, slave) = pty.openpty()
 		self.console.set_pty(master)
-		self.process = Popen(["/usr/bin/python","/usr/bin/emerge"]+options+packages, stdout = slave, stderr = STDOUT, shell = False)
-		self.ps = packages
-		geneticthread.thread_start(self.__emerge)
+		process = Popen(["/usr/bin/python","/usr/bin/emerge"]+options+packages, stdout = slave, stderr = STDOUT, shell = False)
+		Thread(target=self.update_packages, args=(process, packages).start()
 		self.remove_all(it)
 
 	def emerge (self, force = False):
@@ -94,7 +100,6 @@ class EmergeQueue:
 		"""Unmerges everything in the umerge-queue. If force is 'False' (default) only "emerge -pv -C" is called."""
 		if len(self.unmergequeue) == 0: return
 
-		#list = " ".join(self.unmergequeue)
 		list = self.unmergequeue[:]
 		s = ["-C"]
 		if not force: s = ["-Cpv"]
@@ -614,6 +619,7 @@ class MainWindow:
 	
 	def main (self):
 		"""Main."""
+		gobject.threads_init()
 		gtk.main()
 
 def blocked_dialog (blocked, blocks):

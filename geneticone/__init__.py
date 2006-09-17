@@ -18,4 +18,3 @@ vartree = gentoolkit.vartree
 # import our packages
 from helper import *
 from package import *
-import modules

@@ -2,12 +2,12 @@
 
 from distutils.core import setup, Extension
 
-thread = Extension("geneticone.modules.geneticthread", sources=["geneticone/modules/geneticthread.c"])
+#thread = Extension("geneticone.modules.geneticthread", sources=["geneticone/modules/geneticthread.c"])
 
 setup(name="Genetic/One",
-		version="0.1-alpha",
+		version="SVN",
 		author="Necoro d.M. et.al.",
 		author_email="geneticone@projects.necoro.net",
-		packages=["geneticone", "geneticone.gui", "geneticone.modules"],
-		ext_modules=[thread]
+		packages=["geneticone", "geneticone.gui"],
+		#ext_modules=[thread]
 		)
