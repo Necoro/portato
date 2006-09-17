@@ -81,7 +81,7 @@ class EmergeQueue:
 		(master, slave) = pty.openpty()
 		self.console.set_pty(master)
 		process = Popen(["/usr/bin/python","/usr/bin/emerge"]+options+packages, stdout = slave, stderr = STDOUT, shell = False)
-		Thread(target=self.update_packages, args=(process, packages).start()
+		Thread(target=self.update_packages, args=(process, packages)).start()
 		self.remove_all(it)
 
 	def emerge (self, force = False):
@@ -619,7 +619,9 @@ class MainWindow:
 	
 	def main (self):
 		"""Main."""
-		gobject.threads_init()
+		gobject.threads_init() 
+		# now subthreads can run normally, but are not allowed to touch the GUI. If threads should change sth there - use gobject.idle_add().
+		# for more informations on threading and gtk: http://www.async.com.br/faq/pygtk/index.py?req=show&file=faq20.006.htp
 		gtk.main()
 
 def blocked_dialog (blocked, blocks):
