@@ -13,6 +13,7 @@
 
 # our backend stuff
 import geneticone
+from geneticone import flags
 
 # gtk stuff
 import pygtk
@@ -214,11 +215,16 @@ class PackageWindow:
 		self.table.attach(buttonHB, 0, 2, 3, 4)
 		
 		self.emergeBtn = gtk.Button("_Emerge")
-		if not self.queue: self.emergeBtn.set_sensitive(False)
+		self.unmergeBtn = gtk.Button("_Unmerge")
+		if not self.queue: 
+			self.emergeBtn.set_sensitive(False)
+			self.unmergeBtn.set_sensitive(False)
 		self.cancelBtn = gtk.Button("_Cancel")
 		self.cancelBtn.connect("clicked", lambda x: self.window.destroy())
 		self.emergeBtn.connect("clicked", self.cb_emerge_clicked)
+		self.unmergeBtn.connect("clicked", self.cb_unmerge_clicked)
 		buttonHB.pack_start(self.emergeBtn)
+		buttonHB.pack_start(self.unmergeBtn)
 		buttonHB.pack_start(self.cancelBtn)
 
 		# current status
@@ -243,8 +249,10 @@ class PackageWindow:
 		# set emerge-button-label
 		if not self.actual_package().is_installed():
 			self.emergeBtn.set_label("_Emerge")
+			self.unmergeBtn.set_sensitive(False)
 		else:
-			self.emergeBtn.set_label("_Unmerge")
+			self.emergeBtn.set_label("R_emerge")
+			self.unmergeBtn.set_sensitive(True)
 		
 		# refresh - make window as small as possible
 		self.table.show_all()
@@ -283,7 +291,10 @@ class PackageWindow:
 
 	def cb_button_pressed (self, b, event, data = None):
 		"""Callback for pressed checkboxes. Just quits the event-loop - no redrawing."""
-		b.emit_stop_by_name("button-press-event")
+		print b
+		if not isinstance(b, gtk.CellRendererToggle):
+			b.emit_stop_by_name("button-press-event")
+			print "hallo"
 		return True
 
 	def cb_emerge_clicked (self, button, data = None):
@@ -293,9 +304,24 @@ class PackageWindow:
 			errorMB.run()
 			errorMB.destroy()
 		else:
-			unmerge = self.actual_package().is_installed()
-			self.queue.append(self.actual_package().get_cpv(), unmerge)
+			self.queue.append(self.actual_package().get_cpv(), False)
 			self.window.destroy()
+		return True
+
+	def cb_unmerge_clicked (self, button, data = None):
+		"""Adds the package to the UnmergeQueue."""
+		if not geneticone.am_i_root():
+			errorMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "You cannot (un)merge without being root.")
+			errorMB.run()
+			errorMB.destroy()
+		else:
+			self.queue.append(self.actual_package().get_cpv(), True)
+			self.window.destroy()
+		return True
+
+	def cb_use_flag_toggled (self, cell, path, store, data = None):
+		store[path][0] = not store[path][0]
+		flags.set_use_flag(self.actual_package, store[path][1])
 		return True
 
 	def update_checkboxes (self):
@@ -322,6 +348,8 @@ class PackageWindow:
 		view = gtk.TreeView(store)
 		cell = gtk.CellRendererText()
 		tCell = gtk.CellRendererToggle()
+		tCell.set_property("activatable", True)
+		tCell.connect("toggled", self.cb_use_flag_toggled, store)
 		view.append_column(gtk.TreeViewColumn("Enabled", tCell, active = 0))
 		view.append_column(gtk.TreeViewColumn("Flags", cell, text = 1))
 		view.append_column(gtk.TreeViewColumn("Description", cell, text = 2))
