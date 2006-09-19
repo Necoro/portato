@@ -16,6 +16,7 @@ import os.path
 from subprocess import Popen, PIPE
 
 from geneticone import *
+from portage_util import unique_array
 
 ### GENERAL PART ###
 
@@ -49,17 +50,26 @@ def get_data(pkg):
 	return flags
 
 ### USE FLAG PART ###
-USE_PATH = os.path.join(portage.USER_CONFIG_PATH,"package.use.go")
+USE_PATH = os.path.join(portage.USER_CONFIG_PATH,"package.use")
 USE_PATH_IS_DIR = os.path.isdir(USE_PATH)
 useFlags = {} # useFlags in the file
 newUseFlags = [] # useFlags as we want them to be: format: (cpv, file, line, useflag, (true if removed from list / false if added))
 
 def set_use_flag (pkg, flag):
 	"""Sets the useflag for a given package."""
+	global useFlags, newUseFlags
+
+	def invert_flag (_flag):
+		if _flag[0] == "-":
+			return _flag[1:]
+		else:
+			return "-"+_flag
+
 	if not isinstance(pkg, Package):
 		pkg = Package(pkg) # assume cpv or gentoolkit.Package
 
 	cpv = pkg.get_cpv()
+	invFlag = invert_flag(flag)
 	
 	# if not saved in useFlags, get it by calling get_data() which calls grep()
 	data = None
@@ -69,32 +79,48 @@ def set_use_flag (pkg, flag):
 	else:
 		data = useFlags[cpv]
 
+	print "data: "+str(data)
 	# add a useflag / delete one
 	added = False
 	for file, line, crit, flags in data:
 		if pkg.matches(crit):
-			# we have "-flag" and "flag" is in the uselist -> delete "flag"
-			if flag[0] == "-" and flag[1:] in flags:
+			
+			# we have the inverted flag in the uselist/newuselist --> delete it
+			if finvFlag in flags or (cpv, file, line, invFlag, False) in newUseFlags or (cpv, file, line, flag, True) in newUseFlags:
 				if added: del newUseFlags[-1] # we currently added it as an extra option - delete it
 				added = True
-				newUseFlags.append((pkg.get_cpv(), file, line, flag[1:], True))
+				jumpOut = False
+				for t in [(cpv, file, line, invFlag, False),(cpv, file, line, flag, True)]:
+					if t in newUseFlags:
+						newUseFlags.remove(t)
+						jumpOut = True
+						break
+				if not jumpOut:	newUseFlags.append((cpv, file, line, invFlag, True))
 				break
-			# we have "flag" and "-flag" is in the uselist -> delete "-flag"
-			elif flag[0] != "-" and "-"+flag in flags:
-				if added: del newUseFlags[-1] # we currently added it as an extra option - delete it
-				added = True
-				newUseFlags.append((pkg.get_cpv(), file, line, "-"+flag, True))
+			
+			# we want to duplicate the flag --> ignore
+			elif flag in flags:
+				added = True # emulate adding
 				break
+
 			# add as an extra flag
 			else:
-				if not added: newUseFlags.append((pkg.get_cpv(), file, line, flag, False))
+				if not added: newUseFlags.append((cpv, file, line, flag, False))
 				added = True
+	
 	# create a new line
 	if not added:
+		path = USE_PATH
 		if USE_PATH_IS_DIR:
-			newUseFlags.append((pkg.get_cpv(), os.path.join(USE_PATH,"geneticone"), -1, flag, False))
-		else:
-			newUseFlags.append((pkg.get_cpv(), USE_PATH, -1, flag, False))
+			path = os.path.join(USE_PATH,"geneticone")
+		
+		try:
+			newUseFlags.remove((cpv, path, -1, invFlag, False))
+		except ValueError: # not in UseFlags
+			newUseFlags.append((cpv, path, -1, flag, False))
+
+	newUseFlags = unique_array(newUseFlags)
+	print "newUseFlags: "+str(newUseFlags)
 
 def write_use_flags ():
 	"""This writes our changed useflags into the file."""
