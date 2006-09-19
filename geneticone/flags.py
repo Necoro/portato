@@ -86,7 +86,7 @@ def set_use_flag (pkg, flag):
 		if pkg.matches(crit):
 			
 			# we have the inverted flag in the uselist/newuselist --> delete it
-			if finvFlag in flags or (cpv, file, line, invFlag, False) in newUseFlags or (cpv, file, line, flag, True) in newUseFlags:
+			if invFlag in flags or (cpv, file, line, invFlag, False) in newUseFlags or (cpv, file, line, flag, True) in newUseFlags:
 				if added: del newUseFlags[-1] # we currently added it as an extra option - delete it
 				added = True
 				jumpOut = False

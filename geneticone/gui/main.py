@@ -321,7 +321,10 @@ class PackageWindow:
 
 	def cb_use_flag_toggled (self, cell, path, store, data = None):
 		store[path][0] = not store[path][0]
-		flags.set_use_flag(self.actual_package, store[path][1])
+		prefix = ""
+		if not store[path][0]:
+			prefix = "-"
+		flags.set_use_flag(self.actual_package(), prefix+store[path][1])
 		return True
 
 	def update_checkboxes (self):
