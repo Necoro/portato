@@ -1,5 +1,16 @@
 #!/usr/bin/python
 
+#
+# File: geneticone/package.py
+# This file is part of the Genetic/One-Project, a graphical portage-frontend.
+#
+# Copyright (C) 2006 Necoro d.M.
+# This is free software.  You may redistribute copies of it under the terms of
+# the GNU General Public License version 2.
+# There is NO WARRANTY, to the extent permitted by law.
+#
+# Written by Necoro d.M. <necoro@necoro.net>
+
 from geneticone import *
 
 import gentoolkit
@@ -10,6 +21,8 @@ class Package (gentoolkit.Package):
 	"""This is just a subclass of the Package-class of gentoolkit."""
 
 	def __init__ (self, cpv):
+		if isinstance(cpv, gentoolkit.Package):
+			cpv = cpv.get_cpv()
 		gentoolkit.Package.__init__(self, cpv)
 	
 	def get_mask_status(self):
@@ -153,6 +166,13 @@ class Package (gentoolkit.Package):
 		if "profile" in status or "package.mask" in status:
 			return True
 		return False
+
+	def matches (self, criterion):
+		"""This checks, whether this package matches a specific verisioning criterion - e.g.: "<=net-im/foobar-1.2"."""
+		if portage.match_from_list(criterion, [self.get_cpv()]) == []:
+			return False
+		else:
+			return True
 
 	def _parse_deps(self,deps,curuse=[],level=0):
 		"""Modified method "_parse_deps" of gentoolkit.Package.

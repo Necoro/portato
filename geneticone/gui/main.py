@@ -1,5 +1,16 @@
 #!/usr/bin/python
 
+#
+# File: geneticone/gui/main.py
+# This file is part of the Genetic/One-Project, a graphical portage-frontend.
+#
+# Copyright (C) 2006 Necoro d.M.
+# This is free software.  You may redistribute copies of it under the terms of
+# the GNU General Public License version 2.
+# There is NO WARRANTY, to the extent permitted by law.
+#
+# Written by Necoro d.M. <necoro@necoro.net>
+
 # our backend stuff
 import geneticone
 
@@ -127,6 +138,95 @@ class EmergeQueue:
 class PackageWindow:
 	"""A window with data about a specfic package."""
 
+	def __init__ (self, parent, cp, queue = None, version = None):
+		"""Build up window contents."""
+		self.parent = parent # parent window
+		self.cp = cp # category/package
+		self.version = version # version - if not None this is used
+		self.queue = queue
+		
+		# window
+		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		self.window.set_title(cp)
+		self.window.set_modal(True)
+		self.window.set_transient_for(parent)
+		self.window.set_destroy_with_parent(True)
+		self.window.set_resizable(False)
+		self.window.set_default_size(1,1) # as small as possible
+		self.window.connect("delete-event", lambda a,b: False)
+		#self.window.connect("configure-event", self.cbSizeCheck)
+		
+		# packages and installed packages
+		self.packages = geneticone.sort_package_list(geneticone.find_packages(cp, masked=True))
+		self.instPackages = geneticone.sort_package_list(geneticone.find_installed_packages(cp, masked=True))
+
+		# main structure - the table
+		self.table = gtk.Table(rows=4,columns=2)
+		self.window.add(self.table)
+
+		# version-combo-box
+		self.vCombo = self.build_vers_combo()
+		self.table.attach(self.vCombo, 0, 1, 1, 2, yoptions = gtk.FILL)
+
+		# the label (must be here, because it depends on the combo box)
+		desc = self.actual_package().get_env_var("DESCRIPTION")
+		use_markup = True
+		if not desc: 
+			desc = "<no description>"
+			use_markup = False
+		else:
+			desc = "<b>"+desc+"</b>"
+		self.descLabel = gtk.Label(desc)
+		self.descLabel.set_line_wrap(True)
+		self.descLabel.set_justify(gtk.JUSTIFY_CENTER)
+		self.descLabel.set_use_markup(use_markup)
+		self.table.attach(self.descLabel, 0, 2, 0, 1, xoptions = gtk.FILL, ypadding = 10)
+
+		# the check boxes
+		checkHB = gtk.HBox (True, 1)
+		self.table.attach(checkHB, 1, 2, 1, 2, yoptions = gtk.FILL)
+
+		self.installedCheck = gtk.CheckButton()
+		self.installedCheck.connect("button-press-event", self.cb_button_pressed)
+		self.installedCheck.set_label("Installed")		
+		checkHB.pack_start(self.installedCheck, True, False)
+
+		self.maskedCheck = gtk.CheckButton()
+		self.maskedCheck.connect("button-press-event", self.cb_button_pressed)
+		self.maskedCheck.set_label("Masked")		
+		checkHB.pack_start(self.maskedCheck, True, False)
+
+		self.testingCheck = gtk.CheckButton()
+		self.testingCheck.connect("button-press-event", self.cb_button_pressed)
+		self.testingCheck.set_label("Testing")
+		checkHB.pack_start(self.testingCheck, True, False)
+
+		# use list
+		self.useList = self.build_use_list()
+		self.useListScroll = gtk.ScrolledWindow()
+		self.useListScroll.add(self.useList)
+		self.useListScroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER) # XXX: make this work correctly
+		self.table.attach(self.useListScroll, 0, 2, 2, 3, ypadding = 10)
+		
+		# buttons
+		buttonHB = gtk.HButtonBox()
+		buttonHB.set_layout(gtk.BUTTONBOX_SPREAD)
+		self.table.attach(buttonHB, 0, 2, 3, 4)
+		
+		self.emergeBtn = gtk.Button("_Emerge")
+		if not self.queue: self.emergeBtn.set_sensitive(False)
+		self.cancelBtn = gtk.Button("_Cancel")
+		self.cancelBtn.connect("clicked", lambda x: self.window.destroy())
+		self.emergeBtn.connect("clicked", self.cb_emerge_clicked)
+		buttonHB.pack_start(self.emergeBtn)
+		buttonHB.pack_start(self.cancelBtn)
+
+		# current status
+		self.cb_changed(self.vCombo)
+
+		# show
+		self.window.show_all()
+
 	def cb_changed (self, combo, data = None):
 		"""Callback for the changed ComboBox.
 		It then rebuilds the useList and the checkboxes."""
@@ -232,100 +332,8 @@ class PackageWindow:
 			view.set_child_visible(True)
 		return view
 
-	def __init__ (self, parent, cp, queue = None, version = None):
-		"""Build up window contents."""
-		self.parent = parent # parent window
-		self.cp = cp # category/package
-		self.version = version # version - if not None this is used
-		self.queue = queue
-		
-		# window
-		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.window.set_title(cp)
-		self.window.set_modal(True)
-		self.window.set_transient_for(parent)
-		self.window.set_destroy_with_parent(True)
-		self.window.set_resizable(False)
-		self.window.set_default_size(1,1) # as small as possible
-		self.window.connect("delete-event", lambda a,b: False)
-		#self.window.connect("configure-event", self.cbSizeCheck)
-		
-		# packages and installed packages
-		self.packages = geneticone.sort_package_list(geneticone.find_packages(cp, masked=True))
-		self.instPackages = geneticone.sort_package_list(geneticone.find_installed_packages(cp, masked=True))
-
-		# main structure - the table
-		self.table = gtk.Table(rows=4,columns=2)
-		self.window.add(self.table)
-
-		# version-combo-box
-		self.vCombo = self.build_vers_combo()
-		self.table.attach(self.vCombo, 0, 1, 1, 2, yoptions = gtk.FILL)
-
-		# the label (must be here, because it depends on the combo box)
-		desc = self.actual_package().get_env_var("DESCRIPTION")
-		use_markup = True
-		if not desc: 
-			desc = "<no description>"
-			use_markup = False
-		else:
-			desc = "<b>"+desc+"</b>"
-		self.descLabel = gtk.Label(desc)
-		self.descLabel.set_line_wrap(True)
-		self.descLabel.set_justify(gtk.JUSTIFY_CENTER)
-		self.descLabel.set_use_markup(use_markup)
-		self.table.attach(self.descLabel, 0, 2, 0, 1, xoptions = gtk.FILL, ypadding = 10)
-
-		# the check boxes
-		checkHB = gtk.HBox (True, 1)
-		self.table.attach(checkHB, 1, 2, 1, 2, yoptions = gtk.FILL)
-
-		self.installedCheck = gtk.CheckButton()
-		self.installedCheck.connect("button-press-event", self.cb_button_pressed)
-		self.installedCheck.set_label("Installed")		
-		checkHB.pack_start(self.installedCheck, True, False)
-
-		self.maskedCheck = gtk.CheckButton()
-		self.maskedCheck.connect("button-press-event", self.cb_button_pressed)
-		self.maskedCheck.set_label("Masked")		
-		checkHB.pack_start(self.maskedCheck, True, False)
-
-		self.testingCheck = gtk.CheckButton()
-		self.testingCheck.connect("button-press-event", self.cb_button_pressed)
-		self.testingCheck.set_label("Testing")
-		checkHB.pack_start(self.testingCheck, True, False)
-
-		# use list
-		self.useList = self.build_use_list()
-		self.useListScroll = gtk.ScrolledWindow()
-		self.useListScroll.add(self.useList)
-		self.useListScroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER) # XXX: make this work correctly
-		self.table.attach(self.useListScroll, 0, 2, 2, 3, ypadding = 10)
-		
-		# buttons
-		buttonHB = gtk.HButtonBox()
-		buttonHB.set_layout(gtk.BUTTONBOX_SPREAD)
-		self.table.attach(buttonHB, 0, 2, 3, 4)
-		
-		self.emergeBtn = gtk.Button("_Emerge")
-		if not self.queue: self.emergeBtn.set_sensitive(False)
-		self.cancelBtn = gtk.Button("_Cancel")
-		self.cancelBtn.connect("clicked", lambda x: self.window.destroy())
-		self.emergeBtn.connect("clicked", self.cb_emerge_clicked)
-		buttonHB.pack_start(self.emergeBtn)
-		buttonHB.pack_start(self.cancelBtn)
-
-		# current status
-		self.cb_changed(self.vCombo)
-
-		# show
-		self.window.show_all()
-
 class SearchWindow:
 	"""A window showing the results of a search process."""
-	def cb_ok_btn_clicked (self, button, data = None):
-		self.window.destroy()
-		self.jump_to(self.list[self.combo.get_active()])
 	
 	def __init__ (self, parent, list, jump_to):
 		# window
@@ -355,10 +363,122 @@ class SearchWindow:
 
 		self.window.show_all()
 
+	def cb_ok_btn_clicked (self, button, data = None):
+		self.window.destroy()
+		self.jump_to(self.list[self.combo.get_active()])
 
 class MainWindow:
 	"""Application main window."""
 	
+	def __init__ (self):
+		"""Build up window"""
+
+		# window
+		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		self.window.set_title("Genetic/One")
+		self.window.connect("delete_event", self.cb_delete)
+		self.window.connect("destroy", self.cb_destroy)
+		self.window.set_border_width(2)
+		self.window.set_geometry_hints (self.window, min_width = 600, min_height = 800, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
+		self.window.set_resizable(True)
+
+		# main vb
+		vb = gtk.VBox(False, 1)
+		self.window.add(vb)
+
+		# menubar
+		menubar = self.create_main_menu()
+		vb.pack_start(menubar, False)
+		
+		# search
+		self.searchEntry = gtk.Entry()
+		self.searchBtn = gtk.Button("_Search")
+		self.searchBtn.connect("clicked", self.cb_search_clicked)
+		hbSearch = gtk.HBox(False, 5)
+		hbSearch.pack_start(self.searchEntry, True, True)
+		hbSearch.pack_start(self.searchBtn, False, False)
+		vb.pack_start(hbSearch, False, False, 5)
+
+		# VPaned holding the lists and the Terminal
+		vpaned = gtk.VPaned()
+		vpaned.set_position(400)
+		vb.pack_start(vpaned, True, True)
+
+		# a HB holding the lists
+		hb = gtk.HBox(True, 5)
+		hbFrame = gtk.Frame()
+		hbFrame.add(hb)
+		hbFrame.set_shadow_type(gtk.SHADOW_IN)
+		vpaned.pack1(hbFrame, shrink = True, resize = True)
+		
+		self.scroll_1 = gtk.ScrolledWindow()
+		self.scroll_2 = gtk.ScrolledWindow()
+		self.scroll_1.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+		self.scroll_2.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+		hb.pack_start(self.scroll_1, True, True)
+		hb.pack_start(self.scroll_2, True, True)
+		
+		# create cat List
+		self.catList = self.create_cat_list()
+		self.scroll_1.add(self.catList)
+		
+		# create pkg list
+		self.pkgList = self.create_pkg_list()
+		self.scroll_2.add(self.pkgList)
+		# queue list
+		queueVB = gtk.VBox(False, 0)
+		hb.pack_start(queueVB, True, True)
+		
+		emergeStore = gtk.TreeStore(str)
+		self.emergeView = gtk.TreeView(emergeStore)
+		cell = gtk.CellRendererText()
+		col = gtk.TreeViewColumn("Queue", cell, text = 0)
+		self.emergeView.append_column(col)
+		self.emergeView.connect("row-activated", self.cb_row_activated, emergeStore)
+		queueVB.pack_start(self.emergeView, True, True)
+
+		# buttons right unter the queue list
+		buttonBox = gtk.HButtonBox()
+		queueVB.pack_start(buttonBox, False)
+		self.emergeBtn = gtk.Button("_Emerge")
+		self.emergeBtn.connect("clicked", self.cb_emerge_clicked)
+		self.unmergeBtn = gtk.Button("_Unmerge")
+		self.unmergeBtn.connect("clicked", self.cb_emerge_clicked)
+		self.removeBtn = gtk.Button("_Remove")
+		self.removeBtn.connect("clicked", self.cb_remove_clicked)
+		buttonBox.pack_start(self.emergeBtn)
+		buttonBox.pack_start(self.removeBtn)
+		buttonBox.pack_start(self.unmergeBtn)
+		
+		# the terminal
+		term = vte.Terminal()
+		term.set_scrollback_lines(1024)
+		term.set_scroll_on_output(True)
+		# XXX why is this not working with the colors
+		term.set_color_background(gtk.gdk.color_parse("white"))
+		term.set_color_foreground(gtk.gdk.color_parse("black"))
+		termBox = gtk.HBox(False, 0)
+		termScroll = gtk.VScrollbar(term.get_adjustment())
+		termBox.pack_start(term, True, True)
+		termBox.pack_start(termScroll, False)
+		
+		termFrame = gtk.Frame("Console")
+		termFrame.set_shadow_type(gtk.SHADOW_IN)
+		termFrame.add(termBox)
+		vpaned.pack2(termFrame, shrink = True, resize = True)
+
+		# the status line
+		self.statusLabel = gtk.Label("Genetic/One")
+		self.statusLabel.set_alignment(0.0,0.7)
+		self.statusLabel.set_single_line_mode(True)
+		vb.pack_start(self.statusLabel, False, False)
+
+		# show
+		self.window.show_all()
+
+		# set emerge queue
+		self.queue = EmergeQueue(console=term, tree = emergeStore, packages = self.packages)
+
 	def cb_delete (self, widget, data = None):
 		"""Returns false -> window is deleted."""
 		return False
@@ -514,109 +634,6 @@ class MainWindow:
 		"""Is called when we want to jump to a specific package."""
 		PackageWindow(self.window, cp, self.queue)
 
-	def __init__ (self):
-		"""Build up window"""
-
-		# window
-		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.window.set_title("Genetic/One")
-		self.window.connect("delete_event", self.cb_delete)
-		self.window.connect("destroy", self.cb_destroy)
-		self.window.set_border_width(2)
-		self.window.set_geometry_hints (self.window, min_width = 600, min_height = 800, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
-		self.window.set_resizable(True)
-
-		# main vb
-		vb = gtk.VBox(False, 1)
-		self.window.add(vb)
-
-		# menubar
-		menubar = self.create_main_menu()
-		vb.pack_start(menubar, False)
-		
-		# search
-		self.searchEntry = gtk.Entry()
-		self.searchBtn = gtk.Button("_Search")
-		self.searchBtn.connect("clicked", self.cb_search_clicked)
-		hbSearch = gtk.HBox(False, 5)
-		hbSearch.pack_start(self.searchEntry, True, True)
-		hbSearch.pack_start(self.searchBtn, False, False)
-		vb.pack_start(hbSearch, False, False, 5)
-
-		# VPaned holding the lists and the Terminal
-		vpaned = gtk.VPaned()
-		vpaned.set_position(400)
-		vb.pack_start(vpaned, True, True)
-
-		# a HB holding the lists
-		hb = gtk.HBox(True, 5)
-		hbFrame = gtk.Frame()
-		hbFrame.add(hb)
-		hbFrame.set_shadow_type(gtk.SHADOW_IN)
-		vpaned.pack1(hbFrame, shrink = True, resize = True)
-		
-		self.scroll_1 = gtk.ScrolledWindow()
-		self.scroll_2 = gtk.ScrolledWindow()
-		self.scroll_1.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-		self.scroll_2.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-		hb.pack_start(self.scroll_1, True, True)
-		hb.pack_start(self.scroll_2, True, True)
-		
-		# create cat List
-		self.catList = self.create_cat_list()
-		self.scroll_1.add(self.catList)
-		
-		# create pkg list
-		self.pkgList = self.create_pkg_list()
-		self.scroll_2.add(self.pkgList)
-		# queue list
-		queueVB = gtk.VBox(False, 0)
-		hb.pack_start(queueVB, True, True)
-		
-		emergeStore = gtk.TreeStore(str)
-		self.emergeView = gtk.TreeView(emergeStore)
-		cell = gtk.CellRendererText()
-		col = gtk.TreeViewColumn("Queue", cell, text = 0)
-		self.emergeView.append_column(col)
-		self.emergeView.connect("row-activated", self.cb_row_activated, emergeStore)
-		queueVB.pack_start(self.emergeView, True, True)
-
-		# buttons right unter the queue list
-		buttonBox = gtk.HButtonBox()
-		queueVB.pack_start(buttonBox, False)
-		self.emergeBtn = gtk.Button("_Emerge")
-		self.emergeBtn.connect("clicked", self.cb_emerge_clicked)
-		self.unmergeBtn = gtk.Button("_Unmerge")
-		self.unmergeBtn.connect("clicked", self.cb_emerge_clicked)
-		self.removeBtn = gtk.Button("_Remove")
-		self.removeBtn.connect("clicked", self.cb_remove_clicked)
-		buttonBox.pack_start(self.emergeBtn)
-		buttonBox.pack_start(self.removeBtn)
-		buttonBox.pack_start(self.unmergeBtn)
-		
-		# the terminal
-		term = vte.Terminal()
-		term.set_scrollback_lines(1024)
-		term.set_scroll_on_output(True)
-		# XXX why is this not working with the colors
-		term.set_color_background(gtk.gdk.color_parse("white"))
-		term.set_color_foreground(gtk.gdk.color_parse("black"))
-		termBox = gtk.HBox(False, 0)
-		termScroll = gtk.VScrollbar(term.get_adjustment())
-		termBox.pack_start(term, True, True)
-		termBox.pack_start(termScroll, False)
-		
-		termFrame = gtk.Frame("Console")
-		termFrame.set_shadow_type(gtk.SHADOW_IN)
-		termFrame.add(termBox)
-		vpaned.pack2(termFrame, shrink = True, resize = True)
-
-		# show
-		self.window.show_all()
-
-		# set emerge queue
-		self.queue = EmergeQueue(console=term, tree = emergeStore, packages = self.packages)
-	
 	def main (self):
 		"""Main."""
 		gobject.threads_init() 
