@@ -53,17 +53,17 @@ def get_data(pkg):
 USE_PATH = os.path.join(portage.USER_CONFIG_PATH,"package.use")
 USE_PATH_IS_DIR = os.path.isdir(USE_PATH)
 useFlags = {} # useFlags in the file
-newUseFlags = [] # useFlags as we want them to be: format: (cpv, file, line, useflag, (true if removed from list / false if added))
+newUseFlags = {} # useFlags as we want them to be: format: cpv -> [(file, line, useflag, (true if removed from list / false if added))]
+
+def invert_flag (_flag):
+	if _flag[0] == "-":
+		return _flag[1:]
+	else:
+		return "-"+_flag
 
 def set_use_flag (pkg, flag):
 	"""Sets the useflag for a given package."""
 	global useFlags, newUseFlags
-
-	def invert_flag (_flag):
-		if _flag[0] == "-":
-			return _flag[1:]
-		else:
-			return "-"+_flag
 
 	if not isinstance(pkg, Package):
 		pkg = Package(pkg) # assume cpv or gentoolkit.Package
@@ -79,23 +79,25 @@ def set_use_flag (pkg, flag):
 	else:
 		data = useFlags[cpv]
 
+	if not cpv in newUseFlags:
+		newUseFlags[cpv] = []
+
 	print "data: "+str(data)
 	# add a useflag / delete one
 	added = False
 	for file, line, crit, flags in data:
 		if pkg.matches(crit):
-			
 			# we have the inverted flag in the uselist/newuselist --> delete it
-			if invFlag in flags or (cpv, file, line, invFlag, False) in newUseFlags or (cpv, file, line, flag, True) in newUseFlags:
+			if invFlag in flags or (file, line, invFlag, False) in newUseFlags[cpv] or (file, line, flag, True) in newUseFlags[cpv]:
 				if added: del newUseFlags[-1] # we currently added it as an extra option - delete it
 				added = True
 				jumpOut = False
-				for t in [(cpv, file, line, invFlag, False),(cpv, file, line, flag, True)]:
-					if t in newUseFlags:
-						newUseFlags.remove(t)
+				for t in [(file, line, invFlag, False),(file, line, flag, True)]:
+					if t in newUseFlags[cpv]:
+						newUseFlags[cpv].remove(t)
 						jumpOut = True
 						break
-				if not jumpOut:	newUseFlags.append((cpv, file, line, invFlag, True))
+				if not jumpOut:	newUseFlags[cpv].append((file, line, invFlag, True))
 				break
 			
 			# we want to duplicate the flag --> ignore
@@ -105,7 +107,7 @@ def set_use_flag (pkg, flag):
 
 			# add as an extra flag
 			else:
-				if not added: newUseFlags.append((cpv, file, line, flag, False))
+				if not added: newUseFlags[cpv].append((file, line, flag, False))
 				added = True
 	
 	# create a new line
@@ -115,12 +117,37 @@ def set_use_flag (pkg, flag):
 			path = os.path.join(USE_PATH,"geneticone")
 		
 		try:
-			newUseFlags.remove((cpv, path, -1, invFlag, False))
+			newUseFlags[cpv].remove((path, -1, invFlag, False))
 		except ValueError: # not in UseFlags
-			newUseFlags.append((cpv, path, -1, flag, False))
+			newUseFlags[cpv].append((path, -1, flag, False))
 
-	newUseFlags = unique_array(newUseFlags)
+	newUseFlags[cpv] = unique_array(newUseFlags[cpv])
 	print "newUseFlags: "+str(newUseFlags)
+
+def remove_new_flags (cpv):
+	if isinstance(cpv, Package):
+		cpv = cpv.get_cpv()
+	
+	try:
+		del newUseFlags[cpv]
+	except KeyError:
+		pass
+
+def get_new_flags (cpv):
+	if isinstance(cpv, Package):
+		cpv = cpv.get_cpv()
+
+	list2return = []
+	try:
+		for file, line, flag, remove in newUseFlags[cpv]:
+			if remove:
+				list2return.append(invert_flag(flag))
+			else:
+				list2return.append(flag)
+	except KeyError:
+		pass
+
+	return list2return
 
 def write_use_flags ():
 	"""This writes our changed useflags into the file."""
@@ -144,48 +171,49 @@ def write_use_flags ():
 			insert("#removed by geneticone#",list)
 
 	file_cache = {} # cache for having to read the file only once: name->[lines]
-	for cpv, file, line, flag, delete in newUseFlags:
-		line = int(line) # it is saved as a string so far!
-		
-		# add new line
-		if line == -1:
-			msg = "\n#geneticone update#\n=%s %s" % (cpv, flag)
-			if not file in file_cache:
-				f = open(file, "a")
-				f.write(msg)
-				f.close()
+	for cpv in newUseFlags:
+		for file, line, flag, delete in newUseFlags[cpv]:
+			line = int(line) # it is saved as a string so far!
+			
+			# add new line
+			if line == -1:
+				msg = "\n#geneticone update#\n=%s %s\n" % (cpv, flag)
+				if not file in file_cache:
+					f = open(file, "a")
+					f.write(msg)
+					f.close()
+				else:
+					file_cache[file].append(msg)
+			# change a line
 			else:
-				file_cache[file].append(msg)
-		# change a line
-		else:
-			if not file in file_cache:
-				# read file
-				f = open(file, "r")
-				lines = []
-				i = 1
-				while i < line: # stop at the given line
-					lines.append(f.readline())
-					i = i+1
-				l = f.readline().split(" ")
-				# delete or insert
-				if delete:
-					remove(flag,l)
-				else:
-					insert(flag,l)
-				lines.append(" ".join(l))
-				
-				# read the rest
-				lines.extend(f.readlines())
-				
-				file_cache[file] = lines
-				f.close()
-			else: # in cache
-				l = file_cache[file][line-1].split(" ")
-				if delete:
-					remove(flag,l)
-				else:
-					insert(flag,l)
-				file_cache[file][line-1] = " ".join(l)
+				if not file in file_cache:
+					# read file
+					f = open(file, "r")
+					lines = []
+					i = 1
+					while i < line: # stop at the given line
+						lines.append(f.readline())
+						i = i+1
+					l = f.readline().split(" ")
+					# delete or insert
+					if delete:
+						remove(flag,l)
+					else:
+						insert(flag,l)
+					lines.append(" ".join(l))
+					
+					# read the rest
+					lines.extend(f.readlines())
+					
+					file_cache[file] = lines
+					f.close()
+				else: # in cache
+					l = file_cache[file][line-1].split(" ")
+					if delete:
+						remove(flag,l)
+					else:
+						insert(flag,l)
+					file_cache[file][line-1] = " ".join(l)
 	
 	# write to disk
 	for file in file_cache.keys():
@@ -194,4 +222,4 @@ def write_use_flags ():
 		f.close()
 	# reset
 	useFlags = {}
-	newUseFlags = []
+	newUseFlags = {}

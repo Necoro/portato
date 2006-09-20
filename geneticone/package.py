@@ -50,7 +50,7 @@ class Package (gentoolkit.Package):
 
 	def get_all_useflags (self):
 		"""Returns a list of _all_ useflags for this package."""
-		return self.get_env_var("IUSE").split()
+		return unique_array(self.get_env_var("IUSE").split())
 
 	def get_all_deps (self):
 		"""Returns a linearised list of all first-level dependencies for this package, on

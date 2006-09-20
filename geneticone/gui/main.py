@@ -129,22 +129,25 @@ class EmergeQueue:
 	def remove (self, it):
 		"""Removes a specific item in the tree."""
 		if self.tree.iter_parent(it): # NEVER remove our top stuff
+			cpv = self.tree.get_value(it,0)
 			if self.tree.get_string_from_iter(it).split(":")[0] == self.tree.get_string_from_iter(self.emergeIt):
-				del self.mergequeue[self.tree.get_value(it,0)]
+				del self.mergequeue[cpv]
+				flags.remove_new_flags(cpv)
 			else:
-				self.unmergequeue.remove(self.tree.get_value(it,0))
+				self.unmergequeue.remove(cpv)
 			
 			self.tree.remove(it)
 
 class PackageWindow:
 	"""A window with data about a specfic package."""
 
-	def __init__ (self, parent, cp, queue = None, version = None):
+	def __init__ (self, parent, cp, queue = None, version = None, delOnClose = True):
 		"""Build up window contents."""
 		self.parent = parent # parent window
 		self.cp = cp # category/package
 		self.version = version # version - if not None this is used
 		self.queue = queue
+		self.delOnClose = delOnClose
 		
 		# window
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -220,7 +223,9 @@ class PackageWindow:
 			self.emergeBtn.set_sensitive(False)
 			self.unmergeBtn.set_sensitive(False)
 		self.cancelBtn = gtk.Button("_Cancel")
-		self.cancelBtn.connect("clicked", lambda x: self.window.destroy())
+		if not self.delOnClose:
+			self.cancelBtn.set_label("_Close")
+		self.cancelBtn.connect("clicked", self.cb_cancel_clicked)
 		self.emergeBtn.connect("clicked", self.cb_emerge_clicked)
 		self.unmergeBtn.connect("clicked", self.cb_unmerge_clicked)
 		buttonHB.pack_start(self.emergeBtn)
@@ -297,6 +302,11 @@ class PackageWindow:
 			print "hallo"
 		return True
 
+	def cb_cancel_clicked (self, button, data = None):
+		if self.delOnClose: flags.remove_new_flags(self.actual_package())
+		self.window.destroy()
+		return True
+
 	def cb_emerge_clicked (self, button, data = None):
 		"""Adds the package to the EmergeQueue."""
 		if not geneticone.am_i_root():
@@ -338,10 +348,13 @@ class PackageWindow:
 		store = gtk.ListStore(bool, str, str)
 
 		pkg = self.actual_package()
+		newUses = flags.get_new_flags(pkg)
 		for use in pkg.get_all_useflags():
-			if pkg.is_installed() and use in pkg.get_set_useflags(): # flags set during install
+			if pkg.is_installed() and use in pkg.get_set_useflags() and not flags.invert_flag(use) in newUses: # flags set during install
 				enabled = True
-			elif (not pkg.is_installed()) and use in pkg.get_settings("USE").split(): # flags that would be set
+			elif (not pkg.is_installed()) and use in pkg.get_settings("USE").split() and not flags.invert_flag(use) in newUses: # flags that would be set
+				enabled = True
+			elif use in newUses:
 				enabled = True
 			else:
 				enabled = False
@@ -499,7 +512,7 @@ class MainWindow:
 		vpaned.pack2(termFrame, shrink = True, resize = True)
 
 		# the status line
-		self.statusLabel = gtk.Label("Genetic/One")
+		self.statusLabel = gtk.Label("Genetic/One - <Statusline>")
 		self.statusLabel.set_alignment(0.0,0.7)
 		self.statusLabel.set_single_line_mode(True)
 		vb.pack_start(self.statusLabel, False, False)
@@ -560,7 +573,8 @@ class MainWindow:
 			if len(path) > 1:
 				package = store.get_value(store.get_iter(path), 0)
 				cat, name, vers, rev = geneticone.split_package_name(package)
-				PackageWindow(self.window, cat+"/"+name, queue = None, version = vers+"-"+rev)
+				if rev != "r0": vers = vers+"-"+rev
+				PackageWindow(self.window, cat+"/"+name, queue = None, version = vers, delOnClose=False)
 		return True
 
 	def create_cat_list (self):
@@ -638,6 +652,12 @@ class MainWindow:
 	def cb_emerge_clicked (self, button, data = None):
 		"""Do emerge or unemerge."""
 		if button == self.emergeBtn:
+			if len(flags.newUseFlags) > 0:
+				hintMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+						"You have changed use flags. Genetic/One will write these changes into the appropriate files. Please backup them if you think it is necessairy.")
+				hintMB.run()
+				hintMB.destroy()
+				flags.write_use_flags()
 			self.queue.emerge(force=True)
 		elif button == self.unmergeBtn:
 			self.queue.unmerge(force=True)
