@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 #
-# File: main.py
+# File: geneticone.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 Necoro d.M.
