@@ -15,25 +15,26 @@ import os
 import os.path
 from subprocess import Popen, PIPE
 
-from geneticone import *
+import geneticone
+import portage
 from portage_util import unique_array
 
 ### GENERAL PART ###
 
 def grep (p, path):
 	"""Grep runs "egrep" on a given path and looks for occurences of a given package."""
-	if not isinstance(p, Package):
-		p = Package(p) # assume it is a cpv or a gentoolkit.Package
+	if not isinstance(p, geneticone.Package):
+		p = geneticone.Package(p) # assume it is a cpv or a gentoolkit.Package
 
 	command = "egrep -x -n -r -H '^[<>!=~]{0,2}%s(-[0-9].*)?[[:space:]].*$' %s"
 	return Popen((command % (p.get_cp(), path)), shell = True, stdout = PIPE).communicate()[0].splitlines()
 
-def get_data(pkg):
+def get_data(pkg, path):
 	"""This splits up the data of grep() and builds tuples in the format (file,line,criterion,list_of_flags)."""
 	flags = []
 
 	# do grep
-	list = grep(pkg, USE_PATH)
+	list = grep(pkg, path)
 	
 	for i in range(len(list)):
 		file, line, fl = tuple(list[i].split(":")) # get file, line and flag-list
@@ -55,7 +56,7 @@ USE_PATH_IS_DIR = os.path.isdir(USE_PATH)
 useFlags = {} # useFlags in the file
 newUseFlags = {} # useFlags as we want them to be: format: cpv -> [(file, line, useflag, (true if removed from list / false if added))]
 
-def invert_flag (_flag):
+def invert_use_flag (_flag):
 	if _flag[0] == "-":
 		return _flag[1:]
 	else:
@@ -65,16 +66,16 @@ def set_use_flag (pkg, flag):
 	"""Sets the useflag for a given package."""
 	global useFlags, newUseFlags
 
-	if not isinstance(pkg, Package):
-		pkg = Package(pkg) # assume cpv or gentoolkit.Package
+	if not isinstance(pkg, geneticone.Package):
+		pkg = geneticone.Package(pkg) # assume cpv or gentoolkit.Package
 
 	cpv = pkg.get_cpv()
-	invFlag = invert_flag(flag)
+	invFlag = invert_use_flag(flag)
 	
 	# if not saved in useFlags, get it by calling get_data() which calls grep()
 	data = None
 	if not cpv in useFlags:
-		data = get_data(pkg)
+		data = get_data(pkg, USE_PATH)
 		useFlags[cpv] = data
 	else:
 		data = useFlags[cpv]
@@ -124,8 +125,8 @@ def set_use_flag (pkg, flag):
 	newUseFlags[cpv] = unique_array(newUseFlags[cpv])
 	print "newUseFlags: "+str(newUseFlags)
 
-def remove_new_flags (cpv):
-	if isinstance(cpv, Package):
+def remove_new_use_flags (cpv):
+	if isinstance(cpv, geneticone.Package):
 		cpv = cpv.get_cpv()
 	
 	try:
@@ -133,15 +134,15 @@ def remove_new_flags (cpv):
 	except KeyError:
 		pass
 
-def get_new_flags (cpv):
-	if isinstance(cpv, Package):
+def get_new_use_flags (cpv):
+	if isinstance(cpv, geneticone.Package):
 		cpv = cpv.get_cpv()
 
 	list2return = []
 	try:
 		for file, line, flag, remove in newUseFlags[cpv]:
 			if remove:
-				list2return.append(invert_flag(flag))
+				list2return.append(invert_use_flag(flag))
 			else:
 				list2return.append(flag)
 	except KeyError:

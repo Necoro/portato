@@ -12,6 +12,8 @@
 # Written by Necoro d.M. <necoro@necoro.net>
 
 from geneticone import *
+from geneticone import flags
+import geneticone
 
 import gentoolkit
 import portage
@@ -48,9 +50,43 @@ class Package (gentoolkit.Package):
 	def get_size (self):
 		return self.size()
 
-	def get_all_useflags (self):
+	def get_all_use_flags (self):
 		"""Returns a list of _all_ useflags for this package."""
 		return unique_array(self.get_env_var("IUSE").split())
+
+	def get_installed_use_flags (self):
+		"""Returns a list of the useflags enabled at installation time. If package is not installed, it returns an empty list."""
+		if self.is_installed():
+			uses = self.get_use_flags().split()
+			iuses = self.get_all_use_flags()
+			set = []
+			for u in iuses:
+				if u in uses:
+					set.append(u)
+			return set
+		else:
+			return []
+	
+	def get_new_use_flags (self):
+		return flags.get_new_use_flags(self)
+
+	def get_actual_use_flags (self):
+		if self.is_installed():
+			i_flags = self.get_installed_use_flags()
+			for f in self.get_new_use_flags():
+				if flags.invert_flag(f) in i_flags:
+					i_flags.remove(flags.invert_flag(f))
+				elif f not in i_flags:
+					i_flags.append(f)
+			return i_flags
+		else:
+			return self.get_new_flags()
+
+	def set_use_flag (self, flag):
+		flags.set_use_flag(self, flag)
+
+	def remove_new_use_flags (self):
+		flags.remove_new_use_flags(self)
 
 	def get_all_deps (self):
 		"""Returns a linearised list of all first-level dependencies for this package, on
@@ -62,9 +98,20 @@ class Package (gentoolkit.Package):
 		raises: BlockedException, PackageNotFoundException."""
 		dep_pkgs = [] # the package list
 		
+		# check whether we got use-flags which are not visible for portage yet
+		newUseFlags = self.get_new_use_flags()
+		actual = self.get_settings("USE").split()
+		if newUseFlags:
+			depUses = []
+			for u in newUseFlags:
+				if u[0] == "-" and flags.invert_use_flag(u) in actual:
+					actual.remove(flags.invert_use_flag(u))
+				elif u not in actual:
+					actual.append(u)
+
 		# let portage do the main stuff ;)
 		# pay attention to any changes here
-		deps = portage.dep_check (self.get_env_var("RDEPEND")+" "+self.get_env_var("DEPEND"), vartree.dbapi, self._settings)
+		deps = portage.dep_check (self.get_env_var("RDEPEND")+" "+self.get_env_var("DEPEND")+" "+self.get_env_var("PDEPEND"), vartree.dbapi, self._settings, myuse = actual)
 		
 		if not deps: # what is the difference to [1, []] ?
 			return [] 
@@ -103,7 +150,7 @@ class Package (gentoolkit.Package):
 		
 		# get useflags
 		if self.is_installed():
-			uses = self.get_set_useflags()
+			uses = self.get_installed_use_flags()
 		else:
 			uses = self.get_settings("USE")
 		
@@ -141,19 +188,6 @@ class Package (gentoolkit.Package):
 			dep_packages += find_packages("="+dep)[0].own_get_dep_packages(old_cpv_dict)
 
 		return unique_array(dep_packages)
-
-	def get_set_useflags (self):
-		"""Returns a list of the useflags enabled at installation time. If package is not installed, it returns an empty list."""
-		if self.is_installed():
-			uses = self.get_use_flags().split()
-			iuses = self.get_all_useflags()
-			set = []
-			for u in iuses:
-				if u in uses:
-					set.append(u)
-			return set
-		else:
-			return []
 
 	def get_cp (self):
 		"""Returns category/package."""

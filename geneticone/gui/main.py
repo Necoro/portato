@@ -36,11 +36,22 @@ from portage_util import unique_array
 
 class EmergeQueue:
 	"""This class manages the emerge queue."""
+	
 
 	def __init__ (self, tree = None, console = None, packages = None):
-		""""tree" is a gtk.TreeStore to show the queue in; "console" is a vte.Terminal to print the output to."""
-		self.mergequeue = {}
+		"""Constructor.
+		
+		@param tree: Tree to append all the items to.
+		@type tree: gtk.TreeStore
+		@param console: Output is shown here.
+		@type console: vte.Terminal
+		@param packages: The list of packages sorted by categories. We will delete the appropriate category if we updated sth.
+		@type packages: dictionary: {category: list_of_packages}."""
+		
+		self.mergequeue = []
 		self.unmergequeue = []
+		self.iters = {}
+		self.deps = {}
 		self.tree = tree
 		self.console = console
 		self.packages = packages
@@ -51,24 +62,55 @@ class EmergeQueue:
 		else:
 			self.emergeIt = self.unmergeIt = None
 
-	def append (self, sth, unmerge = False):
+	def update_tree (self, it, cpv):
+		try:
+			deps = self.deps[cpv]
+		except KeyError:
+			deps = geneticone.find_packages("="+cpv)[0].get_dep_packages()
+			self.deps.update({cpv : deps})
+		
+		subIt = self.tree.append(it, [cpv])
+		
+		for d in deps:
+			try:
+				self.update_tree(subIt, d)
+			except geneticone.BlockedException, e:
+				while self.tree.iter_parent(subIt):
+					subIt = self.tree.iter_parent(subIt)
+				self.remove_children(subIt)
+				raise e
+		
+		self.iters.update({cpv: subIt})
+
+	def append (self, sth, unmerge = False, update = False):
 		"""Appends a cpv either to the merge queue or to the unmerge-queue.
 		Also update the tree-view."""
 		if not unmerge:
-			# insert dependencies
-			pkg = geneticone.find_packages("="+sth)[0]
 			try:
-				self.mergequeue.update({sth : pkg.get_dep_packages()})
+				# insert dependencies
+				pkg = geneticone.find_packages("="+sth)[0]
+				deps = pkg.get_dep_packages()
+				
+				if update:
+					if deps == self.deps[sth]:
+						return
+					else:
+						parentIt = self.tree.iter_parent(self.iters[sth])
+						self.remove(self.iters[sth])
+						self.deps.update({sth: deps})
+						self.update_tree(parentIt, sth)
+				else:
+					self.mergequeue.append(sth)
+					self.deps.update({sth : deps})
+			
+					# update tree
+					if self.emergeIt:
+						self.update_tree(self.emergeIt, sth)
+			
 			except geneticone.BlockedException, e :
 				blocks = e[0]
 				blocked_dialog(sth, blocks)
 				return
-			else:
-				# update tree
-				if self.emergeIt:
-					pkgIt = self.tree.append(self.emergeIt, [sth])
-					for p in self.mergequeue[sth]:
-						self.tree.append(pkgIt, [p])
 		else:
 			self.unmergequeue.append(sth)
 			if self.unmergeIt: # update tree
@@ -82,7 +124,7 @@ class EmergeQueue:
 				cat = geneticone.split_package_name(p)[0]
 				while cat[0] in ["=",">","<","!"]:
 					cat = cat[1:]
-				print cat
+				print cat,
 				del self.packages[cat]
 				print "deleted"
 			except KeyError:
@@ -94,19 +136,19 @@ class EmergeQueue:
 		self.console.set_pty(master)
 		process = Popen(["/usr/bin/python","/usr/bin/emerge"]+options+packages, stdout = slave, stderr = STDOUT, shell = False)
 		Thread(target=self.update_packages, args=(process, packages)).start()
-		self.remove_all(it)
+		self.remove_children(it)
 
 	def emerge (self, force = False):
 		"""Emerges everything in the merge-queue. If force is 'False' (default) only 'emerge -pv' is called."""
 		if len(self.mergequeue) == 0: return
 
 		list = []
-		for k in self.mergequeue.keys():
+		for k in self.mergequeue:
 			list += ["="+k]
 		
 		s = []
 		if not force: s = ["-pv"]
-		self._emerge(s,list, self.emergeIt)
+		self._emerge(s, list, self.emergeIt)
 
 	def unmerge (self, force = False):
 		"""Unmerges everything in the umerge-queue. If force is 'False' (default) only "emerge -pv -C" is called."""
@@ -117,7 +159,7 @@ class EmergeQueue:
 		if not force: s = ["-Cpv"]
 		self._emerge(s,list, self.unmergeIt)
 
-	def remove_all (self, parentIt):
+	def remove_children (self, parentIt):
 		"""Removes all children of a given parent TreeIter."""
 		childIt = self.tree.iter_children(parentIt)
 
@@ -125,14 +167,19 @@ class EmergeQueue:
 			temp = childIt
 			childIt = self.tree.iter_next(childIt)
 			self.remove(temp)
-	
+
 	def remove (self, it):
 		"""Removes a specific item in the tree."""
 		if self.tree.iter_parent(it): # NEVER remove our top stuff
 			cpv = self.tree.get_value(it,0)
 			if self.tree.get_string_from_iter(it).split(":")[0] == self.tree.get_string_from_iter(self.emergeIt):
-				del self.mergequeue[cpv]
-				flags.remove_new_flags(cpv)
+				try:
+					self.mergequeue.remove(cpv)
+					del self.iters[cpv]
+					del self.deps[cpv]
+				except ValueError:
+					pass
+				flags.remove_new_use_flags(cpv)
 			else:
 				self.unmergequeue.remove(cpv)
 			
@@ -141,14 +188,16 @@ class EmergeQueue:
 class PackageWindow:
 	"""A window with data about a specfic package."""
 
-	def __init__ (self, parent, cp, queue = None, version = None, delOnClose = True):
+	def __init__ (self, parent, cp, queue = None, version = None, delOnClose = True, doEmerge = True):
 		"""Build up window contents."""
 		self.parent = parent # parent window
 		self.cp = cp # category/package
 		self.version = version # version - if not None this is used
 		self.queue = queue
 		self.delOnClose = delOnClose
-		
+		self.doEmerge = doEmerge
+		self.flagChanged = False
+
 		# window
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.window.set_title(cp)
@@ -219,7 +268,7 @@ class PackageWindow:
 		
 		self.emergeBtn = gtk.Button("_Emerge")
 		self.unmergeBtn = gtk.Button("_Unmerge")
-		if not self.queue: 
+		if not self.queue or not doEmerge: 
 			self.emergeBtn.set_sensitive(False)
 			self.unmergeBtn.set_sensitive(False)
 		self.cancelBtn = gtk.Button("_Cancel")
@@ -296,14 +345,15 @@ class PackageWindow:
 
 	def cb_button_pressed (self, b, event, data = None):
 		"""Callback for pressed checkboxes. Just quits the event-loop - no redrawing."""
-		print b
 		if not isinstance(b, gtk.CellRendererToggle):
 			b.emit_stop_by_name("button-press-event")
-			print "hallo"
 		return True
 
 	def cb_cancel_clicked (self, button, data = None):
-		if self.delOnClose: flags.remove_new_flags(self.actual_package())
+		if self.delOnClose: self.actual_package().remove_new_use_flags()
+		if self.flagChanged:
+			if self.queue:
+				self.queue.append(self.actual_package().get_cpv(), update = True)
 		self.window.destroy()
 		return True
 
@@ -334,7 +384,8 @@ class PackageWindow:
 		prefix = ""
 		if not store[path][0]:
 			prefix = "-"
-		flags.set_use_flag(self.actual_package(), prefix+store[path][1])
+		self.actual_package().set_use_flag(prefix+store[path][1])
+		self.flagChanged = True
 		return True
 
 	def update_checkboxes (self):
@@ -348,13 +399,12 @@ class PackageWindow:
 		store = gtk.ListStore(bool, str, str)
 
 		pkg = self.actual_package()
-		newUses = flags.get_new_flags(pkg)
-		for use in pkg.get_all_useflags():
-			if pkg.is_installed() and use in pkg.get_set_useflags() and not flags.invert_flag(use) in newUses: # flags set during install
+		for use in pkg.get_all_use_flags():
+			if pkg.is_installed() and use in pkg.get_actual_use_flags(): # flags set during install
 				enabled = True
-			elif (not pkg.is_installed()) and use in pkg.get_settings("USE").split() and not flags.invert_flag(use) in newUses: # flags that would be set
+			elif (not pkg.is_installed()) and use in pkg.get_settings("USE").split() and not flags.invert_use_flag(use) in pkg.get_new_use_flags(): # flags that would be set
 				enabled = True
-			elif use in newUses:
+			elif use in pkg.get_new_use_flags():
 				enabled = True
 			else:
 				enabled = False
@@ -574,7 +624,7 @@ class MainWindow:
 				package = store.get_value(store.get_iter(path), 0)
 				cat, name, vers, rev = geneticone.split_package_name(package)
 				if rev != "r0": vers = vers+"-"+rev
-				PackageWindow(self.window, cat+"/"+name, queue = None, version = vers, delOnClose=False)
+				PackageWindow(self.window, cat+"/"+name, queue = self.queue, version = vers, delOnClose = False, doEmerge = False)
 		return True
 
 	def create_cat_list (self):
@@ -638,7 +688,7 @@ class MainWindow:
 				if model.iter_n_children(iter) > 0: # and has children which can be removed :)
 					askMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "Do you really want to clear the whole queue?")
 					if askMB.run() == gtk.RESPONSE_YES :
-						self.queue.remove_all(iter)
+						self.queue.remove_children(iter)
 					askMB.destroy()
 			elif model.iter_parent(model.iter_parent(iter)): # this is in the 3rd level => dependency
 				infoMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, "You cannot remove dependencies. :)")
