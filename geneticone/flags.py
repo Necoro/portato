@@ -13,7 +13,7 @@
 
 import os
 import os.path
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE # needed for grep
 
 import geneticone
 import portage
@@ -21,16 +21,32 @@ from portage_util import unique_array
 
 ### GENERAL PART ###
 
-def grep (p, path):
-	"""Grep runs "egrep" on a given path and looks for occurences of a given package."""
-	if not isinstance(p, geneticone.Package):
-		p = geneticone.Package(p) # assume it is a cpv or a gentoolkit.Package
+def grep (pkg, path):
+	"""Grep runs "egrep" on a given path and looks for occurences of a given package.
+	@param pkg: the package
+	@type pkg: string (cpv) or L{geneticone.Package}-object
+	@param path: path to look in
+	@type path: string
+	
+	@returns: occurences of pkg in the format: "file:line-no:complete_line_found"
+	@rtype: string"""
+
+	if not isinstance(pkg, geneticone.Package):
+		pkg = geneticone.Package(pkg) # assume it is a cpv or a gentoolkit.Package
 
 	command = "egrep -x -n -r -H '^[<>!=~]{0,2}%s(-[0-9].*)?[[:space:]].*$' %s"
-	return Popen((command % (p.get_cp(), path)), shell = True, stdout = PIPE).communicate()[0].splitlines()
+	return Popen((command % (pkg.get_cp(), path)), shell = True, stdout = PIPE).communicate()[0].splitlines()
 
 def get_data(pkg, path):
-	"""This splits up the data of grep() and builds tuples in the format (file,line,criterion,list_of_flags)."""
+	"""This splits up the data of L{grep} and builds tuples in the format (file,line,criterion,list_of_flags).
+	@param pkg: package to find
+	@type pkg: string (cpv) or L{geneticone.Package}-object
+	@param path: path to look in
+	@type path: string
+	
+	@returns: a list of tuples in the form (file,line,criterion,list_of_flags)
+	@rtype: list"""
+	
 	flags = []
 
 	# do grep
@@ -56,14 +72,32 @@ USE_PATH_IS_DIR = os.path.isdir(USE_PATH)
 useFlags = {} # useFlags in the file
 newUseFlags = {} # useFlags as we want them to be: format: cpv -> [(file, line, useflag, (true if removed from list / false if added))]
 
-def invert_use_flag (_flag):
-	if _flag[0] == "-":
-		return _flag[1:]
+def invert_use_flag (flag):
+	"""Invertes a flag.
+
+		>>> invert_use_flag("foo")
+		-foo
+		>>> invert_use_flag("-bar")
+		bar
+
+	@param flag: the flag
+	@type flag: string
+	@returns: inverted flag
+	@rtype: string
+	"""
+	if flag[0] == "-":
+		return flag[1:]
 	else:
-		return "-"+_flag
+		return "-"+flag
 
 def set_use_flag (pkg, flag):
-	"""Sets the useflag for a given package."""
+	"""Sets the useflag for a given package.
+	
+	@param pkg: the package
+	@type pkg: string (cpv) or L{geneticone.Package}-object
+	@param flag: the flag to set
+	@type flag: string"""
+
 	global useFlags, newUseFlags
 
 	if not isinstance(pkg, geneticone.Package):
@@ -126,6 +160,9 @@ def set_use_flag (pkg, flag):
 	print "newUseFlags: "+str(newUseFlags)
 
 def remove_new_use_flags (cpv):
+	"""Removes all new use-flags for a specific package.
+	@param cpv: the package for which to remove the flags
+	@type cpv: string (cpv) or L{geneticone.Package}-object"""
 	if isinstance(cpv, geneticone.Package):
 		cpv = cpv.get_cpv()
 	
@@ -135,6 +172,12 @@ def remove_new_use_flags (cpv):
 		pass
 
 def get_new_use_flags (cpv):
+	"""Gets all the new use-flags for a specific package.
+	@param cpv: the package for which to remove the flags
+	@type cpv: string (cpv) or L{geneticone.Package}-object
+	@returns: list of flags
+	@rtype: list"""
+	
 	if isinstance(cpv, geneticone.Package):
 		cpv = cpv.get_cpv()
 

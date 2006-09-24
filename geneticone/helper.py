@@ -22,24 +22,36 @@ import portage
 from portage_util import unique_array
 
 class BlockedException (Exception):
+	"""An exception marking, that some package is blocking another one."""
 	pass
 
 class PackageNotFoundException (Exception):
+	"""An exception marking that a package could not be found."""
 	pass
 
 class DependencyCalcError (Exception):
+	"""An error occured during dependency calculation."""
 	pass
 
 def find_lambda (name):
-	"""Returns the function needed by all the find_all_*-functions. Returns None if no name is given."""
+	"""Returns the function needed by all the find_all_*-functions. Returns None if no name is given.
+	@param name: name to build the function of
+	@type name: string
+	@returns: 
+				1. None if no name is given
+				2. a lambda function
+	@rtype: function"""
 	if name != None:
 		return lambda x: re.match(".*"+name+".*",x)
 	else:
 		return lambda x: True
 
 def geneticize_list (list_of_packages):
-	'''to convert the output of each gentoolkit helper function is a list of *geneticone* Package objects
-	'''
+	"""Convertes a list of gentoolkit.Packages into L{geneticone.Packages}.
+	@param list_of_packages: the list of packages
+	@type list_of_packages: list of gentoolkit.Packages
+	@returns: converted list
+	@rtype: list of geneticone.Packages"""
 	return [geneticone.Package(x) for x in list_of_packages]
 
 def find_best_match (search_key, only_installed = False):
