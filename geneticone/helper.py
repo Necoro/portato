@@ -27,6 +27,9 @@ class BlockedException (Exception):
 class PackageNotFoundException (Exception):
 	pass
 
+class DependencyCalcError (Exception):
+	pass
+
 def find_lambda (name):
 	"""Returns the function needed by all the find_all_*-functions. Returns None if no name is given."""
 	if name != None:
