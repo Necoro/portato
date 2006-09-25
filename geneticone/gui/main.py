@@ -582,13 +582,16 @@ class MainWindow:
 		queueVB = gtk.VBox(False, 0)
 		hb.pack_start(queueVB, True, True)
 		
+		queueScroll = gtk.ScrolledWindow()
+		queueScroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		emergeStore = gtk.TreeStore(str)
 		self.emergeView = gtk.TreeView(emergeStore)
 		cell = gtk.CellRendererText()
 		col = gtk.TreeViewColumn("Queue", cell, text = 0)
 		self.emergeView.append_column(col)
 		self.emergeView.connect("row-activated", self.cb_row_activated, emergeStore)
-		queueVB.pack_start(self.emergeView, True, True)
+		queueScroll.add(self.emergeView)
+		queueVB.pack_start(queueScroll, True, True)
 
 		# buttons right unter the queue list
 		buttonBox = gtk.HButtonBox()
