@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 #
 # File: geneticone/flags.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
@@ -34,7 +32,7 @@ def grep (pkg, path):
 	if not isinstance(pkg, geneticone.Package):
 		pkg = geneticone.Package(pkg) # assume it is a cpv or a gentoolkit.Package
 
-	command = "egrep -x -n -r -H '^[<>!=~]{0,2}%s(-[0-9].*)?[[:space:]].*$' %s"
+	command = "egrep -x -n -r -H '^[<>!=~]{0,2}%s(-[0-9].*)?[[:space:]]?.*$' %s"
 	return Popen((command % (pkg.get_cp(), path)), shell = True, stdout = PIPE).communicate()[0].splitlines()
 
 def get_data(pkg, path):
@@ -267,3 +265,260 @@ def write_use_flags ():
 	# reset
 	useFlags = {}
 	newUseFlags = {}
+
+#
+#
+# NOTHING IS WORKING / IN USE BELOW THIS LINE
+#
+#
+### MASKING PART ###
+MASK_PATH = os.path.join(portage.USER_CONFIG_PATH,"package.mask")
+UNMASK_PATH = os.path.join(portage.USER_CONFIG_PATH,"package.unmask")
+MASK_PATH_IS_DIR = os.path.isdir(MASK_PATH)
+UNMASK_PATH_IS_DIR = os.path.isdir(UNMASK_PATH)
+
+new_masked = {}
+new_unmasked = {}
+
+def set_masked (pkg):
+	global new_masked, newunmasked
+	if not isinstance(pkg, geneticone.Package):
+		pkg = geneticone.Package(pkg)
+
+	cpv = pkg.get_cpv()
+
+	if not cpv in new_unmasked:
+		new_unmasked[cpv] = []
+	if not cpv in new_masked:
+		new_masked[cpv] = []
+	
+	nu = new_unmasked[cpv][:]
+	for file, line in nu:
+		if line == "-1":
+			new_unmasked[cpv].remove(file, line)
+
+	nm = new_masked[cpv][:]
+	for file, line in nm:
+		if line != "-1":
+			new_masked[cpv].remove(file, line)
+
+	if pkg.is_masked():
+		return
+
+	unmasked = get_data(pkg, UNMASK_PATH)
+	print "data (unmasked): "+str(unmasked)
+	done = False
+	for file, line, crit, flags in unmasked:
+		if pkg.matches(crit):
+			new_unmasked[cpv].append((file, line))
+			done = True
+
+	if done: return
+
+	if MASK_PATH_IS_DIR:
+		file = os.path.join(MASK_PATH, "geneticone")
+	else:
+		file = MASK_PATH
+	
+	new_masked[cpv].append((file, "-1"))
+	new_masked[cpv] = unique_array(new_masked[cpv])
+	print "new_masked: "+str(new_masked)
+
+def set_unmasked (pkg):
+	global new_masked, new_unmasked
+	if not isinstance(pkg, geneticone.Package):
+		pkg = geneticone.Package(pkg)
+	
+	cpv = pkg.get_cpv()
+
+	if not cpv in new_unmasked:
+		new_unmasked[cpv] = []
+	if not cpv in new_masked:
+		new_masked[cpv] = []
+	
+	nu = new_unmasked[cpv][:]
+	for file, line in nu:
+		if line != "-1":
+			new_unmasked[cpv].remove(file, line)
+	
+	nm = new_masked[cpv][:]
+	for file, line in nm:
+		if line == "-1":
+			new_masked[cpv].remove(file, line)
+
+	if not pkg.is_masked():
+		return
+
+	masked = get_data(pkg, MASK_PATH)
+	print "data (masked): "+str(masked)
+	done = False
+	for file, line, crit, fl in masked:
+		if pkg.matches(crit):
+			new_masked[cpv].append((file, line))
+			done = True
+
+	if done: return
+
+	if UNMASK_PATH_IS_DIR:
+		file = os.path.join(UNMASK_PATH, "geneticone")
+	else:
+		file = UNMASK_PATH
+
+	new_unmasked[cpv].append((file, "-1"))
+	new_unmasked[cpv] = unique_array(new_unmasked[cpv])
+	print "new_unmasked: "+str(new_unmasked)
+
+def write_masked_unmasked ():
+	global new_unmasked, new_masked
+	file_cache = {}
+
+	def write(cpv, file, line):
+		line = int(line)
+		# add new line
+		if line == -1:
+			msg = "\n#geneticone update#\n=%s\n" % cpv
+			if not file in file_cache:
+				f = open(file, "a")
+				f.write(msg)
+				f.close()
+			else:
+				file_cache[file].append(msg)
+		# change a line
+		else:
+			if not file in file_cache:
+				# read file
+				f = open(file, "r")
+				lines = []
+				i = 1
+				while i < line: # stop at the given line
+					lines.append(f.readline())
+					i = i+1
+				# delete
+				l = f.readline()
+				l = "#"+l[:-1]+" # removed by geneticone\n"
+				lines.append(l)
+				
+				# read the rest
+				lines.extend(f.readlines())
+				
+				file_cache[file] = lines
+				f.close()
+			else: # in cache
+				l = file_cache[file][line-1]
+				# delete:
+				l = "#"+l[:-1]+" # removed by geneticone\n"
+				file_cache[file][line-1] = l
+	
+	
+	for cpv in new_masked:
+		for file, line in new_masked[cpv]:
+			write(cpv, file, line)
+	
+	for cpv in new_unmasked:
+		for file, line in new_unmasked[cpv]:
+			write(cpv, file, line)
+	
+	# write to disk
+	for file in file_cache.keys():
+		f = open(file, "w")
+		f.writelines(file_cache[file])
+		f.close()
+	# reset
+	new_masked = {}
+	new_unmasked = {}
+
+### TESTING PART ###
+TESTING_PATH = os.path.join(portage.USER_CONFIG_PATH, "package.keywords")
+TESTING_PATH_IS_DIR = os.path.isdir(TESTING_PATH)
+newTesting = {}
+arch = ""
+
+def set_testing (pkg, enable):
+	"""Enables the package for installing when it is marked as testing (~ARCH).
+	@param pkg: the package
+	@type pkg: string (cpv) or L{geneticone.Package}-object
+	@param enable: controls whether to enable (True) or disable (False) for test-installing
+	@type enable: boolean"""
+
+	global arch, newTesting
+	if not isinstance(pkg, geneticone.Package):
+		pkg = geneticone.Package(pkg)
+
+	arch = pkg.get_settings("ARCH")
+	cpv = pkg.get_cpv()
+	if not cpv in newTesting: 
+		newTesting[cpv] = []
+
+	print "arch: "+arch
+	for file, line in newTesting[cpv]:
+		if (enable and line != "-1") or (not enable and line == "-1"):
+			newTesting[cpv].remove((file, line))
+
+	if (enable and (pkg.get_mask_status() % 3 == 0)) or (not enable and (pkg.get_mask_status() % 3 != 0)):
+		return
+
+	if not enable:
+		test = get_data(pkg, TESTING_PATH)
+		print "data (test): "+str(test)
+		for file, line, crit, flags in test:
+			if pkg.matches(crit) and flags[0] == "~"+arch:
+				newTesting[cpv].append((file, line))
+	else:
+		if TESTING_PATH_IS_DIR:
+			file = os.path.join(TESTING_PATH, "geneticone")
+		else:
+			file = TESTING_PATH
+		newTesting[cpv].append((file, "-1"))
+
+	newTesting[cpv] = unique_array(newTesting[cpv])
+	print "newTesting: "+str(newTesting)
+
+def write_testing ():
+	global arch, newTesting
+	file_cache = {}
+
+	for cpv in newTesting:
+		for file, line in newTesting[cpv]:
+			line = int(line)
+			# add new line
+			if line == -1:
+				msg = "\n#geneticone update#\n=%s ~%s\n" % (cpv, arch)
+				if not file in file_cache:
+					f = open(file, "a")
+					f.write(msg)
+					f.close()
+				else:
+					file_cache[file].append(msg)
+			# change a line
+			else:
+				if not file in file_cache:
+					# read file
+					f = open(file, "r")
+					lines = []
+					i = 1
+					while i < line: # stop at the given line
+						lines.append(f.readline())
+						i = i+1
+					# delete
+					l = f.readline()
+					l = "#"+l[:-1]+" # removed by geneticone\n"
+					lines.append(l)
+					
+					# read the rest
+					lines.extend(f.readlines())
+					
+					file_cache[file] = lines
+					f.close()
+				else: # in cache
+					l = file_cache[file][line-1]
+					# delete:
+					l = "#"+l[:-1]+" # removed by geneticone\n"
+					file_cache[file][line-1] = l
+	
+	# write to disk
+	for file in file_cache.keys():
+		f = open(file, "w")
+		f.writelines(file_cache[file])
+		f.close()
+	# reset
+	newTesting = {}
