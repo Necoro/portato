@@ -74,7 +74,7 @@ class EmergeQueue:
 		
 		# get depencies
 		if cpv in self.deps:
-			deps = self.deps[cpv]
+			return # in list already
 		else:
 			deps = geneticone.find_packages("="+cpv)[0].get_dep_packages()
 			self.deps.update({cpv : deps})
@@ -117,12 +117,11 @@ class EmergeQueue:
 						return # nothing changed - return
 					else:
 						parentIt = self.tree.iter_parent(self.iters[cpv])
-						self.remove(self.iters[cpv])
-						self.deps.update({cpv: deps})
+						self.remove_children(self.iters[cpv], False) # this is needed to def delete everything
+						self.remove(self.iters[cpv], False)
 						self.update_tree(parentIt, cpv)
 				else: # not update
 					self.mergequeue.append(cpv)
-					self.deps.update({cpv : deps})
 					if self.emergeIt: self.update_tree(self.emergeIt, cpv)
 			
 			except geneticone.BlockedException, e : # there is sth blocked --> call blocked_dialog
@@ -209,35 +208,41 @@ class EmergeQueue:
 		
 		self._emerge(s,list, self.unmergeIt)
 
-	def remove_children (self, parentIt):
-		"""Removes all children of a given parent TreeIter.
+	def remove_children (self, parentIt, removeNewFlags = True):
+		"""Removes all children of a given parent TreeIter recursivly.
 		
 		@param parentIt: The iter from which to remove all children.
-		@type parentIt: gtk.TreeIter"""
+		@type parentIt: gtk.TreeIter
+		@param removeNewFlags: True if new flags should be removed; False otherwise. Default: True.
+		@type removeNewFlags: boolean"""
 
 		childIt = self.tree.iter_children(parentIt)
 
 		while childIt:
+			if (self.tree.iter_has_child(childIt)): # recursive call
+				self.remove_children(childIt, removeNewFlags)
 			temp = childIt
 			childIt = self.tree.iter_next(childIt)
-			self.remove(temp)
+			self.remove(temp, removeNewFlags)
 
-	def remove (self, it):
+	def remove (self, it, removeNewFlags = True):
 		"""Removes a specific item in the tree. This does not remove the top-entries.
 		
 		@param it: Iterator which points to the entry we are going to remove.
-		@type it: gtk.TreeIter"""
+		@type it: gtk.TreeIter
+		@param removeNewFlags: True if new flags should be removed; False otherwise. Default: True.
+		@type removeNewFlags: boolean"""
 		
 		if self.tree.iter_parent(it): # NEVER remove our top stuff
 			cpv = self.tree.get_value(it,0)
 			if self.tree.get_string_from_iter(it).split(":")[0] == self.tree.get_string_from_iter(self.emergeIt): # in Emerge
+				del self.iters[cpv]
+				del self.deps[cpv]
 				try:
 					self.mergequeue.remove(cpv)
-					del self.iters[cpv]
-					del self.deps[cpv]
 				except ValueError: # this is a dependency - ignore
 					pass
-				flags.remove_new_use_flags(cpv)
+				if removeNewFlags: flags.remove_new_use_flags(cpv)
 			
 			else: # in Unmerge
 				self.unmergequeue.remove(cpv)
