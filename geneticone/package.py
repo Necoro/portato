@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 #
 # File: geneticone/package.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.

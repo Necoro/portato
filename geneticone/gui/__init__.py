@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 #
 # File: geneticone/gui/__init__.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
