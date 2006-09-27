@@ -12,6 +12,11 @@
 # Written by Necoro d.M. <necoro@necoro.net>
 
 # our backend stuff
+
+VERSION = "0.3.1"
+MENU_EMERGE = 1
+MENU_UNEMERGE = 2
+
 import geneticone
 from geneticone import flags
 
@@ -248,6 +253,38 @@ class EmergeQueue:
 				self.unmergequeue.remove(cpv)
 			
 			self.tree.remove(it)
+
+class AboutWindow:
+
+	def __init__ (self, parent):
+		# window
+		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		self.window.set_title("About Genetic/One")
+		self.window.set_modal(True)
+		self.window.set_transient_for(parent)
+		self.window.set_destroy_with_parent(True)
+		self.window.set_resizable(False)
+		self.window.set_default_size(1,1)
+
+		box = gtk.VBox(False)
+		self.window.add(box)
+		
+		label = gtk.Label()
+		label.set_justify(gtk.JUSTIFY_CENTER)
+		label.set_markup("""
+<big><b>Genetic/One v.%s</b></big>
+A Portage-GUI
+		
+This software is licensed under the terms of the GPLv2.
+Copyright (C) 2006 Necoro d.M. &lt;necoro@necoro.net&gt;
+""" % VERSION)
+		box.pack_start(label)
+
+		okBtn = gtk.Button("OK")
+		okBtn.connect("clicked", lambda x: self.window.destroy())
+		box.pack_start(okBtn)
+
+		self.window.show_all()
 
 class PackageWindow:
 	"""A window with data about a specfic package."""
@@ -655,10 +692,10 @@ class MainWindow:
 				( "/_File", None, None, 0, "<Branch>"),
 				( "/File/_Close", None, self.cb_destroy, 0, ""),
 				( "/_Emerge", None, None, 0, "<Branch>"),
-				( "/Emerge/_Emerge", None, self.cb_emerge_clicked, 0, ""),
-				( "/Emerge/_Unmerge", None, self.cb_emerge_clicked, 0, ""),
+				( "/Emerge/_Emerge", None, self.cb_emerge_clicked, MENU_EMERGE, ""),
+				( "/Emerge/_Unmerge", None, self.cb_emerge_clicked, MENU_UNEMERGE, ""),
 				( "/_?", None, None, 0, "<Branch>"),
-				( "/?/_About", None, None, 0, "")
+				( "/?/_About", None, lambda x,y: AboutWindow(self.window), 0, "")
 				]
 		self.itemFactory = gtk.ItemFactory(gtk.MenuBar, "<main>", None)
 		self.itemFactory.create_items(mainMenuDesc)
@@ -768,7 +805,8 @@ class MainWindow:
 
 	def cb_emerge_clicked (self, button, data = None):
 		"""Do emerge or unemerge."""
-		if button == self.emergeBtn:
+		print button
+		if button == self.emergeBtn or button == MENU_EMERGE:
 			if len(flags.newUseFlags) > 0:
 				hintMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
 						"You have changed use flags. Genetic/One will write these changes into the appropriate files. Please backup them if you think it is necessairy.")
@@ -776,7 +814,7 @@ class MainWindow:
 				hintMB.destroy()
 				flags.write_use_flags()
 			self.queue.emerge(force=True)
-		elif button == self.unmergeBtn:
+		elif button == self.unmergeBtn or button == MENU_UNEMERGE:
 			self.queue.unmerge(force=True)
 
 		return True
