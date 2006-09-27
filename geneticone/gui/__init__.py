@@ -11,4 +11,4 @@
 #
 # Written by Necoro d.M. <necoro@necoro.net>
 
-from main import *
+from windows import *
