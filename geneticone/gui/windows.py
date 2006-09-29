@@ -23,6 +23,7 @@ import gobject
 
 import geneticone
 from geneticone import flags
+from geneticone.helper import *
 from gui_helper import *
 
 # for the terminal
@@ -229,8 +230,9 @@ class PackageWindow:
 		return True
 
 	def cb_cancel_clicked (self, button, data = None):
-		if self.delOnClose: self.actual_package().remove_new_use_flags()
-		if self.flagChanged:
+		if self.delOnClose: 
+			self.actual_package().remove_new_use_flags()
+		elif self.flagChanged:
 			if self.queue:
 				self.queue.append(self.actual_package().get_cpv(), update = True)
 		self.window.destroy()
@@ -238,7 +240,7 @@ class PackageWindow:
 
 	def cb_emerge_clicked (self, button, data = None):
 		"""Adds the package to the EmergeQueue."""
-		if not geneticone.am_i_root():
+		if not am_i_root():
 			errorMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "You cannot (un)merge without being root.")
 			errorMB.run()
 			errorMB.destroy()
@@ -583,7 +585,7 @@ class MainWindow:
 
 	def cb_emerge_clicked (self, button, data = None):
 		"""Do emerge or unemerge."""
-		print button
+		debug(button)
 		if button == self.emergeBtn or button == MENU_EMERGE:
 			if len(flags.newUseFlags) > 0:
 				hintMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,

@@ -14,6 +14,7 @@ import os.path
 from subprocess import Popen, PIPE # needed for grep
 
 import geneticone
+from helper import *
 import portage
 from portage_util import unique_array
 
@@ -115,7 +116,7 @@ def set_use_flag (pkg, flag):
 	if not cpv in newUseFlags:
 		newUseFlags[cpv] = []
 
-	print "data: "+str(data)
+	debug("data: "+str(data))
 	# add a useflag / delete one
 	added = False
 	for file, line, crit, flags in data:
@@ -155,7 +156,7 @@ def set_use_flag (pkg, flag):
 			newUseFlags[cpv].append((path, -1, flag, False))
 
 	newUseFlags[cpv] = unique_array(newUseFlags[cpv])
-	print "newUseFlags: "+str(newUseFlags)
+	debug("newUseFlags: "+str(newUseFlags))
 
 def remove_new_use_flags (cpv):
 	"""Removes all new use-flags for a specific package.
@@ -306,7 +307,7 @@ def set_masked (pkg):
 		return
 
 	unmasked = get_data(pkg, UNMASK_PATH)
-	print "data (unmasked): "+str(unmasked)
+	debug("data (unmasked): "+str(unmasked))
 	done = False
 	for file, line, crit, flags in unmasked:
 		if pkg.matches(crit):
@@ -322,7 +323,7 @@ def set_masked (pkg):
 	
 	new_masked[cpv].append((file, "-1"))
 	new_masked[cpv] = unique_array(new_masked[cpv])
-	print "new_masked: "+str(new_masked)
+	debug("new_masked: "+str(new_masked))
 
 def set_unmasked (pkg):
 	global new_masked, new_unmasked
@@ -350,7 +351,7 @@ def set_unmasked (pkg):
 		return
 
 	masked = get_data(pkg, MASK_PATH)
-	print "data (masked): "+str(masked)
+	debug("data (masked): "+str(masked))
 	done = False
 	for file, line, crit, fl in masked:
 		if pkg.matches(crit):
@@ -366,7 +367,7 @@ def set_unmasked (pkg):
 
 	new_unmasked[cpv].append((file, "-1"))
 	new_unmasked[cpv] = unique_array(new_unmasked[cpv])
-	print "new_unmasked: "+str(new_unmasked)
+	debug("new_unmasked: "+str(new_unmasked))
 
 def write_masked_unmasked ():
 	global new_unmasked, new_masked
@@ -449,7 +450,7 @@ def set_testing (pkg, enable):
 	if not cpv in newTesting: 
 		newTesting[cpv] = []
 
-	print "arch: "+arch
+	debug("arch: "+arch)
 	for file, line in newTesting[cpv]:
 		if (enable and line != "-1") or (not enable and line == "-1"):
 			newTesting[cpv].remove((file, line))
@@ -459,7 +460,7 @@ def set_testing (pkg, enable):
 
 	if not enable:
 		test = get_data(pkg, TESTING_PATH)
-		print "data (test): "+str(test)
+		debug("data (test): "+str(test))
 		for file, line, crit, flags in test:
 			if pkg.matches(crit) and flags[0] == "~"+arch:
 				newTesting[cpv].append((file, line))
@@ -471,7 +472,7 @@ def set_testing (pkg, enable):
 		newTesting[cpv].append((file, "-1"))
 
 	newTesting[cpv] = unique_array(newTesting[cpv])
-	print "newTesting: "+str(newTesting)
+	debug("newTesting: "+str(newTesting))
 
 def write_testing ():
 	global arch, newTesting

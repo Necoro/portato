@@ -11,6 +11,7 @@
 
 import geneticone
 from geneticone import flags
+from geneticone.helper import *
 
 from subprocess import *
 from threading import Thread
@@ -130,9 +131,8 @@ class EmergeQueue:
 				cat = geneticone.split_package_name(p)[0] # get category
 				while cat[0] in ["=",">","<","!"]:
 					cat = cat[1:]
-				print "Category: "+cat ,
 				del self.packages[cat]
-				print "marked for refreshing"
+				debug("Category %s marked for refreshing" % cat)
 			except KeyError: # not in self.packages - ignore
 				pass
 
