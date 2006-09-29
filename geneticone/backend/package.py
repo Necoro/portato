@@ -1,5 +1,5 @@
 #
-# File: geneticone/package.py
+# File: geneticone/backend/package.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 Necoro d.M.
@@ -9,9 +9,11 @@
 #
 # Written by Necoro d.M. <necoro@necoro.net>
 
-from geneticone import *
-from geneticone import flags
-import geneticone
+#from portage_helper import *
+#from exceptions import *
+from geneticone.backend import *
+from geneticone.helper import *
+import flags
 
 import gentoolkit
 import portage

@@ -21,9 +21,9 @@ pygtk.require("2.0")
 import gtk
 import gobject
 
-import geneticone
-from geneticone import flags
 from geneticone.helper import *
+from geneticone import backend
+from geneticone.backend import flags
 from gui_helper import *
 
 # for the terminal
@@ -90,8 +90,8 @@ class PackageWindow:
 		#self.window.connect("configure-event", self.cbSizeCheck)
 		
 		# packages and installed packages
-		self.packages = geneticone.sort_package_list(geneticone.find_packages(cp, masked=True))
-		self.instPackages = geneticone.sort_package_list(geneticone.find_installed_packages(cp, masked=True))
+		self.packages = backend.sort_package_list(backend.find_packages(cp, masked=True))
+		self.instPackages = backend.sort_package_list(backend.find_installed_packages(cp, masked=True))
 
 		# main structure - the table
 		self.table = gtk.Table(rows=4,columns=2)
@@ -207,7 +207,7 @@ class PackageWindow:
 			if self.version:
 				best_version = self.version
 			else:
-				best_version = geneticone.find_best_match(self.packages[0].get_cp(), (self.instPackages != [])).get_version()
+				best_version = backend.find_best_match(self.packages[0].get_cp(), (self.instPackages != [])).get_version()
 			for i in range(len(self.packages)):
 				if self.packages[i].get_version() == best_version:
 					combo.set_active(i)
@@ -220,7 +220,7 @@ class PackageWindow:
 		return combo
 
 	def actual_package (self):
-		"""Returns the actual package (a geneticone.Package-object)."""
+		"""Returns the actual package (a backend.Package-object)."""
 		return self.packages[self.vCombo.get_active()]
 
 	def cb_button_pressed (self, b, event, data = None):
@@ -251,7 +251,7 @@ class PackageWindow:
 
 	def cb_unmerge_clicked (self, button, data = None):
 		"""Adds the package to the UnmergeQueue."""
-		if not geneticone.am_i_root():
+		if not backend.am_i_root():
 			errorMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "You cannot (un)merge without being root.")
 			errorMB.run()
 			errorMB.destroy()
@@ -289,7 +289,7 @@ class PackageWindow:
 				enabled = True
 			else:
 				enabled = False
-			store.append([enabled, use, geneticone.get_use_desc(use, self.cp)])
+			store.append([enabled, use, backend.get_use_desc(use, self.cp)])
 
 		# build view
 		view = gtk.TreeView(store)
@@ -506,7 +506,7 @@ class MainWindow:
 		elif view == self.emergeView:
 			if len(path) > 1:
 				package = store.get_value(store.get_iter(path), 0)
-				cat, name, vers, rev = geneticone.split_package_name(package)
+				cat, name, vers, rev = backend.split_package_name(package)
 				if rev != "r0": vers = vers+"-"+rev
 				PackageWindow(self.window, cat+"/"+name, queue = self.queue, version = vers, delOnClose = False, doEmerge = False)
 		return True
@@ -516,7 +516,7 @@ class MainWindow:
 		store = gtk.ListStore(str)
 
 		# build categories
-		for p in geneticone.list_categories():
+		for p in backend.list_categories():
 			store.append([p])
 		# sort them alphabetically
 		store.set_sort_column_id(0, gtk.SORT_ASCENDING)
@@ -541,8 +541,8 @@ class MainWindow:
 		if name:
 			if name not in self.packages and not force: # only calc packages if not already done
 				self.packages[name] = []
-				for p in unique_array([x.get_name() for x in geneticone.find_all_packages(name+"/")]):
-					if geneticone.find_installed_packages(name+"/"+p, masked=True) != []:
+				for p in unique_array([x.get_name() for x in backend.find_all_packages(name+"/")]):
+					if backend.find_installed_packages(name+"/"+p, masked=True) != []:
 						p += "*" # append a '*' if the package is installed
 					self.packages[name].append(p)
 
@@ -585,7 +585,6 @@ class MainWindow:
 
 	def cb_emerge_clicked (self, button, data = None):
 		"""Do emerge or unemerge."""
-		debug(button)
 		if button == self.emergeBtn or button == MENU_EMERGE:
 			if len(flags.newUseFlags) > 0:
 				hintMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
@@ -602,7 +601,7 @@ class MainWindow:
 	def cb_search_clicked (self, button, data = None):
 		"""Do a search."""
 		if self.searchEntry.get_text() != "":
-			packages = geneticone.find_all_packages(self.searchEntry.get_text())
+			packages = backend.find_all_packages(self.searchEntry.get_text())
 
 			if packages == []:
 				dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, "Package not found!")

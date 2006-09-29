@@ -9,8 +9,8 @@
 #
 # Written by Necoro d.M. <necoro@necoro.net>
 
-import geneticone
-from geneticone import flags
+from geneticone import backend
+from geneticone.backend import flags
 from geneticone.helper import *
 
 from subprocess import *
@@ -60,7 +60,7 @@ class EmergeQueue:
 		if cpv in self.deps:
 			return # in list already
 		else:
-			deps = geneticone.find_packages("="+cpv)[0].get_dep_packages()
+			deps = backend.find_packages("="+cpv)[0].get_dep_packages()
 			self.deps.update({cpv : deps})
 		
 		subIt = self.tree.append(it, [cpv])
@@ -69,7 +69,7 @@ class EmergeQueue:
 		for d in deps:
 			try:
 				self.update_tree(subIt, d)
-			except geneticone.BlockedException, e:
+			except backend.BlockedException, e:
 				# remove the project
 				while self.tree.iter_parent(subIt):
 					subIt = self.tree.iter_parent(subIt)
@@ -93,7 +93,7 @@ class EmergeQueue:
 		if not unmerge:
 			try:
 				# insert dependencies
-				pkg = geneticone.find_packages("="+cpv)[0]
+				pkg = backend.find_packages("="+cpv)[0]
 				deps = pkg.get_dep_packages()
 				
 				if update:
@@ -108,7 +108,7 @@ class EmergeQueue:
 					self.mergequeue.append(cpv)
 					if self.emergeIt: self.update_tree(self.emergeIt, cpv)
 			
-			except geneticone.BlockedException, e : # there is sth blocked --> call blocked_dialog
+			except backend.BlockedException, e : # there is sth blocked --> call blocked_dialog
 				blocks = e[0]
 				blocked_dialog(cpv, blocks)
 				return
@@ -128,7 +128,7 @@ class EmergeQueue:
 		if process: process.wait()
 		for p in packages:
 			try:
-				cat = geneticone.split_package_name(p)[0] # get category
+				cat = backend.split_package_name(p)[0] # get category
 				while cat[0] in ["=",">","<","!"]:
 					cat = cat[1:]
 				del self.packages[cat]

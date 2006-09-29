@@ -1,5 +1,5 @@
 #
-# File: geneticone/flags.py
+# File: geneticone/backend/flags.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 Necoro d.M.
@@ -13,8 +13,9 @@ import os
 import os.path
 from subprocess import Popen, PIPE # needed for grep
 
-import geneticone
-from helper import *
+from geneticone.helper import *
+import package
+
 import portage
 from portage_util import unique_array
 
@@ -30,8 +31,8 @@ def grep (pkg, path):
 	@returns: occurences of pkg in the format: "file:line-no:complete_line_found"
 	@rtype: string"""
 
-	if not isinstance(pkg, geneticone.Package):
-		pkg = geneticone.Package(pkg) # assume it is a cpv or a gentoolkit.Package
+	if not isinstance(pkg, package.Package):
+		pkg = package.Package(pkg) # assume it is a cpv or a gentoolkit.Package
 
 	command = "egrep -x -n -r -H '^[<>!=~]{0,2}%s(-[0-9].*)?[[:space:]]?.*$' %s"
 	return Popen((command % (pkg.get_cp(), path)), shell = True, stdout = PIPE).communicate()[0].splitlines()
@@ -99,8 +100,8 @@ def set_use_flag (pkg, flag):
 
 	global useFlags, newUseFlags
 
-	if not isinstance(pkg, geneticone.Package):
-		pkg = geneticone.Package(pkg) # assume cpv or gentoolkit.Package
+	if not isinstance(pkg, package.Package):
+		pkg = package.Package(pkg) # assume cpv or gentoolkit.Package
 
 	cpv = pkg.get_cpv()
 	invFlag = invert_use_flag(flag)
@@ -162,7 +163,7 @@ def remove_new_use_flags (cpv):
 	"""Removes all new use-flags for a specific package.
 	@param cpv: the package for which to remove the flags
 	@type cpv: string (cpv) or L{geneticone.Package}-object"""
-	if isinstance(cpv, geneticone.Package):
+	if isinstance(cpv, package.Package):
 		cpv = cpv.get_cpv()
 	
 	try:
@@ -177,7 +178,7 @@ def get_new_use_flags (cpv):
 	@returns: list of flags
 	@rtype: list"""
 	
-	if isinstance(cpv, geneticone.Package):
+	if isinstance(cpv, package.Package):
 		cpv = cpv.get_cpv()
 
 	list2return = []
@@ -283,8 +284,8 @@ new_unmasked = {}
 
 def set_masked (pkg):
 	global new_masked, newunmasked
-	if not isinstance(pkg, geneticone.Package):
-		pkg = geneticone.Package(pkg)
+	if not isinstance(pkg, package.Package):
+		pkg = package.Package(pkg)
 
 	cpv = pkg.get_cpv()
 
@@ -327,8 +328,8 @@ def set_masked (pkg):
 
 def set_unmasked (pkg):
 	global new_masked, new_unmasked
-	if not isinstance(pkg, geneticone.Package):
-		pkg = geneticone.Package(pkg)
+	if not isinstance(pkg, package.Package):
+		pkg = package.Package(pkg)
 	
 	cpv = pkg.get_cpv()
 
@@ -442,8 +443,8 @@ def set_testing (pkg, enable):
 	@type enable: boolean"""
 
 	global arch, newTesting
-	if not isinstance(pkg, geneticone.Package):
-		pkg = geneticone.Package(pkg)
+	if not isinstance(pkg, package.Package):
+		pkg = package.Package(pkg)
 
 	arch = pkg.get_settings("ARCH")
 	cpv = pkg.get_cpv()

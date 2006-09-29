@@ -1,5 +1,5 @@
 #
-# File: geneticone/portage_helper.py
+# File: geneticone/backend/portage_helper.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 Necoro d.M.
@@ -9,15 +9,15 @@
 #
 # Written by Necoro d.M. <necoro@necoro.net> et.al.
 
-from geneticone import *
-import geneticone
-
 import re
 import os
 
 import gentoolkit
 import portage
 from portage_util import unique_array
+
+from geneticone.backend import *
+import package
 
 def find_lambda (name):
 	"""Returns the function needed by all the find_all_*-functions. Returns None if no name is given.
@@ -33,12 +33,12 @@ def find_lambda (name):
 		return lambda x: True
 
 def geneticize_list (list_of_packages):
-	"""Convertes a list of gentoolkit.Packages into L{geneticone.Packages}.
+	"""Convertes a list of gentoolkit.Packages into L{geneticone.backend.Packages}.
 	@param list_of_packages: the list of packages
 	@type list_of_packages: list of gentoolkit.Packages
 	@returns: converted list
-	@rtype: list of geneticone.Packages"""
-	return [geneticone.Package(x) for x in list_of_packages]
+	@rtype: list of geneticone.backend.Packages"""
+	return [package.Package(x) for x in list_of_packages]
 
 def find_best_match (search_key, only_installed = False):
 	"""Finds the best match in the portage tree."""
@@ -48,7 +48,7 @@ def find_best_match (search_key, only_installed = False):
 	else:
 		t = vartree.dep_bestmatch(search_key)
 	if t:
-		return geneticone.Package(t)
+		return package.Package(t)
 	return None
 
 def find_packages (search_key, masked=False):
@@ -89,14 +89,14 @@ def find_all_world_files (name=None):
 	Returns ALL world packages if name is None."""
 	world = filter(find_lambda(name), [x.get_cpv() for x in find_world_packages()[0]])
 	world = unique_array(world)
-	return [geneticone.Package(x) for x in world]
+	return [package.Package(x) for x in world]
 
 def find_all_system_files (name=None):
 	"""Returns a list of all system packages matching ".*name.*". 
 	Returns ALL system packages if name is None."""
 	sys = filter(find_lambda(name), [x.get_cpv() for x in find_system_packages()[0]])
 	sys = unique_array(sys)
-	return [geneticone.Package(x) for x in sys]
+	return [package.Package(x) for x in sys]
 
 def list_categories (name=None):
 	"""Returns a list of categories matching ".*name.*" or all categories."""
