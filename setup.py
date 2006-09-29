@@ -9,6 +9,6 @@ setup(name="Genetic/One",
 		author="Necoro d.M.",
 		license="GPLv2",
 		author_email="necoro@necoro.net",
-		packages=["geneticone", "geneticone.gui"],
+		packages=["geneticone", "geneticone.gui", "geneticone.backend"],
 		#ext_modules=[thread]
 		)
