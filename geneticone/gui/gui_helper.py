@@ -12,6 +12,7 @@
 from geneticone import backend
 from geneticone.backend import flags
 from geneticone.helper import *
+import windows
 
 from subprocess import *
 from threading import Thread
@@ -56,7 +57,7 @@ class EmergeQueue:
 		
 		@raise geneticone.BlockedException: When occured during dependency-calculation."""
 		
-		# get depencies
+		# get dependencies
 		if cpv in self.deps:
 			return # in list already
 		else:
@@ -64,6 +65,9 @@ class EmergeQueue:
 			self.deps.update({cpv : deps})
 		
 		subIt = self.tree.append(it, [cpv])
+
+		# add iter
+		self.iters.update({cpv: subIt})
 		
 		# recursive call
 		for d in deps:
@@ -76,8 +80,6 @@ class EmergeQueue:
 				self.remove_children(subIt)
 				raise e
 		
-		# add iter
-		self.iters.update({cpv: subIt})
 
 	def append (self, cpv, unmerge = False, update = False):
 		"""Appends a cpv either to the merge queue or to the unmerge-queue.
@@ -110,7 +112,7 @@ class EmergeQueue:
 			
 			except backend.BlockedException, e : # there is sth blocked --> call blocked_dialog
 				blocks = e[0]
-				blocked_dialog(cpv, blocks)
+				windows.blocked_dialog(cpv, blocks)
 				return
 		else: # unmerge
 			self.unmergequeue.append(cpv)
@@ -231,8 +233,3 @@ class EmergeQueue:
 				self.unmergequeue.remove(cpv)
 			
 			self.tree.remove(it)
-
-def blocked_dialog (blocked, blocks):
-	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, blocked+" is blocked by "+blocks+".\nPlease unmerge the blocking package.")
-	dialog.run()
-	dialog.destroy()

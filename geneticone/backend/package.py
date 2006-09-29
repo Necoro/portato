@@ -9,10 +9,9 @@
 #
 # Written by Necoro d.M. <necoro@necoro.net>
 
-#from portage_helper import *
-#from exceptions import *
 from geneticone.backend import *
 from geneticone.helper import *
+from portage_helper import *
 import flags
 
 import gentoolkit
