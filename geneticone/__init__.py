@@ -26,5 +26,6 @@ porttree = gentoolkit.porttree
 vartree = gentoolkit.vartree
 
 # import our packages
-from helper import *
+from debug import *
+from portage_helper import *
 from package import *

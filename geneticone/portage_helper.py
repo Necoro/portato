@@ -1,5 +1,5 @@
 #
-# File: geneticone/helper.py
+# File: geneticone/portage_helper.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 Necoro d.M.
