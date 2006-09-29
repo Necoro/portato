@@ -19,18 +19,6 @@ import gentoolkit
 import portage
 from portage_util import unique_array
 
-class BlockedException (Exception):
-	"""An exception marking, that some package is blocking another one."""
-	pass
-
-class PackageNotFoundException (Exception):
-	"""An exception marking that a package could not be found."""
-	pass
-
-class DependencyCalcError (Exception):
-	"""An error occured during dependency calculation."""
-	pass
-
 def find_lambda (name):
 	"""Returns the function needed by all the find_all_*-functions. Returns None if no name is given.
 	@param name: name to build the function of
@@ -124,13 +112,6 @@ def split_package_name (name):
 def sort_package_list(pkglist):
 	"""Sorts a package list in the same manner portage does."""
 	return gentoolkit.sort_package_list(pkglist)
-
-def am_i_root ():
-	"""Returns True if the current user is root, False otherwise."""
-	if os.getuid() == 0:
-		return True
-	else:
-		return False
 
 use_descs = {}
 local_use_descs = {}
