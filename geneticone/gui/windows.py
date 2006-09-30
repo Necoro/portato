@@ -90,8 +90,8 @@ class PackageWindow:
 		#self.window.connect("configure-event", self.cbSizeCheck)
 		
 		# packages and installed packages
-		self.packages = backend.sort_package_list(backend.find_packages(cp, masked=True))
-		self.instPackages = backend.sort_package_list(backend.find_installed_packages(cp, masked=True))
+		self.packages = backend.sort_package_list(backend.get_all_versions(cp))
+		self.instPackages = backend.sort_package_list(backend.get_all_installed_versions(cp))
 
 		# main structure - the table
 		self.table = gtk.Table(rows=4,columns=2)
@@ -545,10 +545,12 @@ class MainWindow:
 		if name:
 			if name not in self.packages and not force: # only calc packages if not already done
 				self.packages[name] = []
-				for p in unique_array([x.get_name() for x in backend.find_all_packages(name+"/")]):
-					if backend.find_installed_packages(name+"/"+p, masked=True) != []:
+				list = backend.find_all_packages(name = name+"/", withVersion = False)
+				installed = backend.find_all_installed_packages(name = name+"/", withVersion=False)
+				for p in list:
+					if p in installed:
 						p += "*" # append a '*' if the package is installed
-					self.packages[name].append(p)
+					self.packages[name].append(p.split("/")[1])
 
 			for p in self.packages[name]:
 				store.append([p])

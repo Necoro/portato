@@ -69,34 +69,57 @@ def find_world_packages ():
 	list = gentoolkit.find_world_packages()
 	return geneticize_list(list[0]),geneticize_list(list[1])
 
-def find_all_installed_packages (name=None):
+def find_all_installed_packages (name=None, withVersion=True):
 	"""Returns a list of all installed packages matching ".*name.*". 
 	Returns ALL installed packages if name is None."""
-	return geneticize_list(gentoolkit.find_all_installed_packages(find_lambda(name)))
+	if withVersion:
+		return geneticize_list(gentoolkit.find_all_installed_packages(find_lambda(name)))
+	else:
+		t = vartree.dbapi.cp_all()
+		if name:
+			t = filter(find_lambda(name),t)
+		return t
 
 def find_all_uninstalled_packages (name=None):
 	"""Returns a list of all uninstalled packages matching ".*name.*". 
 	Returns ALL uninstalled packages if name is None."""
 	return geneticize_list(gentoolkit.find_all_uninstalled_packages(find_lambda(name)))
 
-def find_all_packages (name=None):
+def find_all_packages (name=None, withVersion = True):
 	"""Returns a list of all packages matching ".*name.*". 
 	Returns ALL packages if name is None."""
-	return geneticize_list(gentoolkit.find_all_packages(find_lambda(name)))
+	if (withVersion):
+		return geneticize_list(gentoolkit.find_all_packages(find_lambda(name)))
+	else:
+		t = porttree.dbapi.cp_all()
+		t += vartree.dbapi.cp_all()
+		t = unique_array(t)
+		if name:
+			t = filter(find_lambda(name),t)
+		return t
 
-def find_all_world_files (name=None):
+def find_all_world_packages (name=None):
 	"""Returns a list of all world packages matching ".*name.*". 
 	Returns ALL world packages if name is None."""
 	world = filter(find_lambda(name), [x.get_cpv() for x in find_world_packages()[0]])
 	world = unique_array(world)
 	return [package.Package(x) for x in world]
 
-def find_all_system_files (name=None):
+def find_all_system_packages (name=None):
 	"""Returns a list of all system packages matching ".*name.*". 
 	Returns ALL system packages if name is None."""
 	sys = filter(find_lambda(name), [x.get_cpv() for x in find_system_packages()[0]])
 	sys = unique_array(sys)
 	return [package.Package(x) for x in sys]
+
+def get_all_versions (cp):
+	t = porttree.dbapi.cp_list(cp)
+	t += vartree.dbapi.cp_list(cp)
+	t = unique_array(t)
+	return geneticize_list(t)
+
+def get_all_installed_versions (cp):
+	return geneticize_list(vartree.dbapi.cp_list(cp))
 
 def list_categories (name=None):
 	"""Returns a list of categories matching ".*name.*" or all categories."""
