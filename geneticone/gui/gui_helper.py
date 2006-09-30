@@ -95,7 +95,11 @@ class EmergeQueue:
 		if not unmerge:
 			try:
 				# insert dependencies
-				pkg = backend.find_packages("="+cpv)[0]
+				pkg = backend.find_packages("="+cpv)
+				if pkg:
+					pkg = pkg[0]
+				else:
+					raise backend.PackageNotFoundException(cpv)
 				deps = pkg.get_dep_packages()
 				
 				if update:

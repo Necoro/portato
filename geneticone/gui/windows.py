@@ -241,22 +241,25 @@ class PackageWindow:
 	def cb_emerge_clicked (self, button, data = None):
 		"""Adds the package to the EmergeQueue."""
 		if not am_i_root():
-			errorMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "You cannot (un)merge without being root.")
-			errorMB.run()
-			errorMB.destroy()
+			not_root_dialog()
 		else:
-			self.queue.append(self.actual_package().get_cpv(), False)
+			try:
+				self.queue.append(self.actual_package().get_cpv(), False)
+			except backend.PackageNotFoundException, e:
+				masked_dialog(e[0])
 			self.window.destroy()
 		return True
 
 	def cb_unmerge_clicked (self, button, data = None):
 		"""Adds the package to the UnmergeQueue."""
-		if not backend.am_i_root():
-			errorMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "You cannot (un)merge without being root.")
-			errorMB.run()
-			errorMB.destroy()
+		if not am_i_root():
+			not_root_dialog()
 		else:
-			self.queue.append(self.actual_package().get_cpv(), True)
+			try:
+				self.queue.append(self.actual_package().get_cpv(), False)
+			except backend.PackageNotFoundException, e:
+				masked_dialog(e[0])
+
 			self.window.destroy()
 		return True
 
@@ -432,6 +435,7 @@ class MainWindow:
 		term = vte.Terminal()
 		term.set_scrollback_lines(1024)
 		term.set_scroll_on_output(True)
+		term.set_font_from_string("Monospace 11")
 		# XXX why is this not working with the colors
 		term.set_color_background(gtk.gdk.color_parse("white"))
 		term.set_color_foreground(gtk.gdk.color_parse("black"))
@@ -628,5 +632,15 @@ class MainWindow:
 
 def blocked_dialog (blocked, blocks):
 	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, blocked+" is blocked by "+blocks+".\nPlease unmerge the blocking package.")
+	dialog.run()
+	dialog.destroy()
+
+def not_root_dialog ():
+	errorMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "You cannot (un)merge without being root.")
+	errorMB.run()
+	errorMB.destroy()
+
+def masked_dialog (cpv):
+	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, cpv+" seems to be masked.\nPlease edit the appropriate file(s) to unmask it and restart Genetic/One.\n")
 	dialog.run()
 	dialog.destroy()

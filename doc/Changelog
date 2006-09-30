@@ -1,3 +1,10 @@
-0.3.1
+0.3.2:
+- restructured program files
+- changed font in terminal 
+- added new dialog warning when we cannot emerge a masked program
+- using debug() instead of print
+- fixing small bugs
+
+0.3.1:
 - added AboutWindow
 - make the menu work
