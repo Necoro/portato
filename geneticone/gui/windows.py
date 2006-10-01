@@ -244,7 +244,7 @@ class PackageWindow:
 			not_root_dialog()
 		else:
 			try:
-				self.queue.append(self.actual_package().get_cpv(), False)
+				self.queue.append(self.actual_package().get_cpv(), unmerge = False)
 			except backend.PackageNotFoundException, e:
 				masked_dialog(e[0])
 			self.window.destroy()
@@ -256,7 +256,7 @@ class PackageWindow:
 			not_root_dialog()
 		else:
 			try:
-				self.queue.append(self.actual_package().get_cpv(), False)
+				self.queue.append(self.actual_package().get_cpv(), unmerge = True)
 			except backend.PackageNotFoundException, e:
 				masked_dialog(e[0])
 
@@ -360,6 +360,10 @@ class MainWindow:
 		self.window.set_geometry_hints (self.window, min_width = 600, min_height = 800, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
 		self.window.set_resizable(True)
 
+		# package db
+		self.db = Database()
+		self.db.populate()
+
 		# main vb
 		vb = gtk.VBox(False, 1)
 		self.window.add(vb)
@@ -459,7 +463,7 @@ class MainWindow:
 		self.window.show_all()
 
 		# set emerge queue
-		self.queue = EmergeQueue(console=term, tree = emergeStore, packages = self.packages)
+		self.queue = EmergeQueue(console=term, tree = emergeStore, db = self.db)
 
 	def cb_delete (self, widget, data = None):
 		"""Returns false -> window is deleted."""
@@ -543,16 +547,7 @@ class MainWindow:
 
 		# calculate packages
 		if name:
-			if name not in self.packages and not force: # only calc packages if not already done
-				self.packages[name] = []
-				list = backend.find_all_packages(name = name+"/", withVersion = False)
-				installed = backend.find_all_installed_packages(name = name+"/", withVersion=False)
-				for p in list:
-					if p in installed:
-						p += "*" # append a '*' if the package is installed
-					self.packages[name].append(p.split("/")[1])
-
-			for p in self.packages[name]:
+			for p in self.db.get_cat(name):
 				store.append([p])
 
 			# sort alphabetically
@@ -607,15 +602,13 @@ class MainWindow:
 	def cb_search_clicked (self, button, data = None):
 		"""Do a search."""
 		if self.searchEntry.get_text() != "":
-			packages = backend.find_all_packages(self.searchEntry.get_text())
+			packages = backend.find_all_packages(self.searchEntry.get_text(), withVersion = False)
 
 			if packages == []:
 				dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, "Package not found!")
 				dialog.run()
 				dialog.destroy()
 			else:
-				packages = unique_array([p.get_cp() for p in packages])
-				
 				if len(packages) == 1:
 					self.jump_to(packages[0])
 				else:

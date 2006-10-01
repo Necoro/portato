@@ -20,10 +20,37 @@ from threading import Thread
 import pty
 import vte
 
+class Database:
+
+	def __init__ (self):
+		self.db = {}
+
+	def populate (self, cat = None):
+		packages = backend.find_all_packages(name = cat, withVersion = False)
+		installed = backend.find_all_installed_packages(name = cat, withVersion = False)
+		for p in packages:
+			list = p.split("/")
+			cat = list[0]
+			pkg = list[1]
+			if p in installed:
+				pkg += "*"
+			if not cat in self.db: self.db[cat] = []
+			self.db[cat].append(pkg)
+
+	def get_cat (self, cat):
+		try:
+			return self.db[cat]
+		except KeyError: # cat is in category list - but not in portage
+			return []
+
+	def reload (self, cat):
+		del self.db[cat]
+		self.populate(cat+"/")
+
 class EmergeQueue:
 	"""This class manages the emerge queue."""
 	
-	def __init__ (self, tree = None, console = None, packages = None):
+	def __init__ (self, tree = None, console = None, db = None):
 		"""Constructor.
 		
 		@param tree: Tree to append all the items to. Default: None.
@@ -39,7 +66,7 @@ class EmergeQueue:
 		self.deps = {}
 		self.tree = tree
 		self.console = console
-		self.packages = packages
+		self.db = db
 
 		if self.tree: 
 			self.emergeIt = self.tree.append(None, ["Emerge"])
@@ -133,14 +160,11 @@ class EmergeQueue:
 
 		if process: process.wait()
 		for p in packages:
-			try:
-				cat = backend.split_package_name(p)[0] # get category
-				while cat[0] in ["=",">","<","!"]:
-					cat = cat[1:]
-				del self.packages[cat]
-				debug("Category %s marked for refreshing" % cat)
-			except KeyError: # not in self.packages - ignore
-				pass
+			cat = backend.split_package_name(p)[0] # get category
+			while cat[0] in ["=",">","<","!"]:
+				cat = cat[1:]
+			self.db.reload(cat)
+			debug("Category %s refreshed" % cat)
 
 	def _emerge (self, options, packages, it):
 		"""Calls emerge and updates the terminal.
