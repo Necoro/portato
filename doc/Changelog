@@ -1,3 +1,9 @@
+0.3.3:
+- removed bug which always apended a package to the emerge-queue - and never
+to the unmerge-queue
+- implemented an internal package-db
+- used new calls to portage for receiving all packages
+
 0.3.2:
 - restructured program files
 - changed font in terminal 
