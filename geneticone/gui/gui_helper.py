@@ -21,13 +21,18 @@ import pty
 import vte
 
 class Database:
+	"""An internal database which holds a simple dictionary cat -> [package_list]."""
 
 	def __init__ (self):
+		"""Constructor."""
 		self.db = {}
 
-	def populate (self, cat = None):
-		packages = backend.find_all_packages(name = cat, withVersion = False)
-		installed = backend.find_all_installed_packages(name = cat, withVersion = False)
+	def populate (self, category = None):
+		"""Populates the database.
+		@param category: An optional category - so only packages of this category are inserted.
+		@type category: string"""
+		packages = backend.find_all_packages(name = category, withVersion = False)
+		installed = backend.find_all_installed_packages(name = category, withVersion = False)
 		for p in packages:
 			list = p.split("/")
 			cat = list[0]
@@ -37,13 +42,25 @@ class Database:
 			if not cat in self.db: self.db[cat] = []
 			self.db[cat].append(pkg)
 
+		for key in self.db:
+			self.db[key].sort(cmp=cmp, key=str.lower)
+
 	def get_cat (self, cat):
+		"""Returns the packages in the category.
+		@param cat: category to return the packages from
+		@type cat: string
+		@return: list of packages or []
+		@rtype: list of strings"""
 		try:
 			return self.db[cat]
 		except KeyError: # cat is in category list - but not in portage
 			return []
 
 	def reload (self, cat):
+		"""Reloads the given category.
+		@param cat: category
+		@type cat: string"""
+
 		del self.db[cat]
 		self.populate(cat+"/")
 
@@ -57,8 +74,8 @@ class EmergeQueue:
 		@type tree: gtk.TreeStore
 		@param console: Output is shown here. Default: None
 		@type console: vte.Terminal
-		@param packages: The list of packages sorted by categories. We will delete the appropriate category if we updated sth. Default: None
-		@type packages: dictionary: {category: list_of_packages}."""
+		@param db: A database instance.
+		@type db: Database"""
 		
 		self.mergequeue = []
 		self.unmergequeue = []
@@ -82,7 +99,7 @@ class EmergeQueue:
 		@param cpv: The package to append.
 		@type cpv: string (cat/pkg-ver)
 		
-		@raise geneticone.BlockedException: When occured during dependency-calculation."""
+		@raise geneticone.backend.BlockedException: When occured during dependency-calculation."""
 		
 		# get dependencies
 		if cpv in self.deps:
@@ -117,7 +134,8 @@ class EmergeQueue:
 		@param unmerge: Set to True if you want to unmerge this package - else False. Default: False
 		@type unmerge: boolean
 		@param update: Set to True if a package is going to be updated (e.g. if the use-flags changed). Default: False
-		@type update: boolean"""
+		@type update: boolean
+		@raises geneticone.backend.PackageNotFoundException: if trying to add a package which does not exist"""
 		
 		if not unmerge:
 			try:
@@ -151,7 +169,7 @@ class EmergeQueue:
 				self.tree.append(self.unmergeIt, [cpv])
 	
 	def _update_packages(self, packages, process = None):
-		"""This updates the packages-list. It simply removes all affected categories so they have to be rebuilt.
+		"""This updates the packages-list. It simply makes the db to rebuild the specific category.
 		
 		@param packages: The packages which we emerged.
 		@type packages: list of cpvs

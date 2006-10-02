@@ -33,7 +33,7 @@ def find_lambda (name):
 		return lambda x: True
 
 def geneticize_list (list_of_packages):
-	"""Convertes a list of gentoolkit.Packages into L{geneticone.backend.Packages}.
+	"""Convertes a list of gentoolkit.Packages into L{backend.Package}s.
 	@param list_of_packages: the list of packages
 	@type list_of_packages: list of gentoolkit.Packages
 	@returns: converted list

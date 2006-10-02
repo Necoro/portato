@@ -24,7 +24,7 @@ from portage_util import unique_array
 def grep (pkg, path):
 	"""Grep runs "egrep" on a given path and looks for occurences of a given package.
 	@param pkg: the package
-	@type pkg: string (cpv) or L{geneticone.Package}-object
+	@type pkg: string (cpv) or L{backend.Package}-object
 	@param path: path to look in
 	@type path: string
 	
@@ -40,7 +40,7 @@ def grep (pkg, path):
 def get_data(pkg, path):
 	"""This splits up the data of L{grep} and builds tuples in the format (file,line,criterion,list_of_flags).
 	@param pkg: package to find
-	@type pkg: string (cpv) or L{geneticone.Package}-object
+	@type pkg: string (cpv) or L{backend.Package}-object
 	@param path: path to look in
 	@type path: string
 	
@@ -94,7 +94,7 @@ def set_use_flag (pkg, flag):
 	"""Sets the useflag for a given package.
 	
 	@param pkg: the package
-	@type pkg: string (cpv) or L{geneticone.Package}-object
+	@type pkg: string (cpv) or L{backend.Package}-object
 	@param flag: the flag to set
 	@type flag: string"""
 
@@ -162,7 +162,7 @@ def set_use_flag (pkg, flag):
 def remove_new_use_flags (cpv):
 	"""Removes all new use-flags for a specific package.
 	@param cpv: the package for which to remove the flags
-	@type cpv: string (cpv) or L{geneticone.Package}-object"""
+	@type cpv: string (cpv) or L{backend.Package}-object"""
 	if isinstance(cpv, package.Package):
 		cpv = cpv.get_cpv()
 	
@@ -174,7 +174,7 @@ def remove_new_use_flags (cpv):
 def get_new_use_flags (cpv):
 	"""Gets all the new use-flags for a specific package.
 	@param cpv: the package for which to remove the flags
-	@type cpv: string (cpv) or L{geneticone.Package}-object
+	@type cpv: string (cpv) or L{backend.Package}-object
 	@returns: list of flags
 	@rtype: list"""
 	
@@ -438,7 +438,7 @@ arch = ""
 def set_testing (pkg, enable):
 	"""Enables the package for installing when it is marked as testing (~ARCH).
 	@param pkg: the package
-	@type pkg: string (cpv) or L{geneticone.Package}-object
+	@type pkg: string (cpv) or L{backend.Package}-object
 	@param enable: controls whether to enable (True) or disable (False) for test-installing
 	@type enable: boolean"""
 

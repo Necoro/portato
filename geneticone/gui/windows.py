@@ -11,7 +11,7 @@
 
 # our backend stuff
 
-VERSION = "0.3.1"
+VERSION = "0.3.4"
 MENU_EMERGE = 1
 MENU_UNEMERGE = 2
 
@@ -34,6 +34,7 @@ import vte
 from portage_util import unique_array
 
 class AboutWindow:
+	"""A window showing the "about"-informations."""
 
 	def __init__ (self, parent):
 		# window
@@ -65,6 +66,55 @@ Copyright (C) 2006 Necoro d.M. &lt;necoro@necoro.net&gt;
 
 		self.window.show_all()
 
+class SearchWindow:
+	"""A window showing the results of a search process."""
+	
+	def __init__ (self, parent, list, jump_to):
+		# window
+		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		self.window.set_title("Search results")
+		self.window.set_modal(True)
+		self.window.set_transient_for(parent)
+		self.window.set_destroy_with_parent(True)
+		self.window.set_resizable(False)
+		self.window.set_default_size(1,1)
+		self.window.connect("key-press-event", self.cb_key_pressed)
+		self.list = list
+		self.jump_to = jump_to
+
+		box = gtk.HBox(False)
+		self.window.add(box)
+
+		self.combo = gtk.combo_box_new_text()
+		for x in list:
+			self.combo.append_text(x)
+		self.combo.set_active(0)
+		self.combo.connect("key-press-event", self.cb_key_pressed)
+
+		box.pack_start(self.combo)
+
+		okBtn = gtk.Button("OK")
+		okBtn.connect("clicked", self.cb_ok_btn_clicked)
+		box.pack_start(okBtn)
+
+		self.window.show_all()
+
+	def cb_ok_btn_clicked (self, button, data = None):
+		self.window.destroy()
+		self.jump_to(self.list[self.combo.get_active()])
+		return True
+
+	def cb_key_pressed (self, widget, event):
+		keyname = gtk.gdk.keyval_name(event.keyval)
+		if keyname == "Return": # take it as an "OK" if Enter is pressed
+			self.cb_ok_btn_clicked(self,widget)
+			return True
+		elif keyname == "Escape":
+			self.window.destroy()
+			return True
+		else:
+			return False
+
 class PackageWindow:
 	"""A window with data about a specfic package."""
 
@@ -86,8 +136,7 @@ class PackageWindow:
 		self.window.set_destroy_with_parent(True)
 		self.window.set_resizable(False)
 		self.window.set_default_size(1,1) # as small as possible
-		self.window.connect("delete-event", lambda a,b: False)
-		#self.window.connect("configure-event", self.cbSizeCheck)
+		self.window.connect("key-press-event", self.cb_key_press_event)
 		
 		# packages and installed packages
 		self.packages = backend.sort_package_list(backend.get_all_versions(cp))
@@ -103,12 +152,12 @@ class PackageWindow:
 
 		# the label (must be here, because it depends on the combo box)
 		desc = self.actual_package().get_env_var("DESCRIPTION")
-		use_markup = True
 		if not desc: 
 			desc = "<no description>"
 			use_markup = False
 		else:
 			desc = "<b>"+desc+"</b>"
+			use_markup = True
 		self.descLabel = gtk.Label(desc)
 		self.descLabel.set_line_wrap(True)
 		self.descLabel.set_justify(gtk.JUSTIFY_CENTER)
@@ -162,36 +211,54 @@ class PackageWindow:
 		buttonHB.pack_start(self.cancelBtn)
 
 		# current status
-		self.cb_changed(self.vCombo)
+		self.cb_combo_changed(self.vCombo)
 
 		# show
 		self.window.show_all()
 
-	def cb_changed (self, combo, data = None):
-		"""Callback for the changed ComboBox.
-		It then rebuilds the useList and the checkboxes."""
-		# remove old useList
-		self.useListScroll.remove(self.useList)
+	def update_checkboxes (self):
+		"""Updates the checkboxes."""
+		self.installedCheck.set_active(self.actual_package().is_installed())
+		self.maskedCheck.set_active(self.actual_package().is_masked())
+		self.testingCheck.set_active((self.actual_package().get_mask_status() % 3) == 1)
+
+	def fill_use_list(self, store):
+		pkg = self.actual_package()
+		pkg_flags = pkg.get_all_use_flags()
+		pkg_flags.sort()
+		for use in pkg_flags:
+			if pkg.is_installed() and use in pkg.get_actual_use_flags(): # flags set during install
+				enabled = True
+			elif (not pkg.is_installed()) and use in pkg.get_settings("USE").split() and not flags.invert_use_flag(use) in pkg.get_new_use_flags(): # flags that would be set
+				enabled = True
+			elif use in pkg.get_new_use_flags():
+				enabled = True
+			else:
+				enabled = False
+			store.append([enabled, use, backend.get_use_desc(use, self.cp)])
 		
-		# build new
-		self.useList = self.build_use_list()
-		self.useListScroll.add(self.useList)
-		self.update_checkboxes()
+		return store
 
-		self.useListScroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
+	def build_use_list (self):
+		"""Builds the useList."""
+		store = gtk.ListStore(bool, str, str)
+		self.fill_use_list(store)
 
-		# set emerge-button-label
-		if not self.actual_package().is_installed():
-			self.emergeBtn.set_label("_Emerge")
-			self.unmergeBtn.set_sensitive(False)
+		# build view
+		view = gtk.TreeView(store)
+		cell = gtk.CellRendererText()
+		tCell = gtk.CellRendererToggle()
+		tCell.set_property("activatable", True)
+		tCell.connect("toggled", self.cb_use_flag_toggled, store)
+		view.append_column(gtk.TreeViewColumn("Enabled", tCell, active = 0))
+		view.append_column(gtk.TreeViewColumn("Flags", cell, text = 1))
+		view.append_column(gtk.TreeViewColumn("Description", cell, text = 2))
+
+		if store.iter_n_children(None) == 0: # if there are no nodes in the list ...
+			view.set_child_visible(False) # ... do not show the list
 		else:
-			self.emergeBtn.set_label("R_emerge")
-			self.unmergeBtn.set_sensitive(True)
-		
-		# refresh - make window as small as possible
-		self.table.show_all()
-		self.window.resize(1,1)
-		return True
+			view.set_child_visible(True)
+		return view
 
 	def build_vers_combo (self):
 		"""Creates the combo box with the different versions."""
@@ -215,13 +282,45 @@ class PackageWindow:
 		except AttributeError: # no package found
 			combo.set_active(0)
 
-		combo.connect("changed", self.cb_changed)
+		combo.connect("changed", self.cb_combo_changed)
 		
 		return combo
 
 	def actual_package (self):
 		"""Returns the actual package (a backend.Package-object)."""
 		return self.packages[self.vCombo.get_active()]
+
+	def cb_key_press_event (self, widget, event):
+		"""Closes the window if esc is pressed."""
+		keyname = gtk.gdk.keyval_name(event.keyval)
+		if keyname == "Escape":
+			self.window.destroy()
+			return True
+		else:
+			return False
+
+	def cb_combo_changed (self, combo, data = None):
+		"""Callback for the changed ComboBox.
+		It then rebuilds the useList and the checkboxes."""
+		
+		store = self.useList.get_model()
+		store.clear()
+		self.fill_use_list(store)
+		
+		self.update_checkboxes()
+
+		# set emerge-button-label
+		if not self.actual_package().is_installed():
+			self.emergeBtn.set_label("_Emerge")
+			self.unmergeBtn.set_sensitive(False)
+		else:
+			self.emergeBtn.set_label("R_emerge")
+			self.unmergeBtn.set_sensitive(True)
+		
+		# refresh - make window as small as possible
+		self.table.show_all()
+		self.window.resize(1,1)
+		return True
 
 	def cb_button_pressed (self, b, event, data = None):
 		"""Callback for pressed checkboxes. Just quits the event-loop - no redrawing."""
@@ -272,79 +371,6 @@ class PackageWindow:
 		self.flagChanged = True
 		return True
 
-	def update_checkboxes (self):
-		"""Updates the checkboxes."""
-		self.installedCheck.set_active(self.actual_package().is_installed())
-		self.maskedCheck.set_active(self.actual_package().is_masked())
-		self.testingCheck.set_active((self.actual_package().get_mask_status() % 3) == 1)
-
-	def build_use_list (self):
-		"""Builds the useList."""
-		store = gtk.ListStore(bool, str, str)
-
-		pkg = self.actual_package()
-		for use in pkg.get_all_use_flags():
-			if pkg.is_installed() and use in pkg.get_actual_use_flags(): # flags set during install
-				enabled = True
-			elif (not pkg.is_installed()) and use in pkg.get_settings("USE").split() and not flags.invert_use_flag(use) in pkg.get_new_use_flags(): # flags that would be set
-				enabled = True
-			elif use in pkg.get_new_use_flags():
-				enabled = True
-			else:
-				enabled = False
-			store.append([enabled, use, backend.get_use_desc(use, self.cp)])
-
-		# build view
-		view = gtk.TreeView(store)
-		cell = gtk.CellRendererText()
-		tCell = gtk.CellRendererToggle()
-		tCell.set_property("activatable", True)
-		tCell.connect("toggled", self.cb_use_flag_toggled, store)
-		view.append_column(gtk.TreeViewColumn("Enabled", tCell, active = 0))
-		view.append_column(gtk.TreeViewColumn("Flags", cell, text = 1))
-		view.append_column(gtk.TreeViewColumn("Description", cell, text = 2))
-
-		if store.iter_n_children(None) == 0:
-			view.set_child_visible(False)
-		else:
-			view.set_child_visible(True)
-		return view
-
-class SearchWindow:
-	"""A window showing the results of a search process."""
-	
-	def __init__ (self, parent, list, jump_to):
-		# window
-		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.window.set_title("Search results")
-		self.window.set_modal(True)
-		self.window.set_transient_for(parent)
-		self.window.set_destroy_with_parent(True)
-		self.window.set_resizable(False)
-		self.window.set_default_size(1,1)
-		self.list = list
-		self.jump_to = jump_to
-
-		box = gtk.HBox(False)
-		self.window.add(box)
-
-		self.combo = gtk.combo_box_new_text()
-		for x in list:
-			self.combo.append_text(x)
-		self.combo.set_active(0)
-
-		box.pack_start(self.combo)
-
-		okBtn = gtk.Button("OK")
-		okBtn.connect("clicked", self.cb_ok_btn_clicked)
-		box.pack_start(okBtn)
-
-		self.window.show_all()
-
-	def cb_ok_btn_clicked (self, button, data = None):
-		self.window.destroy()
-		self.jump_to(self.list[self.combo.get_active()])
-
 class MainWindow:
 	"""Application main window."""
 	
@@ -354,7 +380,6 @@ class MainWindow:
 		# window
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.window.set_title("Genetic/One")
-		self.window.connect("delete_event", self.cb_delete)
 		self.window.connect("destroy", self.cb_destroy)
 		self.window.set_border_width(2)
 		self.window.set_geometry_hints (self.window, min_width = 600, min_height = 800, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
@@ -376,6 +401,7 @@ class MainWindow:
 		self.searchEntry = gtk.Entry()
 		self.searchBtn = gtk.Button("_Search")
 		self.searchBtn.connect("clicked", self.cb_search_clicked)
+		self.searchEntry.connect("activate", self.cb_search_clicked)
 		hbSearch = gtk.HBox(False, 5)
 		hbSearch.pack_start(self.searchEntry, True, True)
 		hbSearch.pack_start(self.searchBtn, False, False)
@@ -465,14 +491,6 @@ class MainWindow:
 		# set emerge queue
 		self.queue = EmergeQueue(console=term, tree = emergeStore, db = self.db)
 
-	def cb_delete (self, widget, data = None):
-		"""Returns false -> window is deleted."""
-		return False
-
-	def cb_destroy (self, widget, data = None):
-		"""Calls main_quit()."""
-		gtk.main_quit()
-
 	def create_main_menu (self):
 		"""Creates the main menu. XXX: Rebuild to use UIManager"""
 		# the menu-list
@@ -489,35 +507,26 @@ class MainWindow:
 		self.itemFactory.create_items(mainMenuDesc)
 		return self.itemFactory.get_widget("<main>")
 
-	def cb_cat_list_selection (self, view, data = None, force = False):
-		"""Callback for a category-list selection. Updates the package list with these packages in the category."""
-		if view == self.catList: # be sure it is the catList
-			# get the selected category
-			sel = view.get_selection()
-			store, it = sel.get_selected()
-			
-			if it:
-				# remove old one
-				self.scroll_2.remove(self.pkgList)
-				# create new package list
-				self.pkgList = self.create_pkg_list(store.get_value(it,0), force)
-				self.scroll_2.add(self.pkgList)
-				self.scroll_2.show_all()
-		return False
+	def fill_pkg_store (self, store, name = None):
+		if name:
+			for p in self.db.get_cat(name):
+				store.append([p])
+		return store
+	
+	def create_pkg_list (self, name = None, force = False):
+		"""Creates the package list. Gets the name of the category."""
+		self.selCatName = name # actual category
+		store = gtk.ListStore(str)
+		self.fill_pkg_store(store,name)
+		
+		# build view
+		pkgList = gtk.TreeView(store)
+		cell = gtk.CellRendererText()
+		col = gtk.TreeViewColumn("Packages", cell, text = 0)
+		pkgList.append_column(col)
+		pkgList.connect("row-activated", self.cb_row_activated, store)
 
-	def cb_row_activated (self, view, path, col, store = None):
-		"""Callback for an activated row in the pkgList. Opens a package window."""
-		if view == self.pkgList:
-			package = store.get_value(store.get_iter(path), 0)
-			if package[-1] == '*': package = package[:-1]
-			PackageWindow(self.window, self.selCatName+"/"+package, self.queue)
-		elif view == self.emergeView:
-			if len(path) > 1:
-				package = store.get_value(store.get_iter(path), 0)
-				cat, name, vers, rev = backend.split_package_name(package)
-				if rev != "r0": vers = vers+"-"+rev
-				PackageWindow(self.window, cat+"/"+name, queue = self.queue, version = vers, delOnClose = False, doEmerge = False)
-		return True
+		return pkgList
 
 	def create_cat_list (self):
 		"""Creates the category list."""
@@ -539,28 +548,38 @@ class MainWindow:
 
 		return view
 
-	packages = {} # directory category -> [packages]
-	def create_pkg_list (self, name = None, force = False):
-		"""Creates the package list. Gets the name of the category."""
-		self.selCatName = name # actual category
-		store = gtk.ListStore(str)
+	def jump_to (self, cp):
+		"""Is called when we want to jump to a specific package."""
+		PackageWindow(self.window, cp, self.queue)
+	
+	def cb_destroy (self, widget, data = None):
+		"""Calls main_quit()."""
+		gtk.main_quit()
 
-		# calculate packages
-		if name:
-			for p in self.db.get_cat(name):
-				store.append([p])
+	def cb_cat_list_selection (self, view, data = None, force = False):
+		"""Callback for a category-list selection. Updates the package list with these packages in the category."""
+		if view == self.catList: # be sure it is the catList
+			# get the selected category
+			sel = view.get_selection()
+			store, it = sel.get_selected()
+			if it:
+				self.pkgList.get_model().clear()
+				self.fill_pkg_store(self.pkgList.get_model(), store.get_value(it, 0))
+		return False
 
-			# sort alphabetically
-			store.set_sort_column_id(0, gtk.SORT_ASCENDING)
-
-		# build view
-		pkgList = gtk.TreeView(store)
-		cell = gtk.CellRendererText()
-		col = gtk.TreeViewColumn("Packages", cell, text = 0)
-		pkgList.append_column(col)
-		pkgList.connect("row-activated", self.cb_row_activated, store)
-
-		return pkgList
+	def cb_row_activated (self, view, path, col, store = None):
+		"""Callback for an activated row in the pkgList. Opens a package window."""
+		if view == self.pkgList:
+			package = store.get_value(store.get_iter(path), 0)
+			if package[-1] == '*': package = package[:-1]
+			PackageWindow(self.window, self.selCatName+"/"+package, self.queue)
+		elif view == self.emergeView:
+			if len(path) > 1:
+				package = store.get_value(store.get_iter(path), 0)
+				cat, name, vers, rev = backend.split_package_name(package)
+				if rev != "r0": vers = vers+"-"+rev
+				PackageWindow(self.window, cat+"/"+name, queue = self.queue, version = vers, delOnClose = False, doEmerge = False)
+		return True
 
 	def cb_remove_clicked (self, button, data = None):
 		"""Removes a selected item in the (un)emerge-queue if possible."""
@@ -613,10 +632,6 @@ class MainWindow:
 					self.jump_to(packages[0])
 				else:
 					SearchWindow(self.window, packages, self.jump_to)
-
-	def jump_to (self, cp):
-		"""Is called when we want to jump to a specific package."""
-		PackageWindow(self.window, cp, self.queue)
 
 	def main (self):
 		"""Main."""
