@@ -13,14 +13,12 @@ import traceback, textwrap, os.path
 
 def debug(*args, **kwargs):
 	"""Prints a debug message including filename and lineno.
-
-    A variable number of positional arguments are allowed. If
-        lineno(obj0, obj1, obj2)
-    is called, the text part of the output looks like the output from
-        print obj0, obj1, obj2
-    The optional keyword "wrap" causes the message to be line-wrapped. The
-    argument to "wrap" should be "1" or "True". "name" is another optional
-    keyword parameter.
+	A variable number of positional arguments are allowed.
+	If lineno(obj0, obj1, obj2) is called, the text part of the output 
+	looks like the output from print obj0, obj1, obj2 .
+	The optional keyword "wrap" causes the message to be line-wrapped. The
+	argument to "wrap" should be "1" or "True". "name" is another optional
+	keyword parameter.
 
 	(This function is adapted from Edward Jones as published under: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/279155)"""
 	
