@@ -25,7 +25,8 @@ class Config:
 	const = {
 			"main_sec" : "Main",
 			"usePerVersion_opt" : "usePerVersion",
-			"useFile_opt" : "usefile"
+			"useFile_opt" : "usefile",
+			"maskFile_opt" : "maskfile"
 			}
 	
 	def __init__ (self, cfgFile):
@@ -47,7 +48,10 @@ class Config:
 		return self._cfg.getboolean(section, name)
 
 	def modify_flags_config (self):
-		flagCfg = {"usefile": self.get(self.const["useFile_opt"]), "usePerVersion" : self.get_boolean(self.const["usePerVersion_opt"])}
+		flagCfg = {
+				"usefile": self.get(self.const["useFile_opt"]), 
+				"usePerVersion" : self.get_boolean(self.const["usePerVersion_opt"]),
+				"maskfile" : self.get(self.const["maskFile_opt"])}
 		flags.set_config(flagCfg)
 
 	def set(self, name, val, section=const["main_sec"]):
@@ -143,7 +147,17 @@ class EmergeQueue:
 		if cpv in self.deps:
 			return # in list already
 		else:
-			deps = backend.find_packages("="+cpv)[0].get_dep_packages()
+			if flags.new_masking_status(cpv) == "unmasked":
+				masked = True
+			else:
+				masked = False
+			pkg = backend.find_packages("="+cpv, masked = masked)
+			if pkg:
+				pkg = pkg[0]
+			else:
+				raise backend.PackageNotFoundException(cpv)
+			
+			deps = pkg.get_dep_packages()
 			self.deps.update({cpv : deps})
 		
 		subIt = self.tree.append(it, [cpv])
@@ -162,7 +176,6 @@ class EmergeQueue:
 				self.remove_children(subIt)
 				raise e
 		
-
 	def append (self, cpv, unmerge = False, update = False):
 		"""Appends a cpv either to the merge queue or to the unmerge-queue.
 		Also updates the tree-view.
@@ -178,7 +191,11 @@ class EmergeQueue:
 		if not unmerge:
 			try:
 				# insert dependencies
-				pkg = backend.find_packages("="+cpv)
+				if flags.new_masking_status(cpv) == "unmasked":
+					masked = True
+				else:
+					masked = False
+				pkg = backend.find_packages("="+cpv, masked = masked)
 				if pkg:
 					pkg = pkg[0]
 				else:

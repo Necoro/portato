@@ -22,6 +22,7 @@ from portage_util import unique_array
 
 CONFIG = {
 		"usefile" : "geneticone",
+		"maskfile" : "geneticone",
 		"usePerVersion" : True
 		}
 
@@ -84,6 +85,14 @@ def set_config (cfg):
 
 	for i in CONFIG:
 		CONFIG[i] = cfg[i]
+
+def generate_path (cpv, exp):
+
+	cat, pkg, ver, rev = split_package_name(cpv)
+	
+	if exp.find("$(") != -1:
+		exp = exp.replace("$(cat)",cat).replace("$(pkg)",pkg).replace("$(cat-1)",cat.split("-")[0]).replace("$(cat-2)",cat.split("-")[1])
+	return exp
 
 ### USE FLAG PART ###
 USE_PATH = os.path.join(portage.USER_CONFIG_PATH,"package.use")
@@ -168,7 +177,7 @@ def set_use_flag (pkg, flag):
 	if not added:
 		path = USE_PATH
 		if USE_PATH_IS_DIR:
-			path = os.path.join(USE_PATH,CONFIG["usefile"])
+			path = os.path.join(USE_PATH,generate_path(cpv, CONFIG["usefile"]))
 		
 		try:
 			newUseFlags[cpv].remove((path, -1, invFlag, False))
@@ -310,7 +319,7 @@ UNMASK_PATH_IS_DIR = os.path.isdir(UNMASK_PATH)
 new_masked = {}
 new_unmasked = {}
 
-def set_masked (pkg):
+def set_masked (pkg, masked = True):
 	global new_masked, newunmasked
 	if not isinstance(pkg, package.Package):
 		pkg = package.Package(pkg)
@@ -321,84 +330,80 @@ def set_masked (pkg):
 		new_unmasked[cpv] = []
 	if not cpv in new_masked:
 		new_masked[cpv] = []
-	
-	nu = new_unmasked[cpv][:]
-	for file, line in nu:
+
+	if masked:
+		link_neq = new_masked
+		link_eq = new_unmasked
+		path = UNMASK_PATH
+	else:
+		link_neq = new_unmasked
+		link_eq = new_masked
+		path = MASK_PATH
+
+	copy = link_eq[cpv]
+	for file, line in copy:
 		if line == "-1":
-			new_unmasked[cpv].remove(file, line)
-
-	nm = new_masked[cpv][:]
-	for file, line in nm:
+			link_eq[cpv].remove((file, line))
+	
+	copy = link_neq[cpv][:]
+	for file, line in copy:
 		if line != "-1":
-			new_masked[cpv].remove(file, line)
+			link_neq[cpv].remove(file, line)
 
-	if pkg.is_masked():
+	if masked == pkg.is_masked():
 		return
 
-	unmasked = get_data(pkg, UNMASK_PATH)
-	debug("data (unmasked): "+str(unmasked))
+	data = get_data(pkg, path)
+	debug("data: "+str(link_eq))
 	done = False
-	for file, line, crit, flags in unmasked:
+	for file, line, crit, flags in data:
 		if pkg.matches(crit):
-			new_unmasked[cpv].append((file, line))
+			link_eq[cpv].append((file, line))
 			done = True
 
 	if done: return
 
-	if MASK_PATH_IS_DIR:
-		file = os.path.join(MASK_PATH, "geneticone")
+	if masked:
+		is_dir = MASK_PATH_IS_DIR
+		path = MASK_PATH
 	else:
-		file = MASK_PATH
-	
-	new_masked[cpv].append((file, "-1"))
-	new_masked[cpv] = unique_array(new_masked[cpv])
-	debug("new_masked: "+str(new_masked))
+		is_dir = UNMASK_PATH_IS_DIR
+		path = UNMASK_PATH
 
-def set_unmasked (pkg):
-	global new_masked, new_unmasked
-	if not isinstance(pkg, package.Package):
-		pkg = package.Package(pkg)
-	
-	cpv = pkg.get_cpv()
-
-	if not cpv in new_unmasked:
-		new_unmasked[cpv] = []
-	if not cpv in new_masked:
-		new_masked[cpv] = []
-	
-	nu = new_unmasked[cpv][:]
-	for file, line in nu:
-		if line != "-1":
-			new_unmasked[cpv].remove(file, line)
-	
-	nm = new_masked[cpv][:]
-	for file, line in nm:
-		if line == "-1":
-			new_masked[cpv].remove(file, line)
-
-	if not pkg.is_masked():
-		return
-
-	masked = get_data(pkg, MASK_PATH)
-	debug("data (masked): "+str(masked))
-	done = False
-	for file, line, crit, fl in masked:
-		if pkg.matches(crit):
-			new_masked[cpv].append((file, line))
-			done = True
-
-	if done: return
-
-	if UNMASK_PATH_IS_DIR:
-		file = os.path.join(UNMASK_PATH, "geneticone")
+	if is_dir:
+		file = os.path.join(path, generate_path(cpv, CONFIG["usefile"]))
 	else:
-		file = UNMASK_PATH
+		file = path
+	
+	link_neq[cpv].append((file, "-1"))
+	link_neq[cpv] = unique_array(link_neq[cpv])
+	debug("new_(un)masked: "+str(link_neq))
 
-	new_unmasked[cpv].append((file, "-1"))
-	new_unmasked[cpv] = unique_array(new_unmasked[cpv])
-	debug("new_unmasked: "+str(new_unmasked))
+def remove_new_masked (cpv):
+	if isinstance(cpv, package.Package):
+		cpv = cpv.get_cpv()
+	
+	try:
+		del new_masked[cpv]
+	except KeyError:
+		pass
 
-def write_masked_unmasked ():
+	try:
+		del new_unmasked[cpv]
+	except KeyError:
+		pass
+
+def new_masking_status (cpv):
+	if isinstance(cpv, package.Package):
+		cpv = cpv.get_cpv()
+
+	if cpv in new_masked and new_masked[cpv]:
+		return "masked"
+	elif cpv in new_unmasked and new_unmasked[cpv]:
+		return "unmasked"
+	else: return None
+
+def write_masked ():
 	global new_unmasked, new_masked
 	file_cache = {}
 

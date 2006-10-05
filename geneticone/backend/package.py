@@ -50,6 +50,29 @@ class Package (gentoolkit.Package):
 			pkgmask = pkgmask + 2
 		return pkgmask
 
+	def is_masked (self):
+		"""Returns True if either masked by package.mask or by profile.
+		@returns: mask-status
+		@rtype: boolean"""
+		# XXX: Better solution than string comparison?
+		status = flags.new_masking_status(self.get_cpv())
+		if status != None:
+			if status == "masked": return True
+			elif status == "unmasked": return False
+			else:
+				debug("BUG in flags.new_masking_status. It returns "+status)
+		else:
+			status = portage.getmaskingstatus(self._cpv, settings = gentoolkit.settings)
+			if "profile" in status or "package.mask" in status:
+				return True
+			return False
+
+	def set_masked (self, masking = False):
+		flags.set_masked(self, masked = masking)
+
+	def remove_new_masked (self):
+		flags.remove_new_masked(self.get_cpv())
+
 	def get_all_use_flags (self):
 		"""Returns a list of _all_ useflags for this package, i.e. all useflags you can set for this package.
 		
@@ -164,16 +187,6 @@ class Package (gentoolkit.Package):
 		@returns: category/package.
 		@rtype: string"""
 		return self.get_category()+"/"+self.get_name()
-
-	def is_masked (self):
-		"""Returns True if either masked by package.mask or by profile.
-		@returns: mask-status
-		@rtype: boolean"""
-		# XXX: Better solution than string comparison?
-		status = portage.getmaskingstatus(self._cpv)
-		if "profile" in status or "package.mask" in status:
-			return True
-		return False
 
 	def matches (self, criterion):
 		"""This checks, whether this package matches a specific verisioning criterion - e.g.: "<=net-im/foobar-1.2".

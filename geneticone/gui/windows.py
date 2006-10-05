@@ -9,8 +9,6 @@
 #
 # Written by Necoro d.M. <necoro@necoro.net>
 
-# our backend stuff
-
 VERSION = "0.3.4"
 CONFIG_LOCATION = "/etc/geneticone/geneticone.cfg"
 MENU_EMERGE = 1
@@ -22,6 +20,7 @@ pygtk.require("2.0")
 import gtk
 import gobject
 
+#our backend stuff
 from geneticone.helper import *
 from geneticone import backend
 from geneticone.backend import flags
@@ -126,6 +125,7 @@ class PreferenceWindow (AbstractDialog):
 
 	def __init__ (self, parent, cfg):
 		AbstractDialog.__init__(self, parent, "Preferences")
+		self.window.set_resizable(True)
 
 		self.cfg = cfg
 		
@@ -137,7 +137,8 @@ class PreferenceWindow (AbstractDialog):
 		box.pack_start(self.perVersionCb, True, True)
 
 		hBox = gtk.HBox()
-		label = gtk.Label("File name to use if package.use is a directory:")
+		label = gtk.Label("File name to use if package.use is a directory:\n<small><b>$(cat)</b> = category\n<b>$(pkg)</b> = package-name\n<b>$(cat-1)</b>/<b>$(cat-2)</b> = first/second part of the category</small>")
+		label.set_use_markup(True)
 		self.editUsefile = gtk.Entry()
 		self.editUsefile.set_text(cfg.get(cfg.const["useFile_opt"]))
 		hBox.pack_start(label, False)
@@ -218,7 +219,7 @@ class PackageWindow (AbstractDialog):
 		checkHB.pack_start(self.installedCheck, True, False)
 
 		self.maskedCheck = gtk.CheckButton()
-		self.maskedCheck.connect("button-press-event", self.cb_button_pressed)
+		self.maskedCheck.connect("toggled", self.cb_masked_toggled)
 		self.maskedCheck.set_label("Masked")		
 		checkHB.pack_start(self.maskedCheck, True, False)
 
@@ -366,6 +367,7 @@ class PackageWindow (AbstractDialog):
 	def cb_cancel_clicked (self, button, data = None):
 		if self.delOnClose: 
 			self.actual_package().remove_new_use_flags()
+			self.actual_package().remove_new_masked()
 		elif self.flagChanged:
 			if self.queue:
 				self.queue.append(self.actual_package().get_cpv(), update = True)
@@ -395,6 +397,13 @@ class PackageWindow (AbstractDialog):
 				masked_dialog(e[0])
 
 			self.window.destroy()
+		return True
+
+	def cb_masked_toggled (self, button):
+		status = button.get_active()
+		debug("status: ",status)
+		self.actual_package().set_masked(status)
+		self.flagChanged = True
 		return True
 
 	def cb_use_flag_toggled (self, cell, path, store, data = None):
@@ -652,6 +661,13 @@ class MainWindow:
 				hintMB.run()
 				hintMB.destroy()
 				flags.write_use_flags()
+			if len(flags.new_masked)>0 or len(flags.new_unmasked)>0:
+				hintMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+						"You have changed masking keywords. Genetic/One will write these changes into the appropriate files. Please backup them if you think it is necessairy.")
+				hintMB.run()
+				hintMB.destroy()
+				flags.write_masked()
+				backend.reload_settings()
 			self.queue.emerge(force=True)
 		elif button == self.unmergeBtn or button == MENU_UNEMERGE:
 			self.queue.unmerge(force=True)

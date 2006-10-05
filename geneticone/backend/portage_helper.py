@@ -11,6 +11,7 @@
 
 import re
 import os
+import copy
 
 import gentoolkit
 import portage
@@ -135,6 +136,10 @@ def split_package_name (name):
 def sort_package_list(pkglist):
 	"""Sorts a package list in the same manner portage does."""
 	return gentoolkit.sort_package_list(pkglist)
+
+def reload_settings ():
+	# XXX: what the hack are we doing here Oo
+	gentoolkit.settings = portage.config(config_incrementals = copy.deepcopy(gentoolkit.settings.incrementals))
 
 use_descs = {}
 local_use_descs = {}
