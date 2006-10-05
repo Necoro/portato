@@ -1,3 +1,9 @@
+0.3.4:
+- removed several minor and less minor bugs
+- added preference window
+- some speedup work (e.g. do not redraw the whole list if something is
+updated)
+
 0.3.3:
 - removed bug which always apended a package to the emerge-queue - and never
 to the unmerge-queue
