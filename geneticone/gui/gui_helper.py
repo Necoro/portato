@@ -16,9 +16,47 @@ import windows
 
 from subprocess import *
 from threading import Thread
+from ConfigParser import SafeConfigParser
 
 import pty
 import vte
+
+class Config:
+	const = {
+			"main_sec" : "Main",
+			"usePerVersion_opt" : "usePerVersion",
+			"useFile_opt" : "usefile"
+			}
+	
+	def __init__ (self, cfgFile):
+		self._cfg = SafeConfigParser()
+		if not isinstance(cfgFile, file):
+			self._file = open(cfgFile) # assume string
+		elif cfgFile.closed:
+			self._file = open(cfgFile.name)
+		else:
+			self._file = cfgFile
+
+		self._cfg.readfp(self._file)
+		self._file.close()
+
+	def get(self, name, section=const["main_sec"]):
+		return self._cfg.get(section, name)
+
+	def get_boolean(self, name, section=const["main_sec"]):
+		return self._cfg.getboolean(section, name)
+
+	def modify_flags_config (self):
+		flagCfg = {"usefile": self.get(self.const["useFile_opt"]), "usePerVersion" : self.get_boolean(self.const["usePerVersion_opt"])}
+		flags.set_config(flagCfg)
+
+	def set(self, name, val, section=const["main_sec"]):
+		self._cfg.set(section, name, val)
+
+	def write(self):
+		self._file = open(self._file.name,"w")
+		self._cfg.write(self._file)
+		self.modify_flags_config()
 
 class Database:
 	"""An internal database which holds a simple dictionary cat -> [package_list]."""

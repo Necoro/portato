@@ -14,10 +14,16 @@ import os.path
 from subprocess import Popen, PIPE # needed for grep
 
 from geneticone.helper import *
+from portage_helper import split_package_name
 import package
 
 import portage
 from portage_util import unique_array
+
+CONFIG = {
+		"usefile" : "geneticone",
+		"usePerVersion" : True
+		}
 
 ### GENERAL PART ###
 
@@ -65,6 +71,19 @@ def get_data(pkg, path):
 		flags.append((file,line,crit,fl))
 
 	return flags
+
+def set_config (cfg):
+	"""This function sets the CONFIG-variable for the whole module. Use this instead of modifying CONFIG directly.
+	@param cfg: a dictionary with at least all the keys of the CONFIG-var
+	@type cfg: dict
+	@raises KeyError: if a keyword is missing in the new cfg"""
+
+	for i in CONFIG.keys():
+		if not i in cfg:
+			raise KeyError, "Missing keyword in config: "+i
+
+	for i in CONFIG:
+		CONFIG[i] = cfg[i]
 
 ### USE FLAG PART ###
 USE_PATH = os.path.join(portage.USER_CONFIG_PATH,"package.use")
@@ -149,7 +168,7 @@ def set_use_flag (pkg, flag):
 	if not added:
 		path = USE_PATH
 		if USE_PATH_IS_DIR:
-			path = os.path.join(USE_PATH,"geneticone")
+			path = os.path.join(USE_PATH,CONFIG["usefile"])
 		
 		try:
 			newUseFlags[cpv].remove((path, -1, invFlag, False))
@@ -216,18 +235,13 @@ def write_use_flags ():
 
 	file_cache = {} # cache for having to read the file only once: name->[lines]
 	for cpv in newUseFlags:
+		flagsToAdd = [] # this is used for collecting the flags to be inserted in a _new_ line
 		for file, line, flag, delete in newUseFlags[cpv]:
 			line = int(line) # it is saved as a string so far!
 			
 			# add new line
 			if line == -1:
-				msg = "\n#geneticone update#\n=%s %s\n" % (cpv, flag)
-				if not file in file_cache:
-					f = open(file, "a")
-					f.write(msg)
-					f.close()
-				else:
-					file_cache[file].append(msg)
+				flagsToAdd.append(flag)
 			# change a line
 			else:
 				if not file in file_cache:
@@ -258,6 +272,20 @@ def write_use_flags ():
 					else:
 						insert(flag,l)
 					file_cache[file][line-1] = " ".join(l)
+
+		# write new lines
+		msg = "\n#geneticone update#\n"
+		if CONFIG["usePerVersion"]:
+			msg += "=%s %s\n" % (cpv, ' '.join(flagsToAdd))
+		else:
+			list = split_package_name(cpv)
+			msg += "%s/%s %s\n" % (list[0], list[1], ' '.join(flagsToAdd))
+		if not file in file_cache:
+			f = open(file, "a")
+			f.write(msg)
+			f.close()
+		else:
+			file_cache[file].append(msg)
 	
 	# write to disk
 	for file in file_cache.keys():

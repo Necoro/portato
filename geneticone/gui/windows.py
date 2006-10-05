@@ -12,6 +12,7 @@
 # our backend stuff
 
 VERSION = "0.3.4"
+CONFIG_LOCATION = "/etc/geneticone/geneticone.cfg"
 MENU_EMERGE = 1
 MENU_UNEMERGE = 2
 
@@ -33,19 +34,32 @@ import vte
 # other
 from portage_util import unique_array
 
-class AboutWindow:
-	"""A window showing the "about"-informations."""
+class AbstractDialog:
 
-	def __init__ (self, parent):
-		# window
+	def __init__ (self, parent, title):
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.window.set_title("About Genetic/One")
+		self.window.set_title(title)
 		self.window.set_modal(True)
 		self.window.set_transient_for(parent)
 		self.window.set_destroy_with_parent(True)
 		self.window.set_resizable(False)
 		self.window.set_default_size(1,1)
+		self.window.connect("key-press-event", self.cb_key_pressed)
 
+	def cb_key_pressed (self, widget, event):
+		"""Closes the window if esc is pressed."""
+		keyname = gtk.gdk.keyval_name(event.keyval)
+		if keyname == "Escape":
+			self.window.destroy()
+			return True
+		else:
+			return False
+
+class AboutWindow (AbstractDialog):
+	"""A window showing the "about"-informations."""
+
+	def __init__ (self, parent):
+		AbstractDialog.__init__(self, parent, "About Genetic/One")
 		box = gtk.VBox(False)
 		self.window.add(box)
 		
@@ -66,19 +80,12 @@ Copyright (C) 2006 Necoro d.M. &lt;necoro@necoro.net&gt;
 
 		self.window.show_all()
 
-class SearchWindow:
+class SearchWindow (AbstractDialog):
 	"""A window showing the results of a search process."""
 	
 	def __init__ (self, parent, list, jump_to):
-		# window
-		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.window.set_title("Search results")
-		self.window.set_modal(True)
-		self.window.set_transient_for(parent)
-		self.window.set_destroy_with_parent(True)
-		self.window.set_resizable(False)
-		self.window.set_default_size(1,1)
-		self.window.connect("key-press-event", self.cb_key_pressed)
+		AbstractDialog.__init__(self, parent, "Search results")
+		
 		self.list = list
 		self.jump_to = jump_to
 
@@ -115,12 +122,59 @@ class SearchWindow:
 		else:
 			return False
 
-class PackageWindow:
+class PreferenceWindow (AbstractDialog):
+
+	def __init__ (self, parent, cfg):
+		AbstractDialog.__init__(self, parent, "Preferences")
+
+		self.cfg = cfg
+		
+		box = gtk.VBox(True)
+		self.window.add(box)
+
+		self.perVersionCb = gtk.CheckButton(label="Add to package.use on a per-version-base")
+		self.perVersionCb.set_active(cfg.get_boolean(cfg.const["usePerVersion_opt"]))
+		box.pack_start(self.perVersionCb, True, True)
+
+		hBox = gtk.HBox()
+		label = gtk.Label("File name to use if package.use is a directory:")
+		self.editUsefile = gtk.Entry()
+		self.editUsefile.set_text(cfg.get(cfg.const["useFile_opt"]))
+		hBox.pack_start(label, False)
+		hBox.pack_start(self.editUsefile, True, True, 5)
+		box.pack_start(hBox, True, True)
+
+		# buttons
+		buttonHB = gtk.HButtonBox()
+		buttonHB.set_layout(gtk.BUTTONBOX_SPREAD)
+		
+		okBtn = gtk.Button("_OK")
+		cancelBtn = gtk.Button("_Cancel")
+		okBtn.connect("clicked", self.cb_ok_clicked)
+		cancelBtn.connect("clicked", lambda x: self.window.destroy())
+		buttonHB.pack_start(okBtn)
+		buttonHB.pack_start(cancelBtn)
+
+		box.pack_start(buttonHB, True, True, 5)
+
+		self.window.show_all()
+
+	def _save(self):
+		self.cfg.set(self.cfg.const["usePerVersion_opt"], str(self.perVersionCb.get_active()))
+		self.cfg.set(self.cfg.const["useFile_opt"], self.editUsefile.get_text())
+
+	def cb_ok_clicked(self, button):
+		self._save()
+		self.cfg.write()
+		self.window.destroy()
+
+class PackageWindow (AbstractDialog):
 	"""A window with data about a specfic package."""
 
 	def __init__ (self, parent, cp, queue = None, version = None, delOnClose = True, doEmerge = True):
 		"""Build up window contents."""
-		self.parent = parent # parent window
+		AbstractDialog.__init__(self, parent, cp)
+
 		self.cp = cp # category/package
 		self.version = version # version - if not None this is used
 		self.queue = queue
@@ -128,16 +182,6 @@ class PackageWindow:
 		self.doEmerge = doEmerge
 		self.flagChanged = False
 
-		# window
-		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.window.set_title(cp)
-		self.window.set_modal(True)
-		self.window.set_transient_for(parent)
-		self.window.set_destroy_with_parent(True)
-		self.window.set_resizable(False)
-		self.window.set_default_size(1,1) # as small as possible
-		self.window.connect("key-press-event", self.cb_key_press_event)
-		
 		# packages and installed packages
 		self.packages = backend.sort_package_list(backend.get_all_versions(cp))
 		self.instPackages = backend.sort_package_list(backend.get_all_installed_versions(cp))
@@ -290,15 +334,6 @@ class PackageWindow:
 		"""Returns the actual package (a backend.Package-object)."""
 		return self.packages[self.vCombo.get_active()]
 
-	def cb_key_press_event (self, widget, event):
-		"""Closes the window if esc is pressed."""
-		keyname = gtk.gdk.keyval_name(event.keyval)
-		if keyname == "Escape":
-			self.window.destroy()
-			return True
-		else:
-			return False
-
 	def cb_combo_changed (self, combo, data = None):
 		"""Callback for the changed ComboBox.
 		It then rebuilds the useList and the checkboxes."""
@@ -376,7 +411,6 @@ class MainWindow:
 	
 	def __init__ (self):
 		"""Build up window"""
-
 		# window
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.window.set_title("Genetic/One")
@@ -388,6 +422,10 @@ class MainWindow:
 		# package db
 		self.db = Database()
 		self.db.populate()
+
+		# config
+		self.cfg = Config(CONFIG_LOCATION)
+		self.cfg.modify_flags_config()
 
 		# main vb
 		vb = gtk.VBox(False, 1)
@@ -496,6 +534,8 @@ class MainWindow:
 		# the menu-list
 		mainMenuDesc = [
 				( "/_File", None, None, 0, "<Branch>"),
+				( "/File/_Preferences", None, lambda x,y: PreferenceWindow(self.window, self.cfg), 0, ""),
+				( "/File/", None, None, 0, "<Separator>"),
 				( "/File/_Close", None, self.cb_destroy, 0, ""),
 				( "/_Emerge", None, None, 0, "<Branch>"),
 				( "/Emerge/_Emerge", None, self.cb_emerge_clicked, MENU_EMERGE, ""),
@@ -515,7 +555,6 @@ class MainWindow:
 	
 	def create_pkg_list (self, name = None, force = False):
 		"""Creates the package list. Gets the name of the category."""
-		self.selCatName = name # actual category
 		store = gtk.ListStore(str)
 		self.fill_pkg_store(store,name)
 		
@@ -563,8 +602,9 @@ class MainWindow:
 			sel = view.get_selection()
 			store, it = sel.get_selected()
 			if it:
+				self.selCatName = store.get_value(it, 0)
 				self.pkgList.get_model().clear()
-				self.fill_pkg_store(self.pkgList.get_model(), store.get_value(it, 0))
+				self.fill_pkg_store(self.pkgList.get_model(), self.selCatName)
 		return False
 
 	def cb_row_activated (self, view, path, col, store = None):

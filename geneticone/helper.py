@@ -30,9 +30,9 @@ def debug(*args, **kwargs):
 		out.append(str(obj))
 	text = ' '.join(out)
 	if "name" in kwargs:
-		text = 'In %s (%s:%s) %s:' % (kwargs["name"], a, b, text)
+		text = 'In %s (%s:%s): %s' % (kwargs["name"], a, b, text)
 	else:
-		text = 'In %s (%s:%s) %s:' % (c, a, b, text)
+		text = 'In %s (%s:%s): %s' % (c, a, b, text)
 	#if wrap:
 	#	text = textwrap.fill(text)
 	
