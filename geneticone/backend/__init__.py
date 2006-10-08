@@ -20,6 +20,7 @@ import portage
 
 # this is set to "var/lib/portage/world" by default - so we add the leading /
 portage.WORLD_FILE = "/"+portage.WORLD_FILE
+portage.settings = None
 
 # portage tree vars
 porttree = gentoolkit.porttree

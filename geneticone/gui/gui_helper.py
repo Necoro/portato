@@ -328,7 +328,10 @@ class EmergeQueue:
 					self.mergequeue.remove(cpv)
 				except ValueError: # this is a dependency - ignore
 					pass
-				if removeNewFlags: flags.remove_new_use_flags(cpv)
+				if removeNewFlags: 
+					flags.remove_new_use_flags(cpv)
+					flags.remove_new_masked(cpv)
+					flags.remove_new_testing(cpv)
 			
 			else: # in Unmerge
 				self.unmergequeue.remove(cpv)

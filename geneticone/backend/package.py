@@ -30,25 +30,33 @@ class Package (gentoolkit.Package):
 		if isinstance(cpv, gentoolkit.Package):
 			cpv = cpv.get_cpv()
 		gentoolkit.Package.__init__(self, cpv)
+		self._status = portage.getmaskingstatus(self.get_cpv(), settings = gentoolkit.settings)
 	
-	def get_mask_status(self):
-		"""Gets the numeric mask status of a package. The return value can be translated as a string when taking the following list of modes: [ "  ", " ~", " -", "M ", "M~", "M-" ]
+	def is_missing_keyword(self):
+		if "missing keyword" in self._status:
+			return True
+		return False
 
-		This method adapted from equery 0.1.4 
-		Original author: Karl Trygve Kalleberg <karltk@gentoo.org>
+	def is_testing(self, allowed = False):
+		testArch = "~" + self.get_settings("ARCH")
+		if not allowed:
+			if testArch in self.get_env_var("KEYWORDS").split():
+				return True
+			return False
+		else:
+			status = flags.new_testing_status(self.get_cpv())
+			if status == None:
+				if testArch+" keyword" in self._status:
+					return True
+				return False
+			else:
+				return status
+	
+	def set_testing(self, enable = True):
+		flags.set_testing(self, enable)
 
-		@returns: mask status
-		@rtype: int"""
-		
-		pkgmask = 0
-		if self.is_masked():
-			pkgmask = pkgmask + 3
-		keywords = self.get_env_var("KEYWORDS").split()
-		if "~" + gentoolkit.settings["ARCH"] in keywords:
-			pkgmask = pkgmask + 1
-		elif "-*" in keywords or "-" + gentoolkit.settings["ARCH"] in keywords:
-			pkgmask = pkgmask + 2
-		return pkgmask
+	def remove_new_testing(self):
+		flags.remove_new_testing(self.get_cpv())
 
 	def is_masked (self):
 		"""Returns True if either masked by package.mask or by profile.
@@ -62,8 +70,7 @@ class Package (gentoolkit.Package):
 			else:
 				debug("BUG in flags.new_masking_status. It returns "+status)
 		else:
-			status = portage.getmaskingstatus(self._cpv, settings = gentoolkit.settings)
-			if "profile" in status or "package.mask" in status:
+			if "profile" in self._status or "package.mask" in self._status:
 				return True
 			return False
 

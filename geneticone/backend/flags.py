@@ -468,6 +468,26 @@ TESTING_PATH_IS_DIR = os.path.isdir(TESTING_PATH)
 newTesting = {}
 arch = ""
 
+def remove_new_testing (cpv):
+	if isinstance(cpv, package.Package):
+		cpv = cpv.get_cpv()
+	
+	try:
+		del newTesting[cpv]
+	except KeyError:
+		pass
+
+def new_testing_status (cpv):
+	if isinstance(cpv, package.Package):
+		cpv = cpv.get_cpv()
+
+	if cpv in newTesting:
+		for file, line in newTesting[cpv]:
+			if line == "-1": return False
+			else: return True
+
+	return None
+
 def set_testing (pkg, enable):
 	"""Enables the package for installing when it is marked as testing (~ARCH).
 	@param pkg: the package
@@ -484,12 +504,11 @@ def set_testing (pkg, enable):
 	if not cpv in newTesting: 
 		newTesting[cpv] = []
 
-	debug("arch: "+arch)
 	for file, line in newTesting[cpv]:
 		if (enable and line != "-1") or (not enable and line == "-1"):
 			newTesting[cpv].remove((file, line))
 
-	if (enable and (pkg.get_mask_status() % 3 == 0)) or (not enable and (pkg.get_mask_status() % 3 != 0)):
+	if (enable and not pkg.is_testing(allowed=True)) or (not enable and pkg.is_testing(allowed=True)):
 		return
 
 	if not enable:

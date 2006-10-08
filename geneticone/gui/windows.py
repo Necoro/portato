@@ -194,6 +194,7 @@ class PackageWindow (AbstractDialog):
 		# version-combo-box
 		self.vCombo = self.build_vers_combo()
 		self.table.attach(self.vCombo, 0, 1, 1, 2, yoptions = gtk.FILL)
+		if not self.doEmerge: self.vCombo.set_sensitive(False)
 
 		# the label (must be here, because it depends on the combo box)
 		desc = self.actual_package().get_env_var("DESCRIPTION")
@@ -215,18 +216,26 @@ class PackageWindow (AbstractDialog):
 
 		self.installedCheck = gtk.CheckButton()
 		self.installedCheck.connect("button-press-event", self.cb_button_pressed)
-		self.installedCheck.set_label("Installed")		
+		self.installedCheck.set_label("Installed")
+		self.installedCheck.set_no_show_all(True)
 		checkHB.pack_start(self.installedCheck, True, False)
 
 		self.maskedCheck = gtk.CheckButton()
 		self.maskedCheck.connect("toggled", self.cb_masked_toggled)
 		self.maskedCheck.set_label("Masked")		
+		self.maskedCheck.set_no_show_all(True)
 		checkHB.pack_start(self.maskedCheck, True, False)
 
 		self.testingCheck = gtk.CheckButton()
-		self.testingCheck.connect("button-press-event", self.cb_button_pressed)
+		self.testingCheck.connect("toggled", self.cb_testing_toggled)
 		self.testingCheck.set_label("Testing")
+		self.testingCheck.set_no_show_all(True)
 		checkHB.pack_start(self.testingCheck, True, False)
+
+		self.missing_label = gtk.Label("<span foreground='red'><b>MISSING KEYWORD</b></span>")
+		self.missing_label.set_use_markup(True)
+		self.missing_label.set_no_show_all(True)
+		self.table.attach(self.missing_label, 1, 2, 1, 2, yoptions = gtk.FILL)
 
 		# use list
 		self.useList = self.build_use_list()
@@ -242,7 +251,7 @@ class PackageWindow (AbstractDialog):
 		
 		self.emergeBtn = gtk.Button("_Emerge")
 		self.unmergeBtn = gtk.Button("_Unmerge")
-		if not self.queue or not doEmerge: 
+		if not self.queue or not self.doEmerge: 
 			self.emergeBtn.set_sensitive(False)
 			self.unmergeBtn.set_sensitive(False)
 		self.cancelBtn = gtk.Button("_Cancel")
@@ -260,12 +269,6 @@ class PackageWindow (AbstractDialog):
 
 		# show
 		self.window.show_all()
-
-	def update_checkboxes (self):
-		"""Updates the checkboxes."""
-		self.installedCheck.set_active(self.actual_package().is_installed())
-		self.maskedCheck.set_active(self.actual_package().is_masked())
-		self.testingCheck.set_active((self.actual_package().get_mask_status() % 3) == 1)
 
 	def fill_use_list(self, store):
 		pkg = self.actual_package()
@@ -343,15 +346,38 @@ class PackageWindow (AbstractDialog):
 		store.clear()
 		self.fill_use_list(store)
 		
-		self.update_checkboxes()
+		pkg = self.actual_package()
 
-		# set emerge-button-label
-		if not self.actual_package().is_installed():
-			self.emergeBtn.set_label("_Emerge")
-			self.unmergeBtn.set_sensitive(False)
+		if pkg.is_missing_keyword():
+			self.missing_label.show()
+			self.installedCheck.hide()
+			self.maskedCheck.hide()
+			self.testingCheck.hide()
+			self.emergeBtn.set_sensitive(False)
 		else:
-			self.emergeBtn.set_label("R_emerge")
-			self.unmergeBtn.set_sensitive(True)
+			self.missing_label.hide()
+			self.installedCheck.show()
+			self.maskedCheck.show()
+			self.testingCheck.show()
+			if self.doEmerge:
+				self.emergeBtn.set_sensitive(True)
+			self.installedCheck.set_active(pkg.is_installed())
+			self.maskedCheck.set_active(pkg.is_masked())
+			if pkg.is_testing(allowed = False) and not pkg.is_testing(allowed=True):
+				self.testingCheck.set_label("<i>(Testing)</i>")
+				self.testingCheck.get_child().set_use_markup(True)
+			else:
+				self.testingCheck.set_label("Testing")
+			self.testingCheck.set_active(pkg.is_testing(allowed = False))
+
+		if self.doEmerge:
+			# set emerge-button-label
+			if not self.actual_package().is_installed():
+				self.emergeBtn.set_label("_Emerge")
+				self.unmergeBtn.set_sensitive(False)
+			else:
+				self.emergeBtn.set_label("R_emerge")
+				self.unmergeBtn.set_sensitive(True)
 		
 		# refresh - make window as small as possible
 		self.table.show_all()
@@ -368,6 +394,7 @@ class PackageWindow (AbstractDialog):
 		if self.delOnClose: 
 			self.actual_package().remove_new_use_flags()
 			self.actual_package().remove_new_masked()
+			self.actual_package().remove_new_testing()
 		elif self.flagChanged:
 			if self.queue:
 				self.queue.append(self.actual_package().get_cpv(), update = True)
@@ -399,9 +426,27 @@ class PackageWindow (AbstractDialog):
 			self.window.destroy()
 		return True
 
+	def cb_testing_toggled (self, button):
+		status = button.get_active()
+
+		if self.actual_package().is_testing(allowed = False) == status:
+			return False
+
+		if not self.actual_package().is_testing(allowed = True):
+			self.actual_package().set_testing(False)
+			button.set_label("Testing")
+			button.set_active(True)
+		else:
+			self.actual_package().set_testing(True)
+			if self.actual_package().is_testing(allowed=False):
+				button.set_label("<i>(Testing)</i>")
+				button.get_child().set_use_markup(True)
+				button.set_active(True)
+		self.flagChanged = True
+		return True
+
 	def cb_masked_toggled (self, button):
 		status = button.get_active()
-		debug("status: ",status)
 		self.actual_package().set_masked(status)
 		self.flagChanged = True
 		return True
