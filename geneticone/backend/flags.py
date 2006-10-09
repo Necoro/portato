@@ -23,7 +23,10 @@ from portage_util import unique_array
 CONFIG = {
 		"usefile" : "geneticone",
 		"maskfile" : "geneticone",
-		"usePerVersion" : True
+		"testingfile" : "geneticone",
+		"usePerVersion" : True,
+		"maskPerVersion" : True,
+		"testingPerVersion" : True
 		}
 
 ### GENERAL PART ###
@@ -41,7 +44,7 @@ def grep (pkg, path):
 	if not isinstance(pkg, package.Package):
 		pkg = package.Package(pkg) # assume it is a cpv or a gentoolkit.Package
 
-	command = "egrep -x -n -r -H '^[<>!=~]{0,2}%s(-[0-9].*)?[[:space:]]?.*$' %s"
+	command = "egrep -x -n -r -H '^[<>!=~]{0,2}%s(-[0-9].*)?[[:space:]]?.*$' %s" # %s is replaced in the next line ;)
 	return Popen((command % (pkg.get_cp(), path)), shell = True, stdout = PIPE).communicate()[0].splitlines()
 
 def get_data(pkg, path):
@@ -66,7 +69,7 @@ def get_data(pkg, path):
 		fl = fl[1:]
 		# stop after first comment
 		for i in range(len(fl)):
-			if fl[i][0] == "#": #comment - stop here
+			if fl[i][0] == "#": # comment - stop here
 				fl = fl[:i]
 				break
 		flags.append((file,line,crit,fl))
@@ -74,7 +77,7 @@ def get_data(pkg, path):
 	return flags
 
 def set_config (cfg):
-	"""This function sets the CONFIG-variable for the whole module. Use this instead of modifying CONFIG directly.
+	"""This function sets the CONFIG-variable for the whole module. Use this instead of modifying L{CONFIG} directly.
 	@param cfg: a dictionary with at least all the keys of the CONFIG-var
 	@type cfg: dict
 	@raises KeyError: if a keyword is missing in the new cfg"""
@@ -87,11 +90,27 @@ def set_config (cfg):
 		CONFIG[i] = cfg[i]
 
 def generate_path (cpv, exp):
+	"""Generates the correct path out of given wildcards. 
+	These wildcards can be:
+		- $(cat) : category
+		- $(cat-1): first part of the category (e.g. "app")
+		- $(cat-2): second part of the category
+		- $(pkg) : name of the package
+	
+	@param cpv: the cpv of the current package
+	@type cpv: string (cat/pkg-ver)
+	@param exp: the expression to render the path from
+	@type exp: string
+	@returns: rendered path
+	@rtype string"""
 
 	cat, pkg, ver, rev = split_package_name(cpv)
 	
 	if exp.find("$(") != -1:
-		exp = exp.replace("$(cat)",cat).replace("$(pkg)",pkg).replace("$(cat-1)",cat.split("-")[0]).replace("$(cat-2)",cat.split("-")[1])
+		exp = exp.replace("$(cat)",cat).\
+				replace("$(pkg)",pkg).\
+				replace("$(cat-1)",cat.split("-")[0]).\
+				replace("$(cat-2)",cat.split("-")[1])
 	return exp
 
 ### USE FLAG PART ###
@@ -284,9 +303,9 @@ def write_use_flags ():
 
 		# write new lines
 		msg = "\n#geneticone update#\n"
-		if CONFIG["usePerVersion"]:
+		if CONFIG["usePerVersion"]: # add on a per-version-base
 			msg += "=%s %s\n" % (cpv, ' '.join(flagsToAdd))
-		else:
+		else: # add on a per-package-base
 			list = split_package_name(cpv)
 			msg += "%s/%s %s\n" % (list[0], list[1], ' '.join(flagsToAdd))
 		if not file in file_cache:
@@ -305,11 +324,6 @@ def write_use_flags ():
 	useFlags = {}
 	newUseFlags = {}
 
-#
-#
-# NOTHING IS WORKING / IN USE BELOW THIS LINE
-#
-#
 ### MASKING PART ###
 MASK_PATH = os.path.join(portage.USER_CONFIG_PATH,"package.mask")
 UNMASK_PATH = os.path.join(portage.USER_CONFIG_PATH,"package.unmask")
@@ -321,6 +335,7 @@ new_unmasked = {}
 
 def set_masked (pkg, masked = True):
 	global new_masked, newunmasked
+	
 	if not isinstance(pkg, package.Package):
 		pkg = package.Package(pkg)
 
@@ -411,7 +426,12 @@ def write_masked ():
 		line = int(line)
 		# add new line
 		if line == -1:
-			msg = "\n#geneticone update#\n=%s\n" % cpv
+			msg = "\n#geneticone update#\n"
+			if CONFIG["maskPerVersion"]:
+				msg += "=%s\n" % cpv
+			else:
+				list = split_package_name(cpv)
+				msg += "%s/%s\n" % (list[0],list[1])
 			if not file in file_cache:
 				f = open(file, "a")
 				f.write(msg)
@@ -519,7 +539,7 @@ def set_testing (pkg, enable):
 				newTesting[cpv].append((file, line))
 	else:
 		if TESTING_PATH_IS_DIR:
-			file = os.path.join(TESTING_PATH, "geneticone")
+			file = os.path.join(TESTING_PATH, CONFIG["testingfile"])
 		else:
 			file = TESTING_PATH
 		newTesting[cpv].append((file, "-1"))
@@ -536,7 +556,12 @@ def write_testing ():
 			line = int(line)
 			# add new line
 			if line == -1:
-				msg = "\n#geneticone update#\n=%s ~%s\n" % (cpv, arch)
+				msg = "\n#geneticone update#\n"
+				if CONFIG["testingPerVersion"]:
+					msg += "=%s ~%s\n" % (cpv, arch)
+				else:
+					list = split_package_name(cpv)
+					msg += "%s/%s ~%s\n" % (list[0],list[1],arch)
 				if not file in file_cache:
 					f = open(file, "a")
 					f.write(msg)

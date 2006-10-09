@@ -12,9 +12,9 @@
 from geneticone import backend
 from geneticone.backend import flags
 from geneticone.helper import *
-import windows
+import dialogs
 
-from subprocess import *
+from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
 from ConfigParser import SafeConfigParser
 
@@ -26,7 +26,11 @@ class Config:
 			"main_sec" : "Main",
 			"usePerVersion_opt" : "usePerVersion",
 			"useFile_opt" : "usefile",
-			"maskFile_opt" : "maskfile"
+			"maskFile_opt" : "maskfile",
+			"maskPerVersion_opt" : "maskPerVersion",
+			"testingFile_opt" : "keywordfile",
+			"testingPerVersion_opt" : "keywordperversion",
+			"debug_opt" : "debug"
 			}
 	
 	def __init__ (self, cfgFile):
@@ -51,8 +55,14 @@ class Config:
 		flagCfg = {
 				"usefile": self.get(self.const["useFile_opt"]), 
 				"usePerVersion" : self.get_boolean(self.const["usePerVersion_opt"]),
-				"maskfile" : self.get(self.const["maskFile_opt"])}
+				"maskfile" : self.get(self.const["maskFile_opt"]),
+				"maskPerVersion" : self.get_boolean(self.const["maskPerVersion_opt"]),
+				"testingfile" : self.get(self.const["testingFile_opt"]),
+				"testingPerVersion" : self.get_boolean(self.const["testingPerVersion_opt"])}
 		flags.set_config(flagCfg)
+
+	def modify_debug_config (self):
+		set_debug(self.get_boolean(self.const["debug_opt"]))
 
 	def set(self, name, val, section=const["main_sec"]):
 		self._cfg.set(section, name, val)
@@ -61,6 +71,7 @@ class Config:
 		self._file = open(self._file.name,"w")
 		self._cfg.write(self._file)
 		self.modify_flags_config()
+		self.modify_debug_config()
 
 class Database:
 	"""An internal database which holds a simple dictionary cat -> [package_list]."""
@@ -96,6 +107,7 @@ class Database:
 		try:
 			return self.db[cat]
 		except KeyError: # cat is in category list - but not in portage
+			debug("Catched KeyError =>", cat, "seems not to be an available category. Have you played with rsync-excludes?")
 			return []
 
 	def reload (self, cat):
@@ -133,8 +145,27 @@ class EmergeQueue:
 		else:
 			self.emergeIt = self.unmergeIt = None
 
-	def update_tree (self, it, cpv):
-		"""This updates the tree recursivly. 
+	def _get_pkg_from_cpv (self, cpv, unmask = False):
+		pkg = backend.Package(cpv)
+		if not pkg.is_masked() and not pkg.is_testing(allowed=True):
+			masked = True
+		else:
+			masked = False
+		pkg = backend.find_packages("="+cpv, masked = masked)
+		if pkg:
+			pkg = pkg[0]
+		elif unmask:
+			pkg = backend.find_packages("="+cpv, masked = True)[0]
+			if pkg.is_testing(allowed = True):
+				pkg.set_testing(True)
+			if pkg.is_masked():
+				pkg.set_masked()
+		else:
+			raise backend.PackageNotFoundException(cpv)
+		return pkg
+	
+	def update_tree (self, it, cpv, unmask = False):
+		"""This updates the tree recursivly, or? Isn't it? Bjorn!
 
 		@param it: iterator where to append
 		@type it: gtk.TreeIter
@@ -146,37 +177,35 @@ class EmergeQueue:
 		# get dependencies
 		if cpv in self.deps:
 			return # in list already
-		else:
-			if flags.new_masking_status(cpv) == "unmasked":
-				masked = True
-			else:
-				masked = False
-			pkg = backend.find_packages("="+cpv, masked = masked)
-			if pkg:
-				pkg = pkg[0]
-			else:
-				raise backend.PackageNotFoundException(cpv)
-			
-			deps = pkg.get_dep_packages()
-			self.deps.update({cpv : deps})
 		
-		subIt = self.tree.append(it, [cpv])
+		try:
+			pkg = self._get_pkg_from_cpv(cpv, unmask)
+		except backend.PackageNotFoundException, e:
+			if self.tree.iter_parent(it):
+				while self.tree.iter_parent(it):
+					it = self.tree.iter_parent(it)
+				self.remove_children(it)
+				self.remove(it)
+			raise e
 
 		# add iter
+		subIt = self.tree.append(it, [cpv])
 		self.iters.update({cpv: subIt})
+		
+		deps = pkg.get_dep_packages()
+		self.deps.update({cpv : deps})
 		
 		# recursive call
 		for d in deps:
 			try:
-				self.update_tree(subIt, d)
+				self.update_tree(subIt, d, unmask)
 			except backend.BlockedException, e:
-				# remove the project
-				while self.tree.iter_parent(subIt):
-					subIt = self.tree.iter_parent(subIt)
+				debug("Something blocked:", e[0])
 				self.remove_children(subIt)
+				self.remove(subIt)
 				raise e
 		
-	def append (self, cpv, unmerge = False, update = False):
+	def append (self, cpv, unmerge = False, update = False, unmask = False):
 		"""Appends a cpv either to the merge queue or to the unmerge-queue.
 		Also updates the tree-view.
 		
@@ -191,15 +220,7 @@ class EmergeQueue:
 		if not unmerge:
 			try:
 				# insert dependencies
-				if flags.new_masking_status(cpv) == "unmasked":
-					masked = True
-				else:
-					masked = False
-				pkg = backend.find_packages("="+cpv, masked = masked)
-				if pkg:
-					pkg = pkg[0]
-				else:
-					raise backend.PackageNotFoundException(cpv)
+				pkg = self._get_pkg_from_cpv(cpv, unmask)
 				deps = pkg.get_dep_packages()
 				
 				if update:
@@ -209,14 +230,14 @@ class EmergeQueue:
 						parentIt = self.tree.iter_parent(self.iters[cpv])
 						self.remove_children(self.iters[cpv], False) # this is needed to def delete everything
 						self.remove(self.iters[cpv], False)
-						self.update_tree(parentIt, cpv)
+						self.update_tree(parentIt, cpv, unmask)
 				else: # not update
 					self.mergequeue.append(cpv)
-					if self.emergeIt: self.update_tree(self.emergeIt, cpv)
+					if self.emergeIt: self.update_tree(self.emergeIt, cpv, unmask)
 			
 			except backend.BlockedException, e : # there is sth blocked --> call blocked_dialog
 				blocks = e[0]
-				windows.blocked_dialog(cpv, blocks)
+				dialogs.blocked_dialog(cpv, blocks)
 				return
 		else: # unmerge
 			self.unmergequeue.append(cpv)
@@ -323,11 +344,14 @@ class EmergeQueue:
 			cpv = self.tree.get_value(it,0)
 			if self.tree.get_string_from_iter(it).split(":")[0] == self.tree.get_string_from_iter(self.emergeIt): # in Emerge
 				del self.iters[cpv]
-				del self.deps[cpv]
+				try:
+					del self.deps[cpv]
+				except KeyError: # this seems to be removed due to a BlockedException - so no deps here atm ;)
+					debug("Catched KeyError =>", cpv, "seems not to be in self.deps. Should be no harm in normal cases.")
 				try:
 					self.mergequeue.remove(cpv)
 				except ValueError: # this is a dependency - ignore
-					pass
+					debug("Catched ValueError =>", cpv, "seems not to be in merge-queue. Should be no harm.")
 				if removeNewFlags: 
 					flags.remove_new_use_flags(cpv)
 					flags.remove_new_masked(cpv)

@@ -14,8 +14,7 @@ from geneticone.helper import *
 from portage_helper import *
 import flags
 
-import gentoolkit
-import portage
+import portage, gentoolkit
 from portage_util import unique_array
 
 class Package (gentoolkit.Package):
@@ -182,8 +181,21 @@ class Package (gentoolkit.Package):
 					continue
 
 			pkg = find_best_match(dep)
-			if not dep:
-				raise PackageNotFoundException, dep
+			if not pkg: # try to find masked ones
+				list = find_packages(dep, masked = True)
+				if not list:
+					raise PackageNotFoundException, dep
+
+				list = sort_package_list(list)
+				done = False
+				for i in range(len(list)-1,0,-1):
+					p = list[i]
+					if not p.is_masked():
+						dep_pkgs.append(p.get_cpv())
+						done = True
+						break
+				if not done:
+					dep_pkgs.append(list[-1].get_cpv())
 			else:
 				dep_pkgs.append(pkg.get_cpv())
 

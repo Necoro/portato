@@ -9,7 +9,7 @@
 #
 # Written by Necoro d.M. <necoro@necoro.net>
 
-VERSION = "0.3.4"
+VERSION = "0.4.0"
 CONFIG_LOCATION = "/etc/geneticone/geneticone.cfg"
 MENU_EMERGE = 1
 MENU_UNEMERGE = 2
@@ -24,7 +24,10 @@ import gobject
 from geneticone.helper import *
 from geneticone import backend
 from geneticone.backend import flags
-from gui_helper import *
+
+# more GUI stuff
+from gui_helper import Database, Config, EmergeQueue
+from dialogs import *
 
 # for the terminal
 import pty
@@ -46,7 +49,7 @@ class AbstractDialog:
 		self.window.connect("key-press-event", self.cb_key_pressed)
 
 	def cb_key_pressed (self, widget, event):
-		"""Closes the window if esc is pressed."""
+		"""Closes the window if ESC is pressed."""
 		keyname = gtk.gdk.keyval_name(event.keyval)
 		if keyname == "Escape":
 			self.window.destroy()
@@ -70,6 +73,8 @@ A Portage-GUI
 		
 This software is licensed under the terms of the GPLv2.
 Copyright (C) 2006 Necoro d.M. &lt;necoro@necoro.net&gt;
+
+<small>Thanks to Fred for support and ideas :P</small>
 """ % VERSION)
 		box.pack_start(label)
 
@@ -132,19 +137,13 @@ class PreferenceWindow (AbstractDialog):
 		box = gtk.VBox(True)
 		self.window.add(box)
 
-		self.perVersionCb = gtk.CheckButton(label="Add to package.use on a per-version-base")
-		self.perVersionCb.set_active(cfg.get_boolean(cfg.const["usePerVersion_opt"]))
-		box.pack_start(self.perVersionCb, True, True)
+		self.debugCb = gtk.CheckButton(label="Debugging modus")
+		self.debugCb.set_active(self.cfg.get_boolean(self.cfg.const["debug_opt"]))
+		box.pack_start(self.debugCb, True, True)
 
-		hBox = gtk.HBox()
-		label = gtk.Label("File name to use if package.use is a directory:\n<small><b>$(cat)</b> = category\n<b>$(pkg)</b> = package-name\n<b>$(cat-1)</b>/<b>$(cat-2)</b> = first/second part of the category</small>")
-		label.set_use_markup(True)
-		self.editUsefile = gtk.Entry()
-		self.editUsefile.set_text(cfg.get(cfg.const["useFile_opt"]))
-		hBox.pack_start(label, False)
-		hBox.pack_start(self.editUsefile, True, True, 5)
-		box.pack_start(hBox, True, True)
-
+		self.usePerVersionCb, self.useFileEdit = self.draw_cb_and_edit(box, "package.use", "usePerVersion_opt", "useFile_opt")
+		self.maskPerVersionCb, self.maskFileEdit = self.draw_cb_and_edit(box, "package.mask/package.unmask", "maskPerVersion_opt", "maskFile_opt")
+		self.testPerVersionCb, self.testFileEdit = self.draw_cb_and_edit(box, "package.keywords", "testingPerVersion_opt", "testingFile_opt")
 		# buttons
 		buttonHB = gtk.HButtonBox()
 		buttonHB.set_layout(gtk.BUTTONBOX_SPREAD)
@@ -160,9 +159,30 @@ class PreferenceWindow (AbstractDialog):
 
 		self.window.show_all()
 
+	def draw_cb_and_edit (self, box, string, cb_opt, edit_opt):
+		cb = gtk.CheckButton(label=("Add to %s on a per-version-base" % string))
+		cb.set_active(self.cfg.get_boolean(self.cfg.const[cb_opt]))
+		box.pack_start(cb, True, True)
+
+		hBox = gtk.HBox()
+		label = gtk.Label(("File name to use if %s is a directory:\n<small><b>$(cat)</b> = category\n<b>$(pkg)</b> = package-name\n<b>$(cat-1)</b>/<b>$(cat-2)</b> = first/second part of the category</small>" % string))
+		label.set_use_markup(True)
+		edit = gtk.Entry()
+		edit.set_text(self.cfg.get(self.cfg.const[edit_opt]))
+		hBox.pack_start(label, False)
+		hBox.pack_start(edit, True, True, 5)
+		box.pack_start(hBox, True, True)
+
+		return (cb, edit)
+
 	def _save(self):
-		self.cfg.set(self.cfg.const["usePerVersion_opt"], str(self.perVersionCb.get_active()))
-		self.cfg.set(self.cfg.const["useFile_opt"], self.editUsefile.get_text())
+		self.cfg.set(self.cfg.const["usePerVersion_opt"], str(self.usePerVersionCb.get_active()))
+		self.cfg.set(self.cfg.const["useFile_opt"], self.useFileEdit.get_text())
+		self.cfg.set(self.cfg.const["maskPerVersion_opt"], str(self.maskPerVersionCb.get_active()))
+		self.cfg.set(self.cfg.const["maskFile_opt"], self.maskFileEdit.get_text())
+		self.cfg.set(self.cfg.const["testingPerVersion_opt"], str(self.testPerVersionCb.get_active()))
+		self.cfg.set(self.cfg.const["testingFile_opt"], self.testFileEdit.get_text())
+		self.cfg.set(self.cfg.const["debug_opt"], str(self.debugCb.get_active()))
 
 	def cb_ok_clicked(self, button):
 		self._save()
@@ -328,6 +348,7 @@ class PackageWindow (AbstractDialog):
 					combo.set_active(i)
 					break
 		except AttributeError: # no package found
+			debug('catched AttributeError => no "best package" found. Selected first one.')
 			combo.set_active(0)
 
 		combo.connect("changed", self.cb_combo_changed)
@@ -397,7 +418,11 @@ class PackageWindow (AbstractDialog):
 			self.actual_package().remove_new_testing()
 		elif self.flagChanged:
 			if self.queue:
-				self.queue.append(self.actual_package().get_cpv(), update = True)
+				try:
+					self.queue.append(self.actual_package().get_cpv(), update = True)
+				except backend.PackageNotFoundException, e:
+					if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
+						self.queue.append(self.actual_package().get_cpv(), update = True, unmask = True)
 		self.window.destroy()
 		return True
 
@@ -408,9 +433,11 @@ class PackageWindow (AbstractDialog):
 		else:
 			try:
 				self.queue.append(self.actual_package().get_cpv(), unmerge = False)
+				self.window.destroy()
 			except backend.PackageNotFoundException, e:
-				masked_dialog(e[0])
-			self.window.destroy()
+				if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
+					self.queue.append(self.actual_package().get_cpv(), unmerge = False, unmask = True)
+					self.window.destroy()
 		return True
 
 	def cb_unmerge_clicked (self, button, data = None):
@@ -480,6 +507,7 @@ class MainWindow:
 		# config
 		self.cfg = Config(CONFIG_LOCATION)
 		self.cfg.modify_flags_config()
+		self.cfg.modify_debug_config()
 
 		# main vb
 		vb = gtk.VBox(False, 1)
@@ -608,7 +636,7 @@ class MainWindow:
 		return store
 	
 	def create_pkg_list (self, name = None, force = False):
-		"""Creates the package list. Gets the name of the category."""
+		"""Creates the package list."""
 		store = gtk.ListStore(str)
 		self.fill_pkg_store(store,name)
 		
@@ -684,15 +712,13 @@ class MainWindow:
 
 			if not model.iter_parent(iter): # top-level
 				if model.iter_n_children(iter) > 0: # and has children which can be removed :)
-					askMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "Do you really want to clear the whole queue?")
-					if askMB.run() == gtk.RESPONSE_YES :
+					if remove_queue_dialog() == gtk.RESPONSE_YES :
 						self.queue.remove_children(iter)
-					askMB.destroy()
+			
 			elif model.iter_parent(model.iter_parent(iter)): # this is in the 3rd level => dependency
-				infoMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, "You cannot remove dependencies. :)")
-				infoMB.run()
-				infoMB.destroy()
+				remove_deps_dialog()
 			else:
+				self.queue.remove_children(iter) # remove children first
 				self.queue.remove(iter)
 		
 		return True
@@ -701,17 +727,12 @@ class MainWindow:
 		"""Do emerge or unemerge."""
 		if button == self.emergeBtn or button == MENU_EMERGE:
 			if len(flags.newUseFlags) > 0:
-				hintMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
-						"You have changed use flags. Genetic/One will write these changes into the appropriate files. Please backup them if you think it is necessairy.")
-				hintMB.run()
-				hintMB.destroy()
+				changed_flags_dialog("use flags")
 				flags.write_use_flags()
-			if len(flags.new_masked)>0 or len(flags.new_unmasked)>0:
-				hintMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
-						"You have changed masking keywords. Genetic/One will write these changes into the appropriate files. Please backup them if you think it is necessairy.")
-				hintMB.run()
-				hintMB.destroy()
+			if len(flags.new_masked)>0 or len(flags.new_unmasked)>0 or len(flags.newTesting)>0:
+				changed_flags_dialog("masking keywords")
 				flags.write_masked()
+				flags.write_testing()
 				backend.reload_settings()
 			self.queue.emerge(force=True)
 		elif button == self.unmergeBtn or button == MENU_UNEMERGE:
@@ -725,9 +746,7 @@ class MainWindow:
 			packages = backend.find_all_packages(self.searchEntry.get_text(), withVersion = False)
 
 			if packages == []:
-				dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, "Package not found!")
-				dialog.run()
-				dialog.destroy()
+				nothing_found_dialog()
 			else:
 				if len(packages) == 1:
 					self.jump_to(packages[0])
@@ -740,18 +759,3 @@ class MainWindow:
 		# now subthreads can run normally, but are not allowed to touch the GUI. If threads should change sth there - use gobject.idle_add().
 		# for more informations on threading and gtk: http://www.async.com.br/faq/pygtk/index.py?req=show&file=faq20.006.htp
 		gtk.main()
-
-def blocked_dialog (blocked, blocks):
-	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, blocked+" is blocked by "+blocks+".\nPlease unmerge the blocking package.")
-	dialog.run()
-	dialog.destroy()
-
-def not_root_dialog ():
-	errorMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "You cannot (un)merge without being root.")
-	errorMB.run()
-	errorMB.destroy()
-
-def masked_dialog (cpv):
-	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, cpv+" seems to be masked.\nPlease edit the appropriate file(s) to unmask it and restart Genetic/One.\n")
-	dialog.run()
-	dialog.destroy()

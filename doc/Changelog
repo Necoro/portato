@@ -1,3 +1,9 @@
+0.4.0:
+- smashed bugs
+- made testing and masking working (I hope)
+- allowed to unmask a whole queue
+- allowed to disable/enable debug-output
+
 0.3.4:
 - removed several minor and less minor bugs
 - added preference window

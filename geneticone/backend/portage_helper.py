@@ -7,14 +7,11 @@
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
 #
-# Written by Necoro d.M. <necoro@necoro.net> et.al.
+# Written by Necoro d.M. <necoro@necoro.net>
 
-import re
-import os
-import copy
+import re, os, copy
 
-import gentoolkit
-import portage
+import portage, gentoolkit
 from portage_util import unique_array
 
 from geneticone.backend import *
@@ -42,7 +39,16 @@ def geneticize_list (list_of_packages):
 	return [package.Package(x) for x in list_of_packages]
 
 def find_best_match (search_key, only_installed = False):
-	"""Finds the best match in the portage tree."""
+	"""Finds the best match in the portage tree. It does not find masked packages!
+	
+	@param search_key: the key to find in the portage tree
+	@type search_key: string
+	@param only_installed: if True, only installed packages are searched
+	@type only_installed: boolean
+	
+	@returns: the package found or None
+	@rtype: backend.Package or None"""
+
 	t = None
 	if not only_installed:
 		t = porttree.dep_bestmatch(search_key)
@@ -53,14 +59,28 @@ def find_best_match (search_key, only_installed = False):
 	return None
 
 def find_packages (search_key, masked=False):
-	"""This returns a list of packages which have to fit exactly. Additionally ranges like '<,>,=,~,!' et. al. are possible."""
+	"""This returns a list of packages which have to fit exactly. Additionally ranges like '<,>,=,~,!' et. al. are possible.
+	@param search_key: the key to look for
+	@type search_key: string
+	@param masked: if True, also look for masked packages
+	@type masked: boolean
+	@returns: list of found packages
+	@rtype: list of backend.Package"""
+
 	return geneticize_list(gentoolkit.find_packages(search_key, masked))
 
 def find_installed_packages (search_key, masked=False):
-	"""This returns a list of installed packages which have to fit exactly. Additionally ranges like '<,>,=,~,!' et. al. are possible.""" 
+	"""This returns a list of packages which have to fit exactly. Additionally ranges like '<,>,=,~,!' et. al. are possible.
+	@param search_key: the key to look for
+	@type search_key: string
+	@param masked: if True, also look for masked packages
+	@type masked: boolean
+	@returns: list of found packages
+	@rtype: list of backend.Package"""
+
 	return geneticize_list(gentoolkit.find_installed_packages(search_key, masked))
 
-def find_system_packages (name=None):
+def find_system_packages ():
 	"""Returns a list-tuple (resolved_packages, unresolved_packages) for all system packages."""
 	list = gentoolkit.find_system_packages()
 	return (geneticize_list(list[0]), geneticize_list(list[1]))
@@ -114,12 +134,22 @@ def find_all_system_packages (name=None):
 	return [package.Package(x) for x in sys]
 
 def get_all_versions (cp):
+	"""Returns all versions of a certain package.
+	@param cp: the package
+	@type cp: string (cat/pkg)
+	@returns: the list of found packages
+	@rtype: list of backend.Package"""
 	t = porttree.dbapi.cp_list(cp)
 	t += vartree.dbapi.cp_list(cp)
 	t = unique_array(t)
 	return geneticize_list(t)
 
 def get_all_installed_versions (cp):
+	"""Returns all installed versions of a certain package.
+	@param cp: the package
+	@type cp: string (cat/pkg)
+	@returns: the list of found packages
+	@rtype: list of backend.Package"""
 	return geneticize_list(vartree.dbapi.cp_list(cp))
 
 def list_categories (name=None):
@@ -138,7 +168,7 @@ def sort_package_list(pkglist):
 	return gentoolkit.sort_package_list(pkglist)
 
 def reload_settings ():
-	# XXX: what the hack are we doing here Oo
+	"""Reloads portage."""
 	gentoolkit.settings = portage.config(config_incrementals = copy.deepcopy(gentoolkit.settings.incrementals))
 
 use_descs = {}

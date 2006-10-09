@@ -11,6 +11,12 @@
 
 import traceback, textwrap, os.path
 
+DEBUG = True
+
+def set_debug (d):
+	global DEBUG
+	DEBUG = d
+
 def debug(*args, **kwargs):
 	"""Prints a debug message including filename and lineno.
 	A variable number of positional arguments are allowed.
@@ -21,6 +27,8 @@ def debug(*args, **kwargs):
 	keyword parameter.
 
 	(This function is adapted from Edward Jones as published under: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/279155)"""
+	
+	if not DEBUG : return
 	
 	stack = traceback.extract_stack()
 	a, b, c, d = stack[-2]
