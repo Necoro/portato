@@ -363,10 +363,12 @@ class PackageWindow (AbstractDialog):
 		"""Callback for the changed ComboBox.
 		It then rebuilds the useList and the checkboxes."""
 		
-		store = self.useList.get_model()
-		store.clear()
-		self.fill_use_list(store)
+		# remove old useList
+		self.useListScroll.remove(self.useList)
 		
+		# build new
+		self.useList = self.build_use_list()
+		self.useListScroll.add(self.useList)
 		pkg = self.actual_package()
 
 		if pkg.is_missing_keyword():
