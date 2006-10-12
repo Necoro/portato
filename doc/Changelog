@@ -1,3 +1,8 @@
+0.4.1:
+- bug fixing (again ;D)
+- added "oneshot"
+- redesign
+
 0.4.0:
 - smashed bugs
 - made testing and masking working (I hope)

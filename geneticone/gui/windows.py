@@ -567,10 +567,12 @@ class MainWindow:
 		
 		queueScroll = gtk.ScrolledWindow()
 		queueScroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-		emergeStore = gtk.TreeStore(str)
+		emergeStore = gtk.TreeStore(str,str)
 		self.emergeView = gtk.TreeView(emergeStore)
 		cell = gtk.CellRendererText()
 		col = gtk.TreeViewColumn("Queue", cell, text = 0)
+		self.emergeView.append_column(col)
+		col = gtk.TreeViewColumn("Options", cell, markup = 1)
 		self.emergeView.append_column(col)
 		self.emergeView.connect("row-activated", self.cb_row_activated, emergeStore)
 		self.emergeView.connect("button-press-event", self.cb_queue_right_click)
@@ -660,8 +662,8 @@ class MainWindow:
 		um.insert_action_group(group,0)
 
 		group = gtk.ActionGroup("PopupActions")
-		group.add_toggle_actions([
-			("Oneshot", None, "Oneshot")])
+		group.add_actions([
+			("Oneshot", None, "Oneshot", None, None, self.cb_oneshot_clicked)])
 
 		um.insert_action_group(group, 1)
 
@@ -807,6 +809,20 @@ class MainWindow:
 				return True
 			else:
 				return False
+
+	def cb_oneshot_clicked (self, action):
+		sel = self.emergeView.get_selection()
+		store, it = sel.get_selected()
+		if it:
+			package = store.get_value(it, 0)
+			if not self.cfg.get_local(package, self.cfg.const["oneshot_opt"]):
+				set = True
+			else:
+				set = False
+			
+			self.cfg.set_local(package, self.cfg.const["oneshot_opt"], set)
+			self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
+			
 
 	def main (self):
 		"""Main."""

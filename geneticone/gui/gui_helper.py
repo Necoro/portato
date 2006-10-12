@@ -30,7 +30,8 @@ class Config:
 			"maskPerVersion_opt" : "maskPerVersion",
 			"testingFile_opt" : "keywordfile",
 			"testingPerVersion_opt" : "keywordperversion",
-			"debug_opt" : "debug"
+			"debug_opt" : "debug",
+			"oneshot_opt" : "oneshot"
 			}
 	
 	def __init__ (self, cfgFile):
@@ -44,6 +45,8 @@ class Config:
 
 		self._cfg.readfp(self._file)
 		self._file.close()
+
+		self.local = {}
 
 	def get(self, name, section=const["main_sec"]):
 		return self._cfg.get(section, name)
@@ -63,6 +66,20 @@ class Config:
 
 	def modify_debug_config (self):
 		set_debug(self.get_boolean(self.const["debug_opt"]))
+
+	def set_local(self, cpv, name, val):
+		if not cpv in self.local:
+			self.local[cpv] = {}
+
+		self.local[cpv].update({name:val})
+
+	def get_local(self, cpv, name):
+		if not cpv in self.local:
+			return None
+		if not name in self.local[cpv]:
+			return None
+
+		return self.local[cpv][name]
 
 	def set(self, name, val, section=const["main_sec"]):
 		self._cfg.set(section, name, val)
@@ -133,6 +150,7 @@ class EmergeQueue:
 		
 		self.mergequeue = []
 		self.unmergequeue = []
+		self.oneshotmerge = []
 		self.iters = {}
 		self.deps = {}
 		self.tree = tree
@@ -140,8 +158,8 @@ class EmergeQueue:
 		self.db = db
 
 		if self.tree: 
-			self.emergeIt = self.tree.append(None, ["Emerge"])
-			self.unmergeIt = self.tree.append(None, ["Unmerge"])
+			self.emergeIt = self.tree.append(None, ["Emerge", ""])
+			self.unmergeIt = self.tree.append(None, ["Unmerge", ""])
 		else:
 			self.emergeIt = self.unmergeIt = None
 
@@ -164,7 +182,7 @@ class EmergeQueue:
 			raise backend.PackageNotFoundException(cpv)
 		return pkg
 	
-	def update_tree (self, it, cpv, unmask = False):
+	def update_tree (self, it, cpv, unmask = False, options = ""):
 		"""This updates the tree recursivly, or? Isn't it? Bjorn!
 
 		@param it: iterator where to append
@@ -184,12 +202,11 @@ class EmergeQueue:
 			if self.tree.iter_parent(it):
 				while self.tree.iter_parent(it):
 					it = self.tree.iter_parent(it)
-				self.remove_children(it)
-				self.remove(it)
+				self.remove_with_children(it)
 			raise e
 
 		# add iter
-		subIt = self.tree.append(it, [cpv])
+		subIt = self.tree.append(it, [cpv, "<i>"+options+"</i>"])
 		self.iters.update({cpv: subIt})
 		
 		deps = pkg.get_dep_packages()
@@ -201,11 +218,10 @@ class EmergeQueue:
 				self.update_tree(subIt, d, unmask)
 			except backend.BlockedException, e:
 				debug("Something blocked:", e[0])
-				self.remove_children(subIt)
-				self.remove(subIt)
+				self.remove_with_children(subIt)
 				raise e
 		
-	def append (self, cpv, unmerge = False, update = False, unmask = False):
+	def append (self, cpv, unmerge = False, update = False, unmask = False, oneshot = False, forceUpdate = False):
 		"""Appends a cpv either to the merge queue or to the unmerge-queue.
 		Also updates the tree-view.
 		
@@ -224,16 +240,28 @@ class EmergeQueue:
 				deps = pkg.get_dep_packages()
 				
 				if update:
-					if deps == self.deps[cpv]:
+					if not forceUpdate and deps == self.deps[cpv]:
 						return # nothing changed - return
 					else:
+						hasBeenInQueue = (cpv in self.mergequeue or cpv in self.oneshotmerge)
 						parentIt = self.tree.iter_parent(self.iters[cpv])
-						self.remove_children(self.iters[cpv], False) # this is needed to def delete everything
-						self.remove(self.iters[cpv], False)
-						self.update_tree(parentIt, cpv, unmask)
+						options = ""
+						self.remove_with_children(self.iters[cpv], False) # this is needed to def delete everything
+						if hasBeenInQueue:
+							if not oneshot:
+								self.mergequeue.append(cpv)
+							else:
+								self.oneshotmerge.append(cpv)
+								options="oneshot"
+
+						self.update_tree(parentIt, cpv, unmask, options = options)
 				else: # not update
-					self.mergequeue.append(cpv)
-					if self.emergeIt: self.update_tree(self.emergeIt, cpv, unmask)
+					options = ""
+					if not oneshot: self.mergequeue.append(cpv)
+					else: 
+						self.oneshotmerge.append(cpv)
+						options = "oneshot"
+					if self.emergeIt: self.update_tree(self.emergeIt, cpv, unmask, options)
 			
 			except backend.BlockedException, e : # there is sth blocked --> call blocked_dialog
 				blocks = e[0]
@@ -267,8 +295,8 @@ class EmergeQueue:
 		@type options: list
 		@param packages: packages to emerge
 		@type packages: list
-		@param it: Iterator which points to an entry whose children will be removed after completion.
-		@type it: gtk.TreeIter"""
+		@param it: Iterators which point to these entries whose children will be removed after completion.
+		@type it: list of gtk.TreeIter"""
 
 		# open tty
 		(master, slave) = pty.openpty()
@@ -279,7 +307,8 @@ class EmergeQueue:
 		Thread(target=self._update_packages, args=(packages, process)).start()
 		
 		# remove
-		self.remove_children(it)
+		for i in it:
+			self.remove_with_children(i)
 
 	def emerge (self, force = False):
 		"""Emerges everything in the merge-queue.
@@ -287,17 +316,30 @@ class EmergeQueue:
 		@param force: If False, '-pv' is send to emerge. Default: False.
 		@type force: boolean"""
 
-		if len(self.mergequeue) == 0: return # nothing in queue
+		if len(self.oneshotmerge) != 0:
+			# prepare package-list for oneshot
+			list = []
+			its = []
+			for k in self.oneshotmerge:
+				list += ["="+k]
+				its.append(self.iters[k])
+
+			s = ["--oneshot"]
+			if not force: s += ["--verbose", "--pretend"]
+			self._emerge(s, list, its)
 		
-		# prepare package-list
-		list = []
-		for k in self.mergequeue:
-			list += ["="+k]
+		if len(self.mergequeue) != 0:
+			# prepare package-list
+			list = []
+			its = []
+			for k in self.mergequeue:
+				list += ["="+k]
+				its.append(self.iters[k])
 		
-		s = []
-		if not force: s = ["-pv"]
+			s = []
+			if not force: s = ["--verbose", "--pretend"]
 		
-		self._emerge(s, list, self.emergeIt)
+			self._emerge(s, list, its)
 
 	def unmerge (self, force = False):
 		"""Unmerges everything in the umerge-queue.
@@ -313,7 +355,11 @@ class EmergeQueue:
 		s = ["-C"]
 		if not force: s = ["-Cpv"]
 		
-		self._emerge(s,list, self.unmergeIt)
+		self._emerge(s,list, [self.unmergeIt])
+
+	def remove_with_children (self, it, removeNewFlags = True):
+		self.remove_children(it, removeNewFlags)
+		self.remove(it, removeNewFlags)
 
 	def remove_children (self, parentIt, removeNewFlags = True):
 		"""Removes all children of a given parent TreeIter recursivly.
@@ -351,7 +397,11 @@ class EmergeQueue:
 				try:
 					self.mergequeue.remove(cpv)
 				except ValueError: # this is a dependency - ignore
-					debug("Catched ValueError =>", cpv, "seems not to be in merge-queue. Should be no harm.")
+					try:
+						self.oneshotmerge.remove(cpv)
+					except ValueError:
+						debug("Catched ValueError =>", cpv, "seems not to be in merge-queue. Should be no harm.")
+				
 				if removeNewFlags: 
 					flags.remove_new_use_flags(cpv)
 					flags.remove_new_masked(cpv)
