@@ -9,7 +9,7 @@
 #
 # Written by Necoro d.M. <necoro@necoro.net>
 
-VERSION = "0.4.0"
+VERSION = "0.4.1-svn"
 CONFIG_LOCATION = "/etc/geneticone/geneticone.cfg"
 
 # gtk stuff
@@ -494,7 +494,7 @@ class MainWindow:
 		"""Build up window"""
 		# window
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.window.set_title("Genetic/One")
+		self.window.set_title(("Genetic/One (%s)" % VERSION))
 		self.window.connect("destroy", self.cb_destroy)
 		self.window.set_border_width(2)
 		self.window.set_geometry_hints (self.window, min_width = 600, min_height = 800, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
@@ -521,6 +521,7 @@ class MainWindow:
 
 		# menus
 		self.uimanager = self.create_uimanager()
+		self.queuePopup = self.uimanager.get_widget("/popupQueue")
 		menubar = self.uimanager.get_widget("/bar")
 		vb.pack_start(menubar, False)
 		
@@ -560,9 +561,9 @@ class MainWindow:
 		# create pkg list
 		self.pkgList = self.create_pkg_list()
 		self.scroll_2.add(self.pkgList)
+		
 		# queue list
-		queueVB = gtk.VBox(False, 0)
-		hb.pack_start(queueVB, True, True)
+		queueHB = gtk.HBox(False, 0)
 		
 		queueScroll = gtk.ScrolledWindow()
 		queueScroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -572,16 +573,19 @@ class MainWindow:
 		col = gtk.TreeViewColumn("Queue", cell, text = 0)
 		self.emergeView.append_column(col)
 		self.emergeView.connect("row-activated", self.cb_row_activated, emergeStore)
+		self.emergeView.connect("button-press-event", self.cb_queue_right_click)
+		self.emergeView.set_headers_visible(False)
 		queueScroll.add(self.emergeView)
-		queueVB.pack_start(queueScroll, True, True)
+		queueHB.pack_start(queueScroll, True, True)
 
-		# buttons right unter the queue list
-		buttonBox = gtk.HButtonBox()
-		queueVB.pack_start(buttonBox, False)
+		# buttons right to the queue list
+		buttonBox = gtk.VButtonBox()
+		buttonBox.set_layout(gtk.BUTTONBOX_SPREAD)
+		queueHB.pack_start(buttonBox, False)
 		emergeBtn = gtk.Button()
-		emergeAction.connect_proxy(emergeBtn)
+		self.emergeAction.connect_proxy(emergeBtn)
 		unmergeBtn = gtk.Button()
-		unmergeAction.connect_proxy(unmergeBtn)
+		self.unmergeAction.connect_proxy(unmergeBtn)
 		removeBtn = gtk.Button("_Remove")
 		removeBtn.connect("clicked", self.cb_remove_clicked)
 		buttonBox.pack_start(emergeBtn)
@@ -601,13 +605,15 @@ class MainWindow:
 		termBox.pack_start(term, True, True)
 		termBox.pack_start(termScroll, False)
 		
-		termFrame = gtk.Frame("Console")
-		termFrame.set_shadow_type(gtk.SHADOW_IN)
-		termFrame.add(termBox)
-		vpaned.pack2(termFrame, shrink = True, resize = True)
+		# notebook
+		self.notebook = gtk.Notebook()
+		self.notebook.append_page(queueHB, gtk.Label("Queue"))
+		self.notebook.append_page(termBox, gtk.Label("Console"))
+
+		vpaned.pack2(self.notebook, shrink = True, resize = True)
 
 		# the status line
-		self.statusLabel = gtk.Label("Genetic/One - <Statusline>")
+		self.statusLabel = gtk.Label("Genetic/One - A Portage GUI")
 		self.statusLabel.set_alignment(0.0,0.7)
 		self.statusLabel.set_single_line_mode(True)
 		vb.pack_start(self.statusLabel, False, False)
@@ -635,7 +641,7 @@ class MainWindow:
 				<menuitem action="About" />
 			</menu>
 		</menubar>
-		<popup name="queueRightClick">
+		<popup name="popupQueue">
 			<menuitem action="Oneshot" />
 		</popup>
 	</ui>"""
@@ -758,6 +764,7 @@ class MainWindow:
 
 	def cb_emerge_clicked (self, action, data = None):
 		"""Do emerge or unemerge."""
+		self.notebook.set_current_page(1)
 		if action == self.emergeAction:
 			if len(flags.newUseFlags) > 0:
 				changed_flags_dialog("use flags")
@@ -785,6 +792,21 @@ class MainWindow:
 					self.jump_to(packages[0])
 				else:
 					SearchWindow(self.window, packages, self.jump_to)
+
+	def cb_queue_right_click (self, queue, event):
+		if event.button == 3:
+			x = int(event.x)
+			y = int(event.y)
+			time = event.time
+			pthinfo = queue.get_path_at_pos(x, y)
+			if pthinfo is not None:
+				path, col, cellx, celly = pthinfo
+				queue.grab_focus()
+				queue.set_cursor( path, col, 0)
+				self.queuePopup.popup( None, None, None, event.button, time)
+				return True
+			else:
+				return False
 
 	def main (self):
 		"""Main."""
