@@ -11,8 +11,6 @@
 
 VERSION = "0.4.0"
 CONFIG_LOCATION = "/etc/geneticone/geneticone.cfg"
-MENU_EMERGE = 1
-MENU_UNEMERGE = 2
 
 # gtk stuff
 import pygtk
@@ -511,12 +509,19 @@ class MainWindow:
 		self.cfg.modify_flags_config()
 		self.cfg.modify_debug_config()
 
+		# actions needed
+		self.emergeAction = gtk.Action("Emerge", "_Emerge", None, None)
+		self.emergeAction.connect("activate", self.cb_emerge_clicked)
+		self.unmergeAction = gtk.Action("Unmerge", "_Unmerge", None, None)
+		self.unmergeAction.connect("activate", self.cb_emerge_clicked)
+
 		# main vb
 		vb = gtk.VBox(False, 1)
 		self.window.add(vb)
 
-		# menubar
-		menubar = self.create_main_menu()
+		# menus
+		self.uimanager = self.create_uimanager()
+		menubar = self.uimanager.get_widget("/bar")
 		vb.pack_start(menubar, False)
 		
 		# search
@@ -573,15 +578,15 @@ class MainWindow:
 		# buttons right unter the queue list
 		buttonBox = gtk.HButtonBox()
 		queueVB.pack_start(buttonBox, False)
-		self.emergeBtn = gtk.Button("_Emerge")
-		self.emergeBtn.connect("clicked", self.cb_emerge_clicked)
-		self.unmergeBtn = gtk.Button("_Unmerge")
-		self.unmergeBtn.connect("clicked", self.cb_emerge_clicked)
-		self.removeBtn = gtk.Button("_Remove")
-		self.removeBtn.connect("clicked", self.cb_remove_clicked)
-		buttonBox.pack_start(self.emergeBtn)
-		buttonBox.pack_start(self.removeBtn)
-		buttonBox.pack_start(self.unmergeBtn)
+		emergeBtn = gtk.Button()
+		emergeAction.connect_proxy(emergeBtn)
+		unmergeBtn = gtk.Button()
+		unmergeAction.connect_proxy(unmergeBtn)
+		removeBtn = gtk.Button("_Remove")
+		removeBtn.connect("clicked", self.cb_remove_clicked)
+		buttonBox.pack_start(emergeBtn)
+		buttonBox.pack_start(removeBtn)
+		buttonBox.pack_start(unmergeBtn)
 		
 		# the terminal
 		term = vte.Terminal()
@@ -613,23 +618,49 @@ class MainWindow:
 		# set emerge queue
 		self.queue = EmergeQueue(console=term, tree = emergeStore, db = self.db)
 
-	def create_main_menu (self):
-		"""Creates the main menu. XXX: Rebuild to use UIManager"""
-		# the menu-list
-		mainMenuDesc = [
-				( "/_File", None, None, 0, "<Branch>"),
-				( "/File/_Preferences", None, lambda x,y: PreferenceWindow(self.window, self.cfg), 0, ""),
-				( "/File/", None, None, 0, "<Separator>"),
-				( "/File/_Close", None, self.cb_destroy, 0, ""),
-				( "/_Emerge", None, None, 0, "<Branch>"),
-				( "/Emerge/_Emerge", None, self.cb_emerge_clicked, MENU_EMERGE, ""),
-				( "/Emerge/_Unmerge", None, self.cb_emerge_clicked, MENU_UNEMERGE, ""),
-				( "/_?", None, None, 0, "<Branch>"),
-				( "/?/_About", None, lambda x,y: AboutWindow(self.window), 0, "")
-				]
-		self.itemFactory = gtk.ItemFactory(gtk.MenuBar, "<main>", None)
-		self.itemFactory.create_items(mainMenuDesc)
-		return self.itemFactory.get_widget("<main>")
+	def create_uimanager(self):
+		ui ="""
+	<ui>
+		<menubar name="bar">
+			<menu action="File">
+				<menuitem action="Prefs" />
+				<separator />
+				<menuitem action="Close" />
+			</menu>
+			<menu action="EmergeMenu">
+				<menuitem action="Emerge" />
+				<menuitem action="Unmerge" />
+			</menu>
+			<menu action="Help">
+				<menuitem action="About" />
+			</menu>
+		</menubar>
+		<popup name="queueRightClick">
+			<menuitem action="Oneshot" />
+		</popup>
+	</ui>"""
+
+		um = gtk.UIManager()
+		group = gtk.ActionGroup("MenuActions")
+		group.add_actions([
+			("File", None, "_File"),
+			("EmergeMenu", None, "_Emerge"),
+			("Help", None, "_?"),
+			("Prefs", None, "_Preferences", None, None, lambda x,y: PreferenceWindow(self.window, self.cfg)),
+			("Close", None, "_Close", None, None, self.cb_destroy),
+			("About", None, "_About", None, None, lambda x,y: AboutWindow(self.window))])
+		group.add_action(self.emergeAction)
+		group.add_action(self.unmergeAction)
+		um.insert_action_group(group,0)
+
+		group = gtk.ActionGroup("PopupActions")
+		group.add_toggle_actions([
+			("Oneshot", None, "Oneshot")])
+
+		um.insert_action_group(group, 1)
+
+		um.add_ui_from_string(ui)
+		return um
 
 	def fill_pkg_store (self, store, name = None):
 		if name:
@@ -725,9 +756,9 @@ class MainWindow:
 		
 		return True
 
-	def cb_emerge_clicked (self, button, data = None):
+	def cb_emerge_clicked (self, action, data = None):
 		"""Do emerge or unemerge."""
-		if button == self.emergeBtn or button == MENU_EMERGE:
+		if action == self.emergeAction:
 			if len(flags.newUseFlags) > 0:
 				changed_flags_dialog("use flags")
 				flags.write_use_flags()
@@ -737,7 +768,7 @@ class MainWindow:
 				flags.write_testing()
 				backend.reload_settings()
 			self.queue.emerge(force=True)
-		elif button == self.unmergeBtn or button == MENU_UNEMERGE:
+		elif action == self.unmergeAction:
 			self.queue.unmerge(force=True)
 
 		return True
