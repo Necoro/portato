@@ -301,19 +301,20 @@ def write_use_flags ():
 						insert(flag,l)
 					file_cache[file][line-1] = " ".join(l)
 
+		if flagsToAdd:
 		# write new lines
-		msg = "\n#geneticone update#\n"
-		if CONFIG["usePerVersion"]: # add on a per-version-base
-			msg += "=%s %s\n" % (cpv, ' '.join(flagsToAdd))
-		else: # add on a per-package-base
-			list = split_package_name(cpv)
-			msg += "%s/%s %s\n" % (list[0], list[1], ' '.join(flagsToAdd))
-		if not file in file_cache:
-			f = open(file, "a")
-			f.write(msg)
-			f.close()
-		else:
-			file_cache[file].append(msg)
+			msg = "\n#geneticone update#\n"
+			if CONFIG["usePerVersion"]: # add on a per-version-base
+				msg += "=%s %s\n" % (cpv, ' '.join(flagsToAdd))
+			else: # add on a per-package-base
+				list = split_package_name(cpv)
+				msg += "%s/%s %s\n" % (list[0], list[1], ' '.join(flagsToAdd))
+			if not file in file_cache:
+				f = open(file, "a")
+				f.write(msg)
+				f.close()
+			else:
+				file_cache[file].append(msg)
 	
 	# write to disk
 	for file in file_cache.keys():

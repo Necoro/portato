@@ -38,18 +38,18 @@ def nothing_found_dialog ():
 	dialog.destroy()
 
 def changed_flags_dialog (what = "flags"):
-	hintMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+	hintMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
 						"You have changed %s. Genetic/One will write these changes into the appropriate files. Please backup them if you think it is necessairy." % what)
 	hintMB.run()
 	hintMB.destroy()
 
 def remove_deps_dialog ():
-	infoMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, "You cannot remove dependencies. :)")
+	infoMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, "You cannot remove dependencies. :)")
 	infoMB.run()
 	infoMB.destroy()
 
 def remove_queue_dialog ():
-	askMB = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "Do you really want to clear the whole queue?")
+	askMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "Do you really want to clear the whole queue?")
 	ret = askMB.run()
 	askMB.destroy()
 	return ret
