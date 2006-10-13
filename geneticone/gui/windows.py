@@ -28,22 +28,40 @@ from gui_helper import Database, Config, EmergeQueue
 from dialogs import *
 
 # for the terminal
-import pty
 import vte
 
 # other
 from portage_util import unique_array
 
 class AbstractDialog:
+	"""A class all our dialogs get derived from. It sets useful default vars and automatically handles the ESC-Button."""
 
 	def __init__ (self, parent, title):
+		"""Constructor.
+
+		@param parent: the parent window
+		@type parent: gtk.Window
+		@param title: the title of the window
+		@type title: string"""
+
+		# create new
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		
+		# set title
 		self.window.set_title(title)
+		
+		# set modal and transient for the parent --> you have to close this one to get back to the parent
 		self.window.set_modal(True)
 		self.window.set_transient_for(parent)
 		self.window.set_destroy_with_parent(True)
+
+		# not resizable
 		self.window.set_resizable(False)
+		
+		# default size = (1,1) ==> as small as possible
 		self.window.set_default_size(1,1)
+
+		# catch the ESC-key
 		self.window.connect("key-press-event", self.cb_key_pressed)
 
 	def cb_key_pressed (self, widget, event):
@@ -59,10 +77,17 @@ class AboutWindow (AbstractDialog):
 	"""A window showing the "about"-informations."""
 
 	def __init__ (self, parent):
+		"""Constructor.
+
+		@param parent: the parent window
+		@type parent: gtk.Window"""
+
 		AbstractDialog.__init__(self, parent, "About Genetic/One")
+		
 		box = gtk.VBox(False)
 		self.window.add(box)
 		
+		# about label
 		label = gtk.Label()
 		label.set_justify(gtk.JUSTIFY_CENTER)
 		label.set_markup("""
@@ -76,69 +101,104 @@ Copyright (C) 2006 Necoro d.M. &lt;necoro@necoro.net&gt;
 """ % VERSION)
 		box.pack_start(label)
 
+		# button
 		okBtn = gtk.Button("OK")
 		okBtn.connect("clicked", lambda x: self.window.destroy())
 		box.pack_start(okBtn)
 
+		# finished -> show
 		self.window.show_all()
 
 class SearchWindow (AbstractDialog):
 	"""A window showing the results of a search process."""
 	
 	def __init__ (self, parent, list, jump_to):
+		"""Constructor.
+
+		@param parent: parent-window
+		@type parent: gtk.Window
+		@param list: list of results to show
+		@type list: string[]
+		@param jump_to: function to call if "OK"-Button is hit
+		@type jump_to: function(string)"""
+		
 		AbstractDialog.__init__(self, parent, "Search results")
 		
-		self.list = list
-		self.jump_to = jump_to
+		self.list = list # list to show
+		self.jump_to = jump_to # function to call for jumping
 
 		box = gtk.HBox(False)
 		self.window.add(box)
 
+		# combo box
 		self.combo = gtk.combo_box_new_text()
 		for x in list:
 			self.combo.append_text(x)
-		self.combo.set_active(0)
-		self.combo.connect("key-press-event", self.cb_key_pressed)
+		self.combo.set_active(0) # first item
+		self.combo.connect("key-press-event", self.cb_key_pressed_combo)
 
 		box.pack_start(self.combo)
 
+		# ok-button
 		okBtn = gtk.Button("OK")
 		okBtn.connect("clicked", self.cb_ok_btn_clicked)
 		box.pack_start(okBtn)
 
+		# finished --> show
 		self.window.show_all()
 
-	def cb_ok_btn_clicked (self, button, data = None):
+	def cb_ok_btn_clicked (self, button):
+		"""Called if the OK-Button is clicked. 
+		Calls self.jump_to(selected_entry) and closes the window."""
 		self.window.destroy()
 		self.jump_to(self.list[self.combo.get_active()])
 		return True
 
-	def cb_key_pressed (self, widget, event):
+	def cb_key_pressed_combo (self, widget, event):
+		"""Emulates a ok-button-click."""
 		keyname = gtk.gdk.keyval_name(event.keyval)
 		if keyname == "Return": # take it as an "OK" if Enter is pressed
 			self.cb_ok_btn_clicked(self,widget)
-			return True
-		elif keyname == "Escape":
-			self.window.destroy()
 			return True
 		else:
 			return False
 
 class PreferenceWindow (AbstractDialog):
+	"""Window displaying some preferences."""
 
 	def __init__ (self, parent, cfg):
-		AbstractDialog.__init__(self, parent, "Preferences")
-		self.window.set_resizable(True)
+		"""Constructor.
 
+		@param parent: parent window
+		@type parent: gtk.Window
+		@param cfg: configuration object
+		@type cfg: gui_helper.Config"""
+
+		AbstractDialog.__init__(self, parent, "Preferences")
+		self.window.set_resizable(True) # override the default of the AbstractDialog
+		
+		# our config
 		self.cfg = cfg
 		
-		box = gtk.VBox(True)
+		box = gtk.VBox()
+		box.set_spacing(5)
+
 		self.window.add(box)
 
+		# En-/Disable Debugging
 		self.debugCb = gtk.CheckButton(label="Debugging modus")
 		self.debugCb.set_active(self.cfg.get_boolean(self.cfg.const["debug_opt"]))
 		box.pack_start(self.debugCb, True, True)
 
+		pHolderLabel = gtk.Label("""<u>For the following options, you might use these placeholders:</u>
+<b>$(cat)</b> = category
+<b>$(pkg)</b> = package-name
+<b>$(cat-1)</b>/<b>$(cat-2)</b> = first/second part of the category""")
+		pHolderLabel.set_use_markup(True)
+		pHolderLabel.set_alignment(0,0)
+		box.pack_start(pHolderLabel)
+
+		# The use/mask/keywording checkboxes and edits
 		self.usePerVersionCb, self.useFileEdit = self.draw_cb_and_edit(box, "package.use", "usePerVersion_opt", "useFile_opt")
 		self.maskPerVersionCb, self.maskFileEdit = self.draw_cb_and_edit(box, "package.mask/package.unmask", "maskPerVersion_opt", "maskFile_opt")
 		self.testPerVersionCb, self.testFileEdit = self.draw_cb_and_edit(box, "package.keywords", "testingPerVersion_opt", "testingFile_opt")
@@ -155,16 +215,32 @@ class PreferenceWindow (AbstractDialog):
 
 		box.pack_start(buttonHB, True, True, 5)
 
+		# finished --> show all
 		self.window.show_all()
 
 	def draw_cb_and_edit (self, box, string, cb_opt, edit_opt):
+		"""Draws a checkbox and an edit-field. 
+		
+		@param box: box to place the both things into
+		@type box: gtk.Box
+		@param string: string to show
+		@type string: string
+		@param cb_opt: the option string for the Config.const-dict
+		@type cb_opt: string
+		@param edit_opt: the option string for the Config.const-dic
+		@type edit_opt: string
+
+		@return: the checkbox and the edit-field
+		@rtype: (gtk.CheckButton, gtk.Edit)"""
+
+		# check-button
 		cb = gtk.CheckButton(label=("Add to %s on a per-version-base" % string))
 		cb.set_active(self.cfg.get_boolean(self.cfg.const[cb_opt]))
 		box.pack_start(cb, True, True)
 
+		# edit with label
 		hBox = gtk.HBox()
-		label = gtk.Label(("File name to use if %s is a directory:\n<small><b>$(cat)</b> = category\n<b>$(pkg)</b> = package-name\n<b>$(cat-1)</b>/<b>$(cat-2)</b> = first/second part of the category</small>" % string))
-		label.set_use_markup(True)
+		label = gtk.Label("File name to use if %s is a directory:" % string)
 		edit = gtk.Entry()
 		edit.set_text(self.cfg.get(self.cfg.const[edit_opt]))
 		hBox.pack_start(label, False)
@@ -174,6 +250,7 @@ class PreferenceWindow (AbstractDialog):
 		return (cb, edit)
 
 	def _save(self):
+		"""Sets all options in the Config-instance."""
 		self.cfg.set(self.cfg.const["usePerVersion_opt"], str(self.usePerVersionCb.get_active()))
 		self.cfg.set(self.cfg.const["useFile_opt"], self.useFileEdit.get_text())
 		self.cfg.set(self.cfg.const["maskPerVersion_opt"], str(self.maskPerVersionCb.get_active()))
@@ -183,6 +260,7 @@ class PreferenceWindow (AbstractDialog):
 		self.cfg.set(self.cfg.const["debug_opt"], str(self.debugCb.get_active()))
 
 	def cb_ok_clicked(self, button):
+		"""Saves, writes to config-file and closes the window."""
 		self._save()
 		self.cfg.write()
 		self.window.destroy()
@@ -506,8 +584,7 @@ class MainWindow:
 
 		# config
 		self.cfg = Config(CONFIG_LOCATION)
-		self.cfg.modify_flags_config()
-		self.cfg.modify_debug_config()
+		self.cfg.modify_external_configs()
 
 		# actions needed
 		self.emergeAction = gtk.Action("Emerge", "_Emerge", None, None)
@@ -654,9 +731,9 @@ class MainWindow:
 			("File", None, "_File"),
 			("EmergeMenu", None, "_Emerge"),
 			("Help", None, "_?"),
-			("Prefs", None, "_Preferences", None, None, lambda x,y: PreferenceWindow(self.window, self.cfg)),
+			("Prefs", None, "_Preferences", None, None, lambda x: PreferenceWindow(self.window, self.cfg)),
 			("Close", None, "_Close", None, None, self.cb_destroy),
-			("About", None, "_About", None, None, lambda x,y: AboutWindow(self.window))])
+			("About", None, "_About", None, None, lambda x: AboutWindow(self.window))])
 		group.add_action(self.emergeAction)
 		group.add_action(self.unmergeAction)
 		um.insert_action_group(group,0)
