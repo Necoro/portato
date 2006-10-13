@@ -19,12 +19,14 @@ import package
 
 def find_lambda (name):
 	"""Returns the function needed by all the find_all_*-functions. Returns None if no name is given.
+	
 	@param name: name to build the function of
 	@type name: string
 	@returns: 
 				1. None if no name is given
 				2. a lambda function
 	@rtype: function"""
+	
 	if name != None:
 		return lambda x: re.match(".*"+name+".*",x)
 	else:
@@ -32,10 +34,12 @@ def find_lambda (name):
 
 def geneticize_list (list_of_packages):
 	"""Convertes a list of gentoolkit.Packages into L{backend.Package}s.
+	
 	@param list_of_packages: the list of packages
 	@type list_of_packages: list of gentoolkit.Packages
 	@returns: converted list
-	@rtype: list of geneticone.backend.Packages"""
+	@rtype: backend.Package[]"""
+	
 	return [package.Package(x) for x in list_of_packages]
 
 def find_best_match (search_key, only_installed = False):
@@ -47,7 +51,7 @@ def find_best_match (search_key, only_installed = False):
 	@type only_installed: boolean
 	
 	@returns: the package found or None
-	@rtype: backend.Package or None"""
+	@rtype: backend.Package"""
 
 	t = None
 	if not only_installed:
@@ -60,39 +64,59 @@ def find_best_match (search_key, only_installed = False):
 
 def find_packages (search_key, masked=False):
 	"""This returns a list of packages which have to fit exactly. Additionally ranges like '<,>,=,~,!' et. al. are possible.
+	
 	@param search_key: the key to look for
 	@type search_key: string
 	@param masked: if True, also look for masked packages
 	@type masked: boolean
+	
 	@returns: list of found packages
-	@rtype: list of backend.Package"""
+	@rtype: backend.Package[]"""
 
 	return geneticize_list(gentoolkit.find_packages(search_key, masked))
 
 def find_installed_packages (search_key, masked=False):
 	"""This returns a list of packages which have to fit exactly. Additionally ranges like '<,>,=,~,!' et. al. are possible.
+	
 	@param search_key: the key to look for
 	@type search_key: string
 	@param masked: if True, also look for masked packages
 	@type masked: boolean
+	
 	@returns: list of found packages
-	@rtype: list of backend.Package"""
+	@rtype: backend.Package[]"""
 
 	return geneticize_list(gentoolkit.find_installed_packages(search_key, masked))
 
 def find_system_packages ():
-	"""Returns a list-tuple (resolved_packages, unresolved_packages) for all system packages."""
+	"""Looks for all packages saved as "system-packages".
+	
+	@returns: a tuple of (resolved_packages, unresolved_packages).
+	@rtype: (backend.Package[], backend.Package[])"""
+
 	list = gentoolkit.find_system_packages()
 	return (geneticize_list(list[0]), geneticize_list(list[1]))
 
 def find_world_packages ():
-	"""Returns a list-tuple (resolved_packages, unresolved_packages) for all packages in the world-file."""
+	"""Looks for all packages saved in the world-file.
+	
+	@returns: a tuple of (resolved_packages, unresolved_packages).
+	@rtype: (backend.Package[], backend.Package[])"""
+
 	list = gentoolkit.find_world_packages()
 	return geneticize_list(list[0]),geneticize_list(list[1])
 
 def find_all_installed_packages (name=None, withVersion=True):
-	"""Returns a list of all installed packages matching ".*name.*". 
-	Returns ALL installed packages if name is None."""
+	"""Finds all installed packages matching a name or all if no name is specified.
+
+	@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
+	@type name: string or None
+	@param withVersion: if True version-specific packages are returned; else only the cat/package-strings a delivered
+	@type withVersion: boolean
+
+	@returns: all packages/cp-strings found
+	@rtype: backend.Package[] or cp-string[]"""
+
 	if withVersion:
 		return geneticize_list(gentoolkit.find_all_installed_packages(find_lambda(name)))
 	else:
@@ -102,13 +126,26 @@ def find_all_installed_packages (name=None, withVersion=True):
 		return t
 
 def find_all_uninstalled_packages (name=None):
-	"""Returns a list of all uninstalled packages matching ".*name.*". 
-	Returns ALL uninstalled packages if name is None."""
+	"""Finds all uninstalled packages matching a name or all if no name is specified.
+
+	@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
+	@type name: string or None
+	@returns: all packages found
+	@rtype: backend.Package[]"""
+
 	return geneticize_list(gentoolkit.find_all_uninstalled_packages(find_lambda(name)))
 
-def find_all_packages (name=None, withVersion = True):
-	"""Returns a list of all packages matching ".*name.*". 
-	Returns ALL packages if name is None."""
+def find_all_packages (name=None, withVersion=True):
+	"""Finds all packages matching a name or all if no name is specified.
+
+	@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
+	@type name: string or None
+	@param withVersion: if True version-specific packages are returned; else only the cat/package-strings a delivered
+	@type withVersion: boolean
+
+	@returns: all packages/cp-strings found
+	@rtype: backend.Package[] or cp-string[]"""
+	
 	if (withVersion):
 		return geneticize_list(gentoolkit.find_all_packages(find_lambda(name)))
 	else:
@@ -120,25 +157,37 @@ def find_all_packages (name=None, withVersion = True):
 		return t
 
 def find_all_world_packages (name=None):
-	"""Returns a list of all world packages matching ".*name.*". 
-	Returns ALL world packages if name is None."""
+	"""Finds all world packages matching a name or all if no name is specified.
+
+	@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
+	@type name: string or None
+	@returns: all packages found
+	@rtype: backend.Package[]"""
+
 	world = filter(find_lambda(name), [x.get_cpv() for x in find_world_packages()[0]])
 	world = unique_array(world)
-	return [package.Package(x) for x in world]
+	return geneticize_list(world)
 
 def find_all_system_packages (name=None):
-	"""Returns a list of all system packages matching ".*name.*". 
-	Returns ALL system packages if name is None."""
+	"""Finds all system packages matching a name or all if no name is specified.
+
+	@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
+	@type name: string or None
+	@returns: all packages found
+	@rtype: backend.Package[]"""
+
 	sys = filter(find_lambda(name), [x.get_cpv() for x in find_system_packages()[0]])
 	sys = unique_array(sys)
-	return [package.Package(x) for x in sys]
+	return geneticize_list(sys)
 
 def get_all_versions (cp):
 	"""Returns all versions of a certain package.
+	
 	@param cp: the package
 	@type cp: string (cat/pkg)
 	@returns: the list of found packages
-	@rtype: list of backend.Package"""
+	@rtype: backend.Package[]"""
+	
 	t = porttree.dbapi.cp_list(cp)
 	t += vartree.dbapi.cp_list(cp)
 	t = unique_array(t)
@@ -146,25 +195,41 @@ def get_all_versions (cp):
 
 def get_all_installed_versions (cp):
 	"""Returns all installed versions of a certain package.
+	
 	@param cp: the package
 	@type cp: string (cat/pkg)
 	@returns: the list of found packages
-	@rtype: list of backend.Package"""
+	@rtype: backend.Package[]"""
+	
 	return geneticize_list(vartree.dbapi.cp_list(cp))
 
 def list_categories (name=None):
-	"""Returns a list of categories matching ".*name.*" or all categories."""
+	"""Finds all categories matching a name or all if no name is specified.
+
+	@param name: the name to look for - it is expanded to .*name.* ; if None, all categories are returned
+	@type name: string or None
+	@returns: all categories found
+	@rtype: string[]"""
+
 	categories = gentoolkit.settings.categories
 	return filter(find_lambda(name), categories)
 
 def split_package_name (name):
-	"""Returns a list in the form [category, name, version, revision]. Revision will
-	be 'r0' if none can be inferred. Category and version will be empty, if none can
-	be inferred."""
+	"""Splits a package name in its elements.
+
+	@param name: name to split
+	@type name: string
+	@returns: list: [category, name, version, rev] whereby rev is "r0" if not specified in the name
+	@rtype: string[]"""
+
 	return gentoolkit.split_package_name(name)
 
 def sort_package_list(pkglist):
-	"""Sorts a package list in the same manner portage does."""
+	"""Sorts a package list in the same manner portage does.
+	
+	@param pkglist: list to sort
+	@type pkglist: Packages[]"""
+
 	return gentoolkit.sort_package_list(pkglist)
 
 def reload_settings ():
@@ -176,7 +241,16 @@ local_use_descs = {}
 def get_use_desc (flag, package = None):
 	"""Returns the description of a specific useflag or None if no desc was found. 
 	If a package is given (in the <cat>/<name> format) the local use descriptions are searched too.
-	In the first run the dictionaries 'use_descs' and 'local_use_descs' are filled."""
+	
+	@param flag: flag to get the description for
+	@type flag: string
+	@param package: name of a package: if given local use descriptions are searched too
+	@type package: cp-string
+	@returns: found description
+	@rtype: string"""
+	
+	# In the first run the dictionaries 'use_descs' and 'local_use_descs' are filled.
+	
 	# fill cache if needed
 	if use_descs == {} or local_use_descs == {}:
 		# read use.desc
