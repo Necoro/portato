@@ -458,7 +458,7 @@ class EmergeQueue:
 		# oneshot-queue
 		if len(self.oneshotmerge) != 0:
 			# prepare package-list for oneshot
-			list, its = prepare
+			list, its = prepare()
 			
 			s = ["--oneshot"]
 			if not force: s += ["--verbose", "--pretend"]
@@ -468,7 +468,7 @@ class EmergeQueue:
 		# normal queue
 		if len(self.mergequeue) != 0:
 			# prepare package-list
-			list, its = prepare
+			list, its = prepare()
 
 			s = []
 			if not force: s = ["--verbose", "--pretend"]
