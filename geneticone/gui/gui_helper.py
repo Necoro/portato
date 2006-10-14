@@ -377,7 +377,7 @@ class EmergeQueue:
 		else: # unmerge
 			self.unmergequeue.append(cpv)
 			if self.unmergeIt: # update tree
-				self.tree.append(self.unmergeIt, [cpv])
+				self.tree.append(self.unmergeIt, [cpv, ""])
 
 	def _queue_append (self, cpv, oneshot = False):
 		"""Convenience function appending a cpv either to self.mergequeue or to self.oneshotmerge.
@@ -458,7 +458,7 @@ class EmergeQueue:
 		# oneshot-queue
 		if len(self.oneshotmerge) != 0:
 			# prepare package-list for oneshot
-			list, its = prepare()
+			list, its = prepare(self.oneshotmerge)
 			
 			s = ["--oneshot"]
 			if not force: s += ["--verbose", "--pretend"]
@@ -468,7 +468,7 @@ class EmergeQueue:
 		# normal queue
 		if len(self.mergequeue) != 0:
 			# prepare package-list
-			list, its = prepare()
+			list, its = prepare(self.mergequeue)
 
 			s = []
 			if not force: s = ["--verbose", "--pretend"]
