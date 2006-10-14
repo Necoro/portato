@@ -396,6 +396,8 @@ class EmergeQueue:
 		else:
 			self.oneshotmerge.append(cpv)
 			options="oneshot"
+
+		return options
 	
 	def _update_packages(self, packages, process = None):
 		"""This updates the packages-list. It simply makes the db to rebuild the specific category.
