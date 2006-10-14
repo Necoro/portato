@@ -158,7 +158,7 @@ class SearchWindow (AbstractDialog):
 		"""Emulates a ok-button-click."""
 		keyname = gtk.gdk.keyval_name(event.keyval)
 		if keyname == "Return": # take it as an "OK" if Enter is pressed
-			self.cb_ok_btn_clicked(self,widget)
+			self.cb_ok_btn_clicked(widget)
 			return True
 		else:
 			return False
@@ -575,8 +575,11 @@ class MainWindow:
 		self.window.set_title(("Genetic/One (%s)" % VERSION))
 		self.window.connect("destroy", self.cb_destroy)
 		self.window.set_border_width(2)
-		self.window.set_geometry_hints (self.window, min_width = 600, min_height = 800, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
 		self.window.set_resizable(True)
+		
+		mHeight = 800
+		if gtk.gdk.screen_height() <= 800: mHeight = 600
+		self.window.set_geometry_hints (self.window, min_width = 600, min_height = mHeight, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
 
 		# package db
 		self.db = Database()
@@ -614,7 +617,7 @@ class MainWindow:
 
 		# VPaned holding the lists and the Terminal
 		vpaned = gtk.VPaned()
-		vpaned.set_position(400)
+		vpaned.set_position(mHeight/2)
 		vb.pack_start(vpaned, True, True)
 
 		# a HB holding the lists

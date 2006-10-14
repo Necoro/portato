@@ -260,7 +260,7 @@ class EmergeQueue:
 
 		# for the beginning: let us create a package object - but it is not guaranteed, that it actually exists in portage
 		pkg = backend.Package(cpv)
-		masked = not (pkg.is_masked() or pkg.is_testing(allowed=True)) # <-- why am I doing this? FIXME
+		masked = not (pkg.is_masked() or pkg.is_testing(allowed=True)) # we are setting this to True in case we have unmasked it already, but portage does not know this
 		
 		# and now try to find it in portage
 		pkg = backend.find_packages("="+cpv, masked = masked)
