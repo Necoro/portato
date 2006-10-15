@@ -236,6 +236,34 @@ def reload_settings ():
 	"""Reloads portage."""
 	gentoolkit.settings = portage.config(config_incrementals = copy.deepcopy(gentoolkit.settings.incrementals))
 
+def update_world (newuse = False, deep = False):
+	"""Calculates the packages to get updated in an update world.
+
+	@param newuse: Checks if a use-flag has a different state then to install time.
+	@type newuse: boolean
+	@param deep: Not only check world packages but also there dependencies.
+	@type deep: boolean
+	@returns: a list containing of the tuple (new_package, old_package)
+	@rtype: (backend.Package, backend.Package)[]"""
+
+	world = open(portage.WORLD_FILE)
+	packages = []
+	for line in world:
+		line = line.strip()
+		if not len(line): continue # empty line
+		if line[0] == "#": continue
+		packages.append(find_best_match(line))
+	world.close()
+
+	updating = []
+	for p in packages:
+		if not p: continue # if a masked package is installed we have "None" here
+		if not p.is_installed(): 
+			old = find_installed_packages(p.get_cp())[0] # assume we have only one there; FIXME: slotted packages
+			updating.append((p, old))
+
+	return updating
+	
 use_descs = {}
 local_use_descs = {}
 def get_use_desc (flag, package = None):

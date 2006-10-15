@@ -280,7 +280,7 @@ class EmergeQueue:
 		
 		return pkg
 	
-	def update_tree (self, it, cpv, unmask = False, options = ""):
+	def update_tree (self, it, cpv, unmask = False, options = []):
 		"""This updates the tree recursivly, or? Isn't it? Bjorn!
 
 		@param it: iterator where to append
@@ -290,7 +290,7 @@ class EmergeQueue:
 		@param unmask: True if we are allowed to look for masked packages
 		@type unmask: boolean
 		@param options: options to append to the tree
-		@type options: string
+		@type options: string[]
 		
 		@raises backend.BlockedException: When occured during dependency-calculation.
 		@raises backend.PackageNotFoundException: If no package could be found - normally it is existing but masked."""
@@ -308,7 +308,7 @@ class EmergeQueue:
 			raise e
 
 		# add iter
-		subIt = self.tree.append(it, [cpv, "<i>"+options+"</i>"])
+		subIt = self.tree.append(it, [cpv, "<i>"+" ".join(options)+"</i>"])
 		self.iters.update({cpv: subIt})
 		
 		# get dependencies
@@ -324,7 +324,7 @@ class EmergeQueue:
 				self.remove_with_children(subIt)
 				raise e
 		
-	def append (self, cpv, unmerge = False, update = False, forceUpdate = False, unmask = False, oneshot = False):
+	def append (self, cpv, unmerge = False, update = False, forceUpdate = False, unmask = False, oneshot = False, options = []):
 		"""Appends a cpv either to the merge queue or to the unmerge-queue.
 		Also updates the tree-view.
 		
@@ -340,6 +340,8 @@ class EmergeQueue:
 		@type unmask: boolean
 		@param oneshot: True if this package should not be added to the world-file.
 		@type oneshot: boolean
+		@param options: additional options to get showed in tree
+		@param options: string[]
 		
 		@raises geneticone.backend.PackageNotFoundException: if trying to add a package which does not exist"""
 		
@@ -355,17 +357,16 @@ class EmergeQueue:
 					else:
 						hasBeenInQueue = (cpv in self.mergequeue or cpv in self.oneshotmerge)
 						parentIt = self.tree.iter_parent(self.iters[cpv])
-						options = ""
 
 						# delete it out of the tree - but NOT the changed flags
 						self.remove_with_children(self.iters[cpv], removeNewFlags = False)
 						
 						if hasBeenInQueue: # package has been in queue before
-							options = self._queue_append(cpv, oneshot)
+							options += self._queue_append(cpv, oneshot)
 						
 						self.update_tree(parentIt, cpv, unmask, options = options)
 				else: # not update
-					options = self._queue_append(cpv, oneshot)
+					options += self._queue_append(cpv, oneshot)
 					if self.emergeIt: 
 						self.update_tree(self.emergeIt, cpv, unmask, options)
 			
@@ -388,14 +389,14 @@ class EmergeQueue:
 		@type oneshot: boolean
 
 		@returns: options set
-		@rtype: string"""
+		@rtype: string[]"""
 
-		options = ""
+		options = []
 		if not oneshot:
 			self.mergequeue.append(cpv)
 		else:
 			self.oneshotmerge.append(cpv)
-			options="oneshot"
+			options.append("oneshot")
 
 		return options
 	
@@ -433,7 +434,7 @@ class EmergeQueue:
 		process = Popen(["/usr/bin/python","/usr/bin/emerge"]+options+packages, stdout = slave, stderr = STDOUT, shell = False)
 		
 		# start thread waiting for the stop of emerge
-		Thread(target=self._update_packages, args=(packages, process)).start()
+		Thread(target=self._update_packages, args=(packages+self.deps.keys(), process)).start()
 		
 		# remove
 		for i in it:
@@ -487,9 +488,23 @@ class EmergeQueue:
 		
 		# set options
 		s = ["-C"]
-		if not force: s = ["-Cpv"]
+		if not force: s += ["-pv"]
 		
 		self._emerge(s,list, [self.unmergeIt])
+
+	def update_world(self, force = False, newuse = False, deep = False):
+		"""Does an update world. newuse and deep are the arguments handed to emerge.
+
+		@param force: If False, '-pv' is send to emerge. Default: False.
+		@type force: boolean"""
+
+		options = ["--update"]
+
+		if newuse: options += ["--newuse"]
+		if deep: options += ["--deep"]
+		if not force: options += ["-pv"]
+
+		self._emerge(options, ["world"], [self.emergeIt])
 
 	def remove_with_children (self, it, removeNewFlags = True):
 		"""Convenience function which removes all children of an iterator and than the iterator itself.

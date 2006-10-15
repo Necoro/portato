@@ -581,6 +581,9 @@ class MainWindow:
 		if gtk.gdk.screen_height() <= 800: mHeight = 600
 		self.window.set_geometry_hints (self.window, min_width = 600, min_height = mHeight, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
 
+		# booleans
+		self.doUpdate = False
+		
 		# package db
 		self.db = Database()
 		self.db.populate()
@@ -594,6 +597,8 @@ class MainWindow:
 		self.emergeAction.connect("activate", self.cb_emerge_clicked)
 		self.unmergeAction = gtk.Action("Unmerge", "_Unmerge", None, None)
 		self.unmergeAction.connect("activate", self.cb_emerge_clicked)
+		self.updateAction = gtk.Action("UpdateWorld", "Update _World", None, None)
+		self.updateAction.connect("activate", self.cb_update_clicked)
 
 		# main vb
 		vb = gtk.VBox(False, 1)
@@ -664,15 +669,23 @@ class MainWindow:
 		buttonBox = gtk.VButtonBox()
 		buttonBox.set_layout(gtk.BUTTONBOX_SPREAD)
 		queueHB.pack_start(buttonBox, False)
+		
 		emergeBtn = gtk.Button()
 		self.emergeAction.connect_proxy(emergeBtn)
+		
+		updateBtn = gtk.Button()
+		self.updateAction.connect_proxy(updateBtn)
+
 		unmergeBtn = gtk.Button()
 		self.unmergeAction.connect_proxy(unmergeBtn)
+		
 		removeBtn = gtk.Button("_Remove")
 		removeBtn.connect("clicked", self.cb_remove_clicked)
+		
 		buttonBox.pack_start(emergeBtn)
-		buttonBox.pack_start(removeBtn)
 		buttonBox.pack_start(unmergeBtn)
+		buttonBox.pack_start(updateBtn)
+		buttonBox.pack_start(removeBtn)
 		
 		# the terminal
 		term = vte.Terminal()
@@ -718,6 +731,7 @@ class MainWindow:
 			<menu action="EmergeMenu">
 				<menuitem action="Emerge" />
 				<menuitem action="Unmerge" />
+				<menuitem action="UpdateWorld" />
 			</menu>
 			<menu action="Help">
 				<menuitem action="About" />
@@ -739,6 +753,7 @@ class MainWindow:
 			("About", None, "_About", None, None, lambda x: AboutWindow(self.window))])
 		group.add_action(self.emergeAction)
 		group.add_action(self.unmergeAction)
+		group.add_action(self.updateAction)
 		um.insert_action_group(group,0)
 
 		group = gtk.ActionGroup("PopupActions")
@@ -835,30 +850,55 @@ class MainWindow:
 				if model.iter_n_children(iter) > 0: # and has children which can be removed :)
 					if remove_queue_dialog() == gtk.RESPONSE_YES :
 						self.queue.remove_children(iter)
+						self.doUpdate = False
 			
 			elif model.iter_parent(model.iter_parent(iter)): # this is in the 3rd level => dependency
 				remove_deps_dialog()
 			else:
 				self.queue.remove_children(iter) # remove children first
 				self.queue.remove(iter)
+				self.doUpdate = False
 		
 		return True
 
-	def cb_emerge_clicked (self, action, data = None):
+	def cb_emerge_clicked (self, action):
 		"""Do emerge or unemerge."""
+		
 		self.notebook.set_current_page(1)
+		
 		if action == self.emergeAction:
 			if len(flags.newUseFlags) > 0:
 				changed_flags_dialog("use flags")
 				flags.write_use_flags()
+			
 			if len(flags.new_masked)>0 or len(flags.new_unmasked)>0 or len(flags.newTesting)>0:
 				changed_flags_dialog("masking keywords")
 				flags.write_masked()
 				flags.write_testing()
 				backend.reload_settings()
-			self.queue.emerge(force=True)
+			
+			if not self.doUpdate:
+				self.queue.emerge(force=True)
+			else:
+				self.queue.update_world(force=True, deep = False, newuse = False)
+				self.doUpdate = False
+		
 		elif action == self.unmergeAction:
 			self.queue.unmerge(force=True)
+
+		return True
+
+	def cb_update_clicked (self, action):
+		if not backend.am_i_root():
+			not_root_dialog()
+		
+		else:
+			updating = backend.update_world(newuse = False, deep = False)
+			debug("updating list:", updating)
+			for pkg, old_pkg in updating:
+				self.queue.append(pkg.get_cpv(), options=["update from "+old_pkg.get_version()])
+
+			if len(updating): self.doUpdate = True
 
 		return True
 
