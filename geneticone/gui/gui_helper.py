@@ -34,7 +34,9 @@ class Config:
 			"testingFile_opt" : "keywordfile",
 			"testingPerVersion_opt" : "keywordperversion",
 			"debug_opt" : "debug",
-			"oneshot_opt" : "oneshot"
+			"oneshot_opt" : "oneshot",
+			"deep_opt" : "deep",
+			"newuse_opt" : "newuse"
 			}
 	
 	def __init__ (self, cfgFile):

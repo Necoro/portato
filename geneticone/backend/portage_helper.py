@@ -17,6 +17,8 @@ from portage_util import unique_array
 from geneticone.backend import *
 import package
 
+from geneticone.helper import debug
+
 def find_lambda (name):
 	"""Returns the function needed by all the find_all_*-functions. Returns None if no name is given.
 	
@@ -246,6 +248,7 @@ def update_world (newuse = False, deep = False):
 	@returns: a list containing of the tuple (new_package, old_package)
 	@rtype: (backend.Package, backend.Package)[]"""
 
+	# read world file
 	world = open(portage.WORLD_FILE)
 	packages = []
 	for line in world:
@@ -255,13 +258,35 @@ def update_world (newuse = False, deep = False):
 		packages.append(find_best_match(line))
 	world.close()
 
+	checked = []
 	updating = []
+	def check (p, deep = False):
+		"""Checks whether a package is updated or not."""
+		if p.get_cp() in checked: return
+		else: checked.append(p.get_cp())
+
+		if not p.is_installed():
+			old = find_installed_packages(p.get_cp())
+			if old: 
+				old = old[0] # assume we have only one there; FIXME: slotted packages
+			else:
+				debug("Bug? Not found installed one:",p.get_cp())
+				return
+			updating.append((p, old))
+			p = old
+
+		if deep:
+			for i in p.get_matched_dep_packages():
+				bm = find_best_match(i)
+				if not bm: 
+					debug("Bug? No best match could be found:",i)
+				else:
+					check(bm, deep)
+
 	for p in packages:
 		if not p: continue # if a masked package is installed we have "None" here
-		if not p.is_installed(): 
-			old = find_installed_packages(p.get_cp())[0] # assume we have only one there; FIXME: slotted packages
-			updating.append((p, old))
-
+		check(p, deep)
+	
 	return updating
 	
 use_descs = {}

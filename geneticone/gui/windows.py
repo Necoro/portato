@@ -186,10 +186,14 @@ class PreferenceWindow (AbstractDialog):
 		self.window.add(box)
 
 		# En-/Disable Debugging
-		self.debugCb = gtk.CheckButton(label="Debugging modus")
-		self.debugCb.set_active(self.cfg.get_boolean(self.cfg.const["debug_opt"]))
-		box.pack_start(self.debugCb, True, True)
+		self.debugCb = self.draw_cb(box, "Debugging modus", "debug_opt")
 
+		# --deep
+		self.deepCb = self.draw_cb(box, "--deep", "deep_opt")
+
+		# --newuse
+		self.newuseCb = self.draw_cb(box, "--newuse", "newuse_opt")
+		
 		pHolderLabel = gtk.Label("""<u>For the following options, you might use these placeholders:</u>
 <b>$(cat)</b> = category
 <b>$(pkg)</b> = package-name
@@ -234,9 +238,7 @@ class PreferenceWindow (AbstractDialog):
 		@rtype: (gtk.CheckButton, gtk.Edit)"""
 
 		# check-button
-		cb = gtk.CheckButton(label=("Add to %s on a per-version-base" % string))
-		cb.set_active(self.cfg.get_boolean(self.cfg.const[cb_opt]))
-		box.pack_start(cb, True, True)
+		cb = self.draw_cb(box, label=("Add to %s on a per-version-base" % string), opt = cb_opt)
 
 		# edit with label
 		hBox = gtk.HBox()
@@ -249,6 +251,24 @@ class PreferenceWindow (AbstractDialog):
 
 		return (cb, edit)
 
+	def draw_cb (self, box, label, opt):
+		"""Draws a checkbox.
+
+		@param box: box to place the cb into
+		@type box: gtk.Box
+		@param label: Label to show
+		@type label: string
+		@param opt: the option string for the Config.const-dict
+		@type opt: string
+		@returns: the checkbox
+		@rtype: gtk.CheckButton"""
+
+		cb = gtk.CheckButton(label=label)
+		cb.set_active(self.cfg.get_boolean(self.cfg.const[opt]))
+		box.pack_start(cb, True, True)
+		
+		return cb
+
 	def _save(self):
 		"""Sets all options in the Config-instance."""
 		self.cfg.set(self.cfg.const["usePerVersion_opt"], str(self.usePerVersionCb.get_active()))
@@ -258,6 +278,8 @@ class PreferenceWindow (AbstractDialog):
 		self.cfg.set(self.cfg.const["testingPerVersion_opt"], str(self.testPerVersionCb.get_active()))
 		self.cfg.set(self.cfg.const["testingFile_opt"], self.testFileEdit.get_text())
 		self.cfg.set(self.cfg.const["debug_opt"], str(self.debugCb.get_active()))
+		self.cfg.set(self.cfg.const["deep_opt"], str(self.deepCb.get_active()))
+		self.cfg.set(self.cfg.const["newuse_opt"], str(self.newuseCb.get_active()))
 
 	def cb_ok_clicked(self, button):
 		"""Saves, writes to config-file and closes the window."""
@@ -882,7 +904,7 @@ class MainWindow:
 			if not self.doUpdate:
 				self.queue.emerge(force=True)
 			else:
-				self.queue.update_world(force=True, deep = False, newuse = False)
+				self.queue.update_world(force=True, newuse = self.cfg.get_boolean(self.cfg.const["newuse_opt"]), deep = self.cfg.get_boolean(self.cfg.const["deep_opt"]))
 				self.doUpdate = False
 		
 		elif action == self.unmergeAction:
@@ -895,7 +917,8 @@ class MainWindow:
 			not_root_dialog()
 		
 		else:
-			updating = backend.update_world(newuse = False, deep = False)
+			updating = backend.update_world(newuse = self.cfg.get_boolean(self.cfg.const["newuse_opt"]), deep = self.cfg.get_boolean(self.cfg.const["deep_opt"]))
+
 			debug("updating list:", updating)
 			for pkg, old_pkg in updating:
 				self.queue.append(pkg.get_cpv(), options=["update from "+old_pkg.get_version()])

@@ -14,8 +14,10 @@ from geneticone.helper import *
 from portage_helper import *
 import flags
 
-import portage, gentoolkit
+import portage, portage_dep, gentoolkit
 from portage_util import unique_array
+
+import types
 
 class Package (gentoolkit.Package):
 	"""This is a subclass of the gentoolkit.Package-class which a lot of additional functionality we need in Genetic/One."""
@@ -172,6 +174,58 @@ class Package (gentoolkit.Package):
 		
 		flags.remove_new_use_flags(self)
 
+	def get_matched_dep_packages (self):
+		"""This function looks for all dependencies which are resolved. In normal case it makes only sense for installed packages, but should work for uninstalled ones too.
+
+		@returns: unique list of dependencies resolved (with elements like "<=net-im/foobar-1.2.3")
+		@rtype: string[]"""
+		
+		# change the useflags, because we have internally changed some, but not made them visible for portage
+		newUseFlags = self.get_new_use_flags()
+		actual = self.get_settings("USE").split()
+		if newUseFlags:
+			for u in newUseFlags:
+				if u[0] == "-" and flags.invert_use_flag(u) in actual:
+					actual.remove(flags.invert_use_flag(u))
+				elif u not in actual:
+					actual.append(u)
+		
+		#
+		# the following stuff is mostly adapted from portage.dep_check()
+		#
+
+		depstring = self.get_env_var("RDEPEND")+" "+self.get_env_var("DEPEND")+" "+self.get_env_var("PDEPEND")
+		
+		# change the parentheses into lists
+		mysplit = portage_dep.paren_reduce(depstring)
+
+		# strip off these deps we don't have a flag for
+		mysplit = portage_dep.use_reduce(mysplit, uselist = actual, masklist = [], matchall = False, excludeall = self.get_settings("ARCH"))
+
+		# move the || (or) into the lists
+		mysplit = portage_dep.dep_opconvert(mysplit)
+
+		# turn virtuals into real packages
+		mysplit = portage.dep_virtual(mysplit, self._settings)
+
+		mysplit_reduced= portage.dep_wordreduce(mysplit, self._settings, vartree.dbapi, mode = None)
+		
+		retlist = []
+		def add (list, red_list):
+			"""Adds the packages to retlist."""
+			for i in range(len(list)):
+				if type(list[i]) == types.ListType:
+					add(list[i], red_list[i])
+				elif list[i] == "||": 
+					continue
+				else:
+					if red_list[i]:
+						retlist.append(list[i])
+
+		add(mysplit, mysplit_reduced)
+
+		return unique_array(retlist)
+
 	def get_dep_packages (self):
 		"""Returns a cpv-list of packages on which this package depends and which have not been installed yet. This does not check the dependencies in a recursive manner.
 
@@ -188,7 +242,6 @@ class Package (gentoolkit.Package):
 		newUseFlags = self.get_new_use_flags()
 		actual = self.get_settings("USE").split()
 		if newUseFlags:
-			depUses = []
 			for u in newUseFlags:
 				if u[0] == "-" and flags.invert_use_flag(u) in actual:
 					actual.remove(flags.invert_use_flag(u))
