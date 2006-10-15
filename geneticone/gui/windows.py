@@ -732,6 +732,7 @@ class MainWindow:
 				<menuitem action="Emerge" />
 				<menuitem action="Unmerge" />
 				<menuitem action="UpdateWorld" />
+				<menuitem action="Sync" />
 			</menu>
 			<menu action="Help">
 				<menuitem action="About" />
@@ -748,6 +749,7 @@ class MainWindow:
 			("File", None, "_File"),
 			("EmergeMenu", None, "_Emerge"),
 			("Help", None, "_?"),
+			("Sync", None, "_Sync", None, None, self.cb_sync_clicked),
 			("Prefs", None, "_Preferences", None, None, lambda x: PreferenceWindow(self.window, self.cfg)),
 			("Close", None, "_Close", None, None, self.cb_destroy),
 			("About", None, "_About", None, None, lambda x: AboutWindow(self.window))])
@@ -901,6 +903,10 @@ class MainWindow:
 			if len(updating): self.doUpdate = True
 
 		return True
+
+	def cb_sync_clicked (self, action):
+		self.notebook.set_current_page(1)
+		self.queue.sync()
 
 	def cb_search_clicked (self, button, data = None):
 		"""Do a search."""

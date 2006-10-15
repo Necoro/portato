@@ -506,6 +506,10 @@ class EmergeQueue:
 
 		self._emerge(options, ["world"], [self.emergeIt])
 
+	def sync (self):
+		"""Calls "emerge --sync"."""
+		self._emerge(["--sync"], [], [])
+
 	def remove_with_children (self, it, removeNewFlags = True):
 		"""Convenience function which removes all children of an iterator and than the iterator itself.
 
