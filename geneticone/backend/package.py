@@ -31,15 +31,26 @@ class Package (gentoolkit.Package):
 		if isinstance(cpv, gentoolkit.Package):
 			cpv = cpv.get_cpv()
 		gentoolkit.Package.__init__(self, cpv)
-		self._status = portage.getmaskingstatus(self.get_cpv(), settings = gentoolkit.settings)
+		try:
+			self._status = portage.getmaskingstatus(self.get_cpv(), settings = gentoolkit.settings)
+		except KeyError: # package is not located in the system
+			self._status = None
 	
+	def is_in_system (self):
+		"""Returns False if the package could not be found in the portage system.
+
+		@return: True if in portage system; else False
+		@rtype: boolean"""
+
+		return (self._status != None)
+
 	def is_missing_keyword(self):
 		"""Returns True if the package is missing the needed keyword.
 		
 		@return: True if keyword is missing; else False
 		@rtype: boolean"""
 		
-		if "missing keyword" in self._status:
+		if self._status and "missing keyword" in self._status:
 			return True
 		return False
 
@@ -60,7 +71,7 @@ class Package (gentoolkit.Package):
 		else: # keywords are taken into account
 			status = flags.new_testing_status(self.get_cpv())
 			if status == None: # we haven't changed it in any way
-				if testArch+" keyword" in self._status:
+				if self._status and testArch+" keyword" in self._status:
 					return True
 				return False
 			else:
@@ -92,7 +103,7 @@ class Package (gentoolkit.Package):
 			else:
 				debug("BUG in flags.new_masking_status. It returns",status)
 		else: # we have not touched the status
-			if "profile" in self._status or "package.mask" in self._status:
+			if self._status and ("profile" in self._status or "package.mask" in self._status):
 				return True
 			return False
 

@@ -412,6 +412,7 @@ class EmergeQueue:
 
 		if process: process.wait()
 		for p in packages:
+			if p in ["world", "system"]: continue
 			cat = backend.split_package_name(p)[0] # get category
 			while cat[0] in ["=",">","<","!"]:
 				cat = cat[1:]

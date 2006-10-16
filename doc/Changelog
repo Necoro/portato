@@ -1,7 +1,10 @@
-0.4.1:
+0.4.5:
 - bug fixing (again ;D)
 - added "oneshot"
 - redesign
+- added "update world" - ability
+- handled installed packages which are not in portage anymore
+- allowed to reload portage
 
 0.4.0:
 - smashed bugs

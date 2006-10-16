@@ -260,6 +260,7 @@ def update_world (newuse = False, deep = False):
 
 	checked = []
 	updating = []
+	raw_checked = []
 	def check (p, deep = False):
 		"""Checks whether a package is updated or not."""
 		if p.get_cp() in checked: return
@@ -277,11 +278,13 @@ def update_world (newuse = False, deep = False):
 
 		if deep:
 			for i in p.get_matched_dep_packages():
-				bm = find_best_match(i)
-				if not bm: 
-					debug("Bug? No best match could be found:",i)
-				else:
-					check(bm, deep)
+				if i not in raw_checked:
+					raw_checked.append(i)
+					bm = find_best_match(i)
+					if not bm: 
+						debug("Bug? No best match could be found:",i)
+					else:
+						check(bm, deep)
 
 	for p in packages:
 		if not p: continue # if a masked package is installed we have "None" here

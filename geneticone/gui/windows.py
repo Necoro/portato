@@ -9,7 +9,7 @@
 #
 # Written by Necoro d.M. <necoro@necoro.net>
 
-VERSION = "0.4.1-svn"
+VERSION = "0.4.5-svn"
 CONFIG_LOCATION = "/etc/geneticone/geneticone.cfg"
 
 # gtk stuff
@@ -355,6 +355,11 @@ class PackageWindow (AbstractDialog):
 		self.missing_label.set_no_show_all(True)
 		self.table.attach(self.missing_label, 1, 2, 1, 2, yoptions = gtk.FILL)
 
+		self.not_in_sys_label = gtk.Label("<b>Installed, but not in portage anymore</b>")
+		self.not_in_sys_label.set_use_markup(True)
+		self.not_in_sys_label.set_no_show_all(True)
+		self.table.attach(self.not_in_sys_label, 1, 2, 1, 2, yoptions = gtk.FILL)
+
 		# use list
 		self.useList = self.build_use_list()
 		self.useListScroll = gtk.ScrolledWindow()
@@ -469,14 +474,21 @@ class PackageWindow (AbstractDialog):
 		self.useListScroll.add(self.useList)
 		pkg = self.actual_package()
 
-		if pkg.is_missing_keyword():
-			self.missing_label.show()
+		if (not pkg.is_in_system()) or pkg.is_missing_keyword():
+			if not pkg.is_in_system():
+				self.missing_label.hide()
+				self.not_in_sys_label.show()
+			else: # missing keyword
+				self.missing_label.show()
+				self.not_in_sys_label.hide()
+			
 			self.installedCheck.hide()
 			self.maskedCheck.hide()
 			self.testingCheck.hide()
 			self.emergeBtn.set_sensitive(False)
 		else:
 			self.missing_label.hide()
+			self.not_in_sys_label.hide()
 			self.installedCheck.show()
 			self.maskedCheck.show()
 			self.testingCheck.show()
@@ -747,6 +759,7 @@ class MainWindow:
 		<menubar name="bar">
 			<menu action="File">
 				<menuitem action="Prefs" />
+				<menuitem action="Reload" />
 				<separator />
 				<menuitem action="Close" />
 			</menu>
@@ -773,6 +786,7 @@ class MainWindow:
 			("Help", None, "_?"),
 			("Sync", None, "_Sync", None, None, self.cb_sync_clicked),
 			("Prefs", None, "_Preferences", None, None, lambda x: PreferenceWindow(self.window, self.cfg)),
+			("Reload", None, "_Reload Portage", None, None, self.cb_reload_clicked),
 			("Close", None, "_Close", None, None, self.cb_destroy),
 			("About", None, "_About", None, None, lambda x: AboutWindow(self.window))])
 		group.add_action(self.emergeAction)
@@ -917,19 +931,36 @@ class MainWindow:
 			not_root_dialog()
 		
 		else:
-			updating = backend.update_world(newuse = self.cfg.get_boolean(self.cfg.const["newuse_opt"]), deep = self.cfg.get_boolean(self.cfg.const["deep_opt"]))
+			
+			def cb_idle():
+				try:
+					updating = backend.update_world(newuse = self.cfg.get_boolean(self.cfg.const["newuse_opt"]), deep = self.cfg.get_boolean(self.cfg.const["deep_opt"]))
 
-			debug("updating list:", updating)
-			for pkg, old_pkg in updating:
-				self.queue.append(pkg.get_cpv(), options=["update from "+old_pkg.get_version()])
+					debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating])
+					for pkg, old_pkg in updating:
+						self.queue.append(pkg.get_cpv(), options=["update from "+old_pkg.get_version()])
 
-			if len(updating): self.doUpdate = True
+					if len(updating): self.doUpdate = True
+				finally:
+					self.window.window.set_cursor(None)
+				return False
+
+			watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
+			self.window.window.set_cursor(watch)
+			
+			gobject.idle_add(cb_idle)
 
 		return True
 
 	def cb_sync_clicked (self, action):
 		self.notebook.set_current_page(1)
 		self.queue.sync()
+
+	def cb_reload_clicked (self, action):
+		backend.reload_settings()
+		del self.db
+		self.db = Database()
+		self.db.populate()
 
 	def cb_search_clicked (self, button, data = None):
 		"""Do a search."""
