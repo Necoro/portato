@@ -926,42 +926,52 @@ class MainWindow:
 
 		return True
 
+	def watch_cursor (func):
+		"""This is a decorator for functions being so time consuming, that it is appropriate to show the watch-cursor.
+		@attention: this function relies on the gtk.Window-Object being stored as self.window"""
+		def wrapper (self, *args, **kwargs):
+			ret = None
+			def cb_idle():
+				try:
+					ret = func(self, *args, **kwargs)
+				finally:
+					self.window.window.set_cursor(None)
+				return False
+			
+			watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
+			self.window.window.set_cursor(watch)
+			gobject.idle_add(cb_idle)
+			return ret
+		return wrapper
+
+	@watch_cursor
 	def cb_update_clicked (self, action):
 		if not backend.am_i_root():
 			not_root_dialog()
 		
 		else:
-			
-			def cb_idle():
-				try:
-					updating = backend.update_world(newuse = self.cfg.get_boolean(self.cfg.const["newuse_opt"]), deep = self.cfg.get_boolean(self.cfg.const["deep_opt"]))
+			updating = backend.update_world(newuse = self.cfg.get_boolean(self.cfg.const["newuse_opt"]), deep = self.cfg.get_boolean(self.cfg.const["deep_opt"]))
 
-					debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating])
-					for pkg, old_pkg in updating:
-						self.queue.append(pkg.get_cpv(), options=["update from "+old_pkg.get_version()])
+			debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating])
+			for pkg, old_pkg in updating:
+					self.queue.append(pkg.get_cpv(), options=["update from "+old_pkg.get_version()])
 
-					if len(updating): self.doUpdate = True
-				finally:
-					self.window.window.set_cursor(None)
-				return False
-
-			watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
-			self.window.window.set_cursor(watch)
-			
-			gobject.idle_add(cb_idle)
-
+			if len(updating): self.doUpdate = True
 		return True
 
 	def cb_sync_clicked (self, action):
 		self.notebook.set_current_page(1)
 		self.queue.sync()
-
+	
+	@watch_cursor
 	def cb_reload_clicked (self, action):
+		"""Reloads the portage settings and the database."""
 		backend.reload_settings()
 		del self.db
 		self.db = Database()
 		self.db.populate()
-
+	
+	@watch_cursor
 	def cb_search_clicked (self, button, data = None):
 		"""Do a search."""
 		if self.searchEntry.get_text() != "":

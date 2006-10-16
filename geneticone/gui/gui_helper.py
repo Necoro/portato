@@ -343,7 +343,7 @@ class EmergeQueue:
 		@param oneshot: True if this package should not be added to the world-file.
 		@type oneshot: boolean
 		@param options: additional options to get showed in tree
-		@param options: string[]
+		@type options: string[]
 		
 		@raises geneticone.backend.PackageNotFoundException: if trying to add a package which does not exist"""
 		
@@ -387,7 +387,7 @@ class EmergeQueue:
 
 		@param cpv: cpv to add
 		@type cpv: string (cpv)
-		@param onehost: True if this package should not be added to the world-file.
+		@param oneshot: True if this package should not be added to the world-file.
 		@type oneshot: boolean
 
 		@returns: options set
@@ -516,8 +516,8 @@ class EmergeQueue:
 	def remove_with_children (self, it, removeNewFlags = True):
 		"""Convenience function which removes all children of an iterator and than the iterator itself.
 
-		@param parentIt: The iter which to remove.
-		@type parentIt: gtk.TreeIter
+		@param it: The iter which to remove.
+		@type it: gtk.TreeIter
 		@param removeNewFlags: True if new flags should be removed; False otherwise. Default: True.
 		@type removeNewFlags: boolean"""
 
