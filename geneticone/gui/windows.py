@@ -954,7 +954,7 @@ class MainWindow:
 
 			debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating])
 			for pkg, old_pkg in updating:
-					self.queue.append(pkg.get_cpv(), options=["update from "+old_pkg.get_version()])
+					self.queue.append(pkg.get_cpv())
 
 			if len(updating): self.doUpdate = True
 		return True

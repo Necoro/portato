@@ -255,9 +255,26 @@ def update_world (newuse = False, deep = False):
 		line = line.strip()
 		if not len(line): continue # empty line
 		if line[0] == "#": continue
-		packages.append(find_best_match(line))
+		packages.append(line)
 	world.close()
 
+	sys = gentoolkit.settings.packages
+	for x in sys:
+		if x[0] == "*":
+			x = x[1:]
+		packages.append(x.strip())
+
+	# Remove everything that is package.provided from our list
+	# This is copied from emerge.getlist()
+	for atom in packages[:]:
+		for expanded_atom in portage.flatten(portage.dep_virtual([atom], gentoolkit.settings)):
+			mykey = portage.dep_getkey(expanded_atom)
+			if mykey in gentoolkit.settings.pprovideddict and portage.match_from_list(expanded_atom, settings.pprovideddict[mykey]):
+					packages.remove(atom)
+					break
+
+	packages = [find_best_match(x) for x in packages]
+		
 	checked = []
 	updating = []
 	raw_checked = []

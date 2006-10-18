@@ -282,7 +282,7 @@ class EmergeQueue:
 		
 		return pkg
 	
-	def update_tree (self, it, cpv, unmask = False, options = []):
+	def update_tree (self, it, cpv, unmask = False, options = None):
 		"""This updates the tree recursivly, or? Isn't it? Bjorn!
 
 		@param it: iterator where to append
@@ -297,11 +297,19 @@ class EmergeQueue:
 		@raises backend.BlockedException: When occured during dependency-calculation.
 		@raises backend.PackageNotFoundException: If no package could be found - normally it is existing but masked."""
 		
+		if not options: options = []
+
 		if cpv in self.deps:
 			return # in list already and therefore it's already in the tree too	
 		
 		try:
 			pkg = self._get_pkg_from_cpv(cpv, unmask)
+			if not pkg.is_installed():
+				old = backend.get_all_installed_versions(pkg.get_cp())
+				if old: 
+					old = old[0] # assume we have only one there; FIXME: slotted packages
+					options += ["updating from "+old.get_version()]
+
 		except backend.PackageNotFoundException, e: # package not found / package is masked -> delete current tree and re-raise the exception
 			if self.tree.iter_parent(it):
 				while self.tree.iter_parent(it):
