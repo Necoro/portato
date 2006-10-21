@@ -9,7 +9,7 @@
 #
 # Written by Necoro d.M. <necoro@necoro.net>
 
-VERSION = "0.4.5-svn"
+VERSION = "0.4.5"
 CONFIG_LOCATION = "/etc/geneticone/geneticone.cfg"
 
 # gtk stuff
