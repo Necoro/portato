@@ -282,7 +282,7 @@ def write_use_flags ():
 					i = 1
 					while i < line: # stop at the given line
 						lines.append(f.readline())
-						i++
+						i += 1
 					l = f.readline().split(" ")
 					
 					# delete or insert
