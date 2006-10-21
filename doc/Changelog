@@ -2,7 +2,7 @@
 - bug fixing (again ;D)
 - added "oneshot"
 - redesign
-- added "update world" - ability
+- added "update world" - ability (w/o newuse)
 - handled installed packages which are not in portage anymore
 - allowed to reload portage
 

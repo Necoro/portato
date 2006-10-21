@@ -55,7 +55,7 @@ def get_data(pkg, path):
 	@type path: string
 	
 	@returns: a list of tuples in the form (file,line,criterion,list_of_flags)
-	@rtype: list"""
+	@rtype: (string,string,string,string[])[]"""
 	
 	flags = []
 
@@ -132,6 +132,7 @@ def invert_use_flag (flag):
 	@returns: inverted flag
 	@rtype: string
 	"""
+	
 	if flag[0] == "-":
 		return flag[1:]
 	else:
@@ -196,8 +197,7 @@ def set_use_flag (pkg, flag):
 	if not added:
 		path = USE_PATH
 		if USE_PATH_IS_DIR:
-			path = os.path.join(USE_PATH,generate_path(cpv, CONFIG["usefile"]))
-		
+			path = os.path.join(USE_PATH, generate_path(cpv, CONFIG["usefile"]))
 		try:
 			newUseFlags[cpv].remove((path, -1, invFlag, False))
 		except ValueError: # not in UseFlags
@@ -208,8 +208,10 @@ def set_use_flag (pkg, flag):
 
 def remove_new_use_flags (cpv):
 	"""Removes all new use-flags for a specific package.
+	
 	@param cpv: the package for which to remove the flags
 	@type cpv: string (cpv) or L{backend.Package}-object"""
+	
 	if isinstance(cpv, package.Package):
 		cpv = cpv.get_cpv()
 	
@@ -220,10 +222,11 @@ def remove_new_use_flags (cpv):
 
 def get_new_use_flags (cpv):
 	"""Gets all the new use-flags for a specific package.
-	@param cpv: the package for which to remove the flags
+	
+	@param cpv: the package from which to get the flags
 	@type cpv: string (cpv) or L{backend.Package}-object
 	@returns: list of flags
-	@rtype: list"""
+	@rtype: string[]"""
 	
 	if isinstance(cpv, package.Package):
 		cpv = cpv.get_cpv()
@@ -279,8 +282,9 @@ def write_use_flags ():
 					i = 1
 					while i < line: # stop at the given line
 						lines.append(f.readline())
-						i = i+1
+						i++
 					l = f.readline().split(" ")
+					
 					# delete or insert
 					if delete:
 						remove(flag,l)
@@ -293,6 +297,7 @@ def write_use_flags ():
 					
 					file_cache[file] = lines
 					f.close()
+
 				else: # in cache
 					l = file_cache[file][line-1].split(" ")
 					if delete:
@@ -335,6 +340,13 @@ new_masked = {}
 new_unmasked = {}
 
 def set_masked (pkg, masked = True):
+	"""Sets the masking status of the package.
+	
+	@param cpv: the package from which to get the flags
+	@type cpv: string (cpv) or L{backend.Package}-object
+	@param masked: if True: mask it; if False: unmask it
+	@type masked: boolean"""
+	
 	global new_masked, newunmasked
 	
 	if not isinstance(pkg, package.Package):
