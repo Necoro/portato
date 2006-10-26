@@ -2,12 +2,12 @@
 # File: geneticone/gui/windows.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006 Necoro d.M.
+# Copyright (C) 2006 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
 #
-# Written by Necoro d.M. <necoro@necoro.net>
+# Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 VERSION = "0.4.5"
 CONFIG_LOCATION = "/etc/geneticone/geneticone.cfg"
@@ -95,7 +95,7 @@ class AboutWindow (AbstractDialog):
 A Portage-GUI
 		
 This software is licensed under the terms of the GPLv2.
-Copyright (C) 2006 Necoro d.M. &lt;necoro@necoro.net&gt;
+Copyright (C) 2006 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;
 
 <small>Thanks to Fred for support and ideas :P</small>
 """ % VERSION)
