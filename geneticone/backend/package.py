@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # File: geneticone/backend/package.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
@@ -275,7 +276,7 @@ class Package (gentoolkit.Package):
 			if dep[0] == '!': # blocking sth
 				blocked = find_installed_packages(dep[1:])
 				if blocked != []:
-					raise BlockedException, blocked[0].get_cpv()
+					raise BlockedException, (self.get_cpv(), blocked[0].get_cpv())
 				else: # next flag
 					continue
 

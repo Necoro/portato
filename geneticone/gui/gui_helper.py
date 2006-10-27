@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # File: geneticone/gui/gui_helper.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
@@ -13,9 +14,6 @@
 from geneticone import backend
 from geneticone.backend import flags
 from geneticone.helper import *
-
-# our dialogs
-import dialogs
 
 # some stuff needed
 from subprocess import Popen, PIPE, STDOUT
@@ -356,35 +354,29 @@ class EmergeQueue:
 		@raises geneticone.backend.PackageNotFoundException: if trying to add a package which does not exist"""
 		
 		if not unmerge: # emerge
-			try:
-				# insert dependencies
-				pkg = self._get_pkg_from_cpv(cpv, unmask)
-				deps = pkg.get_dep_packages()
-				
-				if update:
-					if not forceUpdate and deps == self.deps[cpv]:
-						return # nothing changed - return
-					else:
-						hasBeenInQueue = (cpv in self.mergequeue or cpv in self.oneshotmerge)
-						parentIt = self.tree.iter_parent(self.iters[cpv])
-
-						# delete it out of the tree - but NOT the changed flags
-						self.remove_with_children(self.iters[cpv], removeNewFlags = False)
-						
-						if hasBeenInQueue: # package has been in queue before
-							options += self._queue_append(cpv, oneshot)
-						
-						self.update_tree(parentIt, cpv, unmask, options = options)
-				else: # not update
-					options += self._queue_append(cpv, oneshot)
-					if self.emergeIt: 
-						self.update_tree(self.emergeIt, cpv, unmask, options)
+			# insert dependencies
+			pkg = self._get_pkg_from_cpv(cpv, unmask)
+			deps = pkg.get_dep_packages()
 			
-			except backend.BlockedException, e : # there is sth blocked --> call blocked_dialog
-				blocks = e[0]
-				dialogs.blocked_dialog(cpv, blocks)
-				return
+			if update:
+				if not forceUpdate and deps == self.deps[cpv]:
+					return # nothing changed - return
+				else:
+					hasBeenInQueue = (cpv in self.mergequeue or cpv in self.oneshotmerge)
+					parentIt = self.tree.iter_parent(self.iters[cpv])
 
+					# delete it out of the tree - but NOT the changed flags
+					self.remove_with_children(self.iters[cpv], removeNewFlags = False)
+					
+					if hasBeenInQueue: # package has been in queue before
+						options += self._queue_append(cpv, oneshot)
+					
+					self.update_tree(parentIt, cpv, unmask, options = options)
+			else: # not update
+				options += self._queue_append(cpv, oneshot)
+				if self.emergeIt: 
+					self.update_tree(self.emergeIt, cpv, unmask, options)
+			
 		else: # unmerge
 			self.unmergequeue.append(cpv)
 			if self.unmergeIt: # update tree

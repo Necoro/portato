@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # File: geneticone/gui/windows.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
@@ -22,9 +23,10 @@ import gobject
 from geneticone.helper import *
 from geneticone import backend
 from geneticone.backend import flags
+from geneticone.backend.exceptions import *
 
 # more GUI stuff
-from gui_helper import Database, Config, EmergeQueue
+from geneticone.gui.gui_helper import Database, Config, EmergeQueue
 from dialogs import *
 
 # for the terminal
@@ -531,10 +533,14 @@ class PackageWindow (AbstractDialog):
 		elif self.flagChanged:
 			if self.queue:
 				try:
-					self.queue.append(self.actual_package().get_cpv(), update = True)
-				except backend.PackageNotFoundException, e:
-					if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
-						self.queue.append(self.actual_package().get_cpv(), update = True, unmask = True)
+					try:
+						self.queue.append(self.actual_package().get_cpv(), update = True)
+					except backend.PackageNotFoundException, e:
+						if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
+							self.queue.append(self.actual_package().get_cpv(), update = True, unmask = True)
+				except backend.BlockedException, e:
+					blocked_dialog(e[0], e[1])
+					
 		self.window.destroy()
 		return True
 
@@ -544,12 +550,15 @@ class PackageWindow (AbstractDialog):
 			not_root_dialog()
 		else:
 			try:
-				self.queue.append(self.actual_package().get_cpv(), unmerge = False)
-				self.window.destroy()
-			except backend.PackageNotFoundException, e:
-				if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
-					self.queue.append(self.actual_package().get_cpv(), unmerge = False, unmask = True)
+				try:
+					self.queue.append(self.actual_package().get_cpv(), unmerge = False)
 					self.window.destroy()
+				except backend.PackageNotFoundException, e:
+					if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
+						self.queue.append(self.actual_package().get_cpv(), unmerge = False, unmask = True)
+						self.window.destroy()
+			except BlockedException, e:
+				blocked_dialog(e[0], e[1])
 		return True
 
 	def cb_unmerge_clicked (self, button, data = None):
@@ -953,9 +962,11 @@ class MainWindow:
 			updating = backend.update_world(newuse = self.cfg.get_boolean(self.cfg.const["newuse_opt"]), deep = self.cfg.get_boolean(self.cfg.const["deep_opt"]))
 
 			debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating])
-			for pkg, old_pkg in updating:
+			try:
+				for pkg, old_pkg in updating:
 					self.queue.append(pkg.get_cpv())
-
+			except BlockedException, e:
+				blocked_dialog(e[0], e[1])
 			if len(updating): self.doUpdate = True
 		return True
 

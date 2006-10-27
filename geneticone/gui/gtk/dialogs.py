@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # File: geneticone/gui/dialogs.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.

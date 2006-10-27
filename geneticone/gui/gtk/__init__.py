@@ -10,5 +10,4 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-import gtk
-from gtk import *
+from windows import MainWindow
