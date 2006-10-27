@@ -1,0 +1,132 @@
+# -*- coding: utf-8 -*-
+#
+# File: geneticone/gui/wrapper.py
+# This file is part of the Genetic/One-Project, a graphical portage-frontend.
+#
+# Copyright (C) 2006 René 'Necoro' Neumann
+# This is free software.  You may redistribute copies of it under the terms of
+# the GNU General Public License version 2.
+# There is NO WARRANTY, to the extent permitted by law.
+#
+# Written by René 'Necoro' Neumann <necoro@necoro.net>
+
+class Tree:
+	"""This represents an abstract of a Tree-Widget. It should be used for all operations not in a specific frontend, where a Tree is needed.
+	Each frontend _MUST_ define its own subclass and implement ALL of the methods, otherwise a NotImplementedError will be thrown."""
+
+	def iter_has_parent (self, it):
+		"""Returns whether the actual iterator has a parent.
+
+		@param it: the iterator
+		@type it: Iterator
+		@returns: True if it has a parent it, else False.
+		@rtype: boolean"""
+		raise NotImplementedError
+
+	def parent_iter (self, it):
+		"""Returns the parent iter.
+
+		@param it: the iterator
+		@type it: Iterator
+		@returns: Parent iterator or None if the current it has no parent.
+		@rtype: Iterator; None"""
+		raise NotImplementedError 
+	
+	def first_child_iter (self, it):
+		"""Returns the first child iter.
+
+		@param it: the iterator
+		@type it: Iterator
+		@returns: First child iterator or None if the current it has no children.
+		@rtype: Iterator; None"""
+		raise NotImplementedError
+
+	def iter_has_children (self, it):
+		"""Returns whether the actual iterator has children.
+
+		@param it: the iterator
+		@type it: Iterator
+		@returns: True if it has children, else False.
+		@rtype: boolean"""
+		raise NotImplementedError
+
+	def next_iter (self, it):
+		"""Returns the next iter.
+
+		@param it: the iterator
+		@type it: Iterator
+		@returns: Nex iterator or None if the current iter is the last one.
+		@rtype: Iterator; None"""
+		raise NotImplementedError
+
+	def get_value (self, it, column):
+		"""Returns the value of the specific column at the given iterator.
+
+		@param it: the iterator
+		@type it: Iterator
+		@param column: the column of the iterator from where to get the value
+		@type column: int
+		@returns: the value
+		@rtype: anything"""
+		raise NotImplementedError
+
+	def get_path_from_iter(self, it):
+		"""Returns a string defining the path to the given iterator. In this path all nodes are divided by a colon ':'.
+		For example: 2:4:5 could mean the 6th child of the 5th child of the 3rd element. It might also mean the 5th child of the 4th child of the 2nd element. It does not matter, where counting starts as long as it is consistent.
+
+		@param it: the iterator
+		@type it: Iterator
+		@returns: the path string
+		@rtype: string"""
+		raise NotImplementedError
+
+	def append (self, parent = None, values = None):
+		"""Appends some values right after the given parent. If parent is None, it is appended as the first element.
+
+		@param parent: the iterator to append the values right after; if None it symbolizes the top
+		@type parent: Iterator
+		@param values: a list of values which are going to be appended to the tree
+		@type values: list
+		@returns: Iterator pointing to the newly appended stuff
+		@rtype: Iterator"""
+		raise NotImplementedError
+
+	def remove(self, it):
+		"""Removes an iterator out of the tree. 
+		@attention: The iterator can point to anything hereafter. Do not reuse!
+		
+		@param it: iterator to remove
+		@type it: Iterator"""
+		raise NotImplementedError
+
+	def get_original(self):
+		"""Returns the original tree-object.
+		
+		@returns: original tree-object
+		@rtype: tree-object"""
+		raise NotImplementedError
+	
+	def get_cpv_column (self):
+		"""Returns the number of the column where the cpv's are stored.
+
+		@returns: column with cpv's
+		@rtype: int"""
+		raise NotImplementedError
+
+class Console:
+	"""This represents the abstract of a console. It should be used for all operations not in a specific frontend, where a console is needed.
+	Each frontend _MUST_ define its own subclass and implement ALL of the methods, otherwise a NotImplementedError will be thrown."""
+	
+	def set_pty (self, pty):
+		"""This sets the pseudo-terminal where to print the incoming output to.
+
+		@param pty: the terminal to print to
+		@type pty: file-descriptor"""
+		raise NotImplementedError
+
+	def get_original(self):
+		"""Returns the original console-object.
+		
+		@returns: original console-object
+		@rtype: console-object"""
+		raise NotImplementedError

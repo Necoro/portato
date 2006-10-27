@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: geneticone/gui/windows.py
+# File: geneticone/gui/gtk/windows.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 René 'Necoro' Neumann
@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-VERSION = "0.4.5"
+VERSION = "0.4.6-svn"
 CONFIG_LOCATION = "/etc/geneticone/geneticone.cfg"
 
 # gtk stuff
@@ -28,6 +28,7 @@ from geneticone.backend.exceptions import *
 # more GUI stuff
 from geneticone.gui.gui_helper import Database, Config, EmergeQueue
 from dialogs import *
+from wrapper import GtkTree, GtkConsole
 
 # for the terminal
 import vte
@@ -760,7 +761,7 @@ class MainWindow:
 		self.window.show_all()
 
 		# set emerge queue
-		self.queue = EmergeQueue(console=term, tree = emergeStore, db = self.db)
+		self.queue = EmergeQueue(console = GtkConsole(term), tree = GtkTree(emergeStore), db = self.db)
 
 	def create_uimanager(self):
 		ui ="""

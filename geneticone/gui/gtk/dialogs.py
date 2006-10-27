@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: geneticone/gui/dialogs.py
+# File: geneticone/gui/gtk/dialogs.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 René 'Necoro' Neumann

@@ -15,6 +15,9 @@ from geneticone import backend
 from geneticone.backend import flags
 from geneticone.helper import *
 
+# the wrapper
+from wrapper import Console, Tree
+
 # some stuff needed
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
@@ -219,9 +222,9 @@ class EmergeQueue:
 		"""Constructor.
 		
 		@param tree: Tree to append all the items to.
-		@type tree: gtk.TreeStore
+		@type tree: Tree
 		@param console: Output is shown here.
-		@type console: vte.Terminal
+		@type console: Console
 		@param db: A database instance.
 		@type db: Database"""
 		
@@ -236,7 +239,11 @@ class EmergeQueue:
 		
 		# member vars
 		self.tree = tree
+		if self.tree and not isinstance(self.tree, Tree): raise TypeError, "tree passed is not a Tree-object"
+		
 		self.console = console
+		if self.console and not isinstance(self.console, Console): raise TypeError, "console passed is not a Console-object"
+		
 		self.db = db
 		
 		# our iterators pointing at the toplevels; they are set to None if do not have a tree
@@ -309,9 +316,9 @@ class EmergeQueue:
 					options += ["updating from "+old.get_version()]
 
 		except backend.PackageNotFoundException, e: # package not found / package is masked -> delete current tree and re-raise the exception
-			if self.tree.iter_parent(it):
-				while self.tree.iter_parent(it):
-					it = self.tree.iter_parent(it)
+			if self.tree.iter_has_parent(it):
+				while self.tree.iter_has_parent(it):
+					it = self.tree.parent_iter(it)
 				self.remove_with_children(it)
 			raise e
 
@@ -363,7 +370,7 @@ class EmergeQueue:
 					return # nothing changed - return
 				else:
 					hasBeenInQueue = (cpv in self.mergequeue or cpv in self.oneshotmerge)
-					parentIt = self.tree.iter_parent(self.iters[cpv])
+					parentIt = self.tree.parent_iter(self.iters[cpv])
 
 					# delete it out of the tree - but NOT the changed flags
 					self.remove_with_children(self.iters[cpv], removeNewFlags = False)
@@ -532,13 +539,13 @@ class EmergeQueue:
 		@param removeNewFlags: True if new flags should be removed; False otherwise. Default: True.
 		@type removeNewFlags: boolean"""
 
-		childIt = self.tree.iter_children(parentIt)
+		childIt = self.tree.first_child_iter(parentIt)
 
 		while childIt:
-			if (self.tree.iter_has_child(childIt)): # recursive call
+			if (self.tree.iter_has_children(childIt)): # recursive call
 				self.remove_children(childIt, removeNewFlags)
 			temp = childIt
-			childIt = self.tree.iter_next(childIt)
+			childIt = self.tree.next_iter(childIt)
 			self.remove(temp, removeNewFlags)
 
 	def remove (self, it, removeNewFlags = True):
@@ -549,9 +556,9 @@ class EmergeQueue:
 		@param removeNewFlags: True if new flags should be removed; False otherwise. Default: True.
 		@type removeNewFlags: boolean"""
 		
-		if self.tree.iter_parent(it): # NEVER remove our top stuff
-			cpv = self.tree.get_value(it,0)
-			if self.tree.get_string_from_iter(it).split(":")[0] == self.tree.get_string_from_iter(self.emergeIt): # in Emerge
+		if self.tree.iter_has_parent(it): # NEVER remove our top stuff
+			cpv = self.tree.get_value(it, self.tree.get_cpv_column())
+			if self.tree.get_path_from_iter(it).split(":")[0] == self.tree.get_path_from_iter(self.emergeIt): # in Emerge
 				del self.iters[cpv]
 				try:
 					del self.deps[cpv]

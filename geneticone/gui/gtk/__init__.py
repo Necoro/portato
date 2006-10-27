@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: geneticone/gui/__init__.py
+# File: geneticone/gui/gtk/__init__.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 René 'Necoro' Neumann
