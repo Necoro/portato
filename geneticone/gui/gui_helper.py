@@ -291,7 +291,7 @@ class EmergeQueue:
 		"""This updates the tree recursivly, or? Isn't it? Bjorn!
 
 		@param it: iterator where to append
-		@type it: gtk.TreeIter
+		@type it: Iterator
 		@param cpv: The package to append.
 		@type cpv: string (cat/pkg-ver)
 		@param unmask: True if we are allowed to look for masked packages
@@ -434,7 +434,7 @@ class EmergeQueue:
 		@param packages: packages to emerge
 		@type packages: list
 		@param it: Iterators which point to these entries whose children will be removed after completion.
-		@type it: list of gtk.TreeIter"""
+		@type it: Iterator[]"""
 
 		# open tty
 		(master, slave) = pty.openpty()
@@ -524,7 +524,7 @@ class EmergeQueue:
 		"""Convenience function which removes all children of an iterator and than the iterator itself.
 
 		@param it: The iter which to remove.
-		@type it: gtk.TreeIter
+		@type it: Iterator
 		@param removeNewFlags: True if new flags should be removed; False otherwise. Default: True.
 		@type removeNewFlags: boolean"""
 
@@ -535,7 +535,7 @@ class EmergeQueue:
 		"""Removes all children of a given parent TreeIter recursivly.
 		
 		@param parentIt: The iter from which to remove all children.
-		@type parentIt: gtk.TreeIter
+		@type parentIt: Iterator
 		@param removeNewFlags: True if new flags should be removed; False otherwise. Default: True.
 		@type removeNewFlags: boolean"""
 
@@ -552,7 +552,7 @@ class EmergeQueue:
 		"""Removes a specific item in the tree. This does not remove the top-entries.
 		
 		@param it: Iterator which points to the entry we are going to remove.
-		@type it: gtk.TreeIter
+		@type it: Iterator
 		@param removeNewFlags: True if new flags should be removed; False otherwise. Default: True.
 		@type removeNewFlags: boolean"""
 		

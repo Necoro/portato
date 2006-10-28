@@ -36,7 +36,7 @@ class GtkTree (Tree):
 		return self.tree.iter_children(it)
 
 	def iter_has_children (self, it):
-		return self.tree.iter_has_children(it)
+		return self.tree.iter_has_child(it)
 
 	def next_iter (self, it):
 		return self.tree.iter_next(it)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # File: geneticone/backend/portage_helper.py
 # This file is part of the Genetic/One-Project, a graphical portage-frontend.
@@ -278,22 +279,36 @@ def update_world (newuse = False, deep = False):
 	checked = []
 	updating = []
 	raw_checked = []
-	def check (p, deep = False):
+	def check (p):
 		"""Checks whether a package is updated or not."""
 		if p.get_cp() in checked: return
 		else: checked.append(p.get_cp())
 
+		appended = False
+		tempDeep = False
+
 		if not p.is_installed():
-			old = find_installed_packages(p.get_cp())
-			if old: 
-				old = old[0] # assume we have only one there; FIXME: slotted packages
+			oldList = find_installed_packages(p.get_cp())
+			if oldList: 
+				old = oldList[0] # assume we have only one there; FIXME: slotted packages
 			else:
 				debug("Bug? Not found installed one:",p.get_cp())
 				return
 			updating.append((p, old))
+			appended = True
 			p = old
 
-		if deep:
+		if newuse:
+			old = p.get_installed_use_flags()
+			new = p.get_settings("USE").split()
+			
+			for u in p.get_all_use_flags():
+				if (u in new) != (u in old):
+					if not appended: 
+						updating.append((p,p))
+						tempDeep = True
+
+		if deep or tempDeep:
 			for i in p.get_matched_dep_packages():
 				if i not in raw_checked:
 					raw_checked.append(i)
@@ -301,11 +316,11 @@ def update_world (newuse = False, deep = False):
 					if not bm: 
 						debug("Bug? No best match could be found:",i)
 					else:
-						check(bm, deep)
+						check(bm)
 
 	for p in packages:
 		if not p: continue # if a masked package is installed we have "None" here
-		check(p, deep)
+		check(p)
 	
 	return updating
 	

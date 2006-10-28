@@ -195,7 +195,7 @@ class PreferenceWindow (AbstractDialog):
 		self.deepCb = self.draw_cb(box, "--deep", "deep_opt")
 
 		# --newuse
-		#self.newuseCb = self.draw_cb(box, "--newuse", "newuse_opt")
+		self.newuseCb = self.draw_cb(box, "--newuse", "newuse_opt")
 		
 		pHolderLabel = gtk.Label("""<u>For the following options, you might use these placeholders:</u>
 <b>$(cat)</b> = category
@@ -282,7 +282,7 @@ class PreferenceWindow (AbstractDialog):
 		self.cfg.set(self.cfg.const["testingFile_opt"], self.testFileEdit.get_text())
 		self.cfg.set(self.cfg.const["debug_opt"], str(self.debugCb.get_active()))
 		self.cfg.set(self.cfg.const["deep_opt"], str(self.deepCb.get_active()))
-		#self.cfg.set(self.cfg.const["newuse_opt"], str(self.newuseCb.get_active()))
+		self.cfg.set(self.cfg.const["newuse_opt"], str(self.newuseCb.get_active()))
 
 	def cb_ok_clicked(self, button):
 		"""Saves, writes to config-file and closes the window."""
