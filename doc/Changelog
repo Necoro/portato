@@ -1,3 +1,7 @@
+0.4.6:
+- made it possible to build other frontends than GTK
+- implemented --newuse
+
 0.4.5:
 - bug fixing (again ;D)
 - added "oneshot"

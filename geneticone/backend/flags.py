@@ -68,9 +68,9 @@ def get_data(pkg, path):
 		crit = fl[0]
 		fl = fl[1:]
 		# stop after first comment
-		for i in range(len(fl)):
-			if fl[i][0] == "#": # comment - stop here
-				fl = fl[:i]
+		for j in range(len(fl)):
+			if fl[j][0] == "#": # comment - stop here
+				fl = fl[:j]
 				break
 		flags.append((file,line,crit,fl))
 
@@ -342,8 +342,8 @@ new_unmasked = {}
 def set_masked (pkg, masked = True):
 	"""Sets the masking status of the package.
 	
-	@param cpv: the package from which to get the flags
-	@type cpv: string (cpv) or L{backend.Package}-object
+	@param pkg: the package from which to get the flags
+	@type pkg: string (cpv) or L{backend.Package}-object
 	@param masked: if True: mask it; if False: unmask it
 	@type masked: boolean"""
 	

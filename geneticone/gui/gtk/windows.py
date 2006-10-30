@@ -294,7 +294,21 @@ class PackageWindow (AbstractDialog):
 	"""A window with data about a specfic package."""
 
 	def __init__ (self, parent, cp, queue = None, version = None, delOnClose = True, doEmerge = True):
-		"""Build up window contents."""
+		"""Build up window contents.
+		
+		@param parent: the parent window
+		@type parent: gtk.Window
+		@param cp: the selected package
+		@type cp: string (cp)
+		@param queue: emerge-queue (if None the emerge-buttons are disabled)
+		@type queue: EmergeQueue
+		@param version: if not None, specifies the version to select
+		@type version: string
+		@param delOnClose: if True (default) changed flags are changed on closing
+		@type delOnClose: boolean
+		@param doEmerge: if False, the emerge buttons are disabled
+		@type doEmerge: False"""
+
 		AbstractDialog.__init__(self, parent, cp)
 
 		self.cp = cp # category/package
@@ -397,6 +411,11 @@ class PackageWindow (AbstractDialog):
 		self.window.show_all()
 
 	def fill_use_list(self, store):
+		"""Fills a given ListStore with the use-flag data.
+		
+		@param store: the store to fill
+		@type store: gtk.ListStore"""
+
 		pkg = self.actual_package()
 		pkg_flags = pkg.get_all_use_flags()
 		pkg_flags.sort()
@@ -462,10 +481,14 @@ class PackageWindow (AbstractDialog):
 		return combo
 
 	def actual_package (self):
-		"""Returns the actual package (a backend.Package-object)."""
+		"""Returns the actual selected package.
+		
+		@returns: the actual selected package
+		@rtype: backend.Package"""
+		
 		return self.packages[self.vCombo.get_active()]
 
-	def cb_combo_changed (self, combo, data = None):
+	def cb_combo_changed (self, combo):
 		"""Callback for the changed ComboBox.
 		It then rebuilds the useList and the checkboxes."""
 		
@@ -476,7 +499,10 @@ class PackageWindow (AbstractDialog):
 		self.useList = self.build_use_list()
 		self.useListScroll.add(self.useList)
 		pkg = self.actual_package()
-
+		
+		#
+		# rebuild the buttons and checkboxes in all the different manners which are possible
+		#
 		if (not pkg.is_in_system()) or pkg.is_missing_keyword():
 			if not pkg.is_in_system():
 				self.missing_label.hide()
@@ -520,13 +546,14 @@ class PackageWindow (AbstractDialog):
 		self.window.resize(1,1)
 		return True
 
-	def cb_button_pressed (self, b, event, data = None):
+	def cb_button_pressed (self, b, event):
 		"""Callback for pressed checkboxes. Just quits the event-loop - no redrawing."""
 		if not isinstance(b, gtk.CellRendererToggle):
 			b.emit_stop_by_name("button-press-event")
 		return True
 
 	def cb_cancel_clicked (self, button, data = None):
+		"""Callback for pressed cancel-button. Closes the window."""
 		if self.delOnClose: 
 			self.actual_package().remove_new_use_flags()
 			self.actual_package().remove_new_masked()
@@ -546,7 +573,7 @@ class PackageWindow (AbstractDialog):
 		return True
 
 	def cb_emerge_clicked (self, button, data = None):
-		"""Adds the package to the EmergeQueue."""
+		"""Callback for pressed emerge-button. Adds the package to the EmergeQueue."""
 		if not am_i_root():
 			not_root_dialog()
 		else:
@@ -563,7 +590,7 @@ class PackageWindow (AbstractDialog):
 		return True
 
 	def cb_unmerge_clicked (self, button, data = None):
-		"""Adds the package to the UnmergeQueue."""
+		"""Callback for pressed unmerge-button clicked. Adds the package to the UnmergeQueue."""
 		if not am_i_root():
 			not_root_dialog()
 		else:
@@ -576,6 +603,7 @@ class PackageWindow (AbstractDialog):
 		return True
 
 	def cb_testing_toggled (self, button):
+		"""Callback for toggled testing-checkbox."""
 		status = button.get_active()
 
 		if self.actual_package().is_testing(allowed = False) == status:
@@ -595,12 +623,14 @@ class PackageWindow (AbstractDialog):
 		return True
 
 	def cb_masked_toggled (self, button):
+		"""Callback for toggled masking-checkbox."""
 		status = button.get_active()
 		self.actual_package().set_masked(status)
 		self.flagChanged = True
 		return True
 
-	def cb_use_flag_toggled (self, cell, path, store, data = None):
+	def cb_use_flag_toggled (self, cell, path, store):
+		"""Callback for a toggled use-flag button."""
 		store[path][0] = not store[path][0]
 		prefix = ""
 		if not store[path][0]:
@@ -764,6 +794,10 @@ class MainWindow:
 		self.queue = EmergeQueue(console = GtkConsole(term), tree = GtkTree(emergeStore), db = self.db)
 
 	def create_uimanager(self):
+		"""Creates a UIManager holding the menubar and the popups.
+		@returns: created UIManager
+		@rtype: gtk.UIManager"""
+
 		ui ="""
 	<ui>
 		<menubar name="bar">
@@ -789,6 +823,8 @@ class MainWindow:
 	</ui>"""
 
 		um = gtk.UIManager()
+		
+		# menubar
 		group = gtk.ActionGroup("MenuActions")
 		group.add_actions([
 			("File", None, "_File"),
@@ -799,11 +835,14 @@ class MainWindow:
 			("Reload", None, "_Reload Portage", None, None, self.cb_reload_clicked),
 			("Close", None, "_Close", None, None, self.cb_destroy),
 			("About", None, "_About", None, None, lambda x: AboutWindow(self.window))])
+		# the following actions are defined in __init__, because they are used for buttons too
 		group.add_action(self.emergeAction)
 		group.add_action(self.unmergeAction)
 		group.add_action(self.updateAction)
+
 		um.insert_action_group(group,0)
 
+		# popup
 		group = gtk.ActionGroup("PopupActions")
 		group.add_actions([
 			("Oneshot", None, "Oneshot", None, None, self.cb_oneshot_clicked)])
@@ -814,13 +853,28 @@ class MainWindow:
 		return um
 
 	def fill_pkg_store (self, store, name = None):
+		"""Fills a given ListStore with the packages in a category.
+		
+		@param store: the store to fill
+		@type store: gtk.ListStore
+		@param name: the name of the category
+		@type name: string
+		@returns: the filled store
+		@rtype: gtk.ListStore"""
+
 		if name:
 			for p in self.db.get_cat(name):
 				store.append([p])
 		return store
 	
-	def create_pkg_list (self, name = None, force = False):
-		"""Creates the package list."""
+	def create_pkg_list (self, name = None):
+		"""Creates the package list.
+		
+		@param name: name of the selected catetegory
+		@type name: string
+		@returns: the filled package list
+		@rtype: gtk.TreeView"""
+		
 		store = gtk.ListStore(str)
 		self.fill_pkg_store(store,name)
 		
@@ -834,7 +888,11 @@ class MainWindow:
 		return pkgList
 
 	def create_cat_list (self):
-		"""Creates the category list."""
+		"""Creates the category list.
+		
+		@returns: created view
+		@rtype: gtk.TreeView"""
+		
 		store = gtk.ListStore(str)
 
 		# build categories
@@ -861,20 +919,19 @@ class MainWindow:
 		"""Calls main_quit()."""
 		gtk.main_quit()
 
-	def cb_cat_list_selection (self, view, data = None, force = False):
-		"""Callback for a category-list selection. Updates the package list with these packages in the category."""
-		if view == self.catList: # be sure it is the catList
-			# get the selected category
-			sel = view.get_selection()
-			store, it = sel.get_selected()
-			if it:
-				self.selCatName = store.get_value(it, 0)
-				self.pkgList.get_model().clear()
-				self.fill_pkg_store(self.pkgList.get_model(), self.selCatName)
-		return False
+	def cb_cat_list_selection (self, view):
+		"""Callback for a category-list selection. Updates the package list with the packages in the category."""
+		# get the selected category
+		sel = view.get_selection()
+		store, it = sel.get_selected()
+		if it:
+			self.selCatName = store.get_value(it, 0)
+			self.pkgList.get_model().clear()
+			self.fill_pkg_store(self.pkgList.get_model(), self.selCatName)
+		return True
 
 	def cb_row_activated (self, view, path, col, store = None):
-		"""Callback for an activated row in the pkgList. Opens a package window."""
+		"""Callback for an activated row in the pkgList or in the emergeQueue. Opens a package window."""
 		if view == self.pkgList:
 			package = store.get_value(store.get_iter(path), 0)
 			if package[-1] == '*': package = package[:-1]
@@ -887,12 +944,14 @@ class MainWindow:
 				PackageWindow(self.window, cat+"/"+name, queue = self.queue, version = vers, delOnClose = False, doEmerge = False)
 		return True
 
-	def cb_remove_clicked (self, button, data = None):
+	def cb_remove_clicked (self, button):
 		"""Removes a selected item in the (un)emerge-queue if possible."""
 		selected = self.emergeView.get_selection()
 
 		if selected:
 			model, iter = selected.get_selected()
+			
+			if iter == None: return False
 
 			if not model.iter_parent(iter): # top-level
 				if model.iter_n_children(iter) > 0: # and has children which can be removed :)
@@ -1006,8 +1065,8 @@ class MainWindow:
 			if pthinfo is not None:
 				path, col, cellx, celly = pthinfo
 				queue.grab_focus()
-				queue.set_cursor( path, col, 0)
-				self.queuePopup.popup( None, None, None, event.button, time)
+				queue.set_cursor(path, col, 0)
+				self.queuePopup.popup(None, None, None, event.button, time)
 				return True
 			else:
 				return False
