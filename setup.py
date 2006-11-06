@@ -10,5 +10,5 @@ setup(name="Genetic/One",
 		license="GPLv2",
 		author_email="necoro@necoro.net",
 		packages=["geneticone", "geneticone.gui", "geneticone.backend", "geneticone.gui.gtk"],
-		data_files={DATA_DIR: ["geneticone/gui/gtk/glade/geneticone.glade"]}
+		data_files=[(DATA_DIR, ["geneticone/gui/gtk/glade/geneticone.glade"])]
 		)
