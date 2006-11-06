@@ -498,6 +498,7 @@ class PackageTable:
 			not_root_dialog()
 		else:
 			self._update_keywords(False)
+			self.main.notebook.set_current_page(self.main.QUEUE_PAGE)
 		return True
 
 	def cb_testing_toggled (self, button):
