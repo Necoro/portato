@@ -481,6 +481,8 @@ class PackageTable:
 		self.actual_package().remove_new_masked()
 		self.actual_package().remove_new_testing()
 		self.cb_combo_changed(self.vCombo)
+		if self.instantChange:
+			self._update_keywords(True, update = True)
 		return True
 
 	def cb_package_emerge_clicked (self, button):
@@ -612,8 +614,14 @@ class MainWindow (Window):
 		self.packageTable = PackageTable(self)
 		self.packageTable.table.hide_all()
 
+		# popup
+		popupTree = gtk.glade.XML(DATA_DIR+"geneticone.glade", root = "queuePopup")
+		popupTree.signal_autoconnect(self)
+		self.queuePopup = popupTree.get_widget("queuePopup")
+
 		# set emerge queue
-		self.queue = EmergeQueue(console = GtkConsole(term), tree = GtkTree(self.queueList.get_model()), db = self.db)
+		self.queueTree = GtkTree(self.queueList.get_model())
+		self.queue = EmergeQueue(console = GtkConsole(term), tree = self.queueTree, db = self.db)
 
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)
@@ -706,12 +714,14 @@ class MainWindow (Window):
 
 	def cb_row_activated (self, view, path, *args):
 		"""Callback for an activated row in the emergeQueue. Opens a package window."""
-		store = view.get_model()
+		store = self.queueTree
 		if len(path) > 1:
-			package = store.get_value(store.get_iter(path), 0)
-			cat, name, vers, rev = backend.split_package_name(package)
-			if rev != "r0": vers = vers+"-"+rev
-			self.show_package(cat+"/"+name, queue = self.queue, version = vers, instantChange = True, doEmerge = False)
+			iterator = store.get_original().get_iter(path)
+			if store.is_in_emerge(iterator):
+				package = store.get_value(iterator, 0)
+				cat, name, vers, rev = backend.split_package_name(package)
+				if rev != "r0": vers = vers+"-"+rev
+				self.show_package(cat+"/"+name, queue = self.queue, version = vers, instantChange = True, doEmerge = False)
 		return True
 
 	def cb_emerge_clicked (self, action):
@@ -784,8 +794,11 @@ class MainWindow (Window):
 		return True
 
 	def cb_sync_clicked (self, action):
-		self.notebook.set_current_page(self.CONSOLE_PAGE)
-		self.queue.sync()
+		if not backend.am_i_root():
+			not_root_dialog()
+		else:
+			self.notebook.set_current_page(self.CONSOLE_PAGE)
+			self.queue.sync()
 	
 	@Window.watch_cursor
 	def cb_reload_clicked (self, action):
@@ -818,34 +831,33 @@ class MainWindow (Window):
 		return True
 
 	def cb_queue_right_click (self, queue, event):
-		pass
-	#	if event.button == 3:
-	#		x = int(event.x)
-	#		y = int(event.y)
-	#		time = event.time
-	#		pthinfo = queue.get_path_at_pos(x, y)
-	#		if pthinfo is not None:
-	#			path, col, cellx, celly = pthinfo
-	#			queue.grab_focus()
-	#			queue.set_cursor(path, col, 0)
-	#			self.queuePopup.popup(None, None, None, event.button, time)
-	#			return True
-	#		else:
-	#			return False
+		if event.button == 3:
+			x = int(event.x)
+			y = int(event.y)
+			time = event.time
+			pthinfo = queue.get_path_at_pos(x, y)
+			if pthinfo is not None:
+				path, col, cellx, celly = pthinfo
+				if self.queueTree.is_in_emerge(self.queueTree.get_original().get_iter(path)):
+					queue.grab_focus()
+					queue.set_cursor(path, col, 0)
+					self.queuePopup.popup(None, None, None, event.button, time)
+				return True
+			else:
+				return False
 
 	def cb_oneshot_clicked (self, action):
-		pass
-	#	sel = self.queueList.get_selection()
-	#	store, it = sel.get_selected()
-	#	if it:
-	#		package = store.get_value(it, 0)
-	#		if not self.cfg.get_local(package, self.cfg.const["oneshot_opt"]):
-	#			set = True
-	#		else:
-	#			set = False
-	#		
-	#		self.cfg.set_local(package, self.cfg.const["oneshot_opt"], set)
-	#		self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
+		sel = self.queueList.get_selection()
+		store, it = sel.get_selected()
+		if it:
+			package = store.get_value(it, 0)
+			if not self.cfg.get_local(package, self.cfg.const["oneshot_opt"]):
+				set = True
+			else:
+				set = False
+			
+			self.cfg.set_local(package, self.cfg.const["oneshot_opt"], set)
+			self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
 	
 	def cb_destroy (self, widget):
 		"""Calls main_quit()."""

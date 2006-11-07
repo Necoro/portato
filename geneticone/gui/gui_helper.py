@@ -246,10 +246,10 @@ class EmergeQueue:
 		
 		self.db = db
 		
-		# our iterators pointing at the toplevels; they are set to None if do not have a tree
+		# our iterators pointing at the toplevels; they are set to None if we do not have a tree
 		if self.tree: 
-			self.emergeIt = self.tree.append(None, ["Emerge", ""])
-			self.unmergeIt = self.tree.append(None, ["Unmerge", ""])
+			self.emergeIt = self.tree.get_emerge_it()
+			self.unmergeIt = self.tree.get_unmerge_it()
 		else:
 			self.emergeIt = self.unmergeIt = None
 
@@ -287,7 +287,7 @@ class EmergeQueue:
 		
 		return pkg
 	
-	def update_tree (self, it, cpv, unmask = False, options = None):
+	def update_tree (self, it, cpv, unmask = False, oneshot = False):
 		"""This updates the tree recursivly, or? Isn't it? Bjorn!
 
 		@param it: iterator where to append
@@ -296,24 +296,25 @@ class EmergeQueue:
 		@type cpv: string (cat/pkg-ver)
 		@param unmask: True if we are allowed to look for masked packages
 		@type unmask: boolean
-		@param options: options to append to the tree
-		@type options: string[]
+		@param oneshot: True if we want to emerge is oneshot
+		@type oneshot: boolean
 		
 		@raises backend.BlockedException: When occured during dependency-calculation.
 		@raises backend.PackageNotFoundException: If no package could be found - normally it is existing but masked."""
 		
-		if not options: options = []
-
 		if cpv in self.deps:
 			return # in list already and therefore it's already in the tree too	
 		
+		update = False
+		uVersion = None
 		try:
 			pkg = self._get_pkg_from_cpv(cpv, unmask)
 			if not pkg.is_installed():
 				old = backend.get_all_installed_versions(pkg.get_cp())
 				if old: 
 					old = old[0] # assume we have only one there; FIXME: slotted packages
-					options += ["updating from "+old.get_version()]
+					update = True
+					uVersion = old.get_version()
 
 		except backend.PackageNotFoundException, e: # package not found / package is masked -> delete current tree and re-raise the exception
 			if self.tree.iter_has_parent(it):
@@ -323,7 +324,7 @@ class EmergeQueue:
 			raise e
 
 		# add iter
-		subIt = self.tree.append(it, [cpv, "<i>"+" ".join(options)+"</i>"])
+		subIt = self.tree.append(it, self.tree.build_append_value(cpv, oneshot = oneshot, update = update, version = uVersion))
 		self.iters.update({cpv: subIt})
 		
 		# get dependencies
@@ -339,7 +340,7 @@ class EmergeQueue:
 				self.remove_with_children(subIt)
 				raise e
 		
-	def append (self, cpv, unmerge = False, update = False, forceUpdate = False, unmask = False, oneshot = False, options = []):
+	def append (self, cpv, unmerge = False, update = False, forceUpdate = False, unmask = False, oneshot = False):
 		"""Appends a cpv either to the merge queue or to the unmerge-queue.
 		Also updates the tree-view.
 		
@@ -355,8 +356,6 @@ class EmergeQueue:
 		@type unmask: boolean
 		@param oneshot: True if this package should not be added to the world-file.
 		@type oneshot: boolean
-		@param options: additional options to get showed in tree
-		@type options: string[]
 		
 		@raises geneticone.backend.PackageNotFoundException: if trying to add a package which does not exist"""
 		
@@ -376,18 +375,18 @@ class EmergeQueue:
 					self.remove_with_children(self.iters[cpv], removeNewFlags = False)
 					
 					if hasBeenInQueue: # package has been in queue before
-						options += self._queue_append(cpv, oneshot)
+						self._queue_append(cpv, oneshot)
 					
-					self.update_tree(parentIt, cpv, unmask, options = options)
+					self.update_tree(parentIt, cpv, unmask, oneshot = oneshot)
 			else: # not update
-				options += self._queue_append(cpv, oneshot)
+				self._queue_append(cpv, oneshot)
 				if self.emergeIt: 
-					self.update_tree(self.emergeIt, cpv, unmask, options)
+					self.update_tree(self.emergeIt, cpv, unmask, oneshot = oneshot)
 			
 		else: # unmerge
 			self.unmergequeue.append(cpv)
 			if self.unmergeIt: # update tree
-				self.tree.append(self.unmergeIt, [cpv, ""])
+				self.tree.append(self.unmergeIt, self.tree.build_append_value(cpv))
 
 	def _queue_append (self, cpv, oneshot = False):
 		"""Convenience function appending a cpv either to self.mergequeue or to self.oneshotmerge.
@@ -395,19 +394,12 @@ class EmergeQueue:
 		@param cpv: cpv to add
 		@type cpv: string (cpv)
 		@param oneshot: True if this package should not be added to the world-file.
-		@type oneshot: boolean
+		@type oneshot: boolean"""
 
-		@returns: options set
-		@rtype: string[]"""
-
-		options = []
 		if not oneshot:
 			self.mergequeue.append(cpv)
 		else:
 			self.oneshotmerge.append(cpv)
-			options.append("oneshot")
-
-		return options
 	
 	def _update_packages(self, packages, process = None):
 		"""This updates the packages-list. It simply makes the db to rebuild the specific category.
@@ -558,7 +550,7 @@ class EmergeQueue:
 		
 		if self.tree.iter_has_parent(it): # NEVER remove our top stuff
 			cpv = self.tree.get_value(it, self.tree.get_cpv_column())
-			if self.tree.get_path_from_iter(it).split(":")[0] == self.tree.get_path_from_iter(self.emergeIt): # in Emerge
+			if self.tree.is_in_emerge(it): # Emerge
 				del self.iters[cpv]
 				try:
 					del self.deps[cpv]

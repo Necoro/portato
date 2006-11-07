@@ -106,11 +106,63 @@ class Tree:
 		@rtype: tree-object"""
 		raise NotImplementedError
 	
+	#
+	# the "design" part
+	#
+
 	def get_cpv_column (self):
 		"""Returns the number of the column where the cpv's are stored.
 
 		@returns: column with cpv's
 		@rtype: int"""
+		raise NotImplementedError
+
+	def is_in_emerge (self, it):
+		"""Checks whether an iterator is part of the "Emerge" section.
+
+		@param it: the iterator to check
+		@type it: Iterator
+		@returns: True if the iter is part; False otherwise
+		@rtype: boolean"""
+		raise NotImplementedError
+
+	def is_in_unmerge (self, it):
+		"""Checks whether an iterator is part of the "Unmerge" section.
+
+		@param it: the iterator to check
+		@type it: Iterator
+		@returns: True if the iter is part; False otherwise
+		@rtype: boolean"""
+		raise NotImplementedError
+
+	def get_emerge_it (self):
+		"""Returns an iterator signaling the top of the emerge section.
+
+		@returns: emerge-iterator
+		@rtype: Iterator"""
+		raise NotImplementedError
+
+	def get_unmerge_it (self):
+		"""Returns an iterator signaling the top of the unmerge section.
+
+		@returns: unmerge-iterator
+		@rtype: Iterator"""
+		raise NotImplementedError
+
+	def build_append_value (self, cpv, oneshot = False, update = False, version = None):
+		"""Builds the list, which is going to be passed to append. 
+
+		@param cpv: the cpv
+		@type cpv: string (cpv)
+		@param oneshot: True if oneshot
+		@type oneshot: boolean
+		@param update: True if this is an update
+		@type update: boolean
+		@param version: the version we update from
+		@type version: string
+
+		@returns: the created list
+		@rtype: list"""
 		raise NotImplementedError
 
 class Console:

@@ -25,6 +25,34 @@ class GtkTree (Tree):
 
 		self.tree = tree
 		self.cpv_col = col
+		self.emergeIt = self.append(None, ["Emerge", ""])
+		self.unmergeIt = self.append(None, ["Unmerge", ""])
+
+	def build_append_value (self, cpv, oneshot = False, update = False, version = None):
+		string = ""
+
+		if oneshot:
+			string += "<i>oneshot</i>"
+			if update: string += "; "
+
+		if update:
+			string += "<i>updating</i>"
+			if version != None:
+				string += "<i> from version %s</i>" % version
+
+		return [cpv, string]
+
+	def get_emerge_it (self):
+		return self.emergeIt
+
+	def get_unmerge_it (self):
+		return self.unmergeIt
+
+	def is_in_emerge (self, it):
+		return self.get_path_from_iter(it).split(":")[0] == self.get_path_from_iter(self.emergeIt)
+
+	def is_in_unmerge (self, it):
+		return self.get_path_from_iter(it).split(":")[0] == self.get_path_from_iter(self.unmergeIt)
 	
 	def iter_has_parent (self, it):
 		return (self.tree.iter_parent(it) != None)
