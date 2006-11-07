@@ -6,11 +6,7 @@ Backend:
 GUI:
 =====
 
-- EmergeQueue more flexible
-
 GTK:
 ----
 - make oneshot better
-- scrollable use-flag-list
 - better infos in queue for "newuse"
-- nicier pref-dialog
