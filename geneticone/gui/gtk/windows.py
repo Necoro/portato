@@ -304,6 +304,7 @@ class PackageTable:
 		else:
 			desc = "<b>"+desc+"</b>"
 			use_markup = True
+		desc = "<i><u>"+self.actual_package().get_cp()+"</u></i>\n\n"+desc
 		self.descLabel = self.tree.get_widget("descLabel")
 		self.descLabel.set_use_markup(use_markup)
 		self.descLabel.set_label(desc)
