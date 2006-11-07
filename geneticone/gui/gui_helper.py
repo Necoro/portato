@@ -15,13 +15,15 @@ from geneticone import backend
 from geneticone.backend import flags
 from geneticone.helper import *
 
+# parser
+from geneticone.config_parser import ConfigParser
+
 # the wrapper
 from wrapper import Console, Tree
 
 # some stuff needed
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
-from ConfigParser import SafeConfigParser
 import pty
 
 class Config:
@@ -42,25 +44,15 @@ class Config:
 	
 	def __init__ (self, cfgFile):
 		"""Constructor.
-		@attention: If cfgFile is a file, it is closed afterwards!
 
-		@param cfgFile: path to config file or file-object of the config-file.
-		@type cfgFile: string or file"""
+		@param cfgFile: path to config file
+		@type cfgFile: string"""
 
 		# init ConfigParser
-		self._cfg = SafeConfigParser()
+		self._cfg = ConfigParser(cfgFile)
 		
-		# set correct file-obj
-		if not isinstance(cfgFile, file):
-			self._file = open(cfgFile) # assume string
-		elif cfgFile.closed:
-			self._file = open(cfgFile.name)
-		else:
-			self._file = cfgFile
-
 		# read config
-		self._cfg.readfp(self._file)
-		self._file.close()
+		self._cfg.parse()
 
 		# local configs
 		self.local = {}
@@ -75,7 +67,7 @@ class Config:
 		@return: the option's value
 		@rtype: string"""
 
-		return self._cfg.get(section, name)
+		return self._cfg.get(name, section)
 
 	def get_boolean(self, name, section=const["main_sec"]):
 		"""Gets a boolean option.
@@ -87,7 +79,7 @@ class Config:
 		@return: the option's value
 		@rtype: boolean"""
 
-		return self._cfg.getboolean(section, name)
+		return self._cfg.get_boolean(name, section)
 
 	def modify_flags_config (self):
 		"""Sets the internal config of the L{flags}-module.
@@ -150,16 +142,27 @@ class Config:
 		@param name: name of the option
 		@type name: string
 		@param val: value to set the option to
-		@type val: string or boolean
+		@type val: string
 		@param section: section to look in; default is Main-Section
 		@type section: string"""
 
-		self._cfg.set(section, name, val)
+		self._cfg.set(name, val, section)
+
+	def set_boolean (self, name, val, section=const["main_sec"]):
+		"""Sets a boolean option.
+		
+		@param name: name of the option
+		@type name: string
+		@param val: value to set the option to
+		@type val: boolean
+		@param section: section to look in; default is Main-Section
+		@type section: string"""
+
+		self._cfg.set_boolean(name, val, section)
 
 	def write(self):
 		"""Writes to the config file and modify any external configs."""
-		self._file = open(self._file.name,"w")
-		self._cfg.write(self._file)
+		self._cfg.write()
 		self.modify_external_configs()
 
 class Database:

@@ -209,9 +209,9 @@ class PreferenceWindow (AbstractDialog):
 		"""Sets all options in the Config-instance."""
 		
 		for box in self.checkboxes:
-			self.cfg.set(\
+			self.cfg.set_boolean(\
 					self.cfg.const[self.checkboxes[box]],\
-					str(self.tree.get_widget(box).get_active()))
+					self.tree.get_widget(box).get_active())
 
 		for edit in self.edits:
 			self.cfg.set(\

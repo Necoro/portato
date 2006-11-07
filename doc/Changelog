@@ -1,3 +1,6 @@
+0.5.1:
+- new config parser and new config-layout
+
 0.5.0:
 - rewritten GTK-Frontend using Glade
 - made the wrapper more powerful
