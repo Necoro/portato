@@ -274,11 +274,12 @@ class Package (gentoolkit.Package):
 
 		for dep in deps:
 			if dep[0] == '!': # blocking sth
-				blocked = find_installed_packages(dep[1:])
-				if blocked != []:
-					raise BlockedException, (self.get_cpv(), blocked[0].get_cpv())
-				else: # next flag
-					continue
+				dep = dep[1:]
+				if dep != self.get_cp(): # not cpv, because a version might explicitly block another one
+					blocked = find_installed_packages(dep)
+					if blocked != []:
+						raise BlockedException, (self.get_cpv(), blocked[0].get_cpv())
+				continue # finished with the blocking one -> next
 
 			pkg = find_best_match(dep)
 			if not pkg: # try to find masked ones
