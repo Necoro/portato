@@ -170,9 +170,10 @@ class PreferenceWindow (AbstractDialog):
 	# all edits in the window
 	# widget name -> option name
 	edits = {
-			"maskFileEdit"	: "maskFile_opt",
-			"testFileEdit"	: "testingFile_opt",
-			"useFileEdit"	: "useFile_opt"
+			"maskFileEdit"		: "maskFile_opt",
+			"testFileEdit"		: "testingFile_opt",
+			"useFileEdit"		: "useFile_opt",
+			"syncCommandEdit"	: "syncCmd_opt"
 			}
 
 	def __init__ (self, parent, cfg):
@@ -191,7 +192,6 @@ class PreferenceWindow (AbstractDialog):
 		# set the bg-color of the hint
 		hintEB = self.tree.get_widget("hintEB")
 		hintEB.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#f3f785"))
-
 
 		for box in self.checkboxes:
 			self.tree.get_widget(box).\
@@ -735,6 +735,9 @@ class MainWindow (Window):
 			flags.write_use_flags()
 		
 		if len(flags.new_masked)>0 or len(flags.new_unmasked)>0 or len(flags.newTesting)>0:
+			debug("new masked:",flags.new_masked)
+			debug("new unmasked:", flags.new_unmasked)
+			debug("new testing:", flags.newTesting)
 			changed_flags_dialog("masking keywords")
 			flags.write_masked()
 			flags.write_testing()
@@ -799,7 +802,13 @@ class MainWindow (Window):
 			not_root_dialog()
 		else:
 			self.notebook.set_current_page(self.CONSOLE_PAGE)
-			self.queue.sync()
+			cmd = self.cfg.get(self.cfg.const["syncCmd_opt"])
+
+			if cmd != "emerge --sync":
+				cmd = cmd.split()
+				self.queue.sync(cmd)
+			else:
+				self.queue.sync()
 	
 	@Window.watch_cursor
 	def cb_reload_clicked (self, action):

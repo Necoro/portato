@@ -1,5 +1,6 @@
 0.5.1:
 - new config parser and new config-layout
+- added sync-command option
 
 0.5.0:
 - rewritten GTK-Frontend using Glade

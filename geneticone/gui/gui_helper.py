@@ -39,7 +39,8 @@ class Config:
 			"debug_opt" : "debug",
 			"oneshot_opt" : "oneshot",
 			"deep_opt" : "deep",
-			"newuse_opt" : "newuse"
+			"newuse_opt" : "newuse",
+			"syncCmd_opt" : "synccommand"
 			}
 	
 	def __init__ (self, cfgFile):
@@ -421,7 +422,7 @@ class EmergeQueue:
 			self.db.reload(cat)
 			debug("Category %s refreshed" % cat)
 
-	def _emerge (self, options, packages, it):
+	def _emerge (self, options, packages, it, command = ["/usr/bin/python","/usr/bin/emerge"]):
 		"""Calls emerge and updates the terminal.
 		
 		@param options: options to send to emerge
@@ -429,14 +430,16 @@ class EmergeQueue:
 		@param packages: packages to emerge
 		@type packages: list
 		@param it: Iterators which point to these entries whose children will be removed after completion.
-		@type it: Iterator[]"""
+		@type it: Iterator[]
+		@param command: the command to execute - default is "/usr/bin/python /usr/bin/emerge"
+		@type command: string[]"""
 
 		# open tty
 		(master, slave) = pty.openpty()
 		self.console.set_pty(master)
 		
 		# start emerge
-		process = Popen(["/usr/bin/python","/usr/bin/emerge"]+options+packages, stdout = slave, stderr = STDOUT, shell = False)
+		process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False)
 		
 		# start thread waiting for the stop of emerge
 		Thread(target=self._update_packages, args=(packages+self.deps.keys(), process)).start()
@@ -511,9 +514,16 @@ class EmergeQueue:
 
 		self._emerge(options, ["world"], [self.emergeIt])
 
-	def sync (self):
-		"""Calls "emerge --sync"."""
-		self._emerge(["--sync"], [], [])
+	def sync (self, command = None):
+		"""Calls "emerge --sync".
+		
+		@param command: command to execute to sync. If None "emerge --sync" is taken.
+		@type command: string[]"""
+
+		if command == None:
+			self._emerge(["--sync"], [], [])
+		else:
+			self._emerge([],[],[], command = command)
 
 	def remove_with_children (self, it, removeNewFlags = True):
 		"""Convenience function which removes all children of an iterator and than the iterator itself.
