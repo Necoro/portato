@@ -195,13 +195,11 @@ class PreferenceWindow (AbstractDialog):
 
 		for box in self.checkboxes:
 			self.tree.get_widget(box).\
-					set_active(self.cfg.get_boolean(\
-					self.cfg.const[self.checkboxes[box]]))
+					set_active(self.cfg.get_boolean(self.checkboxes[box]))
 
 		for edit in self.edits:
 			self.tree.get_widget(edit).\
-					set_text(self.cfg.get(\
-					self.cfg.const[self.edits[edit]]))
+					set_text(self.cfg.get(self.edits[edit]))
 
 		self.window.show_all()
 
@@ -209,19 +207,19 @@ class PreferenceWindow (AbstractDialog):
 		"""Sets all options in the Config-instance."""
 		
 		for box in self.checkboxes:
-			self.cfg.set_boolean(\
-					self.cfg.const[self.checkboxes[box]],\
-					self.tree.get_widget(box).get_active())
+			self.cfg.set_boolean(self.checkboxes[box], self.tree.get_widget(box).get_active())
 
 		for edit in self.edits:
-			self.cfg.set(\
-					self.cfg.const[self.edits[edit]],\
-					self.tree.get_widget(edit).get_text())
+			self.cfg.set(self.edits[edit],self.tree.get_widget(edit).get_text())
 					
 	def cb_ok_clicked(self, button):
 		"""Saves, writes to config-file and closes the window."""
 		self._save()
-		self.cfg.write()
+		try:
+			self.cfg.write()
+		except IOError, e:
+			io_ex_dialog(e)
+
 		self.window.destroy()
 
 	def cb_cancel_clicked (self, button):
@@ -577,7 +575,12 @@ class MainWindow (Window):
 		self.db.populate()
 
 		# config
-		self.cfg = Config(CONFIG_LOCATION)
+		try:
+			self.cfg = Config(CONFIG_LOCATION)
+		except IOError, e:
+			io_ex_dialog(e)
+			raise e
+
 		self.cfg.modify_external_configs()
 
 		# set vpaned position
@@ -746,7 +749,7 @@ class MainWindow (Window):
 		if not self.doUpdate:
 			self.queue.emerge(force=True)
 		else:
-			self.queue.update_world(force=True, newuse = self.cfg.get_boolean(self.cfg.const["newuse_opt"]), deep = self.cfg.get_boolean(self.cfg.const["deep_opt"]))
+			self.queue.update_world(force=True, newuse = self.cfg.get_boolean("newuse_opt"), deep = self.cfg.get_boolean("deep_opt"))
 			self.doUpdate = False
 		
 	def cb_unmerge_clicked (self, button):
@@ -762,7 +765,7 @@ class MainWindow (Window):
 			not_root_dialog()
 		
 		else:
-			updating = backend.update_world(newuse = self.cfg.get_boolean(self.cfg.const["newuse_opt"]), deep = self.cfg.get_boolean(self.cfg.const["deep_opt"]))
+			updating = backend.update_world(newuse = self.cfg.get_boolean("newuse_opt"), deep = self.cfg.get_boolean("deep_opt"))
 
 			debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating])
 			try:
@@ -802,7 +805,7 @@ class MainWindow (Window):
 			not_root_dialog()
 		else:
 			self.notebook.set_current_page(self.CONSOLE_PAGE)
-			cmd = self.cfg.get(self.cfg.const["syncCmd_opt"])
+			cmd = self.cfg.get("syncCmd_opt")
 
 			if cmd != "emerge --sync":
 				cmd = cmd.split()
@@ -861,12 +864,12 @@ class MainWindow (Window):
 		store, it = sel.get_selected()
 		if it:
 			package = store.get_value(it, 0)
-			if not self.cfg.get_local(package, self.cfg.const["oneshot_opt"]):
+			if not self.cfg.get_local(package, "oneshot_opt"):
 				set = True
 			else:
 				set = False
 			
-			self.cfg.set_local(package, self.cfg.const["oneshot_opt"], set)
+			self.cfg.set_local(package, "oneshot_opt", set)
 			self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
 	
 	def cb_destroy (self, widget):

@@ -58,27 +58,37 @@ class Config:
 		# local configs
 		self.local = {}
 
-	def get(self, name, section=const["main_sec"]):
+	def get(self, name, section=const["main_sec"], constName = True):
 		"""Gets an option.
 		
 		@param name: name of the option
 		@type name: string
 		@param section: section to look in; default is Main-Section
 		@type section: string
+		@param constName: If True (the default), the option names are first looked up in the const-dict.
+		@type constName: boolean
 		@return: the option's value
 		@rtype: string"""
 
+		if constName:
+			name = self.const[name]
+
 		return self._cfg.get(name, section)
 
-	def get_boolean(self, name, section=const["main_sec"]):
+	def get_boolean(self, name, section=const["main_sec"], constName = True):
 		"""Gets a boolean option.
 			
 		@param name: name of the option
 		@type name: string
 		@param section: section to look in; default is Main-Section
 		@type section: string
+		@param constName: If True (the default), the option names are first looked up in the const-dict.
+		@type constName: boolean
 		@return: the option's value
 		@rtype: boolean"""
+
+		if constName:
+			name = self.const[name]
 
 		return self._cfg.get_boolean(name, section)
 
@@ -87,18 +97,18 @@ class Config:
 		@see: L{flags.set_config()}"""
 
 		flagCfg = {
-				"usefile": self.get(self.const["useFile_opt"]), 
-				"usePerVersion" : self.get_boolean(self.const["usePerVersion_opt"]),
-				"maskfile" : self.get(self.const["maskFile_opt"]),
-				"maskPerVersion" : self.get_boolean(self.const["maskPerVersion_opt"]),
-				"testingfile" : self.get(self.const["testingFile_opt"]),
-				"testingPerVersion" : self.get_boolean(self.const["testingPerVersion_opt"])}
+				"usefile": self.get("useFile_opt"), 
+				"usePerVersion" : self.get_boolean("usePerVersion_opt"),
+				"maskfile" : self.get("maskFile_opt"),
+				"maskPerVersion" : self.get_boolean("maskPerVersion_opt"),
+				"testingfile" : self.get("testingFile_opt"),
+				"testingPerVersion" : self.get_boolean("testingPerVersion_opt")}
 		flags.set_config(flagCfg)
 
 	def modify_debug_config (self):
 		"""Sets the external debug-config.
 		@see: L{helper.set_debug()}"""
-		set_debug(self.get_boolean(self.const["debug_opt"]))
+		set_debug(self.get_boolean("debug_opt"))
 
 	def modify_external_configs (self):
 		"""Convenience function setting all external configs."""
@@ -137,7 +147,7 @@ class Config:
 
 		return self.local[cpv][name]
 
-	def set(self, name, val, section=const["main_sec"]):
+	def set(self, name, val, section=const["main_sec"], constName = True):
 		"""Sets an option.
 		
 		@param name: name of the option
@@ -145,11 +155,16 @@ class Config:
 		@param val: value to set the option to
 		@type val: string
 		@param section: section to look in; default is Main-Section
-		@type section: string"""
+		@type section: string
+		@param constName: If True (the default), the option names are first looked up in the const-dict.
+		@type constName: boolean"""
+
+		if constName:
+			name = self.const[name]
 
 		self._cfg.set(name, val, section)
 
-	def set_boolean (self, name, val, section=const["main_sec"]):
+	def set_boolean (self, name, val, section=const["main_sec"], constName = True):
 		"""Sets a boolean option.
 		
 		@param name: name of the option
@@ -157,7 +172,12 @@ class Config:
 		@param val: value to set the option to
 		@type val: boolean
 		@param section: section to look in; default is Main-Section
-		@type section: string"""
+		@type section: string
+		@param constName: If True (the default), the option names are first looked up in the const-dict.
+		@type constName: boolean"""
+
+		if constName:
+			name = self.const[name]
 
 		self._cfg.set_boolean(name, val, section)
 
