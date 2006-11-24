@@ -812,6 +812,14 @@ class MainWindow (Window):
 				self.queue.sync(cmd)
 			else:
 				self.queue.sync()
+
+	def cb_save_flags_clicked (self, action):
+		if not backend.am_i_root():
+			not_root_dialog()
+		else:
+			flags.write_use_flags()
+			flags.write_testing()
+			flags.write_masked()
 	
 	@Window.watch_cursor
 	def cb_reload_clicked (self, action):

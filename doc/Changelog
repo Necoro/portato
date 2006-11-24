@@ -1,6 +1,7 @@
 0.5.1:
 - new config parser and new config-layout
 - added sync-command option
+- added a "Save-Flags"-Menu-Item
 
 0.5.0:
 - rewritten GTK-Frontend using Glade

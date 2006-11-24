@@ -29,7 +29,7 @@ def blocked_dialog (blocked, blocks):
 	return ret
 
 def not_root_dialog ():
-	errorMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "You cannot (un)merge without being root.")
+	errorMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "You are not root.")
 	ret = errorMB.run()
 	errorMB.destroy()
 	return ret
