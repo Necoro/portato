@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# File: geneticone/gui/gui_helper.py
-# This file is part of the Genetic/One-Project, a graphical portage-frontend.
+# File: portato/gui/gui_helper.py
+# This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
@@ -11,12 +11,12 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 # some backend things
-from geneticone import backend
-from geneticone.backend import flags
-from geneticone.helper import *
+from portato import backend
+from portato.backend import flags
+from portato.helper import *
 
 # parser
-from geneticone.config_parser import ConfigParser
+from portato.config_parser import ConfigParser
 
 # the wrapper
 from wrapper import Console, Tree
@@ -381,7 +381,7 @@ class EmergeQueue:
 		@param oneshot: True if this package should not be added to the world-file.
 		@type oneshot: boolean
 		
-		@raises geneticone.backend.PackageNotFoundException: if trying to add a package which does not exist"""
+		@raises portato.backend.PackageNotFoundException: if trying to add a package which does not exist"""
 		
 		if not unmerge: # emerge
 			# insert dependencies

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# File: geneticone/backend/flags.py
-# This file is part of the Genetic/One-Project, a graphical portage-frontend.
+# File: portato/backend/flags.py
+# This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
@@ -14,7 +14,7 @@ import os
 import os.path
 from subprocess import Popen, PIPE # needed for grep
 
-from geneticone.helper import *
+from portato.helper import *
 from portage_helper import split_package_name
 import package
 
@@ -22,9 +22,9 @@ import portage
 from portage_util import unique_array
 
 CONFIG = {
-		"usefile" : "geneticone",
-		"maskfile" : "geneticone",
-		"testingfile" : "geneticone",
+		"usefile" : "portato",
+		"maskfile" : "portato",
+		"testingfile" : "portato",
 		"usePerVersion" : True,
 		"maskPerVersion" : True,
 		"testingPerVersion" : True
@@ -263,7 +263,7 @@ def write_use_flags ():
 		# no more flags there - comment it out
 		if len(list) == 1 or list[1][0] in ("#","\n"):
 			list[0] = "#"+list[0]
-			insert("#removed by geneticone#",list)
+			insert("#removed by portato#",list)
 
 	file_cache = {} # cache for having to read the file only once: name->[lines]
 	for cpv in newUseFlags:
@@ -309,7 +309,7 @@ def write_use_flags ():
 
 		if flagsToAdd:
 		# write new lines
-			msg = "\n#geneticone update#\n"
+			msg = "\n#portato update#\n"
 			if CONFIG["usePerVersion"]: # add on a per-version-base
 				msg += "=%s %s\n" % (cpv, ' '.join(flagsToAdd))
 			else: # add on a per-package-base
@@ -440,7 +440,7 @@ def write_masked ():
 		line = int(line)
 		# add new line
 		if line == -1:
-			msg = "\n#geneticone update#\n"
+			msg = "\n#portato update#\n"
 			if CONFIG["maskPerVersion"]:
 				msg += "=%s\n" % cpv
 			else:
@@ -464,7 +464,7 @@ def write_masked ():
 					i = i+1
 				# delete
 				l = f.readline()
-				l = "#"+l[:-1]+" # removed by geneticone\n"
+				l = "#"+l[:-1]+" # removed by portato\n"
 				lines.append(l)
 				
 				# read the rest
@@ -475,7 +475,7 @@ def write_masked ():
 			else: # in cache
 				l = file_cache[file][line-1]
 				# delete:
-				l = "#"+l[:-1]+" # removed by geneticone\n"
+				l = "#"+l[:-1]+" # removed by portato\n"
 				file_cache[file][line-1] = l
 	
 	
@@ -570,7 +570,7 @@ def write_testing ():
 			line = int(line)
 			# add new line
 			if line == -1:
-				msg = "\n#geneticone update#\n"
+				msg = "\n#portato update#\n"
 				if CONFIG["testingPerVersion"]:
 					msg += "=%s ~%s\n" % (cpv, arch)
 				else:
@@ -594,7 +594,7 @@ def write_testing ():
 						i = i+1
 					# delete
 					l = f.readline()
-					l = "#"+l[:-1]+" # removed by geneticone\n"
+					l = "#"+l[:-1]+" # removed by portato\n"
 					lines.append(l)
 					
 					# read the rest
@@ -605,7 +605,7 @@ def write_testing ():
 				else: # in cache
 					l = file_cache[file][line-1]
 					# delete:
-					l = "#"+l[:-1]+" # removed by geneticone\n"
+					l = "#"+l[:-1]+" # removed by portato\n"
 					file_cache[file][line-1] = l
 	
 	# write to disk

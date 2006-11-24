@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# File: geneticone/gui/gtk/windows.py
-# This file is part of the Genetic/One-Project, a graphical portage-frontend.
+# File: portato/gui/gtk/windows.py
+# This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
@@ -18,14 +18,14 @@ import gtk.glade
 import gobject
 
 #our backend stuff
-from geneticone.helper import *
-from geneticone.constants import CONFIG_LOCATION, VERSION, DATA_DIR
-from geneticone import backend
-from geneticone.backend import flags
-from geneticone.backend.exceptions import *
+from portato.helper import *
+from portato.constants import CONFIG_LOCATION, VERSION, DATA_DIR
+from portato import backend
+from portato.backend import flags
+from portato.backend.exceptions import *
 
 # more GUI stuff
-from geneticone.gui.gui_helper import Database, Config, EmergeQueue
+from portato.gui.gui_helper import Database, Config, EmergeQueue
 from dialogs import *
 from wrapper import GtkTree, GtkConsole
 
@@ -37,7 +37,7 @@ from portage_util import unique_array
 
 class Window:
 	def __init__ (self):
-		self.tree = gtk.glade.XML(DATA_DIR+"geneticone.glade", root = self.__class__.__name__)
+		self.tree = gtk.glade.XML(DATA_DIR+"portato.glade", root = self.__class__.__name__)
 		self.tree.signal_autoconnect(self)
 		self.window = self.tree.get_widget(self.__class__.__name__)
 
@@ -102,7 +102,7 @@ class AboutWindow (AbstractDialog):
 
 		label = self.tree.get_widget("aboutLabel")
 		label.set_markup("""
-<big><b>Genetic/One v.%s</b></big>
+<big><b>Portato v.%s</b></big>
 A Portage-GUI
 		
 This software is licensed under the terms of the GPLv2.
@@ -561,7 +561,7 @@ class MainWindow (Window):
 
 		# main window stuff
 		Window.__init__(self)
-		self.window.set_title(("Genetic/One (%s)" % VERSION))
+		self.window.set_title(("Portato (%s)" % VERSION))
 		mHeight = 800
 		if gtk.gdk.screen_height() <= 800: mHeight = 600
 		self.window.set_geometry_hints (self.window, min_width = 600, min_height = mHeight, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
@@ -619,7 +619,7 @@ class MainWindow (Window):
 		self.packageTable.table.hide_all()
 
 		# popup
-		popupTree = gtk.glade.XML(DATA_DIR+"geneticone.glade", root = "queuePopup")
+		popupTree = gtk.glade.XML(DATA_DIR+"portato.glade", root = "queuePopup")
 		popupTree.signal_autoconnect(self)
 		self.queuePopup = popupTree.get_widget("queuePopup")
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# File: geneticone/backend/__init__.py
-# This file is part of the Genetic/One-Project, a graphical portage-frontend.
+# File: portato/backend/__init__.py
+# This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of

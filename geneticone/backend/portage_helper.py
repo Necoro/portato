@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# File: geneticone/backend/portage_helper.py
-# This file is part of the Genetic/One-Project, a graphical portage-frontend.
+# File: portato/backend/portage_helper.py
+# This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
@@ -15,10 +15,10 @@ import re, os, copy
 import portage, gentoolkit
 from portage_util import unique_array
 
-from geneticone.backend import *
+from portato.backend import *
 import package
 
-from geneticone.helper import debug
+from portato.helper import debug
 
 def find_lambda (name):
 	"""Returns the function needed by all the find_all_*-functions. Returns None if no name is given.

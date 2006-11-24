@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# File: geneticone/gui/gtk/wrapper.py
-# This file is part of the Genetic/One-Project, a graphical portage-frontend.
+# File: portato/gui/gtk/wrapper.py
+# This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from geneticone.gui.wrapper import Tree, Console
+from portato.gui.wrapper import Tree, Console
 
 class GtkTree (Tree):
 	"""The implementation of the abstract tree."""

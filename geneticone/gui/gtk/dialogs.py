@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# File: geneticone/gui/gtk/dialogs.py
-# This file is part of the Genetic/One-Project, a graphical portage-frontend.
+# File: portato/gui/gtk/dialogs.py
+# This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
@@ -48,7 +48,7 @@ def nothing_found_dialog ():
 
 def changed_flags_dialog (what = "flags"):
 	hintMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
-						"You have changed %s. Genetic/One will write these changes into the appropriate files. Please backup them if you think it is necessairy." % what)
+						"You have changed %s. Portato will write these changes into the appropriate files. Please backup them if you think it is necessairy." % what)
 	ret = hintMB.run()
 	hintMB.destroy()
 	return ret

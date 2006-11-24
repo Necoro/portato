@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# File: geneticone/backend/package.py
-# This file is part of the Genetic/One-Project, a graphical portage-frontend.
+# File: portato/backend/package.py
+# This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
@@ -10,8 +10,8 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from geneticone.backend import *
-from geneticone.helper import *
+from portato.backend import *
+from portato.helper import *
 from portage_helper import *
 import flags
 
@@ -21,7 +21,7 @@ from portage_util import unique_array
 import types
 
 class Package (gentoolkit.Package):
-	"""This is a subclass of the gentoolkit.Package-class which a lot of additional functionality we need in Genetic/One."""
+	"""This is a subclass of the gentoolkit.Package-class which a lot of additional functionality we need in Portato."""
 
 	def __init__ (self, cpv):
 		"""Constructor.
@@ -244,9 +244,9 @@ class Package (gentoolkit.Package):
 		@returns: list of cpvs on which the package depend
 		@rtype: string[]
 
-		@raises geneticone.BlockedException: when a package in the dependency-list is blocked by an installed one
-		@raises geneticone.PackageNotFoundException: when a package in the dependency list could not be found in the system
-		@raises geneticone.DependencyCalcError: when an error occured during executing portage.dep_check()"""
+		@raises portato.BlockedException: when a package in the dependency-list is blocked by an installed one
+		@raises portato.PackageNotFoundException: when a package in the dependency list could not be found in the system
+		@raises portato.DependencyCalcError: when an error occured during executing portage.dep_check()"""
 
 		dep_pkgs = [] # the package list
 		
