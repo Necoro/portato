@@ -262,7 +262,7 @@ class Package (gentoolkit.Package):
 
 		# let portage do the main stuff ;)
 		# pay attention to any changes here
-		deps = portage.dep_check (self.get_env_var("RDEPEND")+" "+self.get_env_var("DEPEND")+" "+self.get_env_var("PDEPEND"), vartree.dbapi, self._settings, myuse = actual)
+		deps = portage.dep_check (self.get_env_var("RDEPEND")+" "+self.get_env_var("DEPEND")+" "+self.get_env_var("PDEPEND"), vartree.dbapi, self._settings, myuse = actual, trees = trees)
 		
 		if not deps: # FIXME: what is the difference to [1, []] ?
 			return [] 

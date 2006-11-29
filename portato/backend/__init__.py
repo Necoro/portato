@@ -26,6 +26,7 @@ portage.settings = None # we use our own one ...
 # portage tree vars
 porttree = gentoolkit.porttree
 vartree = gentoolkit.vartree
+trees = portage.db
 
 # import our packages
 from exceptions import *
