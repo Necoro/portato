@@ -10,23 +10,23 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-import sys
+import sys, copy
+from threading import Lock
 
-# insert the gentoolkit-location into syspath
-sys.path.insert(0, "/usr/lib/gentoolkit/pym")
-
-# import gentoolkit and portage
-import gentoolkit
+# import portage
 import portage
+
+# portage tree vars
+settingslock = Lock()
+settings = portage.config(clone=portage.settings, config_incrementals = copy.deepcopy(portage.settings.incrementals))
+porttree = portage.db[portage.root]["porttree"]
+vartree  = portage.db[portage.root]["vartree"]
+virtuals = portage.db[portage.root]["virtuals"]
+trees = portage.db
 
 # this is set to "var/lib/portage/world" by default - so we add the leading /
 portage.WORLD_FILE = portage.settings["ROOT"]+portage.WORLD_FILE
 portage.settings = None # we use our own one ...
-
-# portage tree vars
-porttree = gentoolkit.porttree
-vartree = gentoolkit.vartree
-trees = portage.db
 
 # import our packages
 from exceptions import *

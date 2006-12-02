@@ -12,7 +12,7 @@
 
 import re, os, copy
 
-import portage, gentoolkit
+import portage
 from portage_util import unique_array
 
 from portato.backend import *
@@ -76,7 +76,30 @@ def find_packages (search_key, masked=False):
 	@returns: list of found packages
 	@rtype: backend.Package[]"""
 
-	return geneticize_list(gentoolkit.find_packages(search_key, masked))
+	try:
+		if masked:
+			t = portage.db["/"]["porttree"].dbapi.xmatch("match-all", search_key)
+			t += portage.db["/"]["vartree"].dbapi.match(search_key)
+		else:
+			t = portage.db["/"]["porttree"].dbapi.match(search_key)
+			t += portage.db["/"]["vartree"].dbapi.match(search_key)
+	# catch the "amgigous package" Exception
+	except ValueError, e:
+		if type(e[0]) == types.ListType:
+			t = []
+			for cp in e[0]:
+				if masked:
+					t += portage.db["/"]["porttree"].dbapi.xmatch("match-all", cp)
+					t += portage.db["/"]["vartree"].dbapi.match(cp)
+				else:
+					t += portage.db["/"]["porttree"].dbapi.match(cp)
+					t += portage.db["/"]["vartree"].dbapi.match(cp)
+		else:
+			raise ValueError(e)
+	# Make the list of packages unique
+	t = unique_array(t)
+	t.sort()
+	return geneticize_list(t)
 
 def find_installed_packages (search_key, masked=False):
 	"""This returns a list of packages which have to fit exactly. Additionally ranges like '<,>,=,~,!' et. al. are possible.
@@ -89,7 +112,18 @@ def find_installed_packages (search_key, masked=False):
 	@returns: list of found packages
 	@rtype: backend.Package[]"""
 
-	return geneticize_list(gentoolkit.find_installed_packages(search_key, masked))
+	try:
+		t = portage.db["/"]["vartree"].dbapi.match(search_key)
+	# catch the "amgigous package" Exception
+	except ValueError, e:
+		if type(e[0]) == types.ListType:
+			t = []
+			for cp in e[0]:
+				t += portage.db["/"]["vartree"].dbapi.match(cp)
+		else:
+			raise ValueError(e)
+
+	return geneticize_list(t)
 
 def find_system_packages ():
 	"""Looks for all packages saved as "system-packages".
@@ -97,8 +131,18 @@ def find_system_packages ():
 	@returns: a tuple of (resolved_packages, unresolved_packages).
 	@rtype: (backend.Package[], backend.Package[])"""
 
-	list = gentoolkit.find_system_packages()
-	return (geneticize_list(list[0]), geneticize_list(list[1]))
+	pkglist = settings.packages
+	resolved = []
+	unresolved = []
+	for x in pkglist:
+		cpv = x.strip()
+		if len(cpv) and cpv[0] == "*":
+			pkg = find_best_match(cpv)
+			if pkg:
+				resolved.append(pkg)
+			else:
+				unresolved.append(cpv)
+	return (geneticize_list(resolved), geneticize_list(unresolved))
 
 def find_world_packages ():
 	"""Looks for all packages saved in the world-file.
@@ -106,8 +150,19 @@ def find_world_packages ():
 	@returns: a tuple of (resolved_packages, unresolved_packages).
 	@rtype: (backend.Package[], backend.Package[])"""
 
-	list = gentoolkit.find_world_packages()
-	return geneticize_list(list[0]),geneticize_list(list[1])
+	f = open(portage.WORLD_FILE)
+	pkglist = f.readlines()
+	resolved = []
+	unresolved = []
+	for x in pkglist:
+		cpv = x.strip()
+		if len(cpv) and cpv[0] != "#":
+			pkg = find_best_match(cpv)
+			if pkg:
+				resolved.append(pkg)
+			else:
+				unresolved.append(cpv)
+	return (geneticize_list(resolved), geneticize_list(unresolved))
 
 def find_all_installed_packages (name=None, withVersion=True):
 	"""Finds all installed packages matching a name or all if no name is specified.
@@ -121,7 +176,11 @@ def find_all_installed_packages (name=None, withVersion=True):
 	@rtype: backend.Package[] or cp-string[]"""
 
 	if withVersion:
-		return geneticize_list(gentoolkit.find_all_installed_packages(find_lambda(name)))
+		t = vartree.dbapi.cpv_all()
+		if name:
+			t = filter(find_lambda(name),t)
+		return geneticize_list(t)
+	
 	else:
 		t = vartree.dbapi.cp_all()
 		if name:
@@ -136,7 +195,8 @@ def find_all_uninstalled_packages (name=None):
 	@returns: all packages found
 	@rtype: backend.Package[]"""
 
-	return geneticize_list(gentoolkit.find_all_uninstalled_packages(find_lambda(name)))
+	alist = find_all_packages(name)
+	return geneticize_list([x for x in alist if not x.is_installed()])	
 
 def find_all_packages (name=None, withVersion=True):
 	"""Finds all packages matching a name or all if no name is specified.
@@ -149,15 +209,21 @@ def find_all_packages (name=None, withVersion=True):
 	@returns: all packages/cp-strings found
 	@rtype: backend.Package[] or cp-string[]"""
 	
+	t = porttree.dbapi.cp_all()
+	t += vartree.dbapi.cp_all()
+	if name:
+		t = filter(find_lambda(name),t)
+	t = unique_array(t)
+	
 	if (withVersion):
-		return geneticize_list(gentoolkit.find_all_packages(find_lambda(name)))
+		t2 = []
+		for x in t:
+			t2 += porttree.dbapi.cp_list(x)
+			t2 += vartree.dbapi.cp_list(x)
+			t2 = unique_array(t2)
+		return geneticize_list(t2)
 	else:
-		t = porttree.dbapi.cp_all()
-		t += vartree.dbapi.cp_all()
-		t = unique_array(t)
-		if name:
-			t = filter(find_lambda(name),t)
-		return t
+		return t;
 
 def find_all_world_packages (name=None):
 	"""Finds all world packages matching a name or all if no name is specified.
@@ -214,7 +280,7 @@ def list_categories (name=None):
 	@returns: all categories found
 	@rtype: string[]"""
 
-	categories = gentoolkit.settings.categories
+	categories = settings.categories
 	return filter(find_lambda(name), categories)
 
 def split_package_name (name):
@@ -224,20 +290,31 @@ def split_package_name (name):
 	@type name: string
 	@returns: list: [category, name, version, rev] whereby rev is "r0" if not specified in the name
 	@rtype: string[]"""
-
-	return gentoolkit.split_package_name(name)
+	
+	r = portage.catpkgsplit(name)
+	if not r:
+		r = name.split("/")
+		if len(r) == 1:
+			return ["", name, "", "r0"]
+		else:
+			return r + ["", "r0"]
+	if r[0] == 'null':
+		r[0] = ''
+	return r
 
 def sort_package_list(pkglist):
 	"""Sorts a package list in the same manner portage does.
 	
 	@param pkglist: list to sort
 	@type pkglist: Packages[]"""
-
-	return gentoolkit.sort_package_list(pkglist)
+	
+	pkglist.sort(package.Package.compare_version)
+	return pkglist
 
 def reload_settings ():
 	"""Reloads portage."""
-	gentoolkit.settings = portage.config(config_incrementals = copy.deepcopy(gentoolkit.settings.incrementals))
+	global settings
+	settings = portage.config(config_incrementals = copy.deepcopy(settings.incrementals))
 
 def update_world (newuse = False, deep = False):
 	"""Calculates the packages to get updated in an update world.
@@ -259,7 +336,7 @@ def update_world (newuse = False, deep = False):
 		packages.append(line)
 	world.close()
 
-	sys = gentoolkit.settings.packages
+	sys = settings.packages
 	for x in sys:
 		if x[0] == "*":
 			x = x[1:]
@@ -268,9 +345,9 @@ def update_world (newuse = False, deep = False):
 	# Remove everything that is package.provided from our list
 	# This is copied from emerge.getlist()
 	for atom in packages[:]:
-		for expanded_atom in portage.flatten(portage.dep_virtual([atom], gentoolkit.settings)):
+		for expanded_atom in portage.flatten(portage.dep_virtual([atom], settings)):
 			mykey = portage.dep_getkey(expanded_atom)
-			if mykey in gentoolkit.settings.pprovideddict and portage.match_from_list(expanded_atom, settings.pprovideddict[mykey]):
+			if mykey in settings.pprovideddict and portage.match_from_list(expanded_atom, settings.pprovideddict[mykey]):
 					packages.remove(atom)
 					break
 
@@ -342,7 +419,7 @@ def get_use_desc (flag, package = None):
 	# fill cache if needed
 	if use_descs == {} or local_use_descs == {}:
 		# read use.desc
-		fd = open(gentoolkit.settings["PORTDIR"]+"/profiles/use.desc")
+		fd = open(settings["PORTDIR"]+"/profiles/use.desc")
 		for line in fd.readlines():
 			line = line.strip()
 			if line != "" and line[0] != '#':
@@ -351,7 +428,7 @@ def get_use_desc (flag, package = None):
 					use_descs[fields[0]] = fields[1]
 
 		# read use.local.desc
-		fd = open(gentoolkit.settings["PORTDIR"]+"/profiles/use.local.desc")
+		fd = open(settings["PORTDIR"]+"/profiles/use.local.desc")
 		for line in fd.readlines():
 			line = line.strip()
 			if line != "" and line[0] != '#':

@@ -15,12 +15,12 @@ from portato.helper import *
 from portage_helper import *
 import flags
 
-import portage, portage_dep, gentoolkit
+import portage, portage_dep
 from portage_util import unique_array
 
 import types
 
-class Package (gentoolkit.Package):
+class Package:
 	"""This is a subclass of the gentoolkit.Package-class which a lot of additional functionality we need in Portato."""
 
 	def __init__ (self, cpv):
@@ -29,14 +29,30 @@ class Package (gentoolkit.Package):
 		@param cpv: The cpv or gentoolkit.Package which describes the package to create.
 		@type cpv: string (cat/pkg-ver) or gentoolkit.Package-object."""
 
-		if isinstance(cpv, gentoolkit.Package):
-			cpv = cpv.get_cpv()
-		gentoolkit.Package.__init__(self, cpv)
+		self._cpv = cpv
+		self._scpv = portage.catpkgsplit(self._cpv)
+		
+		if not self._scpv:
+			raise FatalError("invalid cpv: %s" % cpv)
+		self._db = None
+		self._settings = settings
+		self._settingslock = settingslock
+		
 		try:
-			self._status = portage.getmaskingstatus(self.get_cpv(), settings = gentoolkit.settings)
+			self._status = portage.getmaskingstatus(self.get_cpv(), settings = settings)
 		except KeyError: # package is not located in the system
 			self._status = None
 	
+	def is_installed(self):
+		"""Returns true if this package is installed (merged)"""
+		self._initdb()
+		return os.path.exists(self._db.getpath())
+
+	def is_overlay(self):
+		"""Returns true if the package is in an overlay."""
+		dir,ovl = portage.portdb.findname2(self._cpv)
+		return ovl != settings["PORTDIR"]
+
 	def is_in_system (self):
 		"""Returns False if the package could not be found in the portage system.
 
@@ -302,6 +318,10 @@ class Package (gentoolkit.Package):
 
 		return dep_pkgs
 
+	def get_cpv(self):
+		"""Returns full Category/Package-Version string"""
+		return self._cpv
+
 	def get_cp (self):
 		"""Returns the cp-string.
 		
@@ -309,6 +329,88 @@ class Package (gentoolkit.Package):
 		@rtype: string"""
 		
 		return self.get_category()+"/"+self.get_name()
+
+	def get_name(self):
+		"""Returns base name of package, no category nor version"""
+		return self._scpv[1]
+
+	def get_version(self):
+		"""Returns version of package, with revision number"""
+		v = self._scpv[2]
+		if self._scpv[3] != "r0":
+			v += "-" + self._scpv[3]
+		return v
+
+	def get_category(self):
+		"""Returns category of package"""
+		return self._scpv[0]
+
+	def get_settings(self, key):
+		"""Returns the value of the given key for this package (useful 
+		for package.* files."""
+		self._settingslock.acquire()
+		self._settings.setcpv(self._cpv)
+		v = self._settings[key]
+		self._settingslock.release()
+		return v
+
+	def get_ebuild_path(self,in_vartree=0):
+		"""Returns the complete path to the .ebuild file"""
+		if in_vartree:
+			return vartree.getebuildpath(self._cpv)
+		else:
+			return portage.portdb.findname(self._cpv)
+
+	def get_package_path(self):
+		"""Returns the path to where the ChangeLog, Manifest, .ebuild files reside"""
+		p = self.get_ebuild_path()
+		sp = p.split("/")
+		if len(sp):
+			return string.join(sp[:-1],"/")
+
+	def get_env_var(self, var, tree=""):
+		"""Returns one of the predefined env vars DEPEND, RDEPEND, SRC_URI,...."""
+		if tree == "":
+			mytree = vartree
+			if not self.is_installed():
+				mytree = porttree
+		else:
+			mytree = tree
+		r = mytree.dbapi.aux_get(self._cpv,[var])
+		if not r:
+			raise FatalError("Could not find the package tree")
+		if len(r) != 1:
+			raise FatalError("Should only get one element!")
+		return r[0]
+
+	def get_use_flags(self):
+		"""Returns the USE flags active at time of installation"""
+		self._initdb()
+		if self.is_installed():
+			return self._db.getfile("USE")
+		return ""
+
+	def compare_version(self,other):
+		"""Compares this package's version to another's CPV; returns -1, 0, 1"""
+		v1 = self._scpv
+		v2 = portage.catpkgsplit(other.get_cpv())
+		# if category is different
+		if v1[0] != v2[0]:
+			return cmp(v1[0],v2[0])
+		# if name is different
+		elif v1[1] != v2[1]:
+			return cmp(v1[1],v2[1])
+		# Compaare versions
+		else:
+			return portage.pkgcmp(v1[1:],v2[1:])
+
+	def _initdb(self):
+		"""Internal helper function; loads package information from disk,
+		when necessary"""
+		if not self._db:
+			cat = self.get_category()
+			pnv = self.get_name()+"-"+self.get_version()
+			self._db = portage.dblink(cat,pnv,settings["ROOT"],settings)
 
 	def matches (self, criterion):
 		"""This checks, whether this package matches a specific verisioning criterion - e.g.: "<=net-im/foobar-1.2".
