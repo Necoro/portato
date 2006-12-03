@@ -176,6 +176,12 @@ class Console:
 		@type pty: file-descriptor"""
 		raise NotImplementedError
 
+	def get_window_title (self):
+		"""This should return the current title of the console. If this is not possible, it must return None.
+
+		@returns: title of the console or None"""
+		raise NotImplementedError
+
 	def get_original(self):
 		"""Returns the original console-object.
 		

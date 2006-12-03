@@ -98,6 +98,9 @@ class GtkConsole (Console):
 		
 		self.console = console
 
+	def get_window_title(self):
+		return self.console.get_window_title()
+
 	def set_pty (self, pty):
 		self.console.set_pty(pty)
 

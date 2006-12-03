@@ -25,6 +25,7 @@ from wrapper import Console, Tree
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
 import pty
+import time
 
 class Config:
 	"""Wrapper around a ConfigParser and for additional local configurations."""
@@ -242,7 +243,7 @@ class Database:
 class EmergeQueue:
 	"""This class manages the emerge queue."""
 	
-	def __init__ (self, tree = None, console = None, db = None):
+	def __init__ (self, tree = None, console = None, db = None, title_update = None):
 		"""Constructor.
 		
 		@param tree: Tree to append all the items to.
@@ -269,6 +270,7 @@ class EmergeQueue:
 		if self.console and not isinstance(self.console, Console): raise TypeError, "console passed is not a Console-object"
 		
 		self.db = db
+		self.title_update = title_update
 		
 		# our iterators pointing at the toplevels; they are set to None if we do not have a tree
 		if self.tree: 
@@ -432,8 +434,18 @@ class EmergeQueue:
 		@type packages: list of cpvs
 		@param process: The process we have to wait for before we can do our work.
 		@type process: subprocess.Popen"""
+		
+		old_title = self.console.get_window_title()
+		if process: 
+			while process.poll() == None:
+				if self.title_update : 
+					title = self.console.get_window_title()
+					if title != old_title:
+						self.title_update(title)
+					time.sleep(0.5)
 
-		if process: process.wait()
+		if self.title_update: self.title_update(None)
+
 		for p in packages:
 			if p in ["world", "system"]: continue
 			cat = backend.split_package_name(p)[0] # get category

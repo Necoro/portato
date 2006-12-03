@@ -605,10 +605,10 @@ class MainWindow (Window):
 		# XXX why is this not working with the colors
 		term.set_color_background(gtk.gdk.color_parse("white"))
 		term.set_color_foreground(gtk.gdk.color_parse("black"))
-		termHB = self.tree.get_widget("termHB")
+		self.termHB = self.tree.get_widget("termHB")
 		termScroll = gtk.VScrollbar(term.get_adjustment())
-		termHB.pack_start(term, True, True)
-		termHB.pack_start(termScroll, False)
+		self.termHB.pack_start(term, True, True)
+		self.termHB.pack_start(termScroll, False)
 		
 		# notebook
 		self.notebook = self.tree.get_widget("notebook")
@@ -625,7 +625,7 @@ class MainWindow (Window):
 
 		# set emerge queue
 		self.queueTree = GtkTree(self.queueList.get_model())
-		self.queue = EmergeQueue(console = GtkConsole(term), tree = self.queueTree, db = self.db)
+		self.queue = EmergeQueue(console = GtkConsole(term), tree = self.queueTree, db = self.db, title_update = self.title_update)
 
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)
@@ -694,6 +694,16 @@ class MainWindow (Window):
 	def jump_to (self, cp):
 		"""Is called when we want to jump to a specific package."""
 		self.show_package(cp, self.queue)
+
+	def title_update (self, title):
+		def caller(self, t):
+			self.notebook.set_tab_label_text(self.termHB, t)
+		
+		if title == None: title = "Console"
+		else: title = ("Console (%s)" % title)
+
+		gobject.idle_add(caller, self, title)
+		
 
 	def cb_cat_list_selection (self, view):
 		"""Callback for a category-list selection. Updates the package list with the packages in the category."""

@@ -1,6 +1,7 @@
 0.5.2:
 - removed gentoolkit-dependency
 - added support for portage-2.1.2
+- added console-status
 
 0.5.1:
 - new config parser and new config-layout
