@@ -779,8 +779,14 @@ class MainWindow (Window):
 
 			debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating])
 			try:
-				for pkg, old_pkg in updating:
-					self.queue.append(pkg.get_cpv())
+				try:
+					for pkg, old_pkg in updating:
+						self.queue.append(pkg.get_cpv(), unmask = False)
+				except PackageNotFoundException, e:
+					if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
+						for pkg, old_pkg in updating:
+							self.queue.append(pkg.get_cpv(), unmask = True)
+			
 			except BlockedException, e:
 				blocked_dialog(e[0], e[1])
 			if len(updating): self.doUpdate = True

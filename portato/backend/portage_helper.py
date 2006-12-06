@@ -78,22 +78,22 @@ def find_packages (search_key, masked=False):
 
 	try:
 		if masked:
-			t = portage.db["/"]["porttree"].dbapi.xmatch("match-all", search_key)
-			t += portage.db["/"]["vartree"].dbapi.match(search_key)
+			t = porttree.dbapi.xmatch("match-all", search_key)
+			t += vartree.dbapi.match(search_key)
 		else:
-			t = portage.db["/"]["porttree"].dbapi.match(search_key)
-			t += portage.db["/"]["vartree"].dbapi.match(search_key)
-	# catch the "amgigous package" Exception
+			t = porttree.dbapi.match(search_key)
+			t += vartree.dbapi.match(search_key)
+	# catch the "ambigous package" Exception
 	except ValueError, e:
 		if type(e[0]) == types.ListType:
 			t = []
 			for cp in e[0]:
 				if masked:
-					t += portage.db["/"]["porttree"].dbapi.xmatch("match-all", cp)
-					t += portage.db["/"]["vartree"].dbapi.match(cp)
+					t += porttree.dbapi.xmatch("match-all", cp)
+					t += vartree.dbapi.match(cp)
 				else:
-					t += portage.db["/"]["porttree"].dbapi.match(cp)
-					t += portage.db["/"]["vartree"].dbapi.match(cp)
+					t += porttree.dbapi.match(cp)
+					t += vartree.dbapi.match(cp)
 		else:
 			raise ValueError(e)
 	# Make the list of packages unique
@@ -113,13 +113,13 @@ def find_installed_packages (search_key, masked=False):
 	@rtype: backend.Package[]"""
 
 	try:
-		t = portage.db["/"]["vartree"].dbapi.match(search_key)
-	# catch the "amgigous package" Exception
+		t = vartree.dbapi.match(search_key)
+	# catch the "ambigous package" Exception
 	except ValueError, e:
 		if type(e[0]) == types.ListType:
 			t = []
 			for cp in e[0]:
-				t += portage.db["/"]["vartree"].dbapi.match(cp)
+				t += vartree.dbapi.match(cp)
 		else:
 			raise ValueError(e)
 

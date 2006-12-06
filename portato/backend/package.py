@@ -19,27 +19,29 @@ import portage, portage_dep
 from portage_util import unique_array
 
 import types
+import os.path
 
 class Package:
-	"""This is a subclass of the gentoolkit.Package-class which a lot of additional functionality we need in Portato."""
+	"""This is a class abstracting a normal package which can be installed."""
 
 	def __init__ (self, cpv):
 		"""Constructor.
 
-		@param cpv: The cpv or gentoolkit.Package which describes the package to create.
-		@type cpv: string (cat/pkg-ver) or gentoolkit.Package-object."""
+		@param cpv: The cpv which describes the package to create.
+		@type cpv: string (cat/pkg-ver)"""
 
 		self._cpv = cpv
 		self._scpv = portage.catpkgsplit(self._cpv)
 		
 		if not self._scpv:
-			raise FatalError("invalid cpv: %s" % cpv)
+			raise ValueError("invalid cpv: %s" % cpv)
+
 		self._db = None
 		self._settings = settings
 		self._settingslock = settingslock
 		
 		try:
-			self._status = portage.getmaskingstatus(self.get_cpv(), settings = settings)
+			self._status = portage.getmaskingstatus(self.get_cpv(), settings = self._settings)
 		except KeyError: # package is not located in the system
 			self._status = None
 	
@@ -51,7 +53,7 @@ class Package:
 	def is_overlay(self):
 		"""Returns true if the package is in an overlay."""
 		dir,ovl = portage.portdb.findname2(self._cpv)
-		return ovl != settings["PORTDIR"]
+		return ovl != self._settings["PORTDIR"]
 
 	def is_in_system (self):
 		"""Returns False if the package could not be found in the portage system.
@@ -347,7 +349,7 @@ class Package:
 
 	def get_settings(self, key):
 		"""Returns the value of the given key for this package (useful 
-		for package.* files."""
+		for package.* files)."""
 		self._settingslock.acquire()
 		self._settings.setcpv(self._cpv)
 		v = self._settings[key]
@@ -377,10 +379,7 @@ class Package:
 		else:
 			mytree = tree
 		r = mytree.dbapi.aux_get(self._cpv,[var])
-		if not r:
-			raise FatalError("Could not find the package tree")
-		if len(r) != 1:
-			raise FatalError("Should only get one element!")
+		
 		return r[0]
 
 	def get_use_flags(self):
@@ -400,7 +399,7 @@ class Package:
 		# if name is different
 		elif v1[1] != v2[1]:
 			return cmp(v1[1],v2[1])
-		# Compaare versions
+		# Compare versions
 		else:
 			return portage.pkgcmp(v1[1:],v2[1:])
 
@@ -410,7 +409,7 @@ class Package:
 		if not self._db:
 			cat = self.get_category()
 			pnv = self.get_name()+"-"+self.get_version()
-			self._db = portage.dblink(cat,pnv,settings["ROOT"],settings)
+			self._db = portage.dblink(cat, pnv, self._settings["ROOT"], self._settings)
 
 	def matches (self, criterion):
 		"""This checks, whether this package matches a specific verisioning criterion - e.g.: "<=net-im/foobar-1.2".
