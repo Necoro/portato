@@ -282,8 +282,8 @@ class PackageTable:
 		self.instantChange = instantChange
 
 		# packages and installed packages
-		self.packages = backend.sort_package_list(backend.find_packages(cp))
-		self.instPackages = backend.sort_package_list(backend.find_installed_packages(cp))
+		self.packages = backend.sort_package_list(backend.find_packages(cp), masked = True)
+		self.instPackages = backend.sort_package_list(backend.find_installed_packages(cp), masked = True)
 
 		# version-combo-box
 		self.vCombo = self.build_vers_combo()
@@ -378,7 +378,7 @@ class PackageTable:
 					combo.set_active(i)
 					break
 		except AttributeError: # no package found
-			debug('catched AttributeError => no "best package" found. Selected first one.')
+#			debug('catched AttributeError => no "best package" found. Selected first one.')
 			combo.set_active(0)
 
 		combo.connect("changed", self.cb_combo_changed)
