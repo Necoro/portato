@@ -282,8 +282,8 @@ class PackageTable:
 		self.instantChange = instantChange
 
 		# packages and installed packages
-		self.packages = backend.sort_package_list(backend.find_packages(cp), masked = True)
-		self.instPackages = backend.sort_package_list(backend.find_installed_packages(cp), masked = True)
+		self.packages = backend.sort_package_list(backend.find_packages(cp, masked = True))
+		self.instPackages = backend.sort_package_list(backend.find_installed_packages(cp, masked = True))
 
 		# version-combo-box
 		self.vCombo = self.build_vers_combo()
