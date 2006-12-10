@@ -378,27 +378,26 @@ def update_world (newuse = False, deep = False):
 
 		if newuse:
 
-			new = set(p.get_all_use_flags(False)) # IUSE in the ebuild
-			old = set(p.get_all_use_flags(True)) # IUSE in the vardb
-			if old != new:
-				debug(p.get_cpv(),"old:",old)
-				debug(p.get_cpv(),"new:",new)
+			new_iuse = set(p.get_all_use_flags(installed = False)) # IUSE in the ebuild
+			old_iuse = set(p.get_all_use_flags(installed = True)) # IUSE in the vardb
+			
+			if new_iuse.symmetric_difference(old_iuse): # difference between new_iuse and old_iuse
+				debug(p.get_cpv(),"old:",old_iuse)
+				debug(p.get_cpv(),"new:",new_iuse)
 				tempDeep = True
 				if not appended:
 					updating.append((p,p))
 					appended = True
 			
 			else:
-				old = p.get_installed_use_flags()
-				new = p.get_settings("USE").split()
+				old = set(p.get_installed_use_flags())
+				new = set(p.get_settings("USE").split())
 				
-				for u in p.get_all_use_flags():
-					if (u in new) != (u in old):
-						tempDeep = True
-						if not appended:
-							updating.append((p,p))
-							appended = True
-							break
+				if new_iuse.intersection(new) != old_iuse.intersection(old):
+					tempDeep = True
+					if not appended:
+						updating.append((p,p))
+						appended = True
 
 		if deep or tempDeep:
 			for i in p.get_matched_dep_packages():

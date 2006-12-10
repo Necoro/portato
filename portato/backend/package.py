@@ -38,6 +38,10 @@ class Package:
 
 		self._settings = settings
 		self._settingslock = settingslock
+
+		self.forced_flags = set()
+		self.forced_flags.update(self._settings.usemask)
+		self.forced_flags.update(self._settings.useforce)
 		
 		try:
 			self._status = portage.getmaskingstatus(self.get_cpv(), settings = self._settings)
@@ -151,7 +155,7 @@ class Package:
 		else:
 			tree = porttree
 		
-		return unique_array(self.get_env_var("IUSE", tree = tree).split())
+		return list(set(self.get_env_var("IUSE", tree = tree).split()).difference(self.forced_flags))
 
 	def get_installed_use_flags (self):
 		"""Returns a list of the useflags enabled at installation time. If package is not installed, it returns an empty list.
@@ -160,13 +164,10 @@ class Package:
 		@rtype: string[]"""
 		
 		if self.is_installed():
-			uses = self.get_use_flags().split() # all set at installation time
-			iuses = self.get_all_use_flags() # all you can set for the package
-			set = []
-			for u in iuses:
-				if u in uses:
-					set.append(u)
-			return set
+			uses = set(self.get_use_flags().split()) # all set at installation time
+			iuses = set(self.get_all_use_flags(installed=True)) # all you can set for the package
+			
+			return list(uses.intersection(iuses))
 		else:
 			return []
 	
