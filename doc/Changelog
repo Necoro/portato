@@ -2,6 +2,7 @@
 - removed gentoolkit-dependency
 - added support for portage-2.1.2
 - added console-status
+- working slots (for update_world)
 
 0.5.1:
 - new config parser and new config-layout

@@ -336,7 +336,7 @@ class EmergeQueue:
 		try:
 			pkg = self._get_pkg_from_cpv(cpv, unmask)
 			if not pkg.is_installed():
-				old = backend.get_all_installed_versions(pkg.get_cp())
+				old = backend.find_installed_packages(pkg.get_slot_cp())
 				if old: 
 					old = old[0] # assume we have only one there; FIXME: slotted packages
 					update = True

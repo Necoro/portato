@@ -45,6 +45,10 @@ def geneticize_list (list_of_packages):
 	
 	return [package.Package(x) for x in list_of_packages]
 
+def find_best (list):
+
+	return package.Package(portage.best(list))
+
 def find_best_match (search_key, only_installed = False):
 	"""Finds the best match in the portage tree. It does not find masked packages!
 	
@@ -249,29 +253,6 @@ def find_all_system_packages (name=None):
 	sys = unique_array(sys)
 	return geneticize_list(sys)
 
-def get_all_versions (cp):
-	"""Returns all versions of a certain package.
-	
-	@param cp: the package
-	@type cp: string (cat/pkg)
-	@returns: the list of found packages
-	@rtype: backend.Package[]"""
-	
-	t = porttree.dbapi.cp_list(cp)
-	t += vartree.dbapi.cp_list(cp)
-	t = unique_array(t)
-	return geneticize_list(t)
-
-def get_all_installed_versions (cp):
-	"""Returns all installed versions of a certain package.
-	
-	@param cp: the package
-	@type cp: string (cat/pkg)
-	@returns: the list of found packages
-	@rtype: backend.Package[]"""
-	
-	return geneticize_list(vartree.dbapi.cp_list(cp))
-
 def list_categories (name=None):
 	"""Finds all categories matching a name or all if no name is specified.
 
@@ -344,14 +325,34 @@ def update_world (newuse = False, deep = False):
 
 	# Remove everything that is package.provided from our list
 	# This is copied from emerge.getlist()
-	for atom in packages[:]:
-		for expanded_atom in portage.flatten(portage.dep_virtual([atom], settings)):
-			mykey = portage.dep_getkey(expanded_atom)
-			if mykey in settings.pprovideddict and portage.match_from_list(expanded_atom, settings.pprovideddict[mykey]):
-					packages.remove(atom)
-					break
+	#for atom in packages[:]:
+	#	for expanded_atom in portage.flatten(portage.dep_virtual([atom], settings)):
+	#		mykey = portage.dep_getkey(expanded_atom)
+	#		if mykey in settings.pprovideddict and portage.match_from_list(expanded_atom, settings.pprovideddict[mykey]):
+	#				packages.remove(atom)
+	#				break
 
-	packages = [find_best_match(x) for x in packages]
+	
+	def get_new_packages (packages):
+		new_packages = []
+		for p in packages:
+			inst = find_installed_packages(p)
+			if len(inst) > 1:
+				myslots = set()
+				for i in inst: # get the slots of the installed packages
+					myslots.add(i.get_env_var("SLOT"))
+
+				myslots.add(find_best_match(p).get_env_var("SLOT")) # add the slot of the best package in portage
+				for slot in myslots:
+					new_packages.append(\
+							find_best(\
+							[x.get_cpv() for x in find_packages("%s:%s" % (i.get_cp(), slot))]\
+							))
+			else:
+				new_packages.append(find_best_match(p))
+
+		return new_packages
+						
 		
 	checked = []
 	updating = []
@@ -365,9 +366,9 @@ def update_world (newuse = False, deep = False):
 		tempDeep = False
 
 		if not p.is_installed():
-			oldList = find_installed_packages(p.get_cp())
+			oldList = find_installed_packages(p.get_slot_cp())
 			if oldList: 
-				old = oldList[0] # assume we have only one there; FIXME: slotted packages
+				old = oldList[0] # we should only have one package here - else it is a bug
 			else:
 				debug("Bug? Not found installed one:",p.get_cp())
 				return
@@ -376,26 +377,40 @@ def update_world (newuse = False, deep = False):
 			p = old
 
 		if newuse:
-			old = p.get_installed_use_flags()
-			new = p.get_settings("USE").split()
+
+			new = set(p.get_all_use_flags(False)) # IUSE in the ebuild
+			old = set(p.get_all_use_flags(True)) # IUSE in the vardb
+			if old != new:
+				debug(p.get_cpv(),"old:",old)
+				debug(p.get_cpv(),"new:",new)
+				tempDeep = True
+				if not appended:
+					updating.append((p,p))
+					appended = True
 			
-			for u in p.get_all_use_flags():
-				if (u in new) != (u in old):
-					if not appended: 
-						updating.append((p,p))
+			else:
+				old = p.get_installed_use_flags()
+				new = p.get_settings("USE").split()
+				
+				for u in p.get_all_use_flags():
+					if (u in new) != (u in old):
 						tempDeep = True
+						if not appended:
+							updating.append((p,p))
+							appended = True
+							break
 
 		if deep or tempDeep:
 			for i in p.get_matched_dep_packages():
 				if i not in raw_checked:
 					raw_checked.append(i)
-					bm = find_best_match(i)
+					bm = get_new_packages([i])
 					if not bm: 
 						debug("Bug? No best match could be found:",i)
 					else:
-						check(bm)
+						for p in bm: check(p)
 
-	for p in packages:
+	for p in get_new_packages(packages):
 		if not p: continue # if a masked package is installed we have "None" here
 		check(p)
 	

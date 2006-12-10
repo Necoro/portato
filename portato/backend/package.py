@@ -36,7 +36,6 @@ class Package:
 		if not self._scpv:
 			raise ValueError("invalid cpv: %s" % cpv)
 
-		self._db = None
 		self._settings = settings
 		self._settingslock = settingslock
 		
@@ -47,8 +46,7 @@ class Package:
 	
 	def is_installed(self):
 		"""Returns true if this package is installed (merged)"""
-		self._initdb()
-		return os.path.exists(self._db.getpath())
+		return vartree.dbapi.cpv_exists(self._cpv)
 
 	def is_overlay(self):
 		"""Returns true if the package is in an overlay."""
@@ -139,13 +137,21 @@ class Package:
 		
 		flags.remove_new_masked(self.get_cpv())
 
-	def get_all_use_flags (self):
+	def get_all_use_flags (self, installed = False):
 		"""Returns a list of _all_ useflags for this package, i.e. all useflags you can set for this package.
 		
+		@param installed: do not take the ones stated in the ebuild, but the ones it has been installed with
+		@type installed: boolean
+
 		@returns: list of use-flags
 		@rtype: string[]"""
 
-		return unique_array(self.get_env_var("IUSE").split())
+		if installed:
+			tree = vartree
+		else:
+			tree = porttree
+		
+		return unique_array(self.get_env_var("IUSE", tree = tree).split())
 
 	def get_installed_use_flags (self):
 		"""Returns a list of the useflags enabled at installation time. If package is not installed, it returns an empty list.
@@ -332,6 +338,10 @@ class Package:
 		
 		return self.get_category()+"/"+self.get_name()
 
+	def get_slot_cp (self):
+
+		return ("%s:%s" % (self.get_cp(), self.get_env_var("SLOT")))
+
 	def get_name(self):
 		"""Returns base name of package, no category nor version"""
 		return self._scpv[1]
@@ -356,12 +366,9 @@ class Package:
 		self._settingslock.release()
 		return v
 
-	def get_ebuild_path(self,in_vartree=0):
+	def get_ebuild_path(self):
 		"""Returns the complete path to the .ebuild file"""
-		if in_vartree:
-			return vartree.getebuildpath(self._cpv)
-		else:
-			return portage.portdb.findname(self._cpv)
+		return portage.portdb.findname(self._cpv)
 
 	def get_package_path(self):
 		"""Returns the path to where the ChangeLog, Manifest, .ebuild files reside"""
@@ -383,11 +390,9 @@ class Package:
 		return r[0]
 
 	def get_use_flags(self):
-		"""Returns the USE flags active at time of installation"""
-		self._initdb()
 		if self.is_installed():
-			return self._db.getfile("USE")
-		return ""
+			return self.get_env_var("USE", tree = vartree)
+		else: return ""
 
 	def compare_version(self,other):
 		"""Compares this package's version to another's CPV; returns -1, 0, 1"""
@@ -402,14 +407,6 @@ class Package:
 		# Compare versions
 		else:
 			return portage.pkgcmp(v1[1:],v2[1:])
-
-	def _initdb(self):
-		"""Internal helper function; loads package information from disk,
-		when necessary"""
-		if not self._db:
-			cat = self.get_category()
-			pnv = self.get_name()+"-"+self.get_version()
-			self._db = portage.dblink(cat, pnv, self._settings["ROOT"], self._settings)
 
 	def matches (self, criterion):
 		"""This checks, whether this package matches a specific verisioning criterion - e.g.: "<=net-im/foobar-1.2".
