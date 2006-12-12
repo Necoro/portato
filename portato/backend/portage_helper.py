@@ -376,14 +376,12 @@ def update_world (newuse = False, deep = False):
 			appended = True
 			p = old
 
-		if newuse:
+		if newuse and p.is_in_system(): # there is no use to check newuse for a package which is not existing anymore in portage :)
 
 			new_iuse = set(p.get_all_use_flags(installed = False)) # IUSE in the ebuild
 			old_iuse = set(p.get_all_use_flags(installed = True)) # IUSE in the vardb
 			
 			if new_iuse.symmetric_difference(old_iuse): # difference between new_iuse and old_iuse
-				debug(p.get_cpv(),"old:",old_iuse)
-				debug(p.get_cpv(),"new:",new_iuse)
 				tempDeep = True
 				if not appended:
 					updating.append((p,p))
@@ -407,7 +405,9 @@ def update_world (newuse = False, deep = False):
 					if not bm: 
 						debug("Bug? No best match could be found:",i)
 					else:
-						for p in bm: check(p)
+						for p in bm: 
+							if not p: continue
+							check(p)
 
 	for p in get_new_packages(packages):
 		if not p: continue # if a masked package is installed we have "None" here
