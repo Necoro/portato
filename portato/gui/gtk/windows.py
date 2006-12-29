@@ -696,13 +696,11 @@ class MainWindow (Window):
 		self.show_package(cp, self.queue)
 
 	def title_update (self, title):
-		def caller(self, t):
-			self.notebook.set_tab_label_text(self.termHB, t)
 		
 		if title == None: title = "Console"
 		else: title = ("Console (%s)" % title)
 
-		gobject.idle_add(caller, self, title)
+		gobject.idle_add(self.notebook.set_tab_label_text, self.termHB, title)
 		
 
 	def cb_cat_list_selection (self, view):

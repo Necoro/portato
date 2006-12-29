@@ -10,9 +10,10 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from portato.backend import *
+from portato.backend import portage_settings
 from portato.helper import *
 from portage_helper import *
+from exceptions import *
 import flags
 
 import portage, portage_dep
@@ -36,8 +37,10 @@ class Package:
 		if not self._scpv:
 			raise ValueError("invalid cpv: %s" % cpv)
 
-		self._settings = settings
-		self._settingslock = settingslock
+		self._settings = portage_settings.settings
+		self._settingslock = portage_settings.settingslock
+
+		self._trees = portage_settings.trees
 
 		self.forced_flags = set()
 		self.forced_flags.update(self._settings.usemask)
@@ -50,11 +53,11 @@ class Package:
 	
 	def is_installed(self):
 		"""Returns true if this package is installed (merged)"""
-		return vartree.dbapi.cpv_exists(self._cpv)
+		return portage_settings.vartree.dbapi.cpv_exists(self._cpv)
 
 	def is_overlay(self):
 		"""Returns true if the package is in an overlay."""
-		dir,ovl = portage.portdb.findname2(self._cpv)
+		dir,ovl = portage_settings.porttree.dbapi.findname2(self._cpv)
 		return ovl != self._settings["PORTDIR"]
 
 	def is_in_system (self):
@@ -150,10 +153,10 @@ class Package:
 		@returns: list of use-flags
 		@rtype: string[]"""
 
-		if installed:
-			tree = vartree
+		if installed or not self.is_in_system():
+			tree = portage_settings.vartree
 		else:
-			tree = porttree
+			tree = portage_settings.porttree
 		
 		return list(set(self.get_env_var("IUSE", tree = tree).split()).difference(self.forced_flags))
 
@@ -211,11 +214,13 @@ class Package:
 		
 		flags.remove_new_use_flags(self)
 
-	def get_matched_dep_packages (self):
+	def get_matched_dep_packages (self, depvar):
 		"""This function looks for all dependencies which are resolved. In normal case it makes only sense for installed packages, but should work for uninstalled ones too.
 
 		@returns: unique list of dependencies resolved (with elements like "<=net-im/foobar-1.2.3")
-		@rtype: string[]"""
+		@rtype: string[]
+
+		@raises portato.DependencyCalcError: when an error occured during executing portage.dep_check()"""
 		
 		# change the useflags, because we have internally changed some, but not made them visible for portage
 		newUseFlags = self.get_new_use_flags()
@@ -227,41 +232,29 @@ class Package:
 				elif u not in actual:
 					actual.append(u)
 		
-		#
-		# the following stuff is mostly adapted from portage.dep_check()
-		#
+		depstring = ""
+		for d in depvar:
+			depstring += self.get_env_var(d)+" "
 
-		depstring = self.get_env_var("RDEPEND")+" "+self.get_env_var("DEPEND")+" "+self.get_env_var("PDEPEND")
+		portage_dep._dep_check_strict = False
+		deps = portage.dep_check(depstring, None, self._settings, myuse = actual, trees = self._trees)
+		portage_dep._dep_check_strict = True
+
+		if not deps: # FIXME: what is the difference to [1, []] ?
+			return [] 
+
+		if deps[0] == 0: # error
+			raise DependencyCalcError, deps[1]
 		
-		# change the parentheses into lists
-		mysplit = portage_dep.paren_reduce(depstring)
+		deps = deps[1]
 
-		# strip off these deps we don't have a flag for
-		mysplit = portage_dep.use_reduce(mysplit, uselist = actual, masklist = [], matchall = False, excludeall = self.get_settings("ARCH"))
-
-		# move the || (or) into the lists
-		mysplit = portage_dep.dep_opconvert(mysplit)
-
-		# turn virtuals into real packages
-		mysplit = portage.dep_virtual(mysplit, self._settings)
-
-		mysplit_reduced= portage.dep_wordreduce(mysplit, self._settings, vartree.dbapi, mode = None)
-		
 		retlist = []
-		def add (list, red_list):
-			"""Adds the packages to retlist."""
-			for i in range(len(list)):
-				if type(list[i]) == types.ListType:
-					add(list[i], red_list[i])
-				elif list[i] == "||": 
-					continue
-				else:
-					if red_list[i]:
-						retlist.append(list[i])
+		
+		for d in retlist:
+			if not d[0] == "!":
+				retlist.append(d)
 
-		add(mysplit, mysplit_reduced)
-
-		return unique_array(retlist)
+		return retlist
 
 	def get_dep_packages (self):
 		"""Returns a cpv-list of packages on which this package depends and which have not been installed yet. This does not check the dependencies in a recursive manner.
@@ -287,7 +280,7 @@ class Package:
 
 		# let portage do the main stuff ;)
 		# pay attention to any changes here
-		deps = portage.dep_check (self.get_env_var("RDEPEND")+" "+self.get_env_var("DEPEND")+" "+self.get_env_var("PDEPEND"), vartree.dbapi, self._settings, myuse = actual, trees = trees)
+		deps = portage.dep_check (self.get_env_var("RDEPEND")+" "+self.get_env_var("DEPEND")+" "+self.get_env_var("PDEPEND"), portage_settings.vartree.dbapi, self._settings, myuse = actual, trees = self._trees)
 		
 		if not deps: # FIXME: what is the difference to [1, []] ?
 			return [] 
@@ -369,7 +362,7 @@ class Package:
 
 	def get_ebuild_path(self):
 		"""Returns the complete path to the .ebuild file"""
-		return portage.portdb.findname(self._cpv)
+		return portage_settings.porttree.dbapi.findname(self._cpv)
 
 	def get_package_path(self):
 		"""Returns the path to where the ChangeLog, Manifest, .ebuild files reside"""
@@ -378,12 +371,12 @@ class Package:
 		if len(sp):
 			return string.join(sp[:-1],"/")
 
-	def get_env_var(self, var, tree=""):
+	def get_env_var(self, var, tree = None):
 		"""Returns one of the predefined env vars DEPEND, RDEPEND, SRC_URI,...."""
-		if tree == "":
-			mytree = vartree
+		if not tree:
+			mytree = portage_settings.vartree
 			if not self.is_installed():
-				mytree = porttree
+				mytree = portage_settings.porttree
 		else:
 			mytree = tree
 		r = mytree.dbapi.aux_get(self._cpv,[var])
@@ -392,7 +385,7 @@ class Package:
 
 	def get_use_flags(self):
 		if self.is_installed():
-			return self.get_env_var("USE", tree = vartree)
+			return self.get_env_var("USE", tree = portage_settings.vartree)
 		else: return ""
 
 	def compare_version(self,other):

@@ -2,7 +2,7 @@ Backend:
 ========
 
 - bugs in update world
-- make it correctly work with portage-2.1.2
+- fix for flag handling, when reverting flags
 
 GUI:
 =====

@@ -15,7 +15,7 @@ import re, os, copy
 import portage
 from portage_util import unique_array
 
-from portato.backend import *
+from portato.backend import portage_settings
 import package
 
 from portato.helper import debug
@@ -62,9 +62,9 @@ def find_best_match (search_key, only_installed = False):
 
 	t = None
 	if not only_installed:
-		t = porttree.dep_bestmatch(search_key)
+		t = portage_settings.porttree.dep_bestmatch(search_key)
 	else:
-		t = vartree.dep_bestmatch(search_key)
+		t = portage_settings.vartree.dep_bestmatch(search_key)
 	if t:
 		return package.Package(t)
 	return None
@@ -82,22 +82,22 @@ def find_packages (search_key, masked=False):
 
 	try:
 		if masked:
-			t = porttree.dbapi.xmatch("match-all", search_key)
-			t += vartree.dbapi.match(search_key)
+			t = portage_settings.porttree.dbapi.xmatch("match-all", search_key)
+			t += portage_settings.vartree.dbapi.match(search_key)
 		else:
-			t = porttree.dbapi.match(search_key)
-			t += vartree.dbapi.match(search_key)
+			t = portage_settings.porttree.dbapi.match(search_key)
+			t += portage_settings.vartree.dbapi.match(search_key)
 	# catch the "ambigous package" Exception
 	except ValueError, e:
 		if type(e[0]) == types.ListType:
 			t = []
 			for cp in e[0]:
 				if masked:
-					t += porttree.dbapi.xmatch("match-all", cp)
-					t += vartree.dbapi.match(cp)
+					t += portage_settings.porttree.dbapi.xmatch("match-all", cp)
+					t += portage_settings.vartree.dbapi.match(cp)
 				else:
-					t += porttree.dbapi.match(cp)
-					t += vartree.dbapi.match(cp)
+					t += portage_settings.porttree.dbapi.match(cp)
+					t += portage_settings.vartree.dbapi.match(cp)
 		else:
 			raise ValueError(e)
 	# Make the list of packages unique
@@ -117,13 +117,13 @@ def find_installed_packages (search_key, masked=False):
 	@rtype: backend.Package[]"""
 
 	try:
-		t = vartree.dbapi.match(search_key)
+		t = portage_settings.vartree.dbapi.match(search_key)
 	# catch the "ambigous package" Exception
 	except ValueError, e:
 		if type(e[0]) == types.ListType:
 			t = []
 			for cp in e[0]:
-				t += vartree.dbapi.match(cp)
+				t += portage_settings.vartree.dbapi.match(cp)
 		else:
 			raise ValueError(e)
 
@@ -180,13 +180,13 @@ def find_all_installed_packages (name=None, withVersion=True):
 	@rtype: backend.Package[] or cp-string[]"""
 
 	if withVersion:
-		t = vartree.dbapi.cpv_all()
+		t = portage_settings.vartree.dbapi.cpv_all()
 		if name:
 			t = filter(find_lambda(name),t)
 		return geneticize_list(t)
 	
 	else:
-		t = vartree.dbapi.cp_all()
+		t = portage_settings.vartree.dbapi.cp_all()
 		if name:
 			t = filter(find_lambda(name),t)
 		return t
@@ -213,8 +213,8 @@ def find_all_packages (name=None, withVersion=True):
 	@returns: all packages/cp-strings found
 	@rtype: backend.Package[] or cp-string[]"""
 	
-	t = porttree.dbapi.cp_all()
-	t += vartree.dbapi.cp_all()
+	t = portage_settings.porttree.dbapi.cp_all()
+	t += portage_settings.vartree.dbapi.cp_all()
 	if name:
 		t = filter(find_lambda(name),t)
 	t = unique_array(t)
@@ -222,8 +222,8 @@ def find_all_packages (name=None, withVersion=True):
 	if (withVersion):
 		t2 = []
 		for x in t:
-			t2 += porttree.dbapi.cp_list(x)
-			t2 += vartree.dbapi.cp_list(x)
+			t2 += portage_settings.porttree.dbapi.cp_list(x)
+			t2 += portage_settings.vartree.dbapi.cp_list(x)
 			t2 = unique_array(t2)
 		return geneticize_list(t2)
 	else:
@@ -261,7 +261,7 @@ def list_categories (name=None):
 	@returns: all categories found
 	@rtype: string[]"""
 
-	categories = settings.categories
+	categories = portage_settings.settings.categories
 	return filter(find_lambda(name), categories)
 
 def split_package_name (name):
@@ -294,8 +294,7 @@ def sort_package_list(pkglist):
 
 def reload_settings ():
 	"""Reloads portage."""
-	global settings
-	settings = portage.config(config_incrementals = copy.deepcopy(settings.incrementals))
+	portage_settings.load()
 
 def update_world (newuse = False, deep = False):
 	"""Calculates the packages to get updated in an update world.
@@ -317,7 +316,7 @@ def update_world (newuse = False, deep = False):
 		packages.append(line)
 	world.close()
 
-	sys = settings.packages
+	sys = portage_settings.settings.packages
 	for x in sys:
 		if x[0] == "*":
 			x = x[1:]
@@ -357,7 +356,7 @@ def update_world (newuse = False, deep = False):
 	checked = []
 	updating = []
 	raw_checked = []
-	def check (p):
+	def check (p, warn_no_installed = True):
 		"""Checks whether a package is updated or not."""
 		if p.get_cp() in checked: return
 		else: checked.append(p.get_cp())
@@ -370,8 +369,13 @@ def update_world (newuse = False, deep = False):
 			if oldList: 
 				old = oldList[0] # we should only have one package here - else it is a bug
 			else:
-				debug("Bug? Not found installed one:",p.get_cp())
-				return
+				oldList = sort_package_list(find_installed_packages(p.get_cp()))
+				if not oldList:
+					if warn_no_installed: 
+						debug("Bug? Not found installed one:",p.get_cp())
+					return
+				old = oldList[-1]
+			
 			updating.append((p, old))
 			appended = True
 			p = old
@@ -398,20 +402,23 @@ def update_world (newuse = False, deep = False):
 						appended = True
 
 		if deep or tempDeep:
-			for i in p.get_matched_dep_packages():
-				if i not in raw_checked:
-					raw_checked.append(i)
-					bm = get_new_packages([i])
-					if not bm: 
-						debug("Bug? No best match could be found:",i)
-					else:
-						for p in bm: 
-							if not p: continue
-							check(p)
+			states = [(["RDEPEND","PDEPEND"],True), (["DEPEND"], False)]
+			
+			for state in states:
+				for i in p.get_matched_dep_packages(state[0]):
+					if i not in raw_checked:
+						raw_checked.append(i)
+						bm = get_new_packages([i])
+						if not bm: 
+							debug("Bug? No best match could be found:",i)
+						else:
+							for pkg in bm: 
+								if not pkg: continue
+								check(pkg, state[1])
 
 	for p in get_new_packages(packages):
 		if not p: continue # if a masked package is installed we have "None" here
-		check(p)
+		check(p, True)
 	
 	return updating
 	
@@ -433,7 +440,7 @@ def get_use_desc (flag, package = None):
 	# fill cache if needed
 	if use_descs == {} or local_use_descs == {}:
 		# read use.desc
-		fd = open(settings["PORTDIR"]+"/profiles/use.desc")
+		fd = open(portage_settings.settings["PORTDIR"]+"/profiles/use.desc")
 		for line in fd.readlines():
 			line = line.strip()
 			if line != "" and line[0] != '#':
@@ -442,7 +449,7 @@ def get_use_desc (flag, package = None):
 					use_descs[fields[0]] = fields[1]
 
 		# read use.local.desc
-		fd = open(settings["PORTDIR"]+"/profiles/use.local.desc")
+		fd = open(portage_settings.settings["PORTDIR"]+"/profiles/use.local.desc")
 		for line in fd.readlines():
 			line = line.strip()
 			if line != "" and line[0] != '#':
