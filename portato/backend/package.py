@@ -250,7 +250,7 @@ class Package:
 
 		retlist = []
 		
-		for d in retlist:
+		for d in deps:
 			if not d[0] == "!":
 				retlist.append(d)
 
