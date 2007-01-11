@@ -3,7 +3,7 @@
 # File: portato/backend/portage_helper.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006 René 'Necoro' Neumann
+# Copyright (C) 2006-2007 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -36,7 +36,7 @@ def find_lambda (name):
 		return lambda x: True
 
 def geneticize_list (list_of_packages):
-	"""Convertes a list of gentoolkit.Packages into L{backend.Package}s.
+	"""Convertes a list of cpv's into L{backend.Package}s.
 	
 	@param list_of_packages: the list of packages
 	@type list_of_packages: list of gentoolkit.Packages
@@ -46,7 +46,13 @@ def geneticize_list (list_of_packages):
 	return [package.Package(x) for x in list_of_packages]
 
 def find_best (list):
+	"""Returns the best package out of a list of packages.
 
+	@param list: the list of packages to select from
+	@type list: string[]
+	@returns: the best package
+	@rtype: backend.Package"""
+	
 	return package.Package(portage.best(list))
 
 def find_best_match (search_key, only_installed = False):
@@ -311,27 +317,18 @@ def update_world (newuse = False, deep = False):
 	packages = []
 	for line in world:
 		line = line.strip()
-		if not len(line): continue # empty line
-		if line[0] == "#": continue
+		if len(line) == 0: continue # empty line
+		if line[0] == "#": continue # comment
 		packages.append(line)
 	world.close()
 
+	# append system packages
 	sys = portage_settings.settings.packages
 	for x in sys:
-		if x[0] == "*":
+		if x[0] == "*": # some packages are stored with a '*' at the front - ignore it
 			x = x[1:]
 		packages.append(x.strip())
 
-	# Remove everything that is package.provided from our list
-	# This is copied from emerge.getlist()
-	#for atom in packages[:]:
-	#	for expanded_atom in portage.flatten(portage.dep_virtual([atom], settings)):
-	#		mykey = portage.dep_getkey(expanded_atom)
-	#		if mykey in settings.pprovideddict and portage.match_from_list(expanded_atom, settings.pprovideddict[mykey]):
-	#				packages.remove(atom)
-	#				break
-
-	
 	def get_new_packages (packages):
 		new_packages = []
 		for p in packages:
@@ -352,7 +349,6 @@ def update_world (newuse = False, deep = False):
 
 		return new_packages
 						
-		
 	checked = []
 	updating = []
 	raw_checked = []
@@ -380,7 +376,7 @@ def update_world (newuse = False, deep = False):
 			appended = True
 			p = old
 
-		if newuse and p.is_in_system(): # there is no use to check newuse for a package which is not existing anymore in portage :)
+		if newuse and p.is_in_system(): # there is no use to check newuse for a package which is not existing in portage anymore :)
 
 			new_iuse = set(p.get_all_use_flags(installed = False)) # IUSE in the ebuild
 			old_iuse = set(p.get_all_use_flags(installed = True)) # IUSE in the vardb

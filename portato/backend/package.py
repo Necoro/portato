@@ -3,7 +3,7 @@
 # File: portato/backend/package.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006 René 'Necoro' Neumann
+# Copyright (C) 2006-2007 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -52,11 +52,15 @@ class Package:
 			self._status = None
 	
 	def is_installed(self):
-		"""Returns true if this package is installed (merged)"""
+		"""Returns true if this package is installed (merged)
+		@rtype: boolean"""
+		
 		return portage_settings.vartree.dbapi.cpv_exists(self._cpv)
 
 	def is_overlay(self):
-		"""Returns true if the package is in an overlay."""
+		"""Returns true if the package is in an overlay.
+		@rtype: boolean"""
+		
 		dir,ovl = portage_settings.porttree.dbapi.findname2(self._cpv)
 		return ovl != self._settings["PORTDIR"]
 
@@ -192,8 +196,8 @@ class Package:
 			i_flags = self.get_installed_use_flags()
 			for f in self.get_new_use_flags():
 				
-				if flags.invert_flag(f) in i_flags:
-					i_flags.remove(flags.invert_flag(f))
+				if flags.invert_use_flag(f) in i_flags:
+					i_flags.remove(flags.invert_use_flag(f))
 				
 				elif f not in i_flags:
 					i_flags.append(f)
