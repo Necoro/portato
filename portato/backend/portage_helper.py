@@ -278,7 +278,7 @@ def split_package_name (name):
 	@returns: list: [category, name, version, rev] whereby rev is "r0" if not specified in the name
 	@rtype: string[]"""
 	
-	r = portage.catpkgsplit(name)
+	r = portage.catpkgsplit(portage.dep_getcpv(name))
 	if not r:
 		r = name.split("/")
 		if len(r) == 1:

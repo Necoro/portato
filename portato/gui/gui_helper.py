@@ -449,8 +449,6 @@ class EmergeQueue:
 		for p in packages:
 			if p in ["world", "system"]: continue
 			cat = backend.split_package_name(p)[0] # get category
-			while cat[0] in ["=",">","<","!"]:
-				cat = cat[1:]
 			self.db.reload(cat)
 			debug("Category %s refreshed" % cat)
 
@@ -474,7 +472,7 @@ class EmergeQueue:
 		process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False)
 		
 		# start thread waiting for the stop of emerge
-		Thread(target=self._update_packages, args=(packages+self.deps.keys(), process)).start()
+		Thread(name="Emerge-Thread", target=self._update_packages, args=(packages+self.deps.keys(), process)).start()
 		
 		# remove
 		for i in it:
