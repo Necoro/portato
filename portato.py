@@ -16,15 +16,27 @@ from portato.constants import VERSION
 import sys
 
 if __name__ == "__main__":
-	if len(sys.argv) > 1 and sys.argv[1] in ("--help","--version","-h","-v"):
-		print """Portato %s
+	
+	uimod = "gtk"
+
+	if len(sys.argv) > 1:
+		if sys.argv[1] in ("--help","--version","-h","-v"):
+			print """Portato %s
 Copyright (C) 2006-2007 René 'Necoro' Neumann
 This is free software.  You may redistribute copies of it under the terms of
 the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
 There is NO WARRANTY, to the extent permitted by law.
 
 Written by René 'Necoro' Neumann <necoro@necoro.net>""" % VERSION
+		else:
+			uimod = sys.argv[1]
+	
+	if uimod == "gtk":
+		from portato.gui.gtk import run
+	elif uimod == "curses":
+		from portato.gui.curses import run
 	else:
-		from portato.gui import MainWindow
-		m = MainWindow()
-		m.main()
+		print "Unknown interface %s. Correct interfaces are: gtk, curses" % uimod
+		sys.exit(1)
+	
+	run()

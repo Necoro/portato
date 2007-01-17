@@ -11,3 +11,7 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 from windows import MainWindow
+
+def run ():
+	m = MainWindow()
+	m.main()
