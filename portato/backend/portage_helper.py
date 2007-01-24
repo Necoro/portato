@@ -352,7 +352,7 @@ def update_world (newuse = False, deep = False):
 	checked = []
 	updating = []
 	raw_checked = []
-	def check (p, warn_no_installed = True):
+	def check (p, add_not_installed = True):
 		"""Checks whether a package is updated or not."""
 		if p.get_cp() in checked: return
 		else: checked.append(p.get_cp())
@@ -367,16 +367,18 @@ def update_world (newuse = False, deep = False):
 			else:
 				oldList = sort_package_list(find_installed_packages(p.get_cp()))
 				if not oldList:
-					if warn_no_installed: 
-						debug("Bug? Not found installed one:",p.get_cp())
-					return
+					if add_not_installed:
+						debug("Not found installed",p.get_cpv(),"==> adding")
+						oldList = [p]
+					else:
+						return
 				old = oldList[-1]
 			
 			updating.append((p, old))
 			appended = True
 			p = old
 
-		if newuse and p.is_in_system(): # there is no use to check newuse for a package which is not existing in portage anymore :)
+		if newuse and p.is_installed() and p.is_in_system(): # there is no use to check newuse for a package which is not existing in portage anymore :)
 
 			new_iuse = set(p.get_all_use_flags(installed = False)) # IUSE in the ebuild
 			old_iuse = set(p.get_all_use_flags(installed = True)) # IUSE in the vardb

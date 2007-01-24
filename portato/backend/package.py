@@ -260,7 +260,7 @@ class Package:
 
 		return retlist
 
-	def get_dep_packages (self):
+	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"]):
 		"""Returns a cpv-list of packages on which this package depends and which have not been installed yet. This does not check the dependencies in a recursive manner.
 
 		@returns: list of cpvs on which the package depend
@@ -282,9 +282,13 @@ class Package:
 				elif u not in actual:
 					actual.append(u)
 
+		depstring = ""
+		for d in depvar:
+			depstring += self.get_env_var(d)+" "
+
 		# let portage do the main stuff ;)
 		# pay attention to any changes here
-		deps = portage.dep_check (self.get_env_var("RDEPEND")+" "+self.get_env_var("DEPEND")+" "+self.get_env_var("PDEPEND"), portage_settings.vartree.dbapi, self._settings, myuse = actual, trees = self._trees)
+		deps = portage.dep_check (depstring, portage_settings.vartree.dbapi, self._settings, myuse = actual, trees = self._trees)
 		
 		if not deps: # FIXME: what is the difference to [1, []] ?
 			return [] 

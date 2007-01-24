@@ -779,7 +779,7 @@ class MainWindow (Window):
 		else:
 			updating = backend.update_world(newuse = self.cfg.get_boolean("newuse_opt"), deep = self.cfg.get_boolean("deep_opt"))
 
-			debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating])
+			debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating],"--> length:",len(updating))
 			try:
 				try:
 					for pkg, old_pkg in updating:
@@ -791,6 +791,7 @@ class MainWindow (Window):
 			
 			except BlockedException, e:
 				blocked_dialog(e[0], e[1])
+				self.queue.remove_children(self.queue.emergeIt)
 			if len(updating): self.doUpdate = True
 		return True
 
@@ -812,8 +813,7 @@ class MainWindow (Window):
 			elif model.iter_parent(model.iter_parent(iter)): # this is in the 3rd level => dependency
 				remove_deps_dialog()
 			else:
-				self.queue.remove_children(iter) # remove children first
-				self.queue.remove(iter)
+				self.queue.remove_with_children(iter)
 				self.doUpdate = False
 		
 		return True
