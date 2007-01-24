@@ -12,12 +12,12 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from portato.constants import VERSION
+from portato.constants import VERSION, FRONTENDS, STD_FRONTEND
 import sys
 
 if __name__ == "__main__":
 	
-	uimod = "gtk"
+	uimod = STD_FRONTEND
 
 	if len(sys.argv) > 1:
 		if sys.argv[1] in ("--help","--version","-h","-v"):
@@ -30,13 +30,17 @@ There is NO WARRANTY, to the extent permitted by law.
 Written by René 'Necoro' Neumann <necoro@necoro.net>""" % VERSION
 		else:
 			uimod = sys.argv[1]
-	
-	if uimod == "gtk":
-		from portato.gui.gtk import run
-	elif uimod == "curses":
-		from portato.gui.curses import run
+	if uimod in FRONTENDS:
+		try:
+			exec ("from portato.gui.%s import run" % uimod)
+		except ImportError:
+			print "'%s' should be installed, but cannot be imported. This is definitly a bug." % uimod
+			sys.exit(1)
 	else:
-		print "Unknown interface %s. Correct interfaces are: gtk, curses" % uimod
+		print ("Unknown interface '%s'. Correct interfaces are:" % uimod) ,
+		for u in FRONTENDS:
+			print u ,
+		print
 		sys.exit(1)
 	
 	run()

@@ -3,7 +3,7 @@
 # File: portato/gui/gui_helper.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006 René 'Necoro' Neumann
+# Copyright (C) 2006-2007 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -26,6 +26,8 @@ from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
 import pty
 import time
+import os
+import signal
 
 class Config:
 	"""Wrapper around a ConfigParser and for additional local configurations."""
@@ -469,10 +471,10 @@ class EmergeQueue:
 		self.console.set_pty(master)
 		
 		# start emerge
-		process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False)
+		self.process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False)
 		
 		# start thread waiting for the stop of emerge
-		Thread(name="Emerge-Thread", target=self._update_packages, args=(packages+self.deps.keys(), process)).start()
+		Thread(name="Emerge-Thread", target=self._update_packages, args=(packages+self.deps.keys(), self.process)).start()
 		
 		# remove
 		for i in it:
@@ -554,6 +556,16 @@ class EmergeQueue:
 			self._emerge(["--sync"], [], [])
 		else:
 			self._emerge([],[],[], command = command)
+
+	def kill_emerge (self):
+		"""Kills the emerge process."""
+		try:
+			os.kill(self.process.pid, signal.SIGTERM)
+			debug("Process should be killed")
+		except AttributeError:
+			debug("AttributeError occured ==> process not exisiting - ignore")
+		except OSError:
+			debug("OSError occured ==> process already stopped - ignore")
 
 	def remove_with_children (self, it, removeNewFlags = True):
 		"""Convenience function which removes all children of an iterator and than the iterator itself.

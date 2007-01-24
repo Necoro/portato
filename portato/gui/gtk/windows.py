@@ -3,7 +3,7 @@
 # File: portato/gui/gtk/windows.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006 René 'Necoro' Neumann
+# Copyright (C) 2006-2007 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -35,9 +35,11 @@ import vte
 # other
 from portage_util import unique_array
 
+GLADE_FILE = DATA_DIR+"portato.glade"
+
 class Window:
 	def __init__ (self):
-		self.tree = gtk.glade.XML(DATA_DIR+"portato.glade", root = self.__class__.__name__)
+		self.tree = gtk.glade.XML(GLADE_FILE, root = self.__class__.__name__)
 		self.tree.signal_autoconnect(self)
 		self.window = self.tree.get_widget(self.__class__.__name__)
 
@@ -59,6 +61,11 @@ class Window:
 			gobject.idle_add(cb_idle)
 			return ret
 		return wrapper
+
+	def create_popup (self, name):
+		popupTree = gtk.glade.XML(GLADE_FILE, root = name)
+		popupTree.signal_autoconnect(self)
+		return popupTree.get_widget(name)
 
 class AbstractDialog (Window):
 	"""A class all our dialogs get derived from. It sets useful default vars and automatically handles the ESC-Button."""
@@ -106,7 +113,7 @@ class AboutWindow (AbstractDialog):
 A Portage-GUI
 		
 This software is licensed under the terms of the GPLv2.
-Copyright (C) 2006 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;
+Copyright (C) 2006-2007 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;
 
 <small>Thanks to Fred for support and ideas :P</small>
 """ % VERSION)
@@ -598,16 +605,14 @@ class MainWindow (Window):
 		self.build_queue_list()
 
 		# the terminal
-		term = vte.Terminal()
-		term.set_scrollback_lines(1024)
-		term.set_scroll_on_output(True)
-		term.set_font_from_string("Monospace 11")
-		# XXX why is this not working with the colors
-		term.set_color_background(gtk.gdk.color_parse("white"))
-		term.set_color_foreground(gtk.gdk.color_parse("black"))
+		self.console = vte.Terminal()
+		self.console.set_scrollback_lines(1024)
+		self.console.set_scroll_on_output(True)
+		self.console.set_font_from_string("Monospace 11")
+		self.console.connect("button-press-event", self.cb_right_click)
 		self.termHB = self.tree.get_widget("termHB")
-		termScroll = gtk.VScrollbar(term.get_adjustment())
-		self.termHB.pack_start(term, True, True)
+		termScroll = gtk.VScrollbar(self.console.get_adjustment())
+		self.termHB.pack_start(self.console, True, True)
 		self.termHB.pack_start(termScroll, False)
 		
 		# notebook
@@ -618,14 +623,13 @@ class MainWindow (Window):
 		self.packageTable = PackageTable(self)
 		self.packageTable.table.hide_all()
 
-		# popup
-		popupTree = gtk.glade.XML(DATA_DIR+"portato.glade", root = "queuePopup")
-		popupTree.signal_autoconnect(self)
-		self.queuePopup = popupTree.get_widget("queuePopup")
+		# popups
+		self.queuePopup = self.create_popup("queuePopup")
+		self.consolePopup = self.create_popup("consolePopup")
 
 		# set emerge queue
 		self.queueTree = GtkTree(self.queueList.get_model())
-		self.queue = EmergeQueue(console = GtkConsole(term), tree = self.queueTree, db = self.db, title_update = self.title_update)
+		self.queue = EmergeQueue(console = GtkConsole(self.console), tree = self.queueTree, db = self.db, title_update = self.title_update)
 
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)
@@ -865,21 +869,27 @@ class MainWindow (Window):
 		AboutWindow(self.window)
 		return True
 
-	def cb_queue_right_click (self, queue, event):
+	def cb_right_click (self, object, event):
 		if event.button == 3:
 			x = int(event.x)
 			y = int(event.y)
 			time = event.time
-			pthinfo = queue.get_path_at_pos(x, y)
-			if pthinfo is not None:
-				path, col, cellx, celly = pthinfo
-				if self.queueTree.is_in_emerge(self.queueTree.get_original().get_iter(path)):
-					queue.grab_focus()
-					queue.set_cursor(path, col, 0)
-					self.queuePopup.popup(None, None, None, event.button, time)
-				return True
+
+			if object == self.queueList:
+				pthinfo = object.get_path_at_pos(x, y)
+				if pthinfo is not None:
+					path, col, cellx, celly = pthinfo
+					if self.queueTree.is_in_emerge(self.queueTree.get_original().get_iter(path)):
+						object.grab_focus()
+						object.set_cursor(path, col, 0)
+						self.queuePopup.popup(None, None, None, event.button, time)
+					return True
+			elif object == self.console:
+				self.consolePopup.popup(None, None, None, event.button, time)
 			else:
 				return False
+		else:
+			return False
 
 	def cb_oneshot_clicked (self, action):
 		sel = self.queueList.get_selection()
@@ -893,6 +903,9 @@ class MainWindow (Window):
 			
 			self.cfg.set_local(package, "oneshot_opt", set)
 			self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
+
+	def cb_kill_clicked (self, action):
+		self.queue.kill_emerge()
 	
 	def cb_destroy (self, widget):
 		"""Calls main_quit()."""

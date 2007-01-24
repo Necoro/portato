@@ -4,6 +4,8 @@
 - added console-status
 - working slots (for update_world)
 - enhanced "--newuse"
+- added some stock-images
+- added ability to kill the running emerge process
 
 0.5.1:
 - new config parser and new config-layout
