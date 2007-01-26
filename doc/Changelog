@@ -1,3 +1,7 @@
+0.5.3:
+- allowed copying out of the console
+- added accelerators
+
 0.5.2:
 - removed gentoolkit-dependency
 - added support for portage-2.1.2

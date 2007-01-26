@@ -28,6 +28,7 @@ the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
 There is NO WARRANTY, to the extent permitted by law.
 
 Written by René 'Necoro' Neumann <necoro@necoro.net>""" % VERSION
+			sys.exit(0)
 		else:
 			uimod = sys.argv[1]
 	if uimod in FRONTENDS:

@@ -465,10 +465,10 @@ class PackageTable:
 		if self.doEmerge:
 			# set emerge-button-label
 			if not self.actual_package().is_installed():
-				self.emergeBtn.set_label("_Emerge")
+				self.emergeBtn.set_label("E_merge")
 				self.unmergeBtn.set_sensitive(False)
 			else:
-				self.emergeBtn.set_label("R_emerge")
+				self.emergeBtn.set_label("Re_merge")
 				self.unmergeBtn.set_sensitive(True)
 		
 		self.table.show_all()
@@ -589,6 +589,12 @@ class MainWindow (Window):
 			raise e
 
 		self.cfg.modify_external_configs()
+
+		# accelerators - for whatever reason they are not automatically working for popups
+		self.accel_group = gtk.AccelGroup()
+		self.window.add_accel_group(self.accel_group)
+		self.accel_group.connect_group(ord("C"), gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE, lambda g, a, k, m: self.cb_copy_clicked(a))
+		self.accel_group.connect_group(ord("1"), gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE, lambda g, a, k, m: self.cb_oneshot_clicked(a))
 
 		# set vpaned position
 		vpaned = self.tree.get_widget("vpaned")
@@ -874,7 +880,7 @@ class MainWindow (Window):
 			x = int(event.x)
 			y = int(event.y)
 			time = event.time
-
+			
 			if object == self.queueList:
 				pthinfo = object.get_path_at_pos(x, y)
 				if pthinfo is not None:
@@ -906,7 +912,10 @@ class MainWindow (Window):
 
 	def cb_kill_clicked (self, action):
 		self.queue.kill_emerge()
-	
+
+	def cb_copy_clicked (self, action):
+		self.console.copy_clipboard()
+
 	def cb_destroy (self, widget):
 		"""Calls main_quit()."""
 		gtk.main_quit()
