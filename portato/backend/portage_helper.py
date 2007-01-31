@@ -10,9 +10,10 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-import re, os, copy
-
+import re, os
+import types
 import portage
+
 from portage_util import unique_array
 
 from portato.backend import portage_settings
@@ -141,7 +142,7 @@ def find_system_packages ():
 	@returns: a tuple of (resolved_packages, unresolved_packages).
 	@rtype: (backend.Package[], backend.Package[])"""
 
-	pkglist = settings.packages
+	pkglist = portage_settings.settings.packages
 	resolved = []
 	unresolved = []
 	for x in pkglist:
@@ -323,7 +324,7 @@ def update_world (newuse = False, deep = False):
 	world.close()
 
 	# append system packages
-	sys = portage_settings.settings.packages
+	sys = find_all_system_packages()
 	for x in sys:
 		if x[0] == "*": # some packages are stored with a '*' at the front - ignore it
 			x = x[1:]

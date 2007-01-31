@@ -203,7 +203,7 @@ class Package:
 					i_flags.append(f)
 			return i_flags
 		else:
-			return self.get_new_flags()
+			return self.get_new_use_flags()
 
 	def set_use_flag (self, flag):
 		"""Set a use-flag.
@@ -377,6 +377,7 @@ class Package:
 		p = self.get_ebuild_path()
 		sp = p.split("/")
 		if len(sp):
+			import string
 			return string.join(sp[:-1],"/")
 
 	def get_env_var(self, var, tree = None):

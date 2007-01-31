@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-import sys, copy, os
+import os
 from threading import Lock
 
 # import portage

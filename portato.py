@@ -16,7 +16,7 @@ from portato.constants import VERSION, FRONTENDS, STD_FRONTEND
 import sys
 
 if __name__ == "__main__":
-	
+#	import pychecker.checker
 	uimod = STD_FRONTEND
 
 	if len(sys.argv) > 1:
