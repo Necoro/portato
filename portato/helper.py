@@ -36,7 +36,10 @@ def debug(*args, **kwargs):
 	if not DEBUG : return
 	
 	stack = traceback.extract_stack()
-	a, b, c, d = stack[-2]
+	minus = -2
+	if "minus" in kwargs:
+		minus = minus - kwargs["minus"]
+	a, b, c, d = stack[minus]
 	a = os.path.basename(a)
 	out = []
 	for obj in args:
@@ -49,7 +52,12 @@ def debug(*args, **kwargs):
 	
 	text = "***DEBUG*** %s ***DEBUG***" % text
 	
-	print text
+	if "file" in kwargs:
+		f = open(kwargs["file"], "a+")
+		f.write(text+"\n")
+		f.close()
+	else:
+		print text
 
 def am_i_root ():
 	"""Returns True if the current user is root, False otherwise.
