@@ -324,11 +324,7 @@ def update_world (newuse = False, deep = False):
 	world.close()
 
 	# append system packages
-	sys = find_all_system_packages()
-	for x in sys:
-		if x[0] == "*": # some packages are stored with a '*' at the front - ignore it
-			x = x[1:]
-		packages.append(x.strip())
+	packages.extend(unique_array([p.get_cp() for p in find_all_system_packages()]))
 
 	def get_new_packages (packages):
 		new_packages = []
