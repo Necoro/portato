@@ -153,7 +153,7 @@ def find_system_packages ():
 				resolved.append(pkg)
 			else:
 				unresolved.append(cpv)
-	return (geneticize_list(resolved), geneticize_list(unresolved))
+	return (resolved, geneticize_list(unresolved))
 
 def find_world_packages ():
 	"""Looks for all packages saved in the world-file.
@@ -173,7 +173,7 @@ def find_world_packages ():
 				resolved.append(pkg)
 			else:
 				unresolved.append(cpv)
-	return (geneticize_list(resolved), geneticize_list(unresolved))
+	return (resolved, geneticize_list(unresolved))
 
 def find_all_installed_packages (name=None, withVersion=True):
 	"""Finds all installed packages matching a name or all if no name is specified.
