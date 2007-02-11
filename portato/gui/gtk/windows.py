@@ -28,12 +28,14 @@ from portato.backend.exceptions import *
 from portato.gui.gui_helper import Database, Config, EmergeQueue
 from dialogs import *
 from wrapper import GtkTree, GtkConsole
+from usetips import UseTips
 
 # for the terminal
 import vte
 
 # other
 from portage_util import unique_array
+import types
 
 GLADE_FILE = DATA_DIR+"portato.glade"
 
@@ -171,6 +173,7 @@ class PreferenceWindow (AbstractDialog):
 			"newUseCheck"			: "newuse_opt",
 			"maskPerVersionCheck"	: "maskPerVersion_opt",
 			"usePerVersionCheck"	: "usePerVersion_opt",
+			"useTipsCheck"			: ("useTips_opt", "gtk_sec"),
 			"testPerVersionCheck"	: "testingPerVersion_opt"
 			}
 	
@@ -201,8 +204,13 @@ class PreferenceWindow (AbstractDialog):
 		hintEB.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#f3f785"))
 
 		for box in self.checkboxes:
-			self.tree.get_widget(box).\
-					set_active(self.cfg.get_boolean(self.checkboxes[box]))
+			val = self.checkboxes[box]
+			if type(val) == types.TupleType:
+				self.tree.get_widget(box).\
+						set_active(self.cfg.get_boolean(val[0], section = self.cfg.const[val[1]]))
+			else:
+				self.tree.get_widget(box).\
+						set_active(self.cfg.get_boolean(val))
 
 		for edit in self.edits:
 			self.tree.get_widget(edit).\
@@ -214,7 +222,11 @@ class PreferenceWindow (AbstractDialog):
 		"""Sets all options in the Config-instance."""
 		
 		for box in self.checkboxes:
-			self.cfg.set_boolean(self.checkboxes[box], self.tree.get_widget(box).get_active())
+			val = self.checkboxes[box]
+			if type(val) == types.TupleType:
+				self.cfg.set_boolean(val[0], self.tree.get_widget(box).get_active(), section = self.cfg.const[val[1]])
+			else:
+				self.cfg.set_boolean(val, self.tree.get_widget(box).get_active())
 
 		for edit in self.edits:
 			self.cfg.set(self.edits[edit],self.tree.get_widget(edit).get_text())
@@ -250,12 +262,16 @@ class PackageTable:
 		# the table
 		self.table = self.tree.get_widget("PackageTable")
 		
+		# the combo vb
+		self.comboVB = self.tree.get_widget("comboVB")
+
 		# chechboxes
 		self.installedCheck = self.tree.get_widget("installedCheck")
 		self.maskedCheck = self.tree.get_widget("maskedCheck")
 		self.testingCheck = self.tree.get_widget("testingCheck")
 
 		# labels
+		self.descLabel = self.tree.get_widget("descLabel")
 		self.notInSysLabel = self.tree.get_widget("notInSysLabel")
 		self.missingLabel = self.tree.get_widget("missingLabel")
 		
@@ -295,11 +311,11 @@ class PackageTable:
 		# version-combo-box
 		self.vCombo = self.build_vers_combo()
 		if not self.doEmerge: self.vCombo.set_sensitive(False)
-		vb = self.tree.get_widget("comboVB")
-		children = vb.get_children()
+		children = self.comboVB.get_children()
 		if children:
-			for c in children: vb.remove(c)
-		vb.pack_start(self.vCombo)
+			for c in children: 
+				self.comboVB.remove(c)
+		self.comboVB.pack_start(self.vCombo)
 
 		# the label (must be here, because it depends on the combo box)
 		desc = self.actual_package().get_env_var("DESCRIPTION").replace("&","&amp;")
@@ -310,7 +326,6 @@ class PackageTable:
 			desc = "<b>"+desc+"</b>"
 			use_markup = True
 		desc = "<i><u>"+self.actual_package().get_cp()+"</u></i>\n\n"+desc
-		self.descLabel = self.tree.get_widget("descLabel")
 		self.descLabel.set_use_markup(use_markup)
 		self.descLabel.set_label(desc)
 		
@@ -332,15 +347,7 @@ class PackageTable:
 		pkg_flags = pkg.get_all_use_flags()
 		pkg_flags.sort()
 		for use in pkg_flags:
-			if pkg.is_installed() and use in pkg.get_actual_use_flags(): # flags set during install
-				enabled = True
-			elif (not pkg.is_installed()) and use in pkg.get_settings("USE").split() and not flags.invert_use_flag(use) in pkg.get_new_use_flags(): # flags that would be set
-				enabled = True
-			elif use in pkg.get_new_use_flags():
-				enabled = True
-			else:
-				enabled = False
-			store.append([enabled, use, backend.get_use_desc(use, self.cp)])
+			store.append([pkg.is_use_flag_enabled(use), use, backend.get_use_desc(use, self.cp)])
 		
 		return store
 
@@ -590,12 +597,6 @@ class MainWindow (Window):
 
 		self.cfg.modify_external_configs()
 
-		# accelerators - for whatever reason they are not automatically working for popups
-		self.accel_group = gtk.AccelGroup()
-		self.window.add_accel_group(self.accel_group)
-		self.accel_group.connect_group(ord("C"), gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE, lambda g, a, k, m: self.cb_copy_clicked(a))
-		self.accel_group.connect_group(ord("1"), gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE, lambda g, a, k, m: self.cb_oneshot_clicked(a))
-
 		# set vpaned position
 		vpaned = self.tree.get_widget("vpaned")
 		vpaned.set_position(mHeight/2)
@@ -630,7 +631,7 @@ class MainWindow (Window):
 		self.packageTable.table.hide_all()
 
 		# popups
-		self.queuePopup = self.create_popup("queuePopup")
+		self.queuePopup = self.tree.get_widget("queuePopup")
 		self.consolePopup = self.create_popup("consolePopup")
 
 		# set emerge queue
@@ -654,6 +655,9 @@ class MainWindow (Window):
 		
 		col = gtk.TreeViewColumn("Options", cell, markup = 1)
 		self.queueList.append_column(col)
+
+		self.useTips = UseTips(0, self.cfg)
+		self.useTips.add_view(self.queueList)
 
 	def build_cat_list (self):
 		"""Builds the category list."""
@@ -711,8 +715,8 @@ class MainWindow (Window):
 		else: title = ("Console (%s)" % title)
 
 		gobject.idle_add(self.notebook.set_tab_label_text, self.termHB, title)
-		
 
+	
 	def cb_cat_list_selection (self, view):
 		"""Callback for a category-list selection. Updates the package list with the packages in the category."""
 		# get the selected category
@@ -885,7 +889,8 @@ class MainWindow (Window):
 				pthinfo = object.get_path_at_pos(x, y)
 				if pthinfo is not None:
 					path, col, cellx, celly = pthinfo
-					if self.queueTree.is_in_emerge(self.queueTree.get_original().get_iter(path)):
+					it = self.queueTree.get_original().get_iter(path)
+					if self.queueTree.is_in_emerge(it) and self.queueTree.iter_has_parent(it):
 						object.grab_focus()
 						object.set_cursor(path, col, 0)
 						self.queuePopup.popup(None, None, None, event.button, time)

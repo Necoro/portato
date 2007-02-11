@@ -33,6 +33,7 @@ class Config:
 	"""Wrapper around a ConfigParser and for additional local configurations."""
 	const = {
 			"main_sec" : "Main",
+			"gtk_sec" : "Gtk",
 			"usePerVersion_opt" : "usePerVersion",
 			"useFile_opt" : "usefile",
 			"maskFile_opt" : "maskfile",
@@ -43,7 +44,8 @@ class Config:
 			"oneshot_opt" : "oneshot",
 			"deep_opt" : "deep",
 			"newuse_opt" : "newuse",
-			"syncCmd_opt" : "synccommand"
+			"syncCmd_opt" : "synccommand",
+			"useTips_opt" : "showusetips"
 			}
 	
 	def __init__ (self, cfgFile):
