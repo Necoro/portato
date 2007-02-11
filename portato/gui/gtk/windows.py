@@ -16,6 +16,9 @@ pygtk.require("2.0")
 import gtk
 import gtk.glade
 import gobject
+from portato.constants import USE_GTKSOURCEVIEW
+if USE_GTKSOURCEVIEW:
+	import gtksourceview
 
 #our backend stuff
 from portato.helper import *
@@ -245,6 +248,52 @@ class PreferenceWindow (AbstractDialog):
 		"""Just closes - w/o saving."""
 		self.window.destroy()
 
+class EbuildWindow (AbstractDialog):
+	"""The window showing the ebuild."""
+
+	def __init__ (self, parent, package):
+		AbstractDialog.__init__(self,parent)
+		
+		# we want it to get minimized
+		self.window.set_transient_for(None)
+
+		self.window.set_title(package.get_cpv())
+		
+		# set geometry (same as MainWindow)
+		mHeight = 800
+		if gtk.gdk.screen_height() <= 800: mHeight = 600
+		self.window.set_geometry_hints (self.window, min_width = 800, min_height = mHeight, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
+
+		if USE_GTKSOURCEVIEW: # we want syntax highlighting
+			# get language
+			man = gtksourceview.SourceLanguagesManager()
+			language = [l for l in man.get_available_languages() if l.get_name() == "Gentoo"]
+			
+			# set buffer and view
+			buf = gtksourceview.SourceBuffer()
+			buf.set_language(language[0])
+			buf.set_highlight(True)
+			view = gtksourceview.SourceView(buf)
+		else:
+			buf = gtk.TextBuffer()
+			view = gtk.TextView(buf)
+
+		view.set_editable(False)
+		view.set_cursor_visible(False)
+		
+		try: # read ebuild
+			f = open(package.get_ebuild_path(), "r")
+			lines = f.readlines()
+			f.close()
+		except IOError,e:
+			io_ex_dialog(e)
+			return
+
+		buf.set_text("".join(lines))
+
+		self.tree.get_widget("ebuildScroll").add(view)
+		self.window.show_all()
+
 class PackageTable:
 	"""A window with data about a specfic package."""
 
@@ -279,6 +328,7 @@ class PackageTable:
 		self.emergeBtn = self.tree.get_widget("pkgEmergeBtn")
 		self.unmergeBtn = self.tree.get_widget("pkgUnmergeBtn")
 		self.cancelBtn = self.tree.get_widget("pkgCancelBtn")
+		self.ebuildBtn = self.tree.get_widget("pkgEbuildBtn")
 		
 		# useList
 		self.useListScroll = self.tree.get_widget("useListScroll")
@@ -514,6 +564,10 @@ class PackageTable:
 		else:
 			self._update_keywords(False)
 			self.main.notebook.set_current_page(self.main.QUEUE_PAGE)
+		return True
+
+	def cb_package_ebuild_clicked(self, button):
+		EbuildWindow(self.main.window, self.actual_package())
 		return True
 
 	def cb_testing_toggled (self, button):

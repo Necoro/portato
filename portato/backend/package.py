@@ -231,7 +231,7 @@ class Package:
 			return True
 		
 		elif (not self.is_installed()) and flag in self.get_settings("USE").split() \
-				and not flags.invert_use_flag(flag) in pkg.get_new_use_flags(): # flags that would be set
+				and not flags.invert_use_flag(flag) in self.get_new_use_flags(): # flags that would be set
 			return True
 		
 		elif flag in self.get_new_use_flags():
