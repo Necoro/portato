@@ -1,4 +1,6 @@
 0.5.3:
+- added ebuild window
+- added usetips
 - allowed copying out of the console
 - added accelerators
 

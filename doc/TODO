@@ -12,3 +12,4 @@ GTK:
 - make oneshot better
 - better infos in queue for "newuse"
 - do not show "linguas_" variables as extra ones (perhaps backend?)
+- find a replacement for the * of installed packages 
