@@ -218,6 +218,28 @@ class Package:
 		
 		flags.remove_new_use_flags(self)
 
+	def is_use_flag_enabled (self, flag):
+		"""Looks whether a given useflag is enabled for the package, taking all options
+		(ie. even the new flags) into account.
+
+		@param flag: the flag to check
+		@type flag: string
+		@returns: True or False
+		@rtype: bool"""
+		
+		if self.is_installed() and flag in self.get_actual_use_flags(): # flags set during install
+			return True
+		
+		elif (not self.is_installed()) and flag in self.get_settings("USE").split() \
+				and not flags.invert_use_flag(flag) in pkg.get_new_use_flags(): # flags that would be set
+			return True
+		
+		elif flag in self.get_new_use_flags():
+			return True
+		
+		else:
+			return False
+
 	def get_matched_dep_packages (self, depvar):
 		"""This function looks for all dependencies which are resolved. In normal case it makes only sense for installed packages, but should work for uninstalled ones too.
 
