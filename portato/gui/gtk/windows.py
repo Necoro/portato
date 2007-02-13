@@ -20,7 +20,7 @@ from portato.constants import USE_GTKSOURCEVIEW
 if USE_GTKSOURCEVIEW:
 	import gtksourceview
 
-#our backend stuff
+# our backend stuff
 from portato.helper import *
 from portato.constants import CONFIG_LOCATION, VERSION, DATA_DIR
 from portato import backend
@@ -387,6 +387,9 @@ class PackageTable:
 		self.cb_combo_changed(self.vCombo)
 		self.table.show_all()
 
+	def hide (self):
+		self.table.hide_all()
+
 	def fill_use_list(self, store):
 		"""Fills a given ListStore with the use-flag data.
 		
@@ -567,7 +570,7 @@ class PackageTable:
 		return True
 
 	def cb_package_ebuild_clicked(self, button):
-		EbuildWindow(self.main.window, self.actual_package())
+		EbuildWindow(self.window, self.actual_package())
 		return True
 
 	def cb_testing_toggled (self, button):
@@ -647,7 +650,7 @@ class MainWindow (Window):
 			self.cfg = Config(CONFIG_LOCATION)
 		except IOError, e:
 			io_ex_dialog(e)
-			raise e
+			raise
 
 		self.cfg.modify_external_configs()
 
@@ -662,19 +665,14 @@ class MainWindow (Window):
 		self.build_pkg_list()
 
 		# queue list
+		self.useTips = UseTips(0, self.cfg)
 		self.queueList = self.tree.get_widget("queueList")
 		self.build_queue_list()
 
 		# the terminal
 		self.console = vte.Terminal()
-		self.console.set_scrollback_lines(1024)
-		self.console.set_scroll_on_output(True)
-		self.console.set_font_from_string("Monospace 11")
-		self.console.connect("button-press-event", self.cb_right_click)
 		self.termHB = self.tree.get_widget("termHB")
-		termScroll = gtk.VScrollbar(self.console.get_adjustment())
-		self.termHB.pack_start(self.console, True, True)
-		self.termHB.pack_start(termScroll, False)
+		self.build_terminal()
 		
 		# notebook
 		self.notebook = self.tree.get_widget("notebook")
@@ -682,10 +680,10 @@ class MainWindow (Window):
 		
 		# table
 		self.packageTable = PackageTable(self)
-		self.packageTable.table.hide_all()
+		self.packageTable.hide()
 
 		# popups
-		self.queuePopup = self.tree.get_widget("queuePopup")
+		self.queuePopup = self.create_popup("queuePopup")
 		self.consolePopup = self.create_popup("consolePopup")
 
 		# set emerge queue
@@ -695,6 +693,17 @@ class MainWindow (Window):
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)
 		self.notebook.set_current_page(self.PKG_PAGE)
+
+	def build_terminal (self):
+		"""Builds the terminal."""
+		
+		self.console.set_scrollback_lines(1024)
+		self.console.set_scroll_on_output(True)
+		self.console.set_font_from_string("Monospace 11")
+		self.console.connect("button-press-event", self.cb_right_click)
+		termScroll = gtk.VScrollbar(self.console.get_adjustment())
+		self.termHB.pack_start(self.console, True, True)
+		self.termHB.pack_start(termScroll, False)
 
 	def build_queue_list (self):
 		"""Builds the queue list."""
@@ -710,7 +719,6 @@ class MainWindow (Window):
 		col = gtk.TreeViewColumn("Options", cell, markup = 1)
 		self.queueList.append_column(col)
 
-		self.useTips = UseTips(0, self.cfg)
 		self.useTips.add_view(self.queueList)
 
 	def build_cat_list (self):
