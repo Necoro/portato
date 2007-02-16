@@ -505,7 +505,7 @@ class PackageTable:
 			self.maskedCheck.hide()
 			self.testingCheck.hide()
 			self.emergeBtn.set_sensitive(False)
-		else:
+		else: # normal package
 			self.missingLabel.hide()
 			self.notInSysLabel.hide()
 			self.installedCheck.show()
@@ -515,12 +515,12 @@ class PackageTable:
 				self.emergeBtn.set_sensitive(True)
 			self.installedCheck.set_active(pkg.is_installed())
 			self.maskedCheck.set_active(pkg.is_masked())
-			if pkg.is_testing(allowed = False) and not pkg.is_testing(allowed=True):
+			if pkg.is_testing(use_keywords = False) and not pkg.is_testing(use_keywords = True):
 				self.testingCheck.set_label("<i>(Testing)</i>")
 				self.testingCheck.get_child().set_use_markup(True)
 			else:
 				self.testingCheck.set_label("Testing")
-			self.testingCheck.set_active(pkg.is_testing(allowed = False))
+			self.testingCheck.set_active(pkg.is_testing(use_keywords = False))
 
 		if self.doEmerge:
 			# set emerge-button-label
@@ -577,16 +577,16 @@ class PackageTable:
 		"""Callback for toggled testing-checkbox."""
 		status = button.get_active()
 
-		if self.actual_package().is_testing(allowed = False) == status:
+		if self.actual_package().is_testing(use_keywords = False) == status:
 			return False
 
-		if not self.actual_package().is_testing(allowed = True):
+		if not self.actual_package().is_testing(use_keywords = True):
 			self.actual_package().set_testing(False)
 			button.set_label("Testing")
 			button.set_active(True)
 		else:
 			self.actual_package().set_testing(True)
-			if self.actual_package().is_testing(allowed=False):
+			if self.actual_package().is_testing(use_keywords=False):
 				button.set_label("<i>(Testing)</i>")
 				button.get_child().set_use_markup(True)
 				button.set_active(True)
@@ -626,7 +626,7 @@ class MainWindow (Window):
 	PKG_PAGE = 0
 	QUEUE_PAGE = 1
 	CONSOLE_PAGE = 2
-	
+
 	def __init__ (self):	
 		"""Build up window"""
 
@@ -640,6 +640,9 @@ class MainWindow (Window):
 		# booleans
 		self.doUpdate = False
 		self.packageInit = True
+
+		# installed pixbuf
+		self.instPixbuf = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
 		
 		# package db
 		self.db = Database()
@@ -743,13 +746,24 @@ class MainWindow (Window):
 		@param name: name of the selected catetegory
 		@type name: string"""
 		
-		store = gtk.ListStore(str)
+		store = gtk.ListStore(str, gtk.gdk.Pixbuf)
 		self.fill_pkg_store(store,name)
 		
 		# build view
 		self.pkgList.set_model(store)
+		
+		col = gtk.TreeViewColumn("Packages")
+
+		# adding the pixbuf
+		cell = gtk.CellRendererPixbuf()
+		col.pack_start(cell, False)
+		col.add_attribute(cell, "pixbuf", 1)
+		
+		# adding the package name
 		cell = gtk.CellRendererText()
-		col = gtk.TreeViewColumn("Packages", cell, text = 0)
+		col.pack_start(cell, True)
+		col.add_attribute(cell, "text", 0)
+		
 		self.pkgList.append_column(col)
 
 	def fill_pkg_store (self, store, name = None):
@@ -763,8 +777,12 @@ class MainWindow (Window):
 		@rtype: gtk.ListStore"""
 
 		if name:
-			for p in self.db.get_cat(name):
-				store.append([p])
+			for pkg, is_inst in self.db.get_cat(name):
+				if is_inst:
+					icon = self.instPixbuf
+				else:
+					icon = None
+				store.append([pkg, icon])
 		return store
 
 	def jump_to (self, cp):
@@ -778,7 +796,6 @@ class MainWindow (Window):
 
 		gobject.idle_add(self.notebook.set_tab_label_text, self.termHB, title)
 
-	
 	def cb_cat_list_selection (self, view):
 		"""Callback for a category-list selection. Updates the package list with the packages in the category."""
 		# get the selected category
@@ -796,7 +813,6 @@ class MainWindow (Window):
 		store, it = sel.get_selected()
 		if it:
 			package = store.get_value(it, 0)
-			if package[-1] == '*': package = package[:-1]
 			self.show_package(self.selCatName+"/"+package, self.queue)
 		return True
 

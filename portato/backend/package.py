@@ -82,23 +82,23 @@ class Package:
 			return True
 		return False
 
-	def is_testing(self, allowed = False):
+	def is_testing(self, use_keywords = False):
 		"""Checks whether a package is marked as testing.
 		
-		@param allowed: Controls whether possible keywords are taken into account or not.
-		@type allowed: boolean
+		@param use_keywords: Controls whether possible keywords are taken into account or not.
+		@type use_keywords: boolean
 		@returns: True if the package is marked as testing; else False.
 		@rtype: boolean"""
 
 		testArch = "~" + self.get_settings("ARCH")
-		if not allowed: # keywords are NOT taken into account
+		if not use_keywords: # keywords are NOT taken into account
 			if testArch in self.get_env_var("KEYWORDS").split():
 				return True
 			return False
 		
 		else: # keywords are taken into account
 			status = flags.new_testing_status(self.get_cpv())
-			if status == None: # we haven't changed it in any way
+			if status is None: # we haven't changed it in any way
 				if self._status and testArch+" keyword" in self._status:
 					return True
 				return False

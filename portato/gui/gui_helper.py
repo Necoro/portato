@@ -213,21 +213,19 @@ class Database:
 			list = p.split("/")
 			cat = list[0]
 			pkg = list[1]
-			if p in installed:
-				pkg += "*"
 			if not cat in self._db: self._db[cat] = []
-			self._db[cat].append(pkg)
+			self._db[cat].append((pkg, p in installed))
 
 		for key in self._db: # sort alphabetically
-			self._db[key].sort(cmp=cmp, key=str.lower)
+			self._db[key].sort(cmp=cmp, key=lambda x: str.lower(x[0]))
 
 	def get_cat (self, cat):
 		"""Returns the packages in the category.
 		
 		@param cat: category to return the packages from
 		@type cat: string
-		@return: list of packages or []
-		@rtype: string[]"""
+		@return: list of tuples: (name, is_installed) or []
+		@rtype: (string, boolean)[]"""
 
 		try:
 			return self._db[cat]
@@ -297,7 +295,7 @@ class EmergeQueue:
 
 		# for the beginning: let us create a package object - but it is not guaranteed, that it actually exists in portage
 		pkg = backend.Package(cpv)
-		masked = not (pkg.is_masked() or pkg.is_testing(allowed=True)) # we are setting this to True in case we have unmasked it already, but portage does not know this
+		masked = not (pkg.is_masked() or pkg.is_testing(use_keywords=True)) # we are setting this to True in case we have unmasked it already, but portage does not know this
 		
 		# and now try to find it in portage
 		pkg = backend.find_packages("="+cpv, masked = masked)
@@ -307,7 +305,7 @@ class EmergeQueue:
 
 		elif unmask: # no pkg returned, but we are allowed to unmask it
 			pkg = backend.find_packages("="+cpv, masked = True)[0]
-			if pkg.is_testing(allowed = True):
+			if pkg.is_testing(use_keywords = True):
 				pkg.set_testing(True)
 			if pkg.is_masked():
 				pkg.set_masked()

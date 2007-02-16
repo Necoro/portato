@@ -542,7 +542,7 @@ def set_testing (pkg, enable):
 		if (enable and line != "-1") or (not enable and line == "-1"):
 			newTesting[cpv].remove((file, line))
 
-	if (enable and not pkg.is_testing(allowed=True)) or (not enable and pkg.is_testing(allowed=True)):
+	if (enable and not pkg.is_testing(use_keywords=True)) or (not enable and pkg.is_testing(use_keywords=True)):
 		return
 
 	if not enable:
