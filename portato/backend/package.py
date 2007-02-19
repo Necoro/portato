@@ -1,0 +1,296 @@
+# -*- coding: utf-8 -*-
+#
+# File: portato/backend/package.py
+# This file is part of the Portato-Project, a graphical portage-frontend.
+#
+# Copyright (C) 2006-2007 René 'Necoro' Neumann
+# This is free software.  You may redistribute copies of it under the terms of
+# the GNU General Public License version 2.
+# There is NO WARRANTY, to the extent permitted by law.
+#
+# Written by René 'Necoro' Neumann <necoro@necoro.net>
+
+from portato.backend import system
+import flags
+
+class Package:
+	"""This is a class abstracting a normal package which can be installed."""
+
+	def __init__ (self, cpv):
+		"""Constructor.
+
+		@param cpv: The cpv which describes the package to create.
+		@type cpv: string (cat/pkg-ver)"""
+
+		self._cpv = cpv
+		self._scpv = system.split_cpv(self._cpv)
+
+		if not self._scpv:
+			raise ValueError("invalid cpv: %s" % cpv)
+	
+	#
+	# implemented
+	#
+	
+	def set_testing(self, enable = True):
+		"""Sets the actual testing status of the package.
+		
+		@param enable: if True it is masked as stable; if False it is marked as testing
+		@type enable: boolean"""
+		
+		flags.set_testing(self, enable)
+
+	def remove_new_testing(self):
+		"""Removes possible changed testing status."""
+		
+		flags.remove_new_testing(self.get_cpv())
+
+	def set_masked (self, masking = False):
+		"""Sets the masking status of the package.
+	
+		@param masking: if True: mask it; if False: unmask it
+		@type masking: boolean"""
+		
+		flags.set_masked(self, masked = masking)
+
+	def remove_new_masked (self):
+		"""Removes possible changed masking status."""
+		
+		flags.remove_new_masked(self.get_cpv())
+
+	def get_installed_use_flags (self):
+		"""Returns a list of the useflags enabled at installation time. If package is not installed, it returns an empty list.
+		
+		@returns: list of useflags enabled at installation time or an empty list
+		@rtype: string[]"""
+		
+		if self.is_installed():
+			uses = set(self.get_use_flags().split()) # all set at installation time
+			iuses = set(self.get_all_use_flags(installed=True)) # all you can set for the package
+			
+			return list(uses.intersection(iuses))
+		else:
+			return []
+	
+	def get_new_use_flags (self):
+		"""Returns a list of the new useflags, i.e. these flags which are not written to the portage-system yet.
+
+		@returns: list of flags or []
+		@rtype: string[]"""
+
+		return flags.get_new_use_flags(self)
+
+	def get_actual_use_flags (self):
+		"""This returns the result of installed_use_flags + new_use_flags. If the package is not installed, it returns only the new flags.
+
+		@return: list of flags
+		@rtype: string[]"""
+
+		if self.is_installed():
+			i_flags = self.get_installed_use_flags()
+			for f in self.get_new_use_flags():
+				
+				if flags.invert_use_flag(f) in i_flags:
+					i_flags.remove(flags.invert_use_flag(f))
+				
+				elif f not in i_flags:
+					i_flags.append(f)
+			return i_flags
+		else:
+			return self.get_new_use_flags()
+
+	def set_use_flag (self, flag):
+		"""Set a use-flag.
+
+		@param flag: the flag to set
+		@type flag: string"""
+		
+		flags.set_use_flag(self, flag)
+
+	def remove_new_use_flags (self):
+		"""Remove all the new use-flags."""
+		
+		flags.remove_new_use_flags(self)
+
+	def is_use_flag_enabled (self, flag):
+		"""Looks whether a given useflag is enabled for the package, taking all options
+		(ie. even the new flags) into account.
+
+		@param flag: the flag to check
+		@type flag: string
+		@returns: True or False
+		@rtype: bool"""
+		
+		if self.is_installed() and flag in self.get_actual_use_flags(): # flags set during install
+			return True
+		
+		elif (not self.is_installed()) and flag in self.get_settings("USE").split() \
+				and not flags.invert_use_flag(flag) in self.get_new_use_flags(): # flags that would be set
+			return True
+		
+		elif flag in self.get_new_use_flags():
+			return True
+		
+		else:
+			return False
+
+	def get_cpv(self):
+		"""Returns full Category/Package-Version string"""
+		
+		return self._cpv
+
+	def get_cp (self):
+		"""Returns the cp-string.
+		
+		@returns: category/package.
+		@rtype: string"""
+		
+		return self.get_category()+"/"+self.get_name()
+
+	def get_slot_cp (self):
+
+		return ("%s:%s" % (self.get_cp(), self.get_env_var("SLOT")))
+
+	def get_name(self):
+		"""Returns base name of package, no category nor version"""
+		
+		return self._scpv[1]
+
+	def get_version(self):
+		"""Returns version of package, with revision number"""
+		
+		v = self._scpv[2]
+		if self._scpv[3] != "r0":
+			v += "-" + self._scpv[3]
+		return v
+
+	def get_category(self):
+		"""Returns category of package"""
+		
+		return self._scpv[0]
+
+	def get_package_path(self):
+		"""Returns the path to where the ChangeLog, Manifest, .ebuild files reside"""
+		p = self.get_ebuild_path()
+		sp = p.split("/")
+		if len(sp):
+			import string
+			return string.join(sp[:-1],"/")
+
+	#
+	# Not implemented
+	#
+	
+	def is_installed(self):
+		"""Returns true if this package is installed (merged)
+		@rtype: boolean"""
+
+		raise NotImplementedError
+
+	def is_overlay(self):
+		"""Returns true if the package is in an overlay.
+		@rtype: boolean"""
+
+		raise NotImplementedError
+		
+	def is_in_system (self):
+		"""Returns False if the package could not be found in the portage system.
+
+		@return: True if in portage system; else False
+		@rtype: boolean"""
+
+		raise NotImplementedError
+
+	def is_missing_keyword(self):
+		"""Returns True if the package is missing the needed keyword.
+		
+		@return: True if keyword is missing; else False
+		@rtype: boolean"""
+
+		raise NotImplementedError
+		
+	def is_testing(self, use_keywords = False):
+		"""Checks whether a package is marked as testing.
+		
+		@param use_keywords: Controls whether possible keywords are taken into account or not.
+		@type use_keywords: boolean
+		@returns: True if the package is marked as testing; else False.
+		@rtype: boolean"""
+
+		raise NotImplementedError
+
+	def is_masked (self):
+		"""Returns True if either masked by package.mask or by profile.
+		
+		@returns: True if masked / False otherwise
+		@rtype: boolean"""
+
+		raise NotImplementedError
+		
+	def get_all_use_flags (self, installed = False):
+		"""Returns a list of _all_ useflags for this package, i.e. all useflags you can set for this package.
+		
+		@param installed: do not take the ones stated in the ebuild, but the ones it has been installed with
+		@type installed: boolean
+
+		@returns: list of use-flags
+		@rtype: string[]"""
+
+		raise NotImplementedError
+
+	def get_matched_dep_packages (self, depvar):
+		"""This function looks for all dependencies which are resolved. In normal case it makes only sense for installed packages, but should work for uninstalled ones too.
+
+		@returns: unique list of dependencies resolved (with elements like "<=net-im/foobar-1.2.3")
+		@rtype: string[]
+
+		@raises portato.DependencyCalcError: when an error occured during executing portage.dep_check()"""
+
+		raise NotImplementedError
+		
+	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"]):
+		"""Returns a cpv-list of packages on which this package depends and which have not been installed yet. This does not check the dependencies in a recursive manner.
+
+		@returns: list of cpvs on which the package depend
+		@rtype: string[]
+
+		@raises portato.BlockedException: when a package in the dependency-list is blocked by an installed one
+		@raises portato.PackageNotFoundException: when a package in the dependency list could not be found in the system
+		@raises portato.DependencyCalcError: when an error occured during executing portage.dep_check()"""
+
+		raise NotImplementedError
+
+	def get_settings(self, key):
+		"""Returns the value of the given key for this package (useful 
+		for package.* files)."""
+
+		raise NotImplementedError
+
+	def get_ebuild_path(self):
+		"""Returns the complete path to the .ebuild file"""
+
+		raise NotImplementedError
+
+	def get_env_var(self, var, tree = None):
+		"""Returns one of the predefined env vars DEPEND, RDEPEND, SRC_URI,...."""
+
+		raise NotImplementedError
+
+	def get_use_flags(self):
+
+		raise NotImplementedError
+
+	def compare_version(self,other):
+		"""Compares this package's version to another's CPV; returns -1, 0, 1"""
+
+		raise NotImplementedError
+
+	def matches (self, criterion):
+		"""This checks, whether this package matches a specific verisioning criterion - e.g.: "<=net-im/foobar-1.2".
+		
+		@param criterion: the criterion to match against
+		@type criterion: string
+		@returns: True if matches; False if not
+		@rtype: boolean"""
+
+		raise NotImplementedError
