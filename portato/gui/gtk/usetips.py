@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from portato.backend import Package
+from portato.backend import system
 from portato.backend.flags import invert_use_flag
 
 from TreeViewTooltips import TreeViewTooltips
@@ -48,7 +48,7 @@ class UseTips (TreeViewTooltips):
 			return None
 
 	def __get_flags(self, cpv):
-		pkg = Package(cpv)
+		pkg = system.new_package(cpv)
 		enabled = []
 		disabled = []
 

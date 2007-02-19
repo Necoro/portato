@@ -15,11 +15,8 @@ import os.path
 from subprocess import Popen, PIPE # needed for grep
 
 from portato.helper import *
-from portage_helper import split_package_name
+from portato.backend import system
 import package
-
-import portage
-from portage_util import unique_array
 
 CONFIG = {
 		"usefile" : "portato",
@@ -29,6 +26,59 @@ CONFIG = {
 		"maskPerVersion" : True,
 		"testingPerVersion" : True
 		}
+
+class Constants:
+
+	def __init__ (self):
+		self.clear()
+	
+	def clear (self):
+		self._use_path = None
+		self._mask_path = None
+		self._unmask_path = None
+		self._testing_path = None
+		self._use_path_is_dir = None
+		self._mask_path_is_dir = None
+		self._unmask_path_is_dir = None
+		self._testing_path_is_dir = None
+
+	def __get (self, name, path):
+		if self.__dict__[name] is None:
+			self.__dict__[name] = os.path.join(system.get_config_path(), path)
+
+		return self.__dict__[name]
+
+	def __is_dir(self, path):
+		name = "_" + path + "_is_dir"
+		if self.__dict__[name] is None:
+			self.__dict__[name] = os.path.isdir(self.__class__.__dict__[path](self))
+		return self.__dict__[name]
+	
+	def use_path (self):
+		return self.__get("_use_path", "package.use")
+
+	def use_path_is_dir (self):
+		return self.__is_dir("use_path")
+
+	def mask_path (self):
+		return self.__get("_mask_path", "package.mask")
+
+	def mask_path_is_dir (self):
+		return self.__is_dir("mask_path")
+
+	def unmask_path (self):
+		return self.__get("_unmask_path", "package.unmask")
+
+	def unmask_path_is_dir (self):
+		return self.__is_dir("unmask_path")
+
+	def testing_path (self):
+		return self.__get("_testing_path", "package.keywords")
+
+	def testing_path_is_dir (self):
+		return self.__is_dir("testing_path")
+
+CONST = Constants()
 
 ### GENERAL PART ###
 
@@ -43,7 +93,7 @@ def grep (pkg, path):
 	@rtype: string"""
 
 	if not isinstance(pkg, package.Package):
-		pkg = package.Package(pkg) # assume it is a cpv or a gentoolkit.Package
+		pkg = system.new_package(pkg) # assume it is a cpv or a gentoolkit.Package
 
 	command = "egrep -x -n -r -H '^[<>!=~]{0,2}%s(-[0-9].*)?[[:space:]]?.*$' %s" # %s is replaced in the next line ;)
 	return Popen((command % (pkg.get_cp(), path)), shell = True, stdout = PIPE).communicate()[0].splitlines()
@@ -105,7 +155,7 @@ def generate_path (cpv, exp):
 	@returns: rendered path
 	@rtype string"""
 
-	cat, pkg, ver, rev = split_package_name(cpv)
+	cat, pkg, ver, rev = system.split_cpv(cpv)
 	
 	if exp.find("$(") != -1:
 		exp = exp.replace("$(cat)",cat).\
@@ -115,8 +165,6 @@ def generate_path (cpv, exp):
 	return exp
 
 ### USE FLAG PART ###
-USE_PATH = os.path.join(portage.USER_CONFIG_PATH,"package.use")
-USE_PATH_IS_DIR = os.path.isdir(USE_PATH)
 useFlags = {} # useFlags in the file
 newUseFlags = {} # useFlags as we want them to be: format: cpv -> [(file, line, useflag, (true if removed from list / false if added))]
 
@@ -150,7 +198,7 @@ def set_use_flag (pkg, flag):
 	global useFlags, newUseFlags
 
 	if not isinstance(pkg, package.Package):
-		pkg = package.Package(pkg) # assume cpv or gentoolkit.Package
+		pkg = system.new_package(pkg) # assume cpv or gentoolkit.Package
 
 	cpv = pkg.get_cpv()
 	invFlag = invert_use_flag(flag)
@@ -158,7 +206,7 @@ def set_use_flag (pkg, flag):
 	# if not saved in useFlags, get it by calling get_data() which calls grep()
 	data = None
 	if not cpv in useFlags:
-		data = get_data(pkg, USE_PATH)
+		data = get_data(pkg, CONST.use_path())
 		useFlags[cpv] = data
 	else:
 		data = useFlags[cpv]
@@ -196,9 +244,9 @@ def set_use_flag (pkg, flag):
 	
 	# create a new line
 	if not added:
-		path = USE_PATH
-		if USE_PATH_IS_DIR:
-			path = os.path.join(USE_PATH, generate_path(cpv, CONFIG["usefile"]))
+		path = CONST.use_path()
+		if CONST.use_path_is_dir():
+			path = os.path.join(CONST.use_path(), generate_path(cpv, CONFIG["usefile"]))
 		try:
 			newUseFlags[cpv].remove((path, -1, invFlag, False))
 		except ValueError: # not in UseFlags
@@ -313,7 +361,7 @@ def write_use_flags ():
 			if CONFIG["usePerVersion"]: # add on a per-version-base
 				msg += "=%s %s\n" % (cpv, ' '.join(flagsToAdd))
 			else: # add on a per-package-base
-				list = split_package_name(cpv)
+				list = system.split_cpv(cpv)
 				msg += "%s/%s %s\n" % (list[0], list[1], ' '.join(flagsToAdd))
 			if not file in file_cache:
 				f = open(file, "a")
@@ -332,11 +380,6 @@ def write_use_flags ():
 	newUseFlags = {}
 
 ### MASKING PART ###
-MASK_PATH = os.path.join(portage.USER_CONFIG_PATH,"package.mask")
-UNMASK_PATH = os.path.join(portage.USER_CONFIG_PATH,"package.unmask")
-MASK_PATH_IS_DIR = os.path.isdir(MASK_PATH)
-UNMASK_PATH_IS_DIR = os.path.isdir(UNMASK_PATH)
-
 new_masked = {}
 new_unmasked = {}
 
@@ -351,7 +394,7 @@ def set_masked (pkg, masked = True):
 	global new_masked, newunmasked
 	
 	if not isinstance(pkg, package.Package):
-		pkg = package.Package(pkg)
+		pkg = system.new_package(pkg)
 
 	cpv = pkg.get_cpv()
 
@@ -363,13 +406,13 @@ def set_masked (pkg, masked = True):
 	if masked:
 		link_neq = new_masked
 		link_eq = new_unmasked
-		path = UNMASK_PATH
+		path = CONST.unmask_path()
 	else:
 		link_neq = new_unmasked
 		link_eq = new_masked
-		path = MASK_PATH
+		path = CONST.mask_path()
 
-	copy = link_eq[cpv]
+	copy = link_eq[cpv][:]
 	for file, line in copy:
 		if line == "-1":
 			link_eq[cpv].remove((file, line))
@@ -393,11 +436,11 @@ def set_masked (pkg, masked = True):
 	if done: return
 
 	if masked:
-		is_dir = MASK_PATH_IS_DIR
-		path = MASK_PATH
+		is_dir = CONST.mask_path_is_dir()
+		path = CONST.mask_path()
 	else:
-		is_dir = UNMASK_PATH_IS_DIR
-		path = UNMASK_PATH
+		is_dir = CONST.unmask_path_is_dir()
+		path = CONST.unmask_path()
 
 	if is_dir:
 		file = os.path.join(path, generate_path(cpv, CONFIG["usefile"]))
@@ -426,9 +469,9 @@ def new_masking_status (cpv):
 	if isinstance(cpv, package.Package):
 		cpv = cpv.get_cpv()
 
-	if cpv in new_masked and new_masked[cpv]:
+	if cpv in new_masked and new_masked[cpv] != []:
 		return "masked"
-	elif cpv in new_unmasked and new_unmasked[cpv]:
+	elif cpv in new_unmasked and new_unmasked[cpv] != []:
 		return "unmasked"
 	else: return None
 
@@ -444,7 +487,7 @@ def write_masked ():
 			if CONFIG["maskPerVersion"]:
 				msg += "=%s\n" % cpv
 			else:
-				list = split_package_name(cpv)
+				list = system.split_cpv(cpv)
 				msg += "%s/%s\n" % (list[0],list[1])
 			if not file in file_cache:
 				f = open(file, "a")
@@ -497,8 +540,6 @@ def write_masked ():
 	new_unmasked = {}
 
 ### TESTING PART ###
-TESTING_PATH = os.path.join(portage.USER_CONFIG_PATH, "package.keywords")
-TESTING_PATH_IS_DIR = os.path.isdir(TESTING_PATH)
 newTesting = {}
 arch = ""
 
@@ -531,7 +572,7 @@ def set_testing (pkg, enable):
 
 	global arch, newTesting
 	if not isinstance(pkg, package.Package):
-		pkg = package.Package(pkg)
+		pkg = system.new_package(pkg)
 
 	arch = pkg.get_settings("ARCH")
 	cpv = pkg.get_cpv()
@@ -546,16 +587,16 @@ def set_testing (pkg, enable):
 		return
 
 	if not enable:
-		test = get_data(pkg, TESTING_PATH)
+		test = get_data(pkg, CONST.testing_path())
 		debug("data (test): "+str(test))
 		for file, line, crit, flags in test:
 			if pkg.matches(crit) and flags[0] == "~"+arch:
 				newTesting[cpv].append((file, line))
 	else:
-		if TESTING_PATH_IS_DIR:
-			file = os.path.join(TESTING_PATH, CONFIG["testingfile"])
+		if CONST.testing_path_is_dir():
+			file = os.path.join(CONST.testing_path(), CONFIG["testingfile"])
 		else:
-			file = TESTING_PATH
+			file = CONST.testing_path()
 		newTesting[cpv].append((file, "-1"))
 
 	newTesting[cpv] = unique_array(newTesting[cpv])
@@ -574,7 +615,7 @@ def write_testing ():
 				if CONFIG["testingPerVersion"]:
 					msg += "=%s ~%s\n" % (cpv, arch)
 				else:
-					list = split_package_name(cpv)
+					list = system.split_cpv(cpv)
 					msg += "%s/%s ~%s\n" % (list[0],list[1],arch)
 				if not file in file_cache:
 					f = open(file, "a")

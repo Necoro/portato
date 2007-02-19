@@ -23,8 +23,7 @@ if USE_GTKSOURCEVIEW:
 # our backend stuff
 from portato.helper import *
 from portato.constants import CONFIG_LOCATION, VERSION, DATA_DIR
-from portato import backend
-from portato.backend import flags
+from portato.backend import flags, system
 from portato.backend.exceptions import *
 
 # more GUI stuff
@@ -37,7 +36,6 @@ from usetips import UseTips
 import vte
 
 # other
-from portage_util import unique_array
 import types
 
 GLADE_FILE = DATA_DIR+"portato.glade"
@@ -189,6 +187,19 @@ class PreferenceWindow (AbstractDialog):
 			"syncCommandEdit"	: "syncCmd_opt"
 			}
 
+	# mapping from the radio buttons to the system name
+	# widget name -> option
+	system_radios = {
+			"portageRadio" : "portage",
+			"pkgCoreRadio" : "pkgcore",
+			"paludisRadio" : "paludis"
+			}
+
+	# mapping from the system name to the radio button
+	# option -> widget name
+	systems = {}
+	systems.update(zip(system_radios.values(), system_radios.keys()))
+
 	def __init__ (self, parent, cfg):
 		"""Constructor.
 
@@ -206,6 +217,7 @@ class PreferenceWindow (AbstractDialog):
 		hintEB = self.tree.get_widget("hintEB")
 		hintEB.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#f3f785"))
 
+		# the checkboxes
 		for box in self.checkboxes:
 			val = self.checkboxes[box]
 			if type(val) == types.TupleType:
@@ -215,9 +227,13 @@ class PreferenceWindow (AbstractDialog):
 				self.tree.get_widget(box).\
 						set_active(self.cfg.get_boolean(val))
 
+		# the edits
 		for edit in self.edits:
 			self.tree.get_widget(edit).\
 					set_text(self.cfg.get(self.edits[edit]))
+
+		# the system radios
+		self.tree.get_widget(self.systems[self.cfg.get("system_opt").lower()]).set_active(True)
 
 		self.window.show_all()
 
@@ -233,6 +249,10 @@ class PreferenceWindow (AbstractDialog):
 
 		for edit in self.edits:
 			self.cfg.set(self.edits[edit],self.tree.get_widget(edit).get_text())
+
+		for radio in self.system_radios:
+			if self.tree.get_widget(radio).get_active():
+				self.cfg.set("system_opt", self.system_radios[radio])
 					
 	def cb_ok_clicked(self, button):
 		"""Saves, writes to config-file and closes the window."""
@@ -355,8 +375,8 @@ class PackageTable:
 		self.instantChange = instantChange
 
 		# packages and installed packages
-		self.packages = backend.sort_package_list(backend.find_packages(cp, masked = True))
-		self.instPackages = backend.sort_package_list(backend.find_installed_packages(cp, masked = True))
+		self.packages = system.sort_package_list(system.find_packages(cp, masked = True))
+		self.instPackages = system.sort_package_list(system.find_installed_packages(cp, masked = True))
 
 		# version-combo-box
 		self.vCombo = self.build_vers_combo()
@@ -400,7 +420,7 @@ class PackageTable:
 		pkg_flags = pkg.get_all_use_flags()
 		pkg_flags.sort()
 		for use in pkg_flags:
-			store.append([pkg.is_use_flag_enabled(use), use, backend.get_use_desc(use, self.cp)])
+			store.append([pkg.is_use_flag_enabled(use), use, system.get_use_desc(use, self.cp)])
 		
 		return store
 
@@ -439,7 +459,7 @@ class PackageTable:
 			if self.version:
 				best_version = self.version
 			else:
-				best_version = backend.find_best_match(self.packages[0].get_cp(), (self.instPackages != [])).get_version()
+				best_version = system.find_best_match(self.packages[0].get_cp(), (self.instPackages != [])).get_version()
 			for i in range(len(self.packages)):
 				if self.packages[i].get_version() == best_version:
 					combo.set_active(i)
@@ -465,7 +485,7 @@ class PackageTable:
 			try:
 				try:
 					self.queue.append(self.actual_package().get_cpv(), unmerge = False, update = update)
-				except backend.PackageNotFoundException, e:
+				except PackageNotFoundException, e:
 					if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
 						self.queue.append(self.actual_package().get_cpv(), unmerge = False, unmask = True, update = update)
 			except BlockedException, e:
@@ -473,7 +493,7 @@ class PackageTable:
 		else:
 			try:
 				self.queue.append(self.actual_package().get_cpv(), unmerge = True)
-			except backend.PackageNotFoundException, e:
+			except PackageNotFoundException, e:
 				masked_dialog(e[0])
 
 	def cb_combo_changed (self, combo):
@@ -730,7 +750,7 @@ class MainWindow (Window):
 		store = gtk.ListStore(str)
 
 		# build categories
-		for p in backend.list_categories():
+		for p in system.list_categories():
 			store.append([p])
 		# sort them alphabetically
 		store.set_sort_column_id(0, gtk.SORT_ASCENDING)
@@ -823,7 +843,7 @@ class MainWindow (Window):
 			iterator = store.get_original().get_iter(path)
 			if store.is_in_emerge(iterator):
 				package = store.get_value(iterator, 0)
-				cat, name, vers, rev = backend.split_package_name(package)
+				cat, name, vers, rev = system.split_cpv(package)
 				if rev != "r0": vers = vers+"-"+rev
 				self.show_package(cat+"/"+name, queue = self.queue, version = vers, instantChange = True, doEmerge = False)
 		return True
@@ -844,7 +864,7 @@ class MainWindow (Window):
 			changed_flags_dialog("masking keywords")
 			flags.write_masked()
 			flags.write_testing()
-			backend.reload_settings()
+			system.reload_settings()
 		
 		if not self.doUpdate:
 			self.queue.emerge(force=True)
@@ -861,11 +881,11 @@ class MainWindow (Window):
 
 	@Window.watch_cursor
 	def cb_update_clicked (self, action):
-		if not backend.am_i_root():
+		if not am_i_root():
 			not_root_dialog()
 		
 		else:
-			updating = backend.update_world(newuse = self.cfg.get_boolean("newuse_opt"), deep = self.cfg.get_boolean("deep_opt"))
+			updating = system.update_world(newuse = self.cfg.get_boolean("newuse_opt"), deep = self.cfg.get_boolean("deep_opt"))
 
 			debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating],"--> length:",len(updating))
 			try:
@@ -907,7 +927,7 @@ class MainWindow (Window):
 		return True
 
 	def cb_sync_clicked (self, action):
-		if not backend.am_i_root():
+		if not am_i_root():
 			not_root_dialog()
 		else:
 			self.notebook.set_current_page(self.CONSOLE_PAGE)
@@ -920,7 +940,7 @@ class MainWindow (Window):
 				self.queue.sync()
 
 	def cb_save_flags_clicked (self, action):
-		if not backend.am_i_root():
+		if not am_i_root():
 			not_root_dialog()
 		else:
 			flags.write_use_flags()
@@ -930,7 +950,7 @@ class MainWindow (Window):
 	@Window.watch_cursor
 	def cb_reload_clicked (self, action):
 		"""Reloads the portage settings and the database."""
-		backend.reload_settings()
+		system.reload_settings()
 		del self.db
 		self.db = Database()
 		self.db.populate()
@@ -939,7 +959,7 @@ class MainWindow (Window):
 	def cb_search_clicked (self, entry):
 		"""Do a search."""
 		if entry.get_text() != "":
-			packages = backend.find_all_packages(entry.get_text(), withVersion = False)
+			packages = system.find_all_packages(entry.get_text(), withVersion = False)
 
 			if packages == []:
 				nothing_found_dialog()

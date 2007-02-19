@@ -4,7 +4,7 @@
 from distutils.core import setup, Extension
 from portato.constants import VERSION, DATA_DIR, FRONTENDS
 
-packages = ["portato", "portato.gui", "portato.backend"]
+packages = ["portato", "portato.gui", "portato.backend", "portato.backend.portage"]
 ext_modules = []
 data_files = []
 cmdclass = {}

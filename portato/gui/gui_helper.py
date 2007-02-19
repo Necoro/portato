@@ -12,7 +12,7 @@
 
 # some backend things
 from portato import backend
-from portato.backend import flags
+from portato.backend import flags, system
 from portato.helper import *
 
 # parser
@@ -45,7 +45,8 @@ class Config:
 			"deep_opt" : "deep",
 			"newuse_opt" : "newuse",
 			"syncCmd_opt" : "synccommand",
-			"useTips_opt" : "showusetips"
+			"useTips_opt" : "showusetips",
+			"system_opt" : "system"
 			}
 	
 	def __init__ (self, cfgFile):
@@ -205,8 +206,8 @@ class Database:
 		@type category: string"""
 		
 		# get the lists
-		packages = backend.find_all_packages(name = category, withVersion = False)
-		installed = backend.find_all_installed_packages(name = category, withVersion = False)
+		packages = system.find_all_packages(name = category, withVersion = False)
+		installed = system.find_all_installed_packages(name = category, withVersion = False)
 		
 		# cycle through packages
 		for p in packages:
@@ -294,17 +295,17 @@ class EmergeQueue:
 		@raises backend.PackageNotFoundException: If no package could be found - normally it is existing but masked."""
 
 		# for the beginning: let us create a package object - but it is not guaranteed, that it actually exists in portage
-		pkg = backend.Package(cpv)
+		pkg = system.new_package(cpv)
 		masked = not (pkg.is_masked() or pkg.is_testing(use_keywords=True)) # we are setting this to True in case we have unmasked it already, but portage does not know this
 		
 		# and now try to find it in portage
-		pkg = backend.find_packages("="+cpv, masked = masked)
+		pkg = system.find_packages("="+cpv, masked = masked)
 		
 		if pkg: # gotcha
 			pkg = pkg[0]
 
 		elif unmask: # no pkg returned, but we are allowed to unmask it
-			pkg = backend.find_packages("="+cpv, masked = True)[0]
+			pkg = system.find_packages("="+cpv, masked = True)[0]
 			if pkg.is_testing(use_keywords = True):
 				pkg.set_testing(True)
 			if pkg.is_masked():
@@ -338,7 +339,7 @@ class EmergeQueue:
 		try:
 			pkg = self._get_pkg_from_cpv(cpv, unmask)
 			if not pkg.is_installed():
-				old = backend.find_installed_packages(pkg.get_slot_cp())
+				old = system.find_installed_packages(pkg.get_slot_cp())
 				if old: 
 					old = old[0] # assume we have only one there; FIXME: slotted packages
 					update = True
@@ -450,11 +451,11 @@ class EmergeQueue:
 
 		for p in packages:
 			if p in ["world", "system"]: continue
-			cat = backend.split_package_name(p)[0] # get category
+			cat = system.split_cpv(p)[0] # get category
 			self.db.reload(cat)
 			debug("Category %s refreshed" % cat)
 
-	def _emerge (self, options, packages, it, command = ["/usr/bin/python","/usr/bin/emerge"]):
+	def _emerge (self, options, packages, it, command = None):
 		"""Calls emerge and updates the terminal.
 		
 		@param options: options to send to emerge
@@ -465,6 +466,9 @@ class EmergeQueue:
 		@type it: Iterator[]
 		@param command: the command to execute - default is "/usr/bin/python /usr/bin/emerge"
 		@type command: string[]"""
+
+		if command is None:
+			command = system.get_merge_command()
 
 		# open tty
 		(master, slave) = pty.openpty()
@@ -501,8 +505,8 @@ class EmergeQueue:
 			# prepare package-list for oneshot
 			list, its = prepare(self.oneshotmerge)
 			
-			s = ["--oneshot"]
-			if not force: s += ["--verbose", "--pretend"]
+			s = system.get_oneshot_option()
+			if not force: s += system.get_pretend_option()
 			
 			self._emerge(s, list, its)
 		
@@ -512,7 +516,7 @@ class EmergeQueue:
 			list, its = prepare(self.mergequeue)
 
 			s = []
-			if not force: s = ["--verbose", "--pretend"]
+			if not force: s = system.get_pretend_option()
 		
 			self._emerge(s, list, its)
 
@@ -527,8 +531,8 @@ class EmergeQueue:
 		list = self.unmergequeue[:] # copy the unmerge-queue
 		
 		# set options
-		s = ["-C"]
-		if not force: s += ["-pv"]
+		s = system.get_unmerge_option()
+		if not force: s += system.get_pretend_option()
 		
 		self._emerge(s,list, [self.unmergeIt])
 
@@ -538,11 +542,11 @@ class EmergeQueue:
 		@param force: If False, '-pv' is send to emerge. Default: False.
 		@type force: boolean"""
 
-		options = ["--update"]
+		options = system.get_update_option()
 
-		if newuse: options += ["--newuse"]
-		if deep: options += ["--deep"]
-		if not force: options += ["-pv"]
+		if newuse: options += system.get_newuse_option()
+		if deep: options += system.get_deep_option()
+		if not force: options += system.get_pretend_option()
 
 		self._emerge(options, ["world"], [self.emergeIt])
 
@@ -552,10 +556,10 @@ class EmergeQueue:
 		@param command: command to execute to sync. If None "emerge --sync" is taken.
 		@type command: string[]"""
 
-		if command == None:
-			self._emerge(["--sync"], [], [])
-		else:
-			self._emerge([],[],[], command = command)
+		if command is None:
+			command = system.get_sync_command()
+		
+		self._emerge([],[],[], command = command)
 
 	def kill_emerge (self):
 		"""Kills the emerge process."""
