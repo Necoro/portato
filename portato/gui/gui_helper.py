@@ -12,7 +12,7 @@
 
 # some backend things
 from portato import backend
-from portato.backend import flags, system
+from portato.backend import flags, system, set_system
 from portato.helper import *
 
 # parser
@@ -116,10 +116,16 @@ class Config:
 		@see: L{helper.set_debug()}"""
 		set_debug(self.get_boolean("debug_opt"))
 
+	def modify_system_config (self):
+		"""Sets the system config.
+		@see: L{backend.set_system()}"""
+		set_system(self.get("system_opt"))
+	
 	def modify_external_configs (self):
 		"""Convenience function setting all external configs."""
 		self.modify_debug_config()
 		self.modify_flags_config()
+		self.modify_system_config()
 
 	def set_local(self, cpv, name, val):
 		"""Sets some local config.

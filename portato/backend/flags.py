@@ -574,7 +574,7 @@ def set_testing (pkg, enable):
 	if not isinstance(pkg, package.Package):
 		pkg = system.new_package(pkg)
 
-	arch = pkg.get_settings("ARCH")
+	arch = pkg.get_global_settings("ARCH")
 	cpv = pkg.get_cpv()
 	if not cpv in newTesting: 
 		newTesting[cpv] = []

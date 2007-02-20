@@ -66,11 +66,11 @@ class UseTips (TreeViewTooltips):
 		string = ""
 		
 		if len(enabled) > 0:
-			string = "<b>+"+"\n+".join(enabled)+"</b>"
+			string = "<b>+%s</b>" % ("\n+".join(enabled),)
 			if len(disabled) > 0:
 				string = string + "\n"
 		
 		if len(disabled) > 0:
-			string = string+"<i>- " + "\n- ".join(disabled) + "</i>"
+			string = string+"<i>- %s</i>" % ("\n- ".join(disabled),)
 
 		return string

@@ -59,9 +59,9 @@ class PortagePackage (Package):
 		return False
 
 	def is_testing(self, use_keywords = False):
-		testArch = "~" + self.get_settings("ARCH")
+		testArch = "~" + self.get_global_settings("ARCH")
 		if not use_keywords: # keywords are NOT taken into account
-			if testArch in self.get_env_var("KEYWORDS").split():
+			if testArch in self.get_package_settings("KEYWORDS").split():
 				return True
 			return False
 		
@@ -92,12 +92,12 @@ class PortagePackage (Package):
 		else:
 			tree = self._settings.porttree
 		
-		return list(set(self.get_env_var("IUSE", tree = tree).split()).difference(self.forced_flags))
+		return list(set(self.get_package_settings("IUSE", tree = tree).split()).difference(self.forced_flags))
 
 	def get_matched_dep_packages (self, depvar):
 		# change the useflags, because we have internally changed some, but not made them visible for portage
 		newUseFlags = self.get_new_use_flags()
-		actual = self.get_settings("USE").split()
+		actual = self.get_global_settings("USE").split()
 		if newUseFlags:
 			for u in newUseFlags:
 				if u[0] == "-" and flags.invert_use_flag(u) in actual:
@@ -107,7 +107,7 @@ class PortagePackage (Package):
 		
 		depstring = ""
 		for d in depvar:
-			depstring += self.get_env_var(d)+" "
+			depstring += self.get_package_settings(d)+" "
 
 		portage_dep._dep_check_strict = False
 		deps = portage.dep_check(depstring, None, self._settings.settings, myuse = actual, trees = self._trees)
@@ -134,7 +134,7 @@ class PortagePackage (Package):
 		
 		# change the useflags, because we have internally changed some, but not made them visible for portage
 		newUseFlags = self.get_new_use_flags()
-		actual = self.get_settings("USE").split()
+		actual = self.get_global_settings("USE").split()
 		if newUseFlags:
 			for u in newUseFlags:
 				if u[0] == "-" and flags.invert_use_flag(u) in actual:
@@ -144,7 +144,7 @@ class PortagePackage (Package):
 
 		depstring = ""
 		for d in depvar:
-			depstring += self.get_env_var(d)+" "
+			depstring += self.get_package_settings(d)+" "
 
 		# let portage do the main stuff ;)
 		# pay attention to any changes here
@@ -188,7 +188,7 @@ class PortagePackage (Package):
 
 		return dep_pkgs
 
-	def get_settings(self, key):
+	def get_global_settings(self, key):
 		self._settingslock.acquire()
 		self._settings.settings.setcpv(self._cpv)
 		v = self._settings.settings[key]
@@ -198,7 +198,7 @@ class PortagePackage (Package):
 	def get_ebuild_path(self):
 		return self._settings.porttree.dbapi.findname(self._cpv)
 
-	def get_env_var(self, var, tree = None):
+	def get_package_settings(self, var, tree = None):
 		if not tree:
 			mytree = self._settings.vartree
 			if not self.is_installed():
@@ -211,7 +211,7 @@ class PortagePackage (Package):
 
 	def get_use_flags(self):
 		if self.is_installed():
-			return self.get_env_var("USE", tree = self._settings.vartree)
+			return self.get_package_settings("USE", tree = self._settings.vartree)
 		else: return ""
 
 	def compare_version(self,other):

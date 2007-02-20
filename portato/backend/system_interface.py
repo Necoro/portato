@@ -174,7 +174,7 @@ class SystemInterface:
 		@type newuse: boolean
 		@param deep: Not only check world packages but also there dependencies.
 		@type deep: boolean
-		@returns: a list containing of the tuple (new_package, old_package)
+		@returns: a list of the tuple (new_package, old_package)
 		@rtype: (backend.Package, backend.Package)[]"""
 
 		raise NotImplementedError

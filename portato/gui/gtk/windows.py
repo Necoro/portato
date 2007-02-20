@@ -388,7 +388,7 @@ class PackageTable:
 		self.comboVB.pack_start(self.vCombo)
 
 		# the label (must be here, because it depends on the combo box)
-		desc = self.actual_package().get_env_var("DESCRIPTION").replace("&","&amp;")
+		desc = self.actual_package().get_package_settings("DESCRIPTION").replace("&","&amp;")
 		if not desc: 
 			desc = "<no description>"
 			use_markup = False

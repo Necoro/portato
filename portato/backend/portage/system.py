@@ -20,9 +20,10 @@ from portato.helper import debug, unique_array
 from portato.backend.system_interface import SystemInterface
 
 class PortageSystem (SystemInterface):
+	"""This class provides access to the portage-system."""
 	
 	def __init__ (self):
-
+		"""Constructor."""
 		self.settings = PortageSettings()
 		portage.WORLD_FILE = self.settings.settings["ROOT"]+portage.WORLD_FILE
 
@@ -138,6 +139,15 @@ class PortageSystem (SystemInterface):
 		return self.geneticize_list(t)
 
 	def __find_resolved_unresolved (self, list, check):
+		"""Checks a given list and divides it into a "resolved" and an "unresolved" part.
+
+		@param list: list of cpv's
+		@type list: string[]
+		@param check: function called to check whether an entry is ok
+		@type check: function(cpv)
+
+		@returns: the divided list: (resolved, unresolved)
+		@rtype: (Package[], Package[])"""
 		resolved = []
 		unresolved = []
 		for x in list:
@@ -242,9 +252,9 @@ class PortageSystem (SystemInterface):
 				if len(inst) > 1:
 					myslots = set()
 					for i in inst: # get the slots of the installed packages
-						myslots.add(i.get_env_var("SLOT"))
+						myslots.add(i.get_package_settings("SLOT"))
 
-					myslots.add(self.find_best_match(p).get_env_var("SLOT")) # add the slot of the best package in portage
+					myslots.add(self.find_best_match(p).get_package_settings("SLOT")) # add the slot of the best package in portage
 					for slot in myslots:
 						new_packages.append(\
 								self.find_best(\
@@ -297,7 +307,7 @@ class PortageSystem (SystemInterface):
 				
 				else:
 					old = set(p.get_installed_use_flags())
-					new = set(p.get_settings("USE").split())
+					new = set(p.get_global_settings("USE").split())
 					
 					if new_iuse.intersection(new) != old_iuse.intersection(old):
 						tempDeep = True

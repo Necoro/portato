@@ -10,32 +10,47 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+from exceptions import *
 from system_interface import SystemInterface
 
-SYSTEM = "portage"
-_sys = None
+SYSTEM = "portage" # the name of the current system
+_sys = None # the SystemInterface-instance
 
 class SystemWrapper (object, SystemInterface):
+	"""This is a wrapper to the different system interfaces, allowing the direct import via C{from portato.backend import system}.
+	With this wrapper a change of the system is propagated to all imports."""
+	
 	def __getattribute__ (self, name):
+		"""Just pass all attribute accesses directly to _sys."""
 		global _sys
 		return eval ("_sys.%s" % name)
 
 def set_system (new_sys):
+	"""Sets the current system to a new one.
+
+	@param new_sys: the name of the system to take
+	@type new_sys: string"""
+
 	global SYSTEM
 	SYSTEM = new_sys
 	load_system()
 
 def load_system ():
+	"""Loads the current chosen system.
+
+	@raises InvalidSystemError: if an inappropriate system is set"""
+	
 	global _sys
 
 	if SYSTEM == "portage":
 		from portato.backend.portage import PortageSystem
 		_sys = PortageSystem ()
+	else:
+		raise InvalidSystemError, SYSTEM
 
 system = SystemWrapper()
 
-from exceptions import *
+# import package before loading the system as some systems may depend on it being in the namespace
 from package import Package
 
 load_system()
-

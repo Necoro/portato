@@ -124,7 +124,7 @@ class Package:
 		if self.is_installed() and flag in self.get_actual_use_flags(): # flags set during install
 			return True
 		
-		elif (not self.is_installed()) and flag in self.get_settings("USE").split() \
+		elif (not self.is_installed()) and flag in self.get_global_settings("USE").split() \
 				and not flags.invert_use_flag(flag) in self.get_new_use_flags(): # flags that would be set
 			return True
 		
@@ -135,7 +135,10 @@ class Package:
 			return False
 
 	def get_cpv(self):
-		"""Returns full Category/Package-Version string"""
+		"""Returns full Category/Package-Version string.
+		
+		@returns: the cpv
+		@rtype: string"""
 		
 		return self._cpv
 
@@ -148,16 +151,26 @@ class Package:
 		return self.get_category()+"/"+self.get_name()
 
 	def get_slot_cp (self):
+		"""Returns the current cp followed by a colon and the slot-number.
+		
+		@returns: cp:slot
+		@rtype: string"""
 
-		return ("%s:%s" % (self.get_cp(), self.get_env_var("SLOT")))
+		return ("%s:%s" % (self.get_cp(), self.get_package_settings("SLOT")))
 
 	def get_name(self):
-		"""Returns base name of package, no category nor version"""
+		"""Returns base name of package, no category nor version.
+		
+		@returns: base-name
+		@rtype: string"""
 		
 		return self._scpv[1]
 
 	def get_version(self):
-		"""Returns version of package, with revision number"""
+		"""Returns version of package, with (optional) revision number.
+		
+		@returns: version-rev
+		@rtype: string"""
 		
 		v = self._scpv[2]
 		if self._scpv[3] != "r0":
@@ -165,12 +178,19 @@ class Package:
 		return v
 
 	def get_category(self):
-		"""Returns category of package"""
+		"""Returns category of package.
+		
+		@returns: category
+		@rtype: string"""
 		
 		return self._scpv[0]
 
 	def get_package_path(self):
-		"""Returns the path to where the ChangeLog, Manifest, .ebuild files reside"""
+		"""Returns the path to where the ChangeLog, Manifest, .ebuild files reside.
+		
+		@returns: path to the package files
+		@rtype: string"""
+		
 		p = self.get_ebuild_path()
 		sp = p.split("/")
 		if len(sp):
@@ -182,7 +202,7 @@ class Package:
 	#
 	
 	def is_installed(self):
-		"""Returns true if this package is installed (merged)
+		"""Returns true if this package is installed (merged).
 		@rtype: boolean"""
 
 		raise NotImplementedError
@@ -260,33 +280,51 @@ class Package:
 
 		raise NotImplementedError
 
-	def get_settings(self, key):
-		"""Returns the value of the given key for this package (useful 
-		for package.* files)."""
+	def get_global_settings(self, key):
+		"""Returns the value of a global setting, i.e. ARCH, USE, ROOT, DISTDIR etc.
+		
+		@param key: the setting to return
+		@type key: string
+		@returns: the value of this setting
+		@rtype: string"""
 
 		raise NotImplementedError
 
 	def get_ebuild_path(self):
-		"""Returns the complete path to the .ebuild file"""
+		"""Returns the complete path to the .ebuild file.
+		
+		@rtype: string"""
 
 		raise NotImplementedError
 
-	def get_env_var(self, var, tree = None):
-		"""Returns one of the predefined env vars DEPEND, RDEPEND, SRC_URI,...."""
+	def get_package_settings(self, var, tree = None):
+		"""Returns a package specific setting, such as DESCRIPTION, SRC_URI, IUSE ...
+		
+		@param var: the setting to get
+		@type var: string
+		@param tree: an object defining whether to take the information from the installed package or from the ebuild
+		@type tree: unknown
+		
+		@returns: the value of the setting
+		@rtype: string"""
 
 		raise NotImplementedError
 
 	def get_use_flags(self):
-
+		"""Returns _all_ (not only the package-specific) useflags which were set at the installation time of the package.
+		
+		@returns: string holding all useflags
+		@rtype: string"""
+		
 		raise NotImplementedError
 
-	def compare_version(self,other):
+	def compare_version(self, other):
 		"""Compares this package's version to another's CPV; returns -1, 0, 1"""
 
 		raise NotImplementedError
 
 	def matches (self, criterion):
-		"""This checks, whether this package matches a specific verisioning criterion - e.g.: "<=net-im/foobar-1.2".
+		"""This checks, whether this package matches a specific versioning criterion - e.g.: "<=net-im/foobar-1.2".
 		
 		@param criterion: the criterion to match against
 		@type criterion: string
