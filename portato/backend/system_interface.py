@@ -206,7 +206,7 @@ class SystemInterface:
 		"""Returns the actual path to the config files.
 		
 		@returns: the path, e.g. /etc/portage
-		@rtyoe: string"""
+		@rtype: string"""
 
 		raise NotImplementedError
 
