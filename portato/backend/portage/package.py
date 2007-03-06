@@ -144,7 +144,7 @@ class PortagePackage (Package):
 
 		depstring = ""
 		for d in depvar:
-			depstring += self.get_package_settings(d)+" "
+			depstring += self.get_package_settings(d, tree=self._settings.porttree)+" "
 
 		# let portage do the main stuff ;)
 		# pay attention to any changes here

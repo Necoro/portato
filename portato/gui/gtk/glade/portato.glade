@@ -202,7 +202,6 @@
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Oneshot</property>
                         <signal name="activate" handler="cb_oneshot_clicked"/>
-                        <accelerator key="1" modifiers="GDK_CONTROL_MASK" signal="activate"/>
                       </widget>
                     </child>
                   </widget>
@@ -224,7 +223,6 @@
                         <property name="label" translatable="yes">_Copy</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="cb_copy_clicked"/>
-                        <accelerator key="C" modifiers="GDK_CONTROL_MASK" signal="activate"/>
                         <child internal-child="image">
                           <widget class="GtkImage" id="menu-item-image8">
                             <property name="visible">True</property>
@@ -242,7 +240,6 @@
                         <property name="label" translatable="yes">_Kill Emerge</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="cb_kill_clicked"/>
-                        <accelerator key="K" modifiers="GDK_CONTROL_MASK" signal="activate"/>
                         <child internal-child="image">
                           <widget class="GtkImage" id="image25">
                             <property name="visible">True</property>
