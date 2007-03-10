@@ -197,6 +197,9 @@ class PluginQueue:
 		if load:
 			self._load()
 
+	def get_plugin_data (self):
+		return [(x.name, x.author) for x in self.list]
+
 	def hook (self, hook, *hargs, **hkwargs):
 		"""This is a method taking care of calling the plugins.
 		

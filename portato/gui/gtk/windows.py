@@ -102,7 +102,7 @@ class AbstractDialog (Window):
 class AboutWindow (AbstractDialog):
 	"""A window showing the "about"-informations."""
 
-	def __init__ (self, parent):
+	def __init__ (self, parent, plugins):
 		"""Constructor.
 
 		@param parent: the parent window
@@ -120,6 +120,21 @@ Copyright (C) 2006-2007 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;
 
 <small>Thanks to Fred for support and ideas :P</small>
 """ % VERSION)
+
+		view = self.tree.get_widget("pluginList")
+		store = gtk.ListStore(str,str)
+		
+		view.set_model(store)
+		
+		cell = gtk.CellRendererText()
+		col = gtk.TreeViewColumn("Plugin", cell, markup = 0)
+		view.append_column(col)
+		
+		col = gtk.TreeViewColumn("Authors", cell, text = 1)
+		view.append_column(col)
+
+		for p in [("<b>"+n+"</b>",a) for n,a in plugins]:
+			store.append(p)
 
 		self.window.show_all()
 
@@ -983,7 +998,7 @@ class MainWindow (Window):
 		return True
 
 	def cb_about_clicked (self, button):
-		AboutWindow(self.window)
+		AboutWindow(self.window, self.pluginQueue.get_plugin_data())
 		return True
 
 	def cb_right_click (self, object, event):
