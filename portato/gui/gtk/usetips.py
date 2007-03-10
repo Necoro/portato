@@ -51,26 +51,35 @@ class UseTips (TreeViewTooltips):
 		pkg = system.new_package(cpv)
 		enabled = []
 		disabled = []
+		expanded = set()
 
 		pkg_flags = pkg.get_all_use_flags()
-		if len(pkg_flags) == 0: # no flags - stop here
+		if not pkg_flags: # no flags - stop here
 			return None
 		
 		pkg_flags.sort()
 		for use in pkg_flags:
-			if pkg.is_use_flag_enabled(use):
-				enabled.append(use)
+			exp = pkg.use_expanded(use)
+			if exp:
+				expanded.add(exp)
+			
 			else:
-				disabled.append(use)
+				if pkg.is_use_flag_enabled(use):
+					enabled.append(use)
+				else:
+					disabled.append(use)
 		
 		string = ""
 		
-		if len(enabled) > 0:
+		if enabled:
 			string = "<b>+%s</b>" % ("\n+".join(enabled),)
 			if len(disabled) > 0:
 				string = string + "\n"
 		
-		if len(disabled) > 0:
+		if disabled:
 			string = string+"<i>- %s</i>" % ("\n- ".join(disabled),)
+
+		if expanded:
+			string = string+"\n\n"+"\n".join(expanded)
 
 		return string

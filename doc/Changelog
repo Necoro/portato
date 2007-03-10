@@ -1,5 +1,6 @@
 next:
 - first plugin support
+- collapsed USE_EXPAND-variables
 
 0.6.0:
 - general support for different backend systems

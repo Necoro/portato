@@ -134,6 +134,27 @@ class Package:
 		else:
 			return False
 
+	def use_expanded (self, flag, suggest = None):
+		"""Tests whether a useflag is an expanded one. If it is, this method returns the USE_EXPAND-value.
+
+		@param flag: the flag to check
+		@type flag: string
+		@param suggest: try this suggestion first
+		@type suggest: string
+		@returns: USE_EXPAND-value on success
+		@rtype: string or None"""
+
+		if not suggest is None:
+			if flag.startswith(suggest.lower()):
+				return suggest
+
+		for exp in self.get_global_settings("USE_EXPAND").split(" "):
+			lexp = exp.lower()
+			if flag.startswith(lexp):
+				return exp
+
+		return None
+
 	def get_cpv(self):
 		"""Returns full Category/Package-Version string.
 		

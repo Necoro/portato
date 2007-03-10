@@ -439,14 +439,27 @@ class PackageTable:
 		pkg = self.actual_package()
 		pkg_flags = pkg.get_all_use_flags()
 		pkg_flags.sort()
+	
+		actual_exp = None
+		actual_exp_it = None
+
 		for use in pkg_flags:
-			store.append([pkg.is_use_flag_enabled(use), use, system.get_use_desc(use, self.cp)])
+			exp = pkg.use_expanded(use, suggest = actual_exp)
+			if exp is not None:
+				if exp != actual_exp:
+					actual_exp_it = store.append(None, [None, exp, "<i>This is an expanded use flag and cannot be selected</i>"])
+					actual_exp = exp
+			else:
+				actual_exp_it = None
+				actual_exp = None
+
+			store.append(actual_exp_it, [pkg.is_use_flag_enabled(use), use, system.get_use_desc(use, self.cp)])
 		
 		return store
 
 	def build_use_list (self):
 		"""Builds the useList."""
-		store = gtk.ListStore(bool, str, str)
+		store = gtk.TreeStore(bool, str, str)
 		self.fill_use_list(store)
 
 		# build view
@@ -457,7 +470,10 @@ class PackageTable:
 		tCell.connect("toggled", self.cb_use_flag_toggled, store)
 		view.append_column(gtk.TreeViewColumn("Enabled", tCell, active = 0))
 		view.append_column(gtk.TreeViewColumn("Flags", cell, text = 1))
-		view.append_column(gtk.TreeViewColumn("Description", cell, text = 2))
+		view.append_column(gtk.TreeViewColumn("Description", cell, markup = 2))
+
+		view.set_search_column(1)
+		view.set_enable_tree_lines(True)
 
 		if store.iter_n_children(None) == 0: # if there are no nodes in the list ...
 			view.set_child_visible(False) # ... do not show the list
@@ -649,12 +665,18 @@ class PackageTable:
 
 	def cb_use_flag_toggled (self, cell, path, store):
 		"""Callback for a toggled use-flag button."""
+		flag = store[path][1]
+		pkg = self.actual_package()
+		
+		if flag in pkg.get_global_settings("USE_EXPAND").split(" "): # ignore expanded flags
+			return False
+
 		store[path][0] = not store[path][0]
 		prefix = ""
 		if not store[path][0]:
 			prefix = "-"
-		self.actual_package().set_use_flag(prefix+store[path][1])
 		
+		pkg.set_use_flag(prefix+flag)	
 		if self.instantChange:
 			self._update_keywords(True, update = True)
 	
