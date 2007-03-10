@@ -16,15 +16,15 @@ pygtk.require("2.0")
 import gtk
 import gtk.glade
 import gobject
-from portato.constants import USE_GTKSOURCEVIEW
-if USE_GTKSOURCEVIEW:
-	import gtksourceview
 
 # our backend stuff
 from portato.helper import *
 from portato.constants import CONFIG_LOCATION, VERSION, DATA_DIR
 from portato.backend import flags, system
 from portato.backend.exceptions import *
+
+# plugins
+from portato.plugin import PluginQueue
 
 # more GUI stuff
 from portato.gui.gui_helper import Database, Config, EmergeQueue
@@ -272,6 +272,13 @@ class EbuildWindow (AbstractDialog):
 	"""The window showing the ebuild."""
 
 	def __init__ (self, parent, package):
+		"""Constructor.
+
+		@param parent: the parent window
+		@type parent: gtk.Window
+		@param package: the actual package
+		@type package: backend.Package"""
+
 		AbstractDialog.__init__(self,parent)
 		
 		# we want it to get minimized
@@ -284,34 +291,32 @@ class EbuildWindow (AbstractDialog):
 		if gtk.gdk.screen_height() <= 800: mHeight = 600
 		self.window.set_geometry_hints (self.window, min_width = 800, min_height = mHeight, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
 
-		if USE_GTKSOURCEVIEW: # we want syntax highlighting
-			# get language
-			man = gtksourceview.SourceLanguagesManager()
-			language = [l for l in man.get_available_languages() if l.get_name() == "Gentoo"]
-			
-			# set buffer and view
-			buf = gtksourceview.SourceBuffer()
-			buf.set_language(language[0])
-			buf.set_highlight(True)
-			view = gtksourceview.SourceView(buf)
-		else:
-			buf = gtk.TextBuffer()
-			view = gtk.TextView(buf)
+		self.package = package
 
-		view.set_editable(False)
-		view.set_cursor_visible(False)
+		self._build_view()
+		self._show()
+
+	def _build_view(self):
+		"""Creates the buffer and the view."""
+		self.buf = gtk.TextBuffer()
+		self.view = gtk.TextView(self.buf)
+
+	def _show (self):
+		"""Fill the buffer with content and shows the window."""
+		self.view.set_editable(False)
+		self.view.set_cursor_visible(False)
 		
 		try: # read ebuild
-			f = open(package.get_ebuild_path(), "r")
+			f = open(self.package.get_ebuild_path(), "r")
 			lines = f.readlines()
 			f.close()
 		except IOError,e:
 			io_ex_dialog(e)
 			return
 
-		buf.set_text("".join(lines))
+		self.buf.set_text("".join(lines))
 
-		self.tree.get_widget("ebuildScroll").add(view)
+		self.tree.get_widget("ebuildScroll").add(self.view)
 		self.window.show_all()
 
 class PackageTable:
@@ -590,7 +595,8 @@ class PackageTable:
 		return True
 
 	def cb_package_ebuild_clicked(self, button):
-		EbuildWindow(self.window, self.actual_package())
+		hook = self.main.pluginQueue.hook("open_ebuild", self.actual_package(), self.window)
+		hook(EbuildWindow)(self.window, self.actual_package())
 		return True
 
 	def cb_testing_toggled (self, button):
@@ -676,6 +682,9 @@ class MainWindow (Window):
 			raise
 
 		self.cfg.modify_external_configs()
+
+		# plugins
+		self.pluginQueue = PluginQueue()
 
 		# set vpaned position
 		vpaned = self.tree.get_widget("vpaned")

@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net> et.al.
 
-import traceback, os.path
+import traceback, os.path, sys
 
 DEBUG = True
 
@@ -33,7 +33,7 @@ def debug(*args, **kwargs):
 	If you pass the optional keyword-argument "name", it is used for the function-name instead of the original one."""
 
 	
-	if not DEBUG : return
+	if not DEBUG and not ("warn" in kwargs or "error" in kwargs): return
 	
 	stack = traceback.extract_stack()
 	minus = -2
@@ -50,14 +50,24 @@ def debug(*args, **kwargs):
 	else:
 		text = 'In %s (%s:%s): %s' % (c, a, b, text)
 	
-	text = "***DEBUG*** %s ***DEBUG***" % text
+	outfile = sys.stdout
+	surround = "DEBUG"
+
+	if "warn" in kwargs:
+		outfile = sys.stderr
+		surround = "WARNING"
+	elif "error" in kwargs:
+		outfile = sys.stderr
+		surround = "ERROR"
+
+	text = ("***%s*** %s ***%s***" % (surround, text, surround))
 	
 	if "file" in kwargs:
 		f = open(kwargs["file"], "a+")
 		f.write(text+"\n")
 		f.close()
 	else:
-		print text
+		print >> outfile, text
 
 def am_i_root ():
 	"""Returns True if the current user is root, False otherwise.

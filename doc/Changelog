@@ -1,3 +1,6 @@
+next:
+- first plugin support
+
 0.6.0:
 - general support for different backend systems
 - removed asterisks as "installed" sign - using an image now
