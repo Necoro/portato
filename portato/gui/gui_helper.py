@@ -14,6 +14,7 @@
 from portato import backend
 from portato.backend import flags, system, set_system
 from portato.helper import *
+from portato import plugin
 
 # parser
 from portato.config_parser import ConfigParser
@@ -280,7 +281,7 @@ class EmergeQueue:
 		
 		self.db = db
 		self.title_update = title_update
-		
+
 		# our iterators pointing at the toplevels; they are set to None if we do not have a tree
 		if self.tree: 
 			self.emergeIt = self.tree.get_emerge_it()
@@ -455,11 +456,15 @@ class EmergeQueue:
 
 		if self.title_update: self.title_update(None)
 
-		for p in packages:
-			if p in ["world", "system"]: continue
-			cat = system.split_cpv(p)[0] # get category
-			self.db.reload(cat)
-			debug("Category %s refreshed" % cat)
+		@plugin.hook("after_emerge", packages)
+		def update_packages():
+			for p in packages:
+				if p in ["world", "system"]: continue
+				cat = system.split_cpv(p)[0] # get category
+				self.db.reload(cat)
+				debug("Category %s refreshed" % cat)
+
+		update_packages()
 
 	def _emerge (self, options, packages, it, command = None):
 		"""Calls emerge and updates the terminal.
@@ -473,22 +478,26 @@ class EmergeQueue:
 		@param command: the command to execute - default is "/usr/bin/python /usr/bin/emerge"
 		@type command: string[]"""
 
-		if command is None:
-			command = system.get_merge_command()
+		@plugin.hook("emerge", packages, command)
+		def sub_emerge(command):
+			if command is None:
+				command = system.get_merge_command()
 
-		# open tty
-		(master, slave) = pty.openpty()
-		self.console.set_pty(master)
-		
-		# start emerge
-		self.process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False)
-		
-		# start thread waiting for the stop of emerge
-		Thread(name="Emerge-Thread", target=self._update_packages, args=(packages+self.deps.keys(), self.process)).start()
-		
-		# remove
-		for i in it:
-			self.remove_with_children(i)
+			# open tty
+			(master, slave) = pty.openpty()
+			self.console.set_pty(master)
+			
+			# start emerge
+			self.process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False)
+			
+			# start thread waiting for the stop of emerge
+			Thread(name="Emerge-Thread", target=self._update_packages, args=(packages+self.deps.keys(), self.process)).start()
+			
+			# remove
+			for i in it:
+				self.remove_with_children(i)
+
+		sub_emerge(command)
 
 	def emerge (self, force = False):
 		"""Emerges everything in the merge-queue.

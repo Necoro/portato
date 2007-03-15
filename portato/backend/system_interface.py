@@ -192,6 +192,16 @@ class SystemInterface:
 
 		raise NotImplementedError
 
+	def get_global_settings(self, key):
+		"""Returns the value of a global setting, i.e. ARCH, USE, ROOT, DISTDIR etc.
+		
+		@param key: the setting to return
+		@type key: string
+		@returns: the value of this setting
+		@rtype: string"""
+
+		raise NotImplementedError
+
 	def new_package (self, cpv):
 		"""Returns an instance of the appropriate Package-Subclass.
 

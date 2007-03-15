@@ -243,7 +243,7 @@ class PluginQueue:
 			else:
 				list = ([],[],[])
 
-			def wrapper (self, *args, **kwargs):
+			def wrapper (*args, **kwargs):
 				
 				# before
 				for cmd in list[0]:
@@ -254,7 +254,7 @@ class PluginQueue:
 					debug("Overriding hook '%s' with plugin '%s'" % (hook, list[1][0].hook.plugin.name))
 					call(list[1][0])
 				else: # normal
-					func(self, *args, **kwargs)
+					func(*args, **kwargs)
 
 				# after
 				for cmd in list[2]:
@@ -368,3 +368,22 @@ class PluginQueue:
 		
 		for hook in after:
 			resolve(hook, after[hook], 2, 1)
+
+
+__plugins = None
+
+def load_plugins():
+	global __plugins
+	if __plugins is None:
+		__plugins = PluginQueue()
+
+def get_plugins():
+	return __plugins
+
+def hook(hook, *args, **kwargs):
+	if __plugins is None:
+		def pseudo_decorator(f):
+			return f
+		return pseudo_decorator
+	else:
+		return __plugins.hook(hook, *args, **kwargs)

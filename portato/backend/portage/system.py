@@ -85,6 +85,9 @@ class PortageSystem (SystemInterface):
 		
 		return [package.PortagePackage(x) for x in list_of_packages]
 
+	def get_global_settings (self, key):
+		return self.settings.settings[key]
+
 	def find_best (self, list):
 		return package.PortagePackage(portage.best(list))
 

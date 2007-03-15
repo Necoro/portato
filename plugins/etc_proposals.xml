@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<plugin
+	author="René 'Necoro' Neumann"
+	name="Etc-proposals plugin">
+	<import>portato.plugins.etc_proposals</import>
+	<frontend>gtk</frontend>
+
+	<hook
+		hook = "after_emerge"
+		call = "etc_prop">
+		<connect type="after" />
+	</hook>
+</plugin>

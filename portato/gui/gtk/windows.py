@@ -24,7 +24,7 @@ from portato.backend import flags, system
 from portato.backend.exceptions import *
 
 # plugins
-from portato.plugin import PluginQueue
+from portato import plugin
 
 # more GUI stuff
 from portato.gui.gui_helper import Database, Config, EmergeQueue
@@ -626,7 +626,7 @@ class PackageTable:
 		return True
 
 	def cb_package_ebuild_clicked(self, button):
-		hook = self.main.pluginQueue.hook("open_ebuild", self.actual_package(), self.window)
+		hook = plugin.hook("open_ebuild", self.actual_package(), self.window)
 		hook(EbuildWindow)(self.window, self.actual_package())
 		return True
 
@@ -720,8 +720,7 @@ class MainWindow (Window):
 
 		self.cfg.modify_external_configs()
 
-		# plugins
-		self.pluginQueue = PluginQueue()
+		plugin.load_plugins()
 
 		# set vpaned position
 		vpaned = self.tree.get_widget("vpaned")
@@ -1020,7 +1019,12 @@ class MainWindow (Window):
 		return True
 
 	def cb_about_clicked (self, button):
-		AboutWindow(self.window, self.pluginQueue.get_plugin_data())
+		queue = plugin.get_plugins()
+		if queue is None:
+			queue = []
+		else:
+			queue = queue.get_plugin_data()
+		AboutWindow(self.window, queue)
 		return True
 
 	def cb_right_click (self, object, event):
