@@ -11,6 +11,8 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net> et.al.
 
 import traceback, os.path, sys
+from itertools import chain
+
 
 DEBUG = True
 
@@ -76,6 +78,16 @@ def am_i_root ():
 		return True
 	else:
 		return False
+
+def flatten (listOfLists):
+	"""Flattens the given list of lists.
+
+	@param listOfLists: the list of lists to flatten
+	@type listOfLists: list of lists
+	@returns: flattend list
+	@rtyoe: list"""
+
+	return list(chain(*listOfLists))
 
 def unique_array(s):
 	"""Stolen from portage_utils:

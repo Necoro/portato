@@ -14,7 +14,7 @@ import os, os.path
 from xml.dom.minidom import parse
 
 from constants import PLUGIN_DIR
-from helper import debug
+from helper import debug, flatten
 
 class ParseException (Exception):
 	pass
@@ -22,6 +22,46 @@ class ParseException (Exception):
 def error (reason, p):
 	reason = "("+reason+")"
 	debug("Malformed plugin:", p, reason, minus=1, error = 1)
+
+class Menu:
+	"""A single <menu>-element."""
+	def __init__ (self, plugin, label, call):
+		"""Constructor.
+
+		@param plugin: the plugin this menu belongs to
+		@type plugin: Plugin
+		@param label: the label to show
+		@type label: string
+		@param call: the function to call relative to the import statement
+		@type call: string
+
+		@raises ParseException: on parsing errors"""
+
+		if not label:
+			raise ParseException, "label attribute missing"
+
+		if not call:
+			raise ParseException, "call attribute missing"
+
+		self.label = label
+		self.plugin = plugin
+
+		if self.plugin.needs_import(): # get import
+			imp = self.plugin.get_import()
+			try:
+				mod = __import__(imp, globals(), locals(), [call])
+			except ImportError:
+				raise ParseException, imp+" cannot be imported"
+
+			try:
+				self.call = eval("mod."+call) # build function
+			except AttributeError:
+				raise ParseException, call+" cannot be imported"
+		else:
+			try:
+				self.call = eval(call)
+			except AttributeError:
+				raise ParseException, call+" cannot be imported"
 
 class Connect:
 	"""A single <connect>-element."""
@@ -129,6 +169,7 @@ class Plugin:
 		self.author = author
 		self._import = None
 		self.hooks = []
+		self.menus = []
 
 	def parse_hooks (self, hooks):
 		"""Gets a list of <hook>-elements and parses them.
@@ -143,6 +184,18 @@ class Plugin:
 			hook.parse_connects(h.getElementsByTagName("connect"))
 			self.hooks.append(hook)
 
+	def parse_menus (self, menus):
+		"""Gets a list of <menu>-elements and parses them.
+
+		@param menus: the list of elements
+		@type menus: NodeList
+
+		@raises ParseException: on parsing errors"""
+
+		for m in menus:
+			menu = Menu(self, m.getAttribute("label"), m.getAttribute("call"))
+			self.menus.append(menu)
+	
 	def set_import (self, imports):
 		"""This gets a list of imports and parses them - setting the import needed to call the plugin.
 
@@ -200,6 +253,9 @@ class PluginQueue:
 	def get_plugin_data (self):
 		return [(x.name, x.author) for x in self.list]
 
+	def get_plugin_menus (self):
+		return flatten([x.menus for x in self.list])
+
 	def hook (self, hook, *hargs, **hkwargs):
 		"""This is a method taking care of calling the plugins.
 		
@@ -230,9 +286,15 @@ class PluginQueue:
 					debug(imp,"cannot be imported", error = 1)
 					return
 
-				f = eval("mod."+cmd.hook.call) # build function
+				try:
+					f = eval("mod."+cmd.hook.call) # build function
+				except AttributeError:
+					debug(cmd.hook.call,"cannot be imported", error = 1)
 			else:
-				f = eval(cmd.hook.call)
+				try:
+					f = eval(cmd.hook.call)
+				except AttributeError:
+					debug(cmd.hook.call,"cannot be imported", error = 1)
 
 			f(*hargs, **hkwargs) # call function
 
@@ -284,6 +346,7 @@ class PluginQueue:
 					plugin = Plugin(p, elem.getAttribute("name"), elem.getAttribute("author"))
 					plugin.parse_hooks(elem.getElementsByTagName("hook"))
 					plugin.set_import(elem.getElementsByTagName("import"))
+					plugin.parse_menus(elem.getElementsByTagName("menu"))
 					
 					self.list.append(plugin)
 

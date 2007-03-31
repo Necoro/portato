@@ -10,10 +10,12 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from portato.helper import debug
+from portato.helper import debug, am_i_root
 from portato.backend import system
 
-import os
+from portato.gui.gtk.dialogs import not_root_dialog
+
+from subprocess import Popen
 from etcproposals.etcproposals_lib import EtcProposals
 
 class PortatoEtcProposals(EtcProposals):
@@ -32,4 +34,10 @@ def etc_prop (*args, **kwargs):
 	debug(l,"files to update")
 
 	if l > 0:
-		os.system("etc-proposals")
+		Popen("etc-proposals")
+
+def etc_prop_menu (*args, **kwargs):
+	if not am_i_root():
+		not_root_dialog()
+	else:
+		Popen("etc-proposals")

@@ -530,7 +530,8 @@ class PackageTable:
 			try:
 				self.queue.append(self.actual_package().get_cpv(), unmerge = True)
 			except PackageNotFoundException, e:
-				masked_dialog(e[0])
+				debug("Package could not be found",e[0], error = 1)
+				#masked_dialog(e[0])
 
 	def cb_combo_changed (self, combo):
 		"""Callback for the changed ComboBox.
@@ -720,7 +721,17 @@ class MainWindow (Window):
 
 		self.cfg.modify_external_configs()
 
+		# set plugins and plugin-menu
 		plugin.load_plugins()
+		menus = plugin.get_plugins().get_plugin_menus()
+		if menus:
+			self.tree.get_widget("pluginMenuItem").set_no_show_all(False)
+			pluginMenu = self.tree.get_widget("pluginMenu")
+
+			for m in menus:
+				item = gtk.MenuItem(m.label)
+				item.connect("activate", m.call)
+				pluginMenu.append(item)
 
 		# set vpaned position
 		vpaned = self.tree.get_widget("vpaned")

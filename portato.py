@@ -15,7 +15,7 @@
 from portato.constants import VERSION, FRONTENDS, STD_FRONTEND
 import sys
 
-if __name__ == "__main__":
+def main ():
 	uimod = STD_FRONTEND
 
 	for arg in sys.argv[1:]:
@@ -41,8 +41,8 @@ Written by René 'Necoro' Neumann <necoro@necoro.net>""" % VERSION
 	if uimod in FRONTENDS:
 		try:
 			exec ("from portato.gui.%s import run" % uimod)
-		except ImportError:
-			print "'%s' should be installed, but cannot be imported. This is definitly a bug." % uimod
+		except ImportError, e:
+			print "'%s' should be installed, but cannot be imported. This is definitly a bug. (%s)" % (uimod, e[0])
 			sys.exit(1)
 	else:
 		print ("Unknown interface '%s'. Correct interfaces are:" % uimod) ,
@@ -52,3 +52,6 @@ Written by René 'Necoro' Neumann <necoro@necoro.net>""" % VERSION
 		sys.exit(1)
 	
 	run()
+
+if __name__ == "__main__":
+	main()

@@ -10,4 +10,9 @@
 		call = "etc_prop">
 		<connect type="after" />
 	</hook>
+
+	<menu
+		label= "Et_c-Proposals"
+		call = "etc_prop_menu" 
+		/>
 </plugin>
