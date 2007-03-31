@@ -85,7 +85,7 @@ def flatten (listOfLists):
 	@param listOfLists: the list of lists to flatten
 	@type listOfLists: list of lists
 	@returns: flattend list
-	@rtyoe: list"""
+	@rtype: list"""
 
 	return list(chain(*listOfLists))
 

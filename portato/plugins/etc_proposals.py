@@ -38,7 +38,7 @@ def etc_prop (*args, **kwargs):
 		if l > 0:
 			Popen("etc-proposals")
 	else:
-		Popen("etc-proposals --frontend gtk --fastexit")
+		Popen(["etc-proposals", "--frontend gtk", "--fastexit"])
 
 def etc_prop_menu (*args, **kwargs):
 	if not am_i_root():
@@ -47,4 +47,4 @@ def etc_prop_menu (*args, **kwargs):
 		if float(__version__) < 1.1:
 			Popen("etc-proposals")
 		else:
-			Popen("etc-proposals --frontend gtk")
+			Popen(["etc-proposals", "--frontend gtk"])
