@@ -16,7 +16,7 @@ from portato.backend import system
 from portato.gui.gtk.dialogs import not_root_dialog
 
 from subprocess import Popen
-from etcproposals.etcproposals_lib import EtcProposals
+from etcproposals.etcproposals_lib import EtcProposals, __version__
 
 class PortatoEtcProposals(EtcProposals):
 	"""Subclassed EtcProposals using portato.backend.system during __init__."""
@@ -30,14 +30,21 @@ class PortatoEtcProposals(EtcProposals):
 
 def etc_prop (*args, **kwargs):
 	"""Entry point for this plugin."""
-	l = len(PortatoEtcProposals())
-	debug(l,"files to update")
 
-	if l > 0:
-		Popen("etc-proposals")
+	if float(__version__) < 1.1:
+		l = len(PortatoEtcProposals())
+		debug(l,"files to update")
+
+		if l > 0:
+			Popen("etc-proposals")
+	else:
+		Popen("etc-proposals --frontend gtk --fastexit")
 
 def etc_prop_menu (*args, **kwargs):
 	if not am_i_root():
 		not_root_dialog()
 	else:
-		Popen("etc-proposals")
+		if float(__version__) < 1.1:
+			Popen("etc-proposals")
+		else:
+			Popen("etc-proposals --frontend gtk")
