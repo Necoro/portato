@@ -1,6 +1,7 @@
-next:
+0.6.1:
 - first plugin support
 - collapsed USE_EXPAND-variables
+- plugin for etc-proposals
 
 0.6.0:
 - general support for different backend systems
