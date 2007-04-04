@@ -74,16 +74,29 @@ class PortagePackage (Package):
 			else:
 				return status
 	
-	def is_masked (self):
-		status = flags.new_masking_status(self.get_cpv())
-		if status != None: # we have locally changed it
-			if status == "masked": return True
-			elif status == "unmasked": return False
-			else:
-				debug("BUG in flags.new_masking_status. It returns",status)
-		else: # we have not touched the status
-			if self._status and ("profile" in self._status or "package.mask" in self._status):
-				return True
+	def is_masked (self, use_changed = True):
+		
+		if use_changed:
+			status = flags.new_masking_status(self.get_cpv())
+			if status != None: # we have locally changed it
+				if status == "masked": return True
+				elif status == "unmasked": return False
+				else:
+					debug("BUG in flags.new_masking_status. It returns",status)
+			else: # we have not touched the status
+				if self._status and ("profile" in self._status or "package.mask" in self._status):
+					return True
+				return False
+		else:
+			try:
+				masked = self._settings.settings.pmaskdict[self.get_cp()]
+			except KeyError: # key error: not masked
+				return False
+
+			for cpv in masked:
+				if self.matches(cpv):
+					return True
+
 			return False
 
 	def get_all_use_flags (self, installed = False):

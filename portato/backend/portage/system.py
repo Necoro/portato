@@ -207,7 +207,7 @@ class PortageSystem (SystemInterface):
 				t2 = unique_array(t2)
 			return self.geneticize_list(t2)
 		else:
-			return t;
+			return t
 
 	def find_all_world_packages (self, name = None):
 		world = filter(self.find_lambda(name), [x.get_cpv() for x in self.find_world_packages()[0]])

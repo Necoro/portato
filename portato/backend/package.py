@@ -260,9 +260,11 @@ class Package:
 
 		raise NotImplementedError
 
-	def is_masked (self):
+	def is_masked (self, use_changed = True):
 		"""Returns True if either masked by package.mask or by profile.
 		
+		@param use_changed: Controls, whether changes applied to masking keywords are taken into account.
+		@type use_changed: boolean
 		@returns: True if masked / False otherwise
 		@rtype: boolean"""
 

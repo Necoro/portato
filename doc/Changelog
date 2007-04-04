@@ -1,3 +1,6 @@
+next:
+- showed difference between unmasked and masked but unmasked by yourself
+
 0.6.1:
 - first plugin support
 - collapsed USE_EXPAND-variables

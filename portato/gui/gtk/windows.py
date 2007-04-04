@@ -571,12 +571,21 @@ class PackageTable:
 			if self.doEmerge:
 				self.emergeBtn.set_sensitive(True)
 			self.installedCheck.set_active(pkg.is_installed())
-			self.maskedCheck.set_active(pkg.is_masked())
+			
+			if pkg.is_masked(use_changed = False) and not pkg.is_masked(use_changed = True):
+				self.maskedCheck.set_label("<i>(Masked)</i>")
+				self.maskedCheck.get_child().set_use_markup(True)
+			else:
+				self.maskedCheck.set_label("Masked")
+			
+			self.maskedCheck.set_active(pkg.is_masked(use_changed = False))
+			
 			if pkg.is_testing(use_keywords = False) and not pkg.is_testing(use_keywords = True):
 				self.testingCheck.set_label("<i>(Testing)</i>")
 				self.testingCheck.get_child().set_use_markup(True)
 			else:
 				self.testingCheck.set_label("Testing")
+			
 			self.testingCheck.set_active(pkg.is_testing(use_keywords = False))
 
 		if self.doEmerge:
