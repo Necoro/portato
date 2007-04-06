@@ -373,7 +373,7 @@ class PortageSystem (SystemInterface):
 							self.local_use_descs[fields[0]][subfields[0]] = subfields[1]
 		
 		# start
-		desc = None
+		desc = ""
 		if flag in self.use_descs:
 			desc = self.use_descs[flag]
 		if package != None:

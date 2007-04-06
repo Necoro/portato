@@ -1,0 +1,418 @@
+<ui version="4.0" >
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>466</width>
+    <height>695</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Portato</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset/>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <layout class="QVBoxLayout" >
+    <property name="margin" >
+     <number>9</number>
+    </property>
+    <property name="spacing" >
+     <number>6</number>
+    </property>
+    <item>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>0</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QLineEdit" name="searchEdit" />
+      </item>
+      <item>
+       <widget class="QPushButton" name="searchBtn" >
+        <property name="text" >
+         <string>&amp;Search</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QSplitter" name="splitter" >
+      <property name="orientation" >
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QWidget" name="layoutWidget_2" >
+       <layout class="QHBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QListView" name="catList" >
+          <property name="mouseTracking" >
+           <bool>false</bool>
+          </property>
+          <property name="frameShadow" >
+           <enum>QFrame::Sunken</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListView" name="pkgList" />
+        </item>
+       </layout>
+      </widget>
+      <widget class="QTabWidget" name="tabWidget" >
+       <property name="currentIndex" >
+        <number>1</number>
+       </property>
+       <widget class="QWidget" name="pkgTab" >
+        <attribute name="title" >
+         <string>Package</string>
+        </attribute>
+        <layout class="QVBoxLayout" >
+         <property name="margin" >
+          <number>9</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="nameLabel" >
+           <property name="text" >
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="descLabel" >
+           <property name="text" >
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QComboBox" name="versCombo" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>3</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="missingLabel" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>13</hsizetype>
+               <vsizetype>5</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text" >
+              <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; color:#ff0000;">MISSING KEYWORD&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="notInSysLabel" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>13</hsizetype>
+               <vsizetype>5</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text" >
+              <string>&lt;b>Installed, but not in portage anymore&lt;/b></string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="installedCheck" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>3</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text" >
+              <string>Installed</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="testingCheck" >
+             <property name="enabled" >
+              <bool>true</bool>
+             </property>
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>3</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text" >
+              <string>Testing</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="maskedCheck" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>3</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text" >
+              <string>Masked</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QTreeWidget" name="useList" >
+           <property name="horizontalScrollBarPolicy" >
+            <enum>Qt::ScrollBarAsNeeded</enum>
+           </property>
+           <property name="rootIsDecorated" >
+            <bool>true</bool>
+           </property>
+           <property name="sortingEnabled" >
+            <bool>false</bool>
+           </property>
+           <property name="allColumnsShowFocus" >
+            <bool>false</bool>
+           </property>
+           <property name="columnCount" >
+            <number>3</number>
+           </property>
+           <column>
+            <property name="text" >
+             <string>1</string>
+            </property>
+           </column>
+           <column>
+            <property name="text" >
+             <string>1</string>
+            </property>
+           </column>
+           <column>
+            <property name="text" >
+             <string>2</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="pkgEmergeBtn" >
+             <property name="text" >
+              <string>&amp;Emerge</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pkgUnmergeBtn" >
+             <property name="text" >
+              <string>&amp;Unmerge</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pkgRevertBtn" >
+             <property name="text" >
+              <string>Re&amp;vert</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pkgEbuildBtn" >
+             <property name="text" >
+              <string>E&amp;build</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="queueTab" >
+        <attribute name="title" >
+         <string>Queue</string>
+        </attribute>
+        <layout class="QVBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QTreeView" name="treeView" />
+         </item>
+         <item>
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>2</number>
+           </property>
+           <property name="spacing" >
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="emergeBtn" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>1</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text" >
+              <string>&amp;Emerge</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="unmergeBtn" >
+             <property name="text" >
+              <string>&amp;Unmerge</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="updateBtn" >
+             <property name="text" >
+              <string>Update &amp;World</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="removeBtn" >
+             <property name="text" >
+              <string>&amp;Remove</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>466</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <addaction name="quitAction" />
+   </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>&amp;?</string>
+    </property>
+    <addaction name="aboutAction" />
+   </widget>
+   <addaction name="menuFile" />
+   <addaction name="menuHelp" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" >
+   <property name="enabled" >
+    <bool>true</bool>
+   </property>
+   <property name="statusTip" >
+    <string/>
+   </property>
+  </widget>
+  <action name="quitAction" >
+   <property name="text" >
+    <string>&amp;Quit</string>
+   </property>
+   <property name="menuRole" >
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="aboutAction" >
+   <property name="text" >
+    <string>&amp;About</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>quitAction</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>361</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
