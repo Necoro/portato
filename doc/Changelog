@@ -1,5 +1,6 @@
 next:
 - showed difference between unmasked and masked but unmasked by yourself
+- added Qt-Frontend
 
 0.6.1:
 - first plugin support

@@ -10,6 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+# qt4
 from PyQt4 import QtGui, uic, QtCore
 import sip
 
@@ -21,10 +22,14 @@ from portato.backend.exceptions import *
 
 from portato.gui.gui_helper import Database, Config, EmergeQueue
 
+# own GUI stuff
 from terminal import QtConsole
+from tree import QtTree
+from dialogs import *
 
 UI_DIR = DATA_DIR+"ui/"
 
+#XXX: global variables are bad
 app = QtGui.QApplication([])
 
 def qCheck (check):
@@ -48,15 +53,16 @@ class WindowMeta (sip.wrappertype, type):
 
 class Window:
 
-	def __init__(self):
-		self._qt_base.__init__(self)
+	def __init__(self, parent = None):
+		self._qt_base.__init__(self, parent)
 		self.setupUi(self)
 
 class AboutDialog (Window):
+	"""A window showing the "about"-informations."""
 	__metaclass__ = WindowMeta
 
-	def __init__ (self):
-		Window.__init__(self)
+	def __init__ (self, parent = None):
+		Window.__init__(self, parent)
 
 		self.label.setText("""
 <font size=5><b>Portato v.%s</b></font><br><br>
@@ -69,6 +75,33 @@ Copyright (C) 2006-2007 Ren&eacute; 'Necoro' Neumann &lt;necoro@necoro.net&gt;<b
 
 		self.adjustSize()
 
+class SearchDialog (Window):
+	"""A window showing the results of a search process."""
+	__metaclass__ = WindowMeta
+
+	def __init__ (self, parent, list, jumpTo):
+		"""Constructor.
+
+		@param parent: parent-window
+		@type parent: QtGui.QWidget
+		@param list: list of results to show
+		@type list: string[]
+		@param jump_to: function to call if "OK"-Button is hit
+		@type jump_to: function(string)"""
+
+		Window.__init__(self, parent)
+
+		self.comboBox.addItems(list)
+		self.comboBox.setCurrentIndex(0)
+		self.jumpTo = jumpTo
+
+		QtCore.QObject.connect(self, QtCore.SIGNAL("accepted()"), self.finish)
+
+	def finish (self):
+		s = str(self.comboBox.currentText())
+		self.done(0)
+		self.jumpTo(s)
+
 class PackageDetails:
 
 	def __init__ (self, window):
@@ -77,10 +110,27 @@ class PackageDetails:
 		self.window.tabWidget.removeTab(0)
 
 		QtCore.QObject.connect(self.window.versCombo, QtCore.SIGNAL("currentIndexChanged(int)"), self.cb_combo_changed)
+		QtCore.QObject.connect(self.window.pkgEmergeBtn, QtCore.SIGNAL("clicked()"), self.cb_emerge_clicked)
 
-	def update (self, cp, version = None):
+	def update (self, cp, queue = None, version = None, doEmerge = True, instantChange = False):
+		"""Updates the table to show the contents for the package.
+		
+		@param cp: the selected package
+		@type cp: string (cp)
+		@param queue: emerge-queue (if None the emerge-buttons are disabled)
+		@type queue: EmergeQueue
+		@param version: if not None, specifies the version to select
+		@type version: string
+		@param doEmerge: if False, the emerge buttons are disabled
+		@type doEmerge: False
+		@param instantChange: if True the changed keywords are updated instantly
+		@type instantChange: boolean"""
+
 		self.cp = cp
 		self.version = version
+		self.queue = queue
+		self.doEmerge = doEmerge
+		self.instantChange = instantChange
 		
 		# packages and installed packages
 		self.packages = system.sort_package_list(system.find_packages(cp, masked = True))
@@ -99,13 +149,18 @@ class PackageDetails:
 		
 		self.window.descLabel.setText(desc)
 		self.window.nameLabel.setText("<i><u>%s</i></u>" % self.actual_package().get_cp())
+
+		# disable buttons when emerging is not allowed
+		if not self.queue or not self.doEmerge: 
+			self.window.pkgEmergeBtn.setEnabled(False)
+			self.window.pkgUnmergeBtn.setEnabled(False)
 		
 		# first update -> show
 		if self.window.pkgTab.isHidden():
 			self.window.tabWidget.insertTab(0, self.window.pkgTab, "Package")
 			self.window.pkgTab.setHidden(False)
 
-		self.window.tabWidget.setCurrentIndex(0)
+		self.window.tabWidget.setCurrentIndex(self.window.PKG_PAGE)
 
 	def set_combo (self):
 		self.window.versCombo.clear()
@@ -148,6 +203,40 @@ class PackageDetails:
 			item = QtGui.QTreeWidgetItem(actual_exp_it, ["", use, system.get_use_desc(use, self.cp)])
 			item.setCheckState(0, qCheck(pkg.is_use_flag_enabled(use)))
 
+	def _update_keywords (self, emerge, update = False):
+		if emerge:
+			try:
+				try:
+					self.queue.append(self.actual_package().get_cpv(), unmerge = False, update = update)
+				except PackageNotFoundException, e:
+					if unmask_dialog(self.window, e[0]) == QtGui.QMessageBox.Yes :
+						self.queue.append(self.actual_package().get_cpv(), unmerge = False, unmask = True, update = update)
+			except BlockedException, e:
+				blocked_dialog(self.window, e[0], e[1])
+		else:
+			try:
+				self.queue.append(self.actual_package().get_cpv(), unmerge = True)
+			except PackageNotFoundException, e:
+				debug("Package could not be found",e[0], error = 1)
+
+
+	def actual_package (self):
+		"""Returns the actual selected package.
+		
+		@returns: the actual selected package
+		@rtype: backend.Package"""
+		
+		return self.packages[self.window.versCombo.currentIndex()]
+
+	def cb_emerge_clicked (self):
+		"""Callback for pressed emerge-button. Adds the package to the EmergeQueue."""
+		if not am_i_root():
+			not_root_dialog(self.window)
+		else:
+			self._update_keywords(True)
+			self.window.tabWidget.setCurrentIndex(self.window.QUEUE_PAGE)
+		return True
+
 	def cb_combo_changed (self, combo):
 		"""Callback for the changed ComboBox.
 		It then rebuilds the useList and the checkboxes."""
@@ -173,15 +262,15 @@ class PackageDetails:
 			self.window.installedCheck.setSizePolicy(hidden)
 			self.window.maskedCheck.setSizePolicy(hidden)
 			self.window.testingCheck.setSizePolicy(hidden)
-			#self.window.pkgEmergeBtn.setEnabled(False)
+			self.window.pkgEmergeBtn.setEnabled(False)
 		else: # normal package
 			self.window.missingLabel.setSizePolicy(hidden)
 			self.window.notInSysLabel.setSizePolicy(hidden)
 			self.window.installedCheck.setSizePolicy(shown)
 			self.window.maskedCheck.setSizePolicy(shown)
 			self.window.testingCheck.setSizePolicy(shown)
-			#if self.doEmerge:
-			#	self.emergeBtn.set_sensitive(True)
+			if self.doEmerge:
+				self.window.pkgEmergeBtn.setEnabled(True)
 			self.window.installedCheck.setCheckState(qCheck(pkg.is_installed()))
 			
 			if pkg.is_masked(use_changed = False) and not pkg.is_masked(use_changed = True):
@@ -198,26 +287,23 @@ class PackageDetails:
 			
 			self.window.testingCheck.setCheckState(qCheck(pkg.is_testing(use_keywords = False)))
 
-#		if self.doEmerge:
-#			# set emerge-button-label
-#			if not self.actual_package().is_installed():
-#				self.emergeBtn.set_label("E_merge")
-#				self.unmergeBtn.set_sensitive(False)
-#			else:
-#				self.emergeBtn.set_label("Re_merge")
-#				self.unmergeBtn.set_sensitive(True)
-
-	def actual_package (self):
-		"""Returns the actual selected package.
-		
-		@returns: the actual selected package
-		@rtype: backend.Package"""
-		
-		return self.packages[self.window.versCombo.currentIndex()]
+		if self.doEmerge:
+			# set emerge-button-label
+			if not self.actual_package().is_installed():
+				self.window.pkgEmergeBtn.setText("E&merge")
+				self.window.pkgUnmergeBtn.setEnabled(False)
+			else:
+				self.window.pkgEmergeBtn.setText("Re&merge")
+				self.window.pkgUnmergeBtn.setEnabled(True)
 		
 class MainWindow (Window):
 
 	__metaclass__ = WindowMeta
+
+	# NOTEBOOK PAGE CONSTANTS
+	PKG_PAGE = 0
+	QUEUE_PAGE = 1
+	CONSOLE_PAGE = 2
 	
 	def __init__ (self):
 		Window.__init__(self)
@@ -225,11 +311,21 @@ class MainWindow (Window):
 		self.setWindowTitle(("Portato (%s)" % VERSION))
 		self.statusbar.showMessage("Portato - A Portage GUI")
 
+		self.doUpdate = False
 		self.pkgDetails = PackageDetails(self)
 		
 		# package db
 		self.db = Database()
 		self.db.populate()
+
+		# config
+		try:
+			self.cfg = Config(CONFIG_LOCATION)
+		except IOError, e:
+			io_ex_dialog(self, e)
+			raise
+
+		self.cfg.modify_external_configs()
 
 		# the two lists
 		self.build_pkg_list()
@@ -245,19 +341,29 @@ class MainWindow (Window):
 		self.consoleTab.setLayout(self.consoleLayout)
 		self.consoleLayout.addWidget(self.console)
 
-		QtCore.QObject.connect(self.aboutAction, QtCore.SIGNAL("triggered()"), self.cb_about_triggered)
-		
+		# build queueList
+		self.queueList.setHeaderLabels(["Package", "Additional infos"])
+		self.queueTree = QtTree(self.queueList)
+
+		QtCore.QObject.connect(self, QtCore.SIGNAL("doTitleUpdate"), self._title_update)
+
+		# set emerge queue
+		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update)
+
 		self.show()
+	
+	def title_update (self, title):
+		self.emit(QtCore.SIGNAL("doTitleUpdate"), title)
 
-	def cb_about_triggered (self):
-		AboutDialog().exec_()
+	def _title_update (self, title):
+		if title == None: title = "Console"
+		else: title = ("Console (%s)" % title)
 
-	def cb_cat_list_selected (self, index, prev):
-		self.selCatName = str(index.data().toString())
-		self.fill_pkg_list(self.selCatName)
+		self.tabWidget.setTabText(self.CONSOLE_PAGE, title)
 
-	def cb_pkg_list_selected (self, index, prev):
-		self.pkgDetails.update(self.selCatName+"/"+str(index.data().toString()))
+	def jump_to (self, cp):
+		"""Is called when we want to jump to a specific package."""
+		self.pkgDetails.update(cp, self.queue)
 
 	def fill_pkg_list (self, cat):
 		self.pkgListModel.setStringList([name for (name,inst) in self.db.get_cat(cat)])
@@ -275,6 +381,50 @@ class MainWindow (Window):
 		self.selCatListModel = QtGui.QItemSelectionModel(self.catListModel)
 		self.catList.setModel(self.catListModel)
 		self.catList.setSelectionModel(self.selCatListModel)
+
+	@QtCore.pyqtSignature("")
+	def on_aboutAction_triggered (self):
+		AboutDialog(self).exec_()
+
+	@QtCore.pyqtSignature("")
+	def on_searchBtn_clicked (self):
+		"""Do a search."""
+		text = str(self.searchEdit.text())
+		if text != "":
+			packages = system.find_all_packages(text, withVersion = False)
+
+			if packages == []:
+				nothing_found_dialog(self)
+			else:
+				if len(packages) == 1:
+					self.jump_to(packages[0])
+				else:
+					SearchDialog(self, packages, self.jump_to).exec_()
+
+	@QtCore.pyqtSignature("")
+	def on_removeBtn_clicked (self):
+		"""Removes a selected item in the (un)emerge-queue if possible."""
+		selected = self.queueList.currentItem()
+
+		if selected:
+			if not selected.parent(): # top-level
+				if self.queueTree.iter_has_children(selected): # and has children which can be removed :)
+					if remove_queue_dialog(self) == QtGui.QMessageBox.Yes :
+						self.queue.remove_children(selected)
+						self.doUpdate = False
+			
+			elif selected.parent().parent(): # this is in the 3rd level => dependency
+				remove_deps_dialog(self)
+			else:
+				self.queue.remove_with_children(selected)
+				self.doUpdate = False
+
+	def cb_cat_list_selected (self, index, prev):
+		self.selCatName = str(index.data().toString())
+		self.fill_pkg_list(self.selCatName)
+
+	def cb_pkg_list_selected (self, index, prev):
+		self.pkgDetails.update(self.selCatName+"/"+str(index.data().toString()), self.queue)
 
 	def main (self):
 		app.exec_()

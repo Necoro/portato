@@ -55,7 +55,7 @@ class Tree:
 
 		@param it: the iterator
 		@type it: Iterator
-		@returns: Nex iterator or None if the current iter is the last one.
+		@returns: Next iterator or None if the current iter is the last one.
 		@rtype: Iterator; None"""
 		raise NotImplementedError
 
@@ -68,16 +68,6 @@ class Tree:
 		@type column: int
 		@returns: the value
 		@rtype: anything"""
-		raise NotImplementedError
-
-	def get_path_from_iter(self, it):
-		"""Returns a string defining the path to the given iterator. In this path all nodes are divided by a colon ':'.
-		For example: 2:4:5 could mean the 6th child of the 5th child of the 3rd element. It might also mean the 5th child of the 4th child of the 2nd element. It does not matter, where counting starts as long as it is consistent.
-
-		@param it: the iterator
-		@type it: Iterator
-		@returns: the path string
-		@rtype: string"""
 		raise NotImplementedError
 
 	def append (self, parent = None, values = None):
@@ -180,11 +170,4 @@ class Console:
 		"""This should return the current title of the console. If this is not possible, it must return None.
 
 		@returns: title of the console or None"""
-		raise NotImplementedError
-
-	def get_original(self):
-		"""Returns the original console-object.
-		
-		@returns: original console-object
-		@rtype: console-object"""
 		raise NotImplementedError

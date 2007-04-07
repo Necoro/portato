@@ -3,9 +3,14 @@ Backend:
 
 - bugs in update world
 - fix for flag handling, when reverting flags
+- save/restore queue on exit/start
 
 GUI:
 =====
+
+- ICON!!!
+- Systray
+- only remove already merged packages from queue
 
 GTK:
 ----

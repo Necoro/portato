@@ -35,7 +35,7 @@ def not_root_dialog ():
 	return ret
 
 def unmask_dialog (cpv):
-	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, cpv+" seems to be masked.\nDo you want to unmask it and its dependencies?.\n")
+	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, cpv+" seems to be masked.\nDo you want to unmask it and its dependencies?")
 	ret = dialog.run()
 	dialog.destroy()
 	return ret

@@ -11,6 +11,7 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 from portato.gui.wrapper import Tree, Console
+import vte
 
 class GtkTree (Tree):
 	"""The implementation of the abstract tree."""
@@ -37,7 +38,7 @@ class GtkTree (Tree):
 
 		if update:
 			string += "<i>updating</i>"
-			if version != None:
+			if version is not None:
 				string += "<i> from version %s</i>" % version
 
 		return [cpv, string]
@@ -49,10 +50,10 @@ class GtkTree (Tree):
 		return self.unmergeIt
 
 	def is_in_emerge (self, it):
-		return self.get_path_from_iter(it).split(":")[0] == self.get_path_from_iter(self.emergeIt)
+		return self.tree.get_string_from_iter(it).split(":")[0] == self.tree.get_string_from_iter(self.emergeIt)
 
 	def is_in_unmerge (self, it):
-		return self.get_path_from_iter(it).split(":")[0] == self.get_path_from_iter(self.unmergeIt)
+		return self.tree.get_string_from_iter(it).split(":")[0] == self.tree.get_string_from_iter(self.unmergeIt)
 	
 	def iter_has_parent (self, it):
 		return (self.tree.iter_parent(it) != None)
@@ -72,14 +73,11 @@ class GtkTree (Tree):
 	def get_value (self, it, column):
 		return self.tree.get_value(it, column)
 
-	def get_path_from_iter (self, it):
-		return self.tree.get_string_from_iter(it)
-
 	def append (self, parent = None, values = None):
 		return self.tree.append(parent, values)
 
 	def remove (self, it):
-		return self.tree.remove(it)
+		self.tree.remove(it)
 
 	def get_original (self):
 		return self.tree
@@ -87,22 +85,6 @@ class GtkTree (Tree):
 	def get_cpv_column (self):
 		return self.cpv_col
 
-class GtkConsole (Console):
+class GtkConsole (vte.Terminal, Console):
 	"""The implementation of the abstract Console for GTK."""
-
-	def __init__ (self, console):
-		"""Constructor.
-
-		@param console: the original console
-		@type console: vte.Terminal"""
-		
-		self.console = console
-
-	def get_window_title(self):
-		return self.console.get_window_title()
-
-	def set_pty (self, pty):
-		self.console.set_pty(pty)
-
-	def get_original (self):
-		return self.console
+	pass

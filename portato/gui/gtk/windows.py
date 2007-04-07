@@ -32,9 +32,6 @@ from dialogs import *
 from wrapper import GtkTree, GtkConsole
 from usetips import UseTips
 
-# for the terminal
-import vte
-
 # other
 import types
 
@@ -712,7 +709,6 @@ class MainWindow (Window):
 
 		# booleans
 		self.doUpdate = False
-		self.packageInit = True
 
 		# installed pixbuf
 		self.instPixbuf = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
@@ -758,7 +754,7 @@ class MainWindow (Window):
 		self.build_queue_list()
 
 		# the terminal
-		self.console = vte.Terminal()
+		self.console = GtkConsole()
 		self.termHB = self.tree.get_widget("termHB")
 		self.build_terminal()
 		
@@ -776,7 +772,7 @@ class MainWindow (Window):
 
 		# set emerge queue
 		self.queueTree = GtkTree(self.queueList.get_model())
-		self.queue = EmergeQueue(console = GtkConsole(self.console), tree = self.queueTree, db = self.db, title_update = self.title_update)
+		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update)
 
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)

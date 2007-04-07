@@ -64,16 +64,23 @@
           <property name="frameShadow" >
            <enum>QFrame::Sunken</enum>
           </property>
+          <property name="editTriggers" >
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
          </widget>
         </item>
         <item>
-         <widget class="QListView" name="pkgList" />
+         <widget class="QListView" name="pkgList" >
+          <property name="editTriggers" >
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
       <widget class="QTabWidget" name="tabWidget" >
        <property name="currentIndex" >
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="pkgTab" >
         <attribute name="title" >
@@ -214,6 +221,9 @@ p, li { white-space: pre-wrap; }
            <property name="horizontalScrollBarPolicy" >
             <enum>Qt::ScrollBarAsNeeded</enum>
            </property>
+           <property name="editTriggers" >
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
            <property name="rootIsDecorated" >
             <bool>true</bool>
            </property>
@@ -295,7 +305,24 @@ p, li { white-space: pre-wrap; }
           <number>6</number>
          </property>
          <item>
-          <widget class="QTreeView" name="treeView" />
+          <widget class="QTreeWidget" name="queueList" >
+           <property name="editTriggers" >
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="columnCount" >
+            <number>2</number>
+           </property>
+           <column>
+            <property name="text" >
+             <string>1</string>
+            </property>
+           </column>
+           <column>
+            <property name="text" >
+             <string>1</string>
+            </property>
+           </column>
+          </widget>
          </item>
          <item>
           <layout class="QHBoxLayout" >
@@ -316,7 +343,7 @@ p, li { white-space: pre-wrap; }
               </sizepolicy>
              </property>
              <property name="text" >
-              <string>&amp;Emerge</string>
+              <string>E&amp;merge</string>
              </property>
             </widget>
            </item>
@@ -416,6 +443,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel" >
      <x>361</x>
      <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>searchEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>searchBtn</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>287</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>400</x>
+     <y>55</y>
     </hint>
    </hints>
   </connection>
