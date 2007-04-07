@@ -21,6 +21,8 @@ from portato.backend.exceptions import *
 
 from portato.gui.gui_helper import Database, Config, EmergeQueue
 
+from terminal import QtConsole
+
 UI_DIR = DATA_DIR+"ui/"
 
 app = QtGui.QApplication([])
@@ -229,10 +231,19 @@ class MainWindow (Window):
 		self.db = Database()
 		self.db.populate()
 
+		# the two lists
 		self.build_pkg_list()
 		self.build_cat_list()
 		QtCore.QObject.connect(self.selCatListModel, QtCore.SIGNAL("currentChanged(QModelIndex, QModelIndex)"), self.cb_cat_list_selected)
 		QtCore.QObject.connect(self.selPkgListModel, QtCore.SIGNAL("currentChanged(QModelIndex, QModelIndex)"), self.cb_pkg_list_selected)
+
+		# build console
+		self.console = QtConsole(self.consoleTab)
+		self.consoleLayout = QtGui.QVBoxLayout()
+		self.consoleLayout.setMargin(0)
+		self.consoleLayout.setSpacing(0)
+		self.consoleTab.setLayout(self.consoleLayout)
+		self.consoleLayout.addWidget(self.console)
 
 		QtCore.QObject.connect(self.aboutAction, QtCore.SIGNAL("triggered()"), self.cb_about_triggered)
 		

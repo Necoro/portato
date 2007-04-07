@@ -73,7 +73,7 @@
       </widget>
       <widget class="QTabWidget" name="tabWidget" >
        <property name="currentIndex" >
-        <number>1</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="pkgTab" >
         <attribute name="title" >
@@ -344,6 +344,11 @@ p, li { white-space: pre-wrap; }
           </layout>
          </item>
         </layout>
+       </widget>
+       <widget class="QWidget" name="consoleTab" >
+        <attribute name="title" >
+         <string>Console</string>
+        </attribute>
        </widget>
       </widget>
      </widget>

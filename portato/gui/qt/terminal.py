@@ -1,0 +1,193 @@
+# -*- coding: utf-8 -*-
+#
+# File: portato/gui/qt/terminal.py
+# This file is part of the Portato-Project, a graphical portage-frontend.
+#
+# Copyright (C) 2007 René 'Necoro' Neumann
+# This is free software.  You may redistribute copies of it under the terms of
+# the GNU General Public License version 2.
+# There is NO WARRANTY, to the extent permitted by law.
+#
+# Written by René 'Necoro' Neumann <necoro@necoro.net>
+
+from PyQt4 import QtGui, QtCore
+
+from threading import Thread, Lock
+from os import read
+
+from portato.gui.wrapper import Console
+from portato.helper import debug
+
+class BoldFormat (QtGui.QTextCharFormat):
+
+	def __init__(self):
+		QtGui.QTextCharFormat.__init__(self)
+		self.setFontWeight(QtGui.QFont.Bold)
+
+class UnderlineFormat (QtGui.QTextCharFormat):
+
+	def __init__(self):
+		QtGui.QTextCharFormat.__init__(self)
+		self.setFontUnderline(True)
+
+class ColorFormat (QtGui.QTextCharFormat):
+
+	def __init__(self, color):
+		QtGui.QTextCharFormat.__init__(self)
+
+		self.setForeground(QtGui.QBrush(QtGui.QColor(color)))
+
+# we only support a subset of the commands
+esc_seq = ("\x1b", "[")
+reset_seq = "39;49;00"
+seq_end = "m"
+seq_sep = ";"
+backspace = 8
+title_seq = ("\x1b", "]")
+title_end = "\x07"
+
+attr = {}
+attr[0]			=  	None 				# normal
+attr[1]			=  	BoldFormat()	 	# bold
+attr[4]    		=  	UnderlineFormat()	# underline
+attr[30]        =  	ColorFormat("black")
+attr[31]        =	ColorFormat("red")
+attr[32]        = 	ColorFormat("green")
+attr[33]       	= 	ColorFormat("yellow")
+attr[34]        = 	ColorFormat("blue")
+attr[35]      	= 	ColorFormat("magenta")
+attr[36]        = 	ColorFormat("cyan")
+attr[37]        = 	ColorFormat("white")
+attr[39]      	= 	None				# default
+
+class QtConsole (Console, QtGui.QTextEdit):
+
+	def __init__ (self, parent):
+		QtGui.QTextEdit.__init__(self, parent)
+
+		self.pty = None
+		self.running = False
+		self.stdFormat = self.currentCharFormat()
+		self.formatQueue = []
+		self.formatLock = Lock()
+		self.title = None
+
+		self.setReadOnly(True)
+
+		QtCore.QObject.connect(self, QtCore.SIGNAL("doSomeWriting"), self._write)
+		QtCore.QObject.connect(self, QtCore.SIGNAL("deletePrevChar()"), self._deletePrev)
+
+	def _deletePrev (self):
+		self.textCursor().deletePreviousChar()
+
+	def _write (self, text):
+		if text == esc_seq[0]:
+			self.setCurrentCharFormat(self.get_format())
+		else:
+			
+			if not self.textCursor().atEnd(): # move cursor and re-set format
+				f = self.currentCharFormat()
+				self.moveCursor(QtGui.QTextCursor.End)
+				self.setCurrentCharFormat(f)
+			
+			# insert the text
+			self.textCursor().insertText(text)
+			
+			# scroll down if needed
+			self.ensureCursorVisible()
+
+	def write(self, text):
+		self.emit(QtCore.SIGNAL("doSomeWriting"), text)
+
+	def set_pty (self, pty):
+		if not self.running:
+			self.pty = pty
+			
+			t = Thread(target=self.__run)
+			t.setDaemon(True) # close application even if this thread is running
+			t.start()
+		
+			self.running = True
+		else:
+			self.clear()
+			self.pty = pty # set this after clearing to lose no chars :)
+
+	def __run (self):
+		while True:
+			s = read(self.pty, 1)
+			if s == "": break
+
+			if ord(s) == backspace:
+				self.emit(QtCore.SIGNAL("deletePrevChar()"))
+				continue
+
+			if s == esc_seq[0]: # -> 0x27
+				s = read(self.pty, 1)
+				if s == esc_seq[1]: # -> [
+					while True:
+						_s = read(self.pty, 1)
+						s += _s
+						if _s == seq_end: break
+					self.parse_seq(s[1:-1])
+					continue
+
+				elif s == title_seq[1]: # -> ]
+					while True:
+						_s = read(self.pty, 1)
+						s += _s
+						if _s == title_end: break
+					
+					self.parse_title(s[1:-1])
+					continue
+				else:
+					self.write(esc_seq[0]+s)
+			
+			if s == "\r": continue
+			self.write(s)
+
+	def parse_seq (self, seq):
+		global attr
+
+		format = self.virgin_format()
+
+		if seq != reset_seq: # resettet -> done
+			seq = seq.split(seq_sep)
+			for s in seq:
+				try:
+					s = int(s)
+				except ValueError:
+					format = self.virgin_format()
+					break
+
+				if attr[s] is not None:
+					format.merge(attr[s])
+				else:
+					format = self.virgin_format()
+					break
+
+		self.add_format(format)
+		self.write(esc_seq[0])
+
+	def parse_title (self, seq):
+
+		if not seq.startswith("0;"):
+			return
+
+		self.title = seq[2:]
+
+	def get_window_title (self):
+		return self.title
+
+	def add_format (self, format):
+		self.formatLock.acquire()
+		self.formatQueue.append(format)
+		self.formatLock.release()
+
+	def get_format (self):
+		self.formatLock.acquire()
+		f = self.formatQueue.pop(0)
+		self.formatLock.release()
+		return f
+
+	def virgin_format (self):
+		return QtGui.QTextCharFormat(self.stdFormat)
