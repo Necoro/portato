@@ -99,21 +99,29 @@ class QtConsole (Console, QtGui.QTextEdit):
 	def write(self, text):
 		self.emit(QtCore.SIGNAL("doSomeWriting"), text)
 
+	def start_new_thread (self):
+			self.run = True
+			self.current = Thread(target=self.__run)
+			self.current.setDaemon(True) # close application even if this thread is running
+			self.current.start()
+
 	def set_pty (self, pty):
 		if not self.running:
 			self.pty = pty
-			
-			t = Thread(target=self.__run)
-			t.setDaemon(True) # close application even if this thread is running
-			t.start()
-		
+			self.start_new_thread()
 			self.running = True
+		
 		else:
+			# quit current thread
+			self.run = False
+	#		self.current.join()
 			self.clear()
+
 			self.pty = pty # set this after clearing to lose no chars :)
+			self.start_new_thread()
 
 	def __run (self):
-		while True:
+		while self.run:
 			s = read(self.pty, 1)
 			if s == "": break
 

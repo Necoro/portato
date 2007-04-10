@@ -499,11 +499,13 @@ class EmergeQueue:
 
 		sub_emerge(command)
 
-	def emerge (self, force = False):
+	def emerge (self, force = False, options = None):
 		"""Emerges everything in the merge-queue.
 		
 		@param force: If False, '-pv' is send to emerge. Default: False.
-		@type force: boolean"""
+		@type force: boolean
+		@param options: Additional options to send to the emerge command
+		@type options: string[]"""
 		
 		def prepare(queue):
 			"""Prepares the list of iterators and the list of packages."""
@@ -522,6 +524,7 @@ class EmergeQueue:
 			
 			s = system.get_oneshot_option()
 			if not force: s += system.get_pretend_option()
+			if options is not None: s += options
 			
 			self._emerge(s, list, its)
 		
@@ -532,14 +535,17 @@ class EmergeQueue:
 
 			s = []
 			if not force: s = system.get_pretend_option()
+			if options is not None: s += options
 		
 			self._emerge(s, list, its)
 
-	def unmerge (self, force = False):
+	def unmerge (self, force = False, options = None):
 		"""Unmerges everything in the umerge-queue.
 
 		@param force: If False, '-pv' is send to emerge. Default: False.
-		@type force: boolean"""
+		@type force: boolean
+		@param options: Additional options to send to the emerge command
+		@type options: string[]"""
 		
 		if len(self.unmergequeue) == 0: return # nothing in queue
 
@@ -548,20 +554,28 @@ class EmergeQueue:
 		# set options
 		s = system.get_unmerge_option()
 		if not force: s += system.get_pretend_option()
+		if options is not None: s += options
 		
 		self._emerge(s,list, [self.unmergeIt])
 
-	def update_world(self, force = False, newuse = False, deep = False):
+	def update_world(self, force = False, newuse = False, deep = False, options = None):
 		"""Does an update world. newuse and deep are the arguments handed to emerge.
 
 		@param force: If False, '-pv' is send to emerge. Default: False.
-		@type force: boolean"""
+		@type force: boolean
+		@param newuse: If True, append newuse options
+		@type force: boolean
+		@param deep: If True, append deep options
+		@type deep: boolean
+		@param options: Additional options to send to the emerge command
+		@type options: string[]"""
 
-		options = system.get_update_option()
+		opts = system.get_update_option()
 
-		if newuse: options += system.get_newuse_option()
-		if deep: options += system.get_deep_option()
-		if not force: options += system.get_pretend_option()
+		if newuse: opts += system.get_newuse_option()
+		if deep: opts += system.get_deep_option()
+		if not force: opts += system.get_pretend_option()
+		if options is not None: opts += options
 
 		self._emerge(options, ["world"], [self.emergeIt])
 

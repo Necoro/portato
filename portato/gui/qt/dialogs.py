@@ -36,3 +36,6 @@ def remove_deps_dialog (parent):
 
 def remove_queue_dialog (parent):
 	return QMessageBox.question(parent, "Portato", "Do you really want to clear the whole queue?", QMessageBox.Yes | QMessageBox.No)
+
+def changed_flags_dialog (parent, what = "flags"):
+	return QMessageBox.information(parent, "Portato", "You have changed %s. Portato will write these changes into the appropriate files. Please backup them if you think it is necessairy." % what, QMessageBox.Ok)

@@ -605,7 +605,7 @@ class PackageTable:
 		return True
 
 	def cb_package_revert_clicked (self, button):
-		"""Callback for pressed cancel-button. Closes the window."""
+		"""Callback for pressed revert-button."""
 		self.actual_package().remove_new_use_flags()
 		self.actual_package().remove_new_masked()
 		self.actual_package().remove_new_testing()

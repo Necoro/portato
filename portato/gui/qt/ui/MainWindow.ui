@@ -167,11 +167,11 @@ p, li { white-space: pre-wrap; }
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="installedCheck" >
+            <widget class="UncheckBox" name="installedCheck" >
              <property name="sizePolicy" >
               <sizepolicy>
-               <hsizetype>3</hsizetype>
-               <vsizetype>0</vsizetype>
+               <hsizetype>13</hsizetype>
+               <vsizetype>13</vsizetype>
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -428,6 +428,13 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>UncheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>portato/gui/qt/uncheckbox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

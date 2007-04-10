@@ -86,8 +86,8 @@ class SearchDialog (Window):
 		@type parent: QtGui.QWidget
 		@param list: list of results to show
 		@type list: string[]
-		@param jump_to: function to call if "OK"-Button is hit
-		@type jump_to: function(string)"""
+		@param jumpTo: function to call if "OK"-Button is hit
+		@type jumpTo: function(string)"""
 
 		Window.__init__(self, parent)
 
@@ -109,8 +109,16 @@ class PackageDetails:
 		self.window.pkgTab.setHidden(True)
 		self.window.tabWidget.removeTab(0)
 
+		self.window.installedCheck.blockSignals(True)
+
 		QtCore.QObject.connect(self.window.versCombo, QtCore.SIGNAL("currentIndexChanged(int)"), self.cb_combo_changed)
+		
 		QtCore.QObject.connect(self.window.pkgEmergeBtn, QtCore.SIGNAL("clicked()"), self.cb_emerge_clicked)
+		QtCore.QObject.connect(self.window.pkgUnmergeBtn, QtCore.SIGNAL("clicked()"), self.cb_unmerge_clicked)
+		QtCore.QObject.connect(self.window.pkgRevertBtn, QtCore.SIGNAL("clicked()"), self.cb_revert_clicked)
+
+		#QtCore.QObject.connect(self.window.maskedCheck, QtCore.SIGNAL("clicked(bool)"), self.cb_masked_clicked)
+		#QtCore.QObject.connect(self.window.testingCheck, QtCore.SIGNAL("clicked(bool)"), self.cb_testing_clicked)
 
 	def update (self, cp, queue = None, version = None, doEmerge = True, instantChange = False):
 		"""Updates the table to show the contents for the package.
@@ -237,7 +245,26 @@ class PackageDetails:
 			self.window.tabWidget.setCurrentIndex(self.window.QUEUE_PAGE)
 		return True
 
-	def cb_combo_changed (self, combo):
+	def cb_unmerge_clicked (self):
+		"""Callback for pressed unmerge-button. Adds the package to the EmergeQueue."""
+		if not am_i_root():
+			not_root_dialog(self.window)
+		else:
+			self._update_keywords(False)
+			self.window.tabWidget.setCurrentIndex(self.window.QUEUE_PAGE)
+		return True
+
+	def cb_revert_clicked (self, button):
+		"""Callback for pressed revert-button."""
+		self.actual_package().remove_new_use_flags()
+		self.actual_package().remove_new_masked()
+		self.actual_package().remove_new_testing()
+		self.cb_combo_changed()
+		if self.instantChange:
+			self._update_keywords(True, update = True)
+		return True
+
+	def cb_combo_changed (self):
 		"""Callback for the changed ComboBox.
 		It then rebuilds the useList and the checkboxes."""
 		
@@ -418,6 +445,38 @@ class MainWindow (Window):
 			else:
 				self.queue.remove_with_children(selected)
 				self.doUpdate = False
+
+	@QtCore.pyqtSignature("")
+	def on_emergeBtn_clicked (self):
+		"""Do emerge."""
+		
+		self.tabWidget.setCurrentIndex(self.CONSOLE_PAGE)
+		
+		if len(flags.newUseFlags) > 0:
+			changed_flags_dialog(self, "use flags")
+			flags.write_use_flags()
+		
+		if len(flags.new_masked)>0 or len(flags.new_unmasked)>0 or len(flags.newTesting)>0:
+			debug("new masked:",flags.new_masked)
+			debug("new unmasked:", flags.new_unmasked)
+			debug("new testing:", flags.newTesting)
+			changed_flags_dialog(self, "masking keywords")
+			flags.write_masked()
+			flags.write_testing()
+			system.reload_settings()
+		
+		if not self.doUpdate:
+			self.queue.emerge(force=True, options = ["--nospinner"])
+		else:
+			self.queue.update_world(force=True, newuse = self.cfg.get_boolean("newuse_opt"), deep = self.cfg.get_boolean("deep_opt"), options = ["--nospinner"])
+			self.doUpdate = False
+
+	@QtCore.pyqtSignature("")
+	def on_unmergeBtn_clicked (self):
+		"""Do unmerge."""
+
+		self.tabWidget.setCurrentIndex(self.CONSOLE_PAGE)
+		self.queue.unmerge(force = True)
 
 	def cb_cat_list_selected (self, index, prev):
 		self.selCatName = str(index.data().toString())
