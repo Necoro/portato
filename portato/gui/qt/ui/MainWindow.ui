@@ -80,7 +80,7 @@
       </widget>
       <widget class="QTabWidget" name="tabWidget" >
        <property name="currentIndex" >
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="pkgTab" >
         <attribute name="title" >
@@ -170,14 +170,29 @@ p, li { white-space: pre-wrap; }
             <widget class="UncheckBox" name="installedCheck" >
              <property name="sizePolicy" >
               <sizepolicy>
-               <hsizetype>13</hsizetype>
-               <vsizetype>13</vsizetype>
+               <hsizetype>3</hsizetype>
+               <vsizetype>5</vsizetype>
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
              <property name="text" >
               <string>Installed</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="maskedCheck" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>3</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text" >
+              <string>Masked</string>
              </property>
             </widget>
            </item>
@@ -199,21 +214,6 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QCheckBox" name="maskedCheck" >
-             <property name="sizePolicy" >
-              <sizepolicy>
-               <hsizetype>3</hsizetype>
-               <vsizetype>0</vsizetype>
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text" >
-              <string>Masked</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </item>
          <item>
@@ -223,6 +223,9 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="editTriggers" >
             <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="textElideMode" >
+            <enum>Qt::ElideNone</enum>
            </property>
            <property name="rootIsDecorated" >
             <bool>true</bool>
@@ -388,7 +391,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>466</width>
-     <height>28</height>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile" >
@@ -403,7 +406,17 @@ p, li { white-space: pre-wrap; }
     </property>
     <addaction name="aboutAction" />
    </widget>
+   <widget class="QMenu" name="menu_Emerge" >
+    <property name="title" >
+     <string>&amp;Emerge</string>
+    </property>
+    <addaction name="emergeAction" />
+    <addaction name="unmergeAction" />
+    <addaction name="updateAction" />
+    <addaction name="separator" />
+   </widget>
    <addaction name="menuFile" />
+   <addaction name="menu_Emerge" />
    <addaction name="menuHelp" />
   </widget>
   <widget class="QStatusBar" name="statusbar" >
@@ -425,6 +438,21 @@ p, li { white-space: pre-wrap; }
   <action name="aboutAction" >
    <property name="text" >
     <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="emergeAction" >
+   <property name="text" >
+    <string>&amp;Emerge</string>
+   </property>
+  </action>
+  <action name="unmergeAction" >
+   <property name="text" >
+    <string>&amp;Unmerge</string>
+   </property>
+  </action>
+  <action name="updateAction" >
+   <property name="text" >
+    <string>Update &amp;World</string>
    </property>
   </action>
  </widget>
@@ -466,6 +494,54 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel" >
      <x>400</x>
      <y>55</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>emergeAction</sender>
+   <signal>triggered()</signal>
+   <receiver>emergeBtn</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>66</x>
+     <y>642</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>unmergeAction</sender>
+   <signal>triggered()</signal>
+   <receiver>unmergeBtn</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>177</x>
+     <y>642</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>updateAction</sender>
+   <signal>triggered()</signal>
+   <receiver>updateBtn</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>288</x>
+     <y>642</y>
     </hint>
    </hints>
   </connection>

@@ -420,13 +420,13 @@ def set_masked (pkg, masked = True):
 	copy = link_neq[cpv][:]
 	for file, line in copy:
 		if line != "-1":
-			link_neq[cpv].remove(file, line)
+			link_neq[cpv].remove((file, line))
 
 	if masked == pkg.is_masked():
 		return
 
 	data = get_data(pkg, path)
-	debug("data: "+str(link_eq))
+	debug("data:", str(data))
 	done = False
 	for file, line, crit, flags in data:
 		if pkg.matches(crit):
@@ -469,12 +469,56 @@ def new_masking_status (cpv):
 	if isinstance(cpv, package.Package):
 		cpv = cpv.get_cpv()
 
-	if cpv in new_masked and new_masked[cpv] != []:
-		return "masked"
-	elif cpv in new_unmasked and new_unmasked[cpv] != []:
-		return "unmasked"
-	else: return None
+	def get(list):
+		ret = None
+		if cpv in list and list[cpv] != []:
+			for file, line in list[cpv]:
+				_ret = (int(line) == -1)
+				if ret is not None and _ret != ret:
+					debug("Conflicting values for masking status!", list, error = True)
+				else:
+					ret = _ret
+		return ret
 
+	masked = get(new_masked)
+	if masked is None:
+		masked = get(new_unmasked)
+		if masked is not None:
+			masked = not masked # revert for new_unmasked
+
+	if masked is not None:
+		if masked: return "masked"
+		else: return "unmasked"
+	else:
+		return None
+
+def is_locally_masked (pkg, changes = True):
+
+	if not isinstance(pkg, package.Package):
+		pkg = system.new_package(pkg) # assume it is a cpv or a gentoolkit.Package
+
+	if changes:
+		if new_masking_status(pkg) == "masked": # we masked it ourselves, but did not save it yet
+			# but sometimes, new_masking_status() returns "masked" if a package's unmask is removed
+			# then it is masked by the system but not locally (except rarely exotic cases)
+			if pkg.get_cpv() in new_unmasked:
+				if new_unmasked[pkg.get_cpv()]: return False # assume that there only exists one entry for this package
+															 # else new_masking_status should have printed an error
+			return True
+
+		if new_masking_status(pkg) == "unmasked": # we unmasked it
+			return False
+	
+	list = get_data(pkg, CONST.mask_path())
+
+	if not list: return False
+
+	for file, line, crit, fl in list:
+		if pkg.matches(crit):
+			return True
+
+	return False
+	
 def write_masked ():
 	global new_unmasked, new_masked
 	file_cache = {}

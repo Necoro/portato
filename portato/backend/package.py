@@ -58,6 +58,14 @@ class Package:
 		
 		flags.remove_new_masked(self.get_cpv())
 
+	def is_locally_masked (self):
+		"""Checks whether the package is masked by the user.
+
+		@returns: True if masked by the user; False if not
+		@rtype: bool"""
+
+		return flags.is_locally_masked(self)
+
 	def get_installed_use_flags (self):
 		"""Returns a list of the useflags enabled at installation time. If package is not installed, it returns an empty list.
 		

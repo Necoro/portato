@@ -33,7 +33,7 @@ class QtTree (Tree):
 		if update:
 			string += "(updating"
 			if version is not None:
-				string += "from version %s" % version
+				string += " from version %s" % version
 			string += ")"
 
 		return [cpv, string]

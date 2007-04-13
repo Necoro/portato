@@ -575,7 +575,12 @@ class PackageTable:
 			else:
 				self.maskedCheck.set_label("Masked")
 			
-			self.maskedCheck.set_active(pkg.is_masked(use_changed = False))
+			if pkg.is_locally_masked():
+				self.maskedCheck.set_label("<b>Masked</b>")
+				self.maskedCheck.get_child().set_use_markup(True)
+				self.maskedCheck.set_active(True)
+			else:
+				self.maskedCheck.set_active(pkg.is_masked(use_changed = False))
 			
 			if pkg.is_testing(use_keywords = False) and not pkg.is_testing(use_keywords = True):
 				self.testingCheck.set_label("<i>(Testing)</i>")
@@ -663,7 +668,32 @@ class PackageTable:
 	def cb_masked_toggled (self, button):
 		"""Callback for toggled masking-checkbox."""
 		status = button.get_active()
-		self.actual_package().set_masked(status)
+		pkg = self.actual_package()
+
+		if pkg.is_masked(use_changed = False) == status and not pkg.is_locally_masked():
+			return False
+
+		if pkg.is_locally_masked() and status:
+			return False
+	
+		if not pkg.is_masked(use_changed = True):
+			pkg.set_masked(True)
+			if pkg.is_locally_masked():
+				button.set_label("<b>Masked</b>")
+				button.get_child().set_use_markup(True)
+			else:
+				button.set_label("Masked")
+
+			button.set_active(True)
+		else:
+			locally = pkg.is_locally_masked()
+			pkg.set_masked(False)
+			if pkg.is_masked(use_changed=False) and not locally:
+				button.set_label("<i>(Masked)</i>")
+				button.get_child().set_use_markup(True)
+				button.set_active(True)
+			else:
+				button.set_label("Masked")
 		
 		if self.instantChange:
 			self._update_keywords(True, update = True)

@@ -82,20 +82,29 @@ class PortagePackage (Package):
 				if status == "masked": return True
 				elif status == "unmasked": return False
 				else:
-					debug("BUG in flags.new_masking_status. It returns",status)
+					debug("BUG in flags.new_masking_status. It returns", status, error = True)
 			else: # we have not touched the status
 				if self._status and ("profile" in self._status or "package.mask" in self._status):
 					return True
 				return False
-		else:
-			try:
-				masked = self._settings.settings.pmaskdict[self.get_cp()]
-			except KeyError: # key error: not masked
-				return False
-
-			for cpv in masked:
-				if self.matches(cpv):
+		else: # we want the original portage value XXX: bug if masked by user AND by system
+			
+			# get the normal masked ones
+			if self._status and ("profile" in self._status or "package.mask" in self._status):
+				if not flags.is_locally_masked(self, changes = False): # assume that if it is locally masked, it is not masked by the system
 					return True
+			else: # more difficult: get the ones we unmasked, but are masked by the system
+				try:
+					masked = self._settings.settings.pmaskdict[self.get_cp()]
+				except KeyError: # key error: not masked
+					return False
+
+				for cpv in masked:
+					if self.matches(cpv):
+						if not flags.is_locally_masked(self, changes = False): # assume that if it is locally masked, it is not masked by the system
+							return True
+						else:
+							return False
 
 			return False
 

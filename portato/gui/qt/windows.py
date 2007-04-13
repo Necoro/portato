@@ -38,6 +38,9 @@ def qCheck (check):
 	else:
 		return QtCore.Qt.Unchecked
 
+def qIsChecked (check):
+	return check == QtCore.Qt.Checked
+
 class WindowMeta (sip.wrappertype, type):
 
 	def __new__ (cls, name, bases, dict):
@@ -56,6 +59,22 @@ class Window:
 	def __init__(self, parent = None):
 		self._qt_base.__init__(self, parent)
 		self.setupUi(self)
+
+	@staticmethod
+	def watch_cursor (func):
+		"""This is a decorator for functions being so time consuming, that it is appropriate to show the watch-cursor."""
+		def wrapper (*args, **kwargs):
+			ret = None
+
+			QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+			try:
+				ret = func(*args, **kwargs)
+			finally:
+				QtGui.QApplication.restoreOverrideCursor()
+
+			return ret
+
+		return wrapper
 
 class AboutDialog (Window):
 	"""A window showing the "about"-informations."""
@@ -111,14 +130,20 @@ class PackageDetails:
 
 		self.window.installedCheck.blockSignals(True)
 
+		# combo
 		QtCore.QObject.connect(self.window.versCombo, QtCore.SIGNAL("currentIndexChanged(int)"), self.cb_combo_changed)
 		
+		# buttons
 		QtCore.QObject.connect(self.window.pkgEmergeBtn, QtCore.SIGNAL("clicked()"), self.cb_emerge_clicked)
 		QtCore.QObject.connect(self.window.pkgUnmergeBtn, QtCore.SIGNAL("clicked()"), self.cb_unmerge_clicked)
 		QtCore.QObject.connect(self.window.pkgRevertBtn, QtCore.SIGNAL("clicked()"), self.cb_revert_clicked)
 
-		#QtCore.QObject.connect(self.window.maskedCheck, QtCore.SIGNAL("clicked(bool)"), self.cb_masked_clicked)
-		#QtCore.QObject.connect(self.window.testingCheck, QtCore.SIGNAL("clicked(bool)"), self.cb_testing_clicked)
+		# checkboxes
+		QtCore.QObject.connect(self.window.maskedCheck, QtCore.SIGNAL("clicked(bool)"), self.cb_masked_clicked)
+		QtCore.QObject.connect(self.window.testingCheck, QtCore.SIGNAL("clicked(bool)"), self.cb_testing_clicked)
+
+		# useflags
+		QtCore.QObject.connect(self.window.useList, QtCore.SIGNAL("itemClicked(QTreeWidgetItem*, int)"), self.cb_use_flag_changed)
 
 	def update (self, cp, queue = None, version = None, doEmerge = True, instantChange = False):
 		"""Updates the table to show the contents for the package.
@@ -263,6 +288,79 @@ class PackageDetails:
 		if self.instantChange:
 			self._update_keywords(True, update = True)
 		return True
+	
+	def cb_testing_clicked (self, status):
+		"""Callback for toggled testing-checkbox."""
+		button = self.window.testingCheck
+
+		if self.actual_package().is_testing(use_keywords = False) == status:
+			return
+
+		if not self.actual_package().is_testing(use_keywords = True):
+			self.actual_package().set_testing(False)
+			button.setText("Testing")
+			button.setCheckState(qCheck(True))
+		else:
+			self.actual_package().set_testing(True)
+			if self.actual_package().is_testing(use_keywords=False):
+				button.setText("(Testing)")
+				button.setCheckState(qCheck(True))
+
+		if self.instantChange:
+			self._update_keywords(True, update = True)
+		
+	def cb_masked_clicked (self, status):
+		"""Callback for toggled masking-checkbox."""
+		pkg = self.actual_package()
+		button = self.window.maskedCheck
+
+		if pkg.is_masked(use_changed = False) == status and not pkg.is_locally_masked():
+			return
+
+		if pkg.is_locally_masked() and status:
+			return False
+	
+		if not pkg.is_masked(use_changed = True):
+			pkg.set_masked(True)
+			if pkg.is_locally_masked():
+				button.setText("Masked by User")
+			else:
+				button.setText("Masked")
+
+			button.setCheckState(qCheck(True))
+		
+		else:
+			locally = pkg.is_locally_masked()
+			pkg.set_masked(False)
+
+			if pkg.is_masked(use_changed=False) and not locally:
+				button.setText("(Masked)")
+				button.setCheckState(qCheck(True))
+			else:
+				button.setText("Masked")
+		
+		if self.instantChange:
+			self._update_keywords(True, update = True)
+		
+		return True
+	
+	def cb_use_flag_changed (self, item, col):
+		if col != 0: return
+		
+		flag = str(item.text(1))
+		pkg = self.actual_package()
+		
+		if flag in pkg.get_global_settings("USE_EXPAND").split(" "): # ignore expanded flags
+			return
+
+		checked = qIsChecked(item.checkState(0))
+
+		prefix = ""
+		if not checked: prefix = "-"
+		
+		pkg.set_use_flag(prefix+flag)	
+		if self.instantChange:
+			self._update_keywords(True, update = True)
 
 	def cb_combo_changed (self):
 		"""Callback for the changed ComboBox.
@@ -305,7 +403,11 @@ class PackageDetails:
 			else:
 				self.window.maskedCheck.setText("Masked")
 			
-			self.window.maskedCheck.setCheckState(qCheck(pkg.is_masked(use_changed = False)))
+			if pkg.is_locally_masked():
+				self.window.maskedCheck.setText("Masked by User")
+				self.window.maskedCheck.setCheckState(qCheck(True))
+			else:
+				self.window.maskedCheck.setCheckState(qCheck(pkg.is_masked(use_changed = False)))
 			
 			if pkg.is_testing(use_keywords = False) and not pkg.is_testing(use_keywords = True):
 				self.window.testingCheck.setText("(Testing)")
@@ -367,12 +469,13 @@ class MainWindow (Window):
 		self.consoleLayout.setSpacing(0)
 		self.consoleTab.setLayout(self.consoleLayout)
 		self.consoleLayout.addWidget(self.console)
+		QtCore.QObject.connect(self, QtCore.SIGNAL("doTitleUpdate"), self._title_update)
 
 		# build queueList
 		self.queueList.setHeaderLabels(["Package", "Additional infos"])
 		self.queueTree = QtTree(self.queueList)
-
-		QtCore.QObject.connect(self, QtCore.SIGNAL("doTitleUpdate"), self._title_update)
+		QtCore.QObject.connect(self.queueList.model(), QtCore.SIGNAL("rowsInserted (const QModelIndex&, int, int)"), self.cb_queue_list_items_added)
+		QtCore.QObject.connect(self.queueList, QtCore.SIGNAL("expanded (const QModelIndex&)"), self.cb_queue_list_items_added)
 
 		# set emerge queue
 		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update)
@@ -414,6 +517,7 @@ class MainWindow (Window):
 		AboutDialog(self).exec_()
 
 	@QtCore.pyqtSignature("")
+	@Window.watch_cursor
 	def on_searchBtn_clicked (self):
 		"""Do a search."""
 		text = str(self.searchEdit.text())
@@ -477,6 +581,34 @@ class MainWindow (Window):
 
 		self.tabWidget.setCurrentIndex(self.CONSOLE_PAGE)
 		self.queue.unmerge(force = True)
+
+	@QtCore.pyqtSignature("")
+	@Window.watch_cursor
+	def on_updateBtn_clicked (self):
+		if not am_i_root():
+			not_root_dialog(self)
+	
+		else:
+			updating = system.update_world(newuse = self.cfg.get_boolean("newuse_opt"), deep = self.cfg.get_boolean("deep_opt"))
+
+			debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating],"--> length:",len(updating))
+			try:
+				try:
+					for pkg, old_pkg in updating:
+						self.queue.append(pkg.get_cpv(), unmask = False)
+				except PackageNotFoundException, e:
+					if unmask_dialog(self, e[0]) == QtGui.QMessageBox.Yes:
+						for pkg, old_pkg in updating:
+							self.queue.append(pkg.get_cpv(), unmask = True)
+			
+			except BlockedException, e:
+				blocked_dialog(self, e[0], e[1])
+				self.queue.remove_children(self.queue.emergeIt)
+
+			if len(updating): self.doUpdate = True
+
+	def cb_queue_list_items_added (self, *args):
+		self.queueList.resizeColumnToContents(0)
 
 	def cb_cat_list_selected (self, index, prev):
 		self.selCatName = str(index.data().toString())
