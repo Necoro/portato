@@ -11,7 +11,7 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 # qt4
-from PyQt4 import QtGui, uic, QtCore
+from PyQt4 import Qt, uic
 import sip
 
 # our backend stuff
@@ -26,20 +26,11 @@ from portato.gui.gui_helper import Database, Config, EmergeQueue
 from terminal import QtConsole
 from tree import QtTree
 from dialogs import *
+from helper import qCheck, qIsChecked
+
+import types
 
 UI_DIR = DATA_DIR+"ui/"
-
-#XXX: global variables are bad
-app = QtGui.QApplication([])
-
-def qCheck (check):
-	if check:
-		return QtCore.Qt.Checked
-	else:
-		return QtCore.Qt.Unchecked
-
-def qIsChecked (check):
-	return check == QtCore.Qt.Checked
 
 class WindowMeta (sip.wrappertype, type):
 
@@ -54,7 +45,7 @@ class WindowMeta (sip.wrappertype, type):
 		del dict["_bases"]
 		super(WindowMeta, cls).__init__(name, b+bases, dict)
 
-class Window:
+class Window (object):
 
 	def __init__(self, parent = None):
 		self._qt_base.__init__(self, parent)
@@ -66,11 +57,11 @@ class Window:
 		def wrapper (*args, **kwargs):
 			ret = None
 
-			QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+			Qt.QApplication.setOverrideCursor(Qt.Qt.WaitCursor)
 			try:
 				ret = func(*args, **kwargs)
 			finally:
-				QtGui.QApplication.restoreOverrideCursor()
+				Qt.QApplication.restoreOverrideCursor()
 
 			return ret
 
@@ -102,7 +93,7 @@ class SearchDialog (Window):
 		"""Constructor.
 
 		@param parent: parent-window
-		@type parent: QtGui.QWidget
+		@type parent: Qt.QWidget
 		@param list: list of results to show
 		@type list: string[]
 		@param jumpTo: function to call if "OK"-Button is hit
@@ -114,12 +105,86 @@ class SearchDialog (Window):
 		self.comboBox.setCurrentIndex(0)
 		self.jumpTo = jumpTo
 
-		QtCore.QObject.connect(self, QtCore.SIGNAL("accepted()"), self.finish)
+		Qt.QObject.connect(self, Qt.SIGNAL("accepted()"), self.finish)
 
 	def finish (self):
 		s = str(self.comboBox.currentText())
 		self.done(0)
 		self.jumpTo(s)
+
+class PreferenceWindow (Window):
+	"""Window displaying some preferences."""
+	
+	__metaclass__ = WindowMeta
+
+	# all checkboxes in the window
+	# widget name -> option name
+	checkboxes = {
+			"debugCheck"	: "debug_opt",
+			"deepCheck"		: "deep_opt",
+			"newUseCheck"	: "newuse_opt",
+			"maskCheck"		: "maskPerVersion_opt",
+			"useCheck"		: "usePerVersion_opt",
+			"testingCheck"	: "testingPerVersion_opt"
+			}
+	
+	# all edits in the window
+	# widget name -> option name
+	edits = {
+			"maskEdit"		: "maskFile_opt",
+			"testingEdit"	: "testingFile_opt",
+			"useEdit"		: "useFile_opt",
+			"syncCmdEdit"	: "syncCmd_opt"
+			}
+
+	def __init__ (self, parent, cfg):
+
+		Window.__init__(self, parent)
+
+		self.cfg = cfg
+		
+		palette = self.hintLabel.palette()
+		palette.setColor(Qt.QPalette.Active, Qt.QPalette.Window, Qt.QColor(Qt.Qt.yellow))
+		self.hintLabel.setPalette(palette)
+
+		# the checkboxes
+		for box in self.checkboxes:
+			val = self.checkboxes[box]
+			box = self.__getattribute__(box)
+			if type(val) == types.TupleType:
+				box.setCheckState(qCheck(self.cfg.get_boolean(val[0], section = self.cfg.const[val[1]])))
+			else:
+				box.setCheckState(qCheck(self.cfg.get_boolean(val)))
+
+		# the edits
+		for edit in self.edits:
+			_edit = self.__getattribute__(edit)
+			_edit.setText(self.cfg.get(self.edits[edit]))
+
+		Qt.QObject.connect(self, Qt.SIGNAL("accepted()"), self.finish)
+
+	def _save (self):
+		"""Sets all options in the Config-instance."""
+		
+		for box in self.checkboxes:
+			val = self.checkboxes[box]
+			box = self.__getattribute__(box)
+			if type(val) == types.TupleType:
+				self.cfg.set_boolean(val[0], qIsChecked(box.checkState()), section = self.cfg.const[val[1]])
+			else:
+				self.cfg.set_boolean(val, qIsChecked(box.checkState()))
+
+		for edit in self.edits:
+			_edit = self.__getattribute__(edit)
+			self.cfg.set(self.edits[edit], _edit.text())
+
+	def finish (self):
+		"""Saves and writes to config-file."""
+		self._save()
+		try:
+			self.cfg.write()
+		except IOError, e:
+			io_ex_dialog(self, e)
 
 class PackageDetails:
 
@@ -131,21 +196,21 @@ class PackageDetails:
 		self.window.installedCheck.blockSignals(True)
 
 		# combo
-		QtCore.QObject.connect(self.window.versCombo, QtCore.SIGNAL("currentIndexChanged(int)"), self.cb_combo_changed)
+		Qt.QObject.connect(self.window.versCombo, Qt.SIGNAL("currentIndexChanged(int)"), self.cb_combo_changed)
 		
 		# buttons
-		QtCore.QObject.connect(self.window.pkgEmergeBtn, QtCore.SIGNAL("clicked()"), self.cb_emerge_clicked)
-		QtCore.QObject.connect(self.window.pkgUnmergeBtn, QtCore.SIGNAL("clicked()"), self.cb_unmerge_clicked)
-		QtCore.QObject.connect(self.window.pkgRevertBtn, QtCore.SIGNAL("clicked()"), self.cb_revert_clicked)
+		Qt.QObject.connect(self.window.pkgEmergeBtn, Qt.SIGNAL("clicked()"), self.cb_emerge_clicked)
+		Qt.QObject.connect(self.window.pkgUnmergeBtn, Qt.SIGNAL("clicked()"), self.cb_unmerge_clicked)
+		Qt.QObject.connect(self.window.pkgRevertBtn, Qt.SIGNAL("clicked()"), self.cb_revert_clicked)
 
 		# checkboxes
-		QtCore.QObject.connect(self.window.maskedCheck, QtCore.SIGNAL("clicked(bool)"), self.cb_masked_clicked)
-		QtCore.QObject.connect(self.window.testingCheck, QtCore.SIGNAL("clicked(bool)"), self.cb_testing_clicked)
+		Qt.QObject.connect(self.window.maskedCheck, Qt.SIGNAL("clicked(bool)"), self.cb_masked_clicked)
+		Qt.QObject.connect(self.window.testingCheck, Qt.SIGNAL("clicked(bool)"), self.cb_testing_clicked)
 
 		# useflags
-		QtCore.QObject.connect(self.window.useList, QtCore.SIGNAL("itemClicked(QTreeWidgetItem*, int)"), self.cb_use_flag_changed)
+		Qt.QObject.connect(self.window.useList, Qt.SIGNAL("itemClicked(QTreeWidgetItem*, int)"), self.cb_use_flag_changed)
 
-	def update (self, cp, queue = None, version = None, doEmerge = True, instantChange = False):
+	def update (self, cp, queue = None, version = None, doEmerge = True, instantChange = None):
 		"""Updates the table to show the contents for the package.
 		
 		@param cp: the selected package
@@ -156,8 +221,8 @@ class PackageDetails:
 		@type version: string
 		@param doEmerge: if False, the emerge buttons are disabled
 		@type doEmerge: False
-		@param instantChange: if True the changed keywords are updated instantly
-		@type instantChange: boolean"""
+		@param instantChange: if not None, the item given is updated immediatly
+		@type instantChange: Qt.QTreeWidgetItem"""
 
 		self.cp = cp
 		self.version = version
@@ -227,13 +292,13 @@ class PackageDetails:
 			exp = pkg.use_expanded(use, suggest = actual_exp)
 			if exp is not None:
 				if exp != actual_exp:
-					actual_exp_it = QtGui.QTreeWidgetItem(self.window.useList, ["", exp, ""])
+					actual_exp_it = Qt.QTreeWidgetItem(self.window.useList, ["", exp, ""])
 					actual_exp = exp
 			else:
 				actual_exp_it = self.window.useList
 				actual_exp = None
 
-			item = QtGui.QTreeWidgetItem(actual_exp_it, ["", use, system.get_use_desc(use, self.cp)])
+			item = Qt.QTreeWidgetItem(actual_exp_it, ["", use, system.get_use_desc(use, self.cp)])
 			item.setCheckState(0, qCheck(pkg.is_use_flag_enabled(use)))
 
 	def _update_keywords (self, emerge, update = False):
@@ -242,7 +307,7 @@ class PackageDetails:
 				try:
 					self.queue.append(self.actual_package().get_cpv(), unmerge = False, update = update)
 				except PackageNotFoundException, e:
-					if unmask_dialog(self.window, e[0]) == QtGui.QMessageBox.Yes :
+					if unmask_dialog(self.window, e[0]) == Qt.QMessageBox.Yes :
 						self.queue.append(self.actual_package().get_cpv(), unmerge = False, unmask = True, update = update)
 			except BlockedException, e:
 				blocked_dialog(self.window, e[0], e[1])
@@ -361,6 +426,7 @@ class PackageDetails:
 		pkg.set_use_flag(prefix+flag)	
 		if self.instantChange:
 			self._update_keywords(True, update = True)
+			self.window.queueTree.make_tooltip(self.instantChange)
 
 	def cb_combo_changed (self):
 		"""Callback for the changed ComboBox.
@@ -370,8 +436,8 @@ class PackageDetails:
 		self.build_use_list()
 		pkg = self.actual_package()
 
-		shown = QtGui.QSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
-		hidden = QtGui.QSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Fixed)
+		shown = Qt.QSizePolicy(Qt.QSizePolicy.MinimumExpanding, Qt.QSizePolicy.Fixed)
+		hidden = Qt.QSizePolicy(Qt.QSizePolicy.Ignored, Qt.QSizePolicy.Fixed)
 		
 		#
 		# rebuild the buttons and checkboxes in all the different manners which are possible
@@ -459,23 +525,25 @@ class MainWindow (Window):
 		# the two lists
 		self.build_pkg_list()
 		self.build_cat_list()
-		QtCore.QObject.connect(self.selCatListModel, QtCore.SIGNAL("currentChanged(QModelIndex, QModelIndex)"), self.cb_cat_list_selected)
-		QtCore.QObject.connect(self.selPkgListModel, QtCore.SIGNAL("currentChanged(QModelIndex, QModelIndex)"), self.cb_pkg_list_selected)
+		Qt.QObject.connect(self.selCatListModel, Qt.SIGNAL("currentChanged(QModelIndex, QModelIndex)"), self.cb_cat_list_selected)
+		Qt.QObject.connect(self.selPkgListModel, Qt.SIGNAL("currentChanged(QModelIndex, QModelIndex)"), self.cb_pkg_list_selected)
 
 		# build console
 		self.console = QtConsole(self.consoleTab)
-		self.consoleLayout = QtGui.QVBoxLayout()
+		self.consoleLayout = Qt.QVBoxLayout()
 		self.consoleLayout.setMargin(0)
 		self.consoleLayout.setSpacing(0)
 		self.consoleTab.setLayout(self.consoleLayout)
 		self.consoleLayout.addWidget(self.console)
-		QtCore.QObject.connect(self, QtCore.SIGNAL("doTitleUpdate"), self._title_update)
+		Qt.QObject.connect(self, Qt.SIGNAL("doTitleUpdate"), self._title_update)
 
 		# build queueList
 		self.queueList.setHeaderLabels(["Package", "Additional infos"])
 		self.queueTree = QtTree(self.queueList)
-		QtCore.QObject.connect(self.queueList.model(), QtCore.SIGNAL("rowsInserted (const QModelIndex&, int, int)"), self.cb_queue_list_items_added)
-		QtCore.QObject.connect(self.queueList, QtCore.SIGNAL("expanded (const QModelIndex&)"), self.cb_queue_list_items_added)
+		Qt.QObject.connect(self.queueList.model(), Qt.SIGNAL("rowsInserted (const QModelIndex&, int, int)"), self.cb_queue_list_items_added)
+		Qt.QObject.connect(self.queueList, Qt.SIGNAL("expanded (const QModelIndex&)"), self.cb_queue_list_items_added)
+		Qt.QObject.connect(self.queueList, Qt.SIGNAL("itemActivated (QTreeWidgetItem*, int)"), self.cb_queue_list_item_selected)
+		Qt.QObject.connect(self.queueList, Qt.SIGNAL("itemDoubleClicked (QTreeWidgetItem*, int)"), self.cb_queue_list_item_selected)
 
 		# set emerge queue
 		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update)
@@ -483,7 +551,7 @@ class MainWindow (Window):
 		self.show()
 	
 	def title_update (self, title):
-		self.emit(QtCore.SIGNAL("doTitleUpdate"), title)
+		self.emit(Qt.SIGNAL("doTitleUpdate"), title)
 
 	def _title_update (self, title):
 		if title == None: title = "Console"
@@ -499,24 +567,28 @@ class MainWindow (Window):
 		self.pkgListModel.setStringList([name for (name,inst) in self.db.get_cat(cat)])
 
 	def build_pkg_list (self):
-		self.pkgListModel = QtGui.QStringListModel([])
+		self.pkgListModel = Qt.QStringListModel([])
 		self.pkgListModel.sort(0)
-		self.selPkgListModel = QtGui.QItemSelectionModel(self.pkgListModel)
+		self.selPkgListModel = Qt.QItemSelectionModel(self.pkgListModel)
 		self.pkgList.setModel(self.pkgListModel)
 		self.pkgList.setSelectionModel(self.selPkgListModel)
 
 	def build_cat_list (self):
-		self.catListModel = QtGui.QStringListModel(system.list_categories())
+		self.catListModel = Qt.QStringListModel(system.list_categories())
 		self.catListModel.sort(0)
-		self.selCatListModel = QtGui.QItemSelectionModel(self.catListModel)
+		self.selCatListModel = Qt.QItemSelectionModel(self.catListModel)
 		self.catList.setModel(self.catListModel)
 		self.catList.setSelectionModel(self.selCatListModel)
 
-	@QtCore.pyqtSignature("")
+	@Qt.pyqtSignature("")
 	def on_aboutAction_triggered (self):
 		AboutDialog(self).exec_()
 
-	@QtCore.pyqtSignature("")
+	@Qt.pyqtSignature("")
+	def on_prefAction_triggered (self):
+		PreferenceWindow(self, self.cfg).exec_()
+	
+	@Qt.pyqtSignature("")
 	@Window.watch_cursor
 	def on_searchBtn_clicked (self):
 		"""Do a search."""
@@ -532,7 +604,7 @@ class MainWindow (Window):
 				else:
 					SearchDialog(self, packages, self.jump_to).exec_()
 
-	@QtCore.pyqtSignature("")
+	@Qt.pyqtSignature("")
 	def on_removeBtn_clicked (self):
 		"""Removes a selected item in the (un)emerge-queue if possible."""
 		selected = self.queueList.currentItem()
@@ -540,7 +612,7 @@ class MainWindow (Window):
 		if selected:
 			if not selected.parent(): # top-level
 				if self.queueTree.iter_has_children(selected): # and has children which can be removed :)
-					if remove_queue_dialog(self) == QtGui.QMessageBox.Yes :
+					if remove_queue_dialog(self) == Qt.QMessageBox.Yes :
 						self.queue.remove_children(selected)
 						self.doUpdate = False
 			
@@ -550,7 +622,7 @@ class MainWindow (Window):
 				self.queue.remove_with_children(selected)
 				self.doUpdate = False
 
-	@QtCore.pyqtSignature("")
+	@Qt.pyqtSignature("")
 	def on_emergeBtn_clicked (self):
 		"""Do emerge."""
 		
@@ -575,14 +647,14 @@ class MainWindow (Window):
 			self.queue.update_world(force=True, newuse = self.cfg.get_boolean("newuse_opt"), deep = self.cfg.get_boolean("deep_opt"), options = ["--nospinner"])
 			self.doUpdate = False
 
-	@QtCore.pyqtSignature("")
+	@Qt.pyqtSignature("")
 	def on_unmergeBtn_clicked (self):
 		"""Do unmerge."""
 
 		self.tabWidget.setCurrentIndex(self.CONSOLE_PAGE)
 		self.queue.unmerge(force = True)
 
-	@QtCore.pyqtSignature("")
+	@Qt.pyqtSignature("")
 	@Window.watch_cursor
 	def on_updateBtn_clicked (self):
 		if not am_i_root():
@@ -597,7 +669,7 @@ class MainWindow (Window):
 					for pkg, old_pkg in updating:
 						self.queue.append(pkg.get_cpv(), unmask = False)
 				except PackageNotFoundException, e:
-					if unmask_dialog(self, e[0]) == QtGui.QMessageBox.Yes:
+					if unmask_dialog(self, e[0]) == Qt.QMessageBox.Yes:
 						for pkg, old_pkg in updating:
 							self.queue.append(pkg.get_cpv(), unmask = True)
 			
@@ -606,6 +678,15 @@ class MainWindow (Window):
 				self.queue.remove_children(self.queue.emergeIt)
 
 			if len(updating): self.doUpdate = True
+
+	def cb_queue_list_item_selected (self, item, col):
+		if col == -1: return # nothing selected
+		
+		if self.queueTree.iter_has_parent(item):
+			package = self.queueTree.get_value(item, self.queueTree.get_cpv_column())
+			cat, name, vers, rev = system.split_cpv(package)
+			if rev != "r0": vers = vers+"-"+rev
+			self.pkgDetails.update(cat+"/"+name, queue = self.queue, version = vers, instantChange = item, doEmerge = False)
 
 	def cb_queue_list_items_added (self, *args):
 		self.queueList.resizeColumnToContents(0)
@@ -616,7 +697,3 @@ class MainWindow (Window):
 
 	def cb_pkg_list_selected (self, index, prev):
 		self.pkgDetails.update(self.selCatName+"/"+str(index.data().toString()), self.queue)
-
-	def main (self):
-		app.exec_()
-

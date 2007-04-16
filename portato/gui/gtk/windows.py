@@ -932,8 +932,8 @@ class MainWindow (Window):
 		store = self.queueTree
 		if len(path) > 1:
 			iterator = store.get_original().get_iter(path)
-			if store.is_in_emerge(iterator):
-				package = store.get_value(iterator, 0)
+			if store.iter_has_parent(iterator):
+				package = store.get_value(iterator, store.get_cpv_column())
 				cat, name, vers, rev = system.split_cpv(package)
 				if rev != "r0": vers = vers+"-"+rev
 				self.show_package(cat+"/"+name, queue = self.queue, version = vers, instantChange = True, doEmerge = False)

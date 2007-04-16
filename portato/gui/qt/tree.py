@@ -10,9 +10,12 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from PyQt4 import QtGui, QtCore
+from PyQt4 import Qt
 from portato.gui.wrapper import Tree
  
+from portato.helper import debug
+from portato.backend import system # for the tooltips
+
 class QtTree (Tree):
 
 	def __init__ (self, treeWidget, col = 0):
@@ -20,8 +23,8 @@ class QtTree (Tree):
 		self.tree = treeWidget
 		self.col = col
 		
-		self.emergeIt = QtGui.QTreeWidgetItem(self.tree, ["Emerge", ""])
-		self.unmergeIt = QtGui.QTreeWidgetItem(self.tree, ["Unmerge", ""])
+		self.emergeIt = Qt.QTreeWidgetItem(self.tree, ["Emerge", ""])
+		self.unmergeIt = Qt.QTreeWidgetItem(self.tree, ["Unmerge", ""])
 
 	def build_append_value (self, cpv, oneshot = False, update = False, version = None):
 		string = ""
@@ -65,7 +68,7 @@ class QtTree (Tree):
 		return (it.childCount() > 0)
 
 	def next_iter (self, it):
-		iter = QtGui.QTreeWidgetItemIterator(it)
+		iter = Qt.QTreeWidgetItemIterator(it)
 		iter += 1 # next iter ...
 		return iter.value()
 
@@ -82,8 +85,10 @@ class QtTree (Tree):
 
 		if parent is None:
 			parent = self.tree
-
-		return QtGui.QTreeWidgetItem(parent, values)
+		
+		item = Qt.QTreeWidgetItem(parent, values)
+		self.make_tooltip(item)
+		return item
 
 	def remove (self, it):
 		# a somehow strange approach ;) - go to the parent and delete the child
@@ -96,4 +101,50 @@ class QtTree (Tree):
 
 	def get_cpv_column (self):
 		return self.col
+	
+	def make_tooltip (self, item):
+		tooltip = self.__get_flags(str(item.text(0)))
+		item.setToolTip(self.col, tooltip)
+
+	def __get_flags(self, cpv):
+		
+		try:
+			pkg = system.new_package(cpv)
+		except ValueError: # no CPV
+			return ""
+
+		enabled = []
+		disabled = []
+		expanded = set()
+
+		pkg_flags = pkg.get_all_use_flags()
+		if not pkg_flags: # no flags - stop here
+			return ""
+		
+		pkg_flags.sort()
+		for use in pkg_flags:
+			exp = pkg.use_expanded(use)
+			if exp:
+				expanded.add(exp)
+			
+			else:
+				if pkg.is_use_flag_enabled(use):
+					enabled.append(use)
+				else:
+					disabled.append(use)
+		
+		string = ""
+		
+		if enabled:
+			string = "<b>+%s</b>" % ("<br>+".join(enabled),)
+			if len(disabled) > 0:
+				string = string + "<br>"
+		
+		if disabled:
+			string = string+"<i>- %s</i>" % ("<br>- ".join(disabled),)
+
+		if expanded:
+			string = string+"<br><br>"+"<br>".join(expanded)
+
+		return string
 

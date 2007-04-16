@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from PyQt4 import QtGui, QtCore
+from PyQt4 import Qt
 
 from threading import Thread, Lock
 from os import read
@@ -18,24 +18,24 @@ from os import read
 from portato.gui.wrapper import Console
 from portato.helper import debug
 
-class BoldFormat (QtGui.QTextCharFormat):
+class BoldFormat (Qt.QTextCharFormat):
 
 	def __init__(self):
-		QtGui.QTextCharFormat.__init__(self)
-		self.setFontWeight(QtGui.QFont.Bold)
+		Qt.QTextCharFormat.__init__(self)
+		self.setFontWeight(Qt.QFont.Bold)
 
-class UnderlineFormat (QtGui.QTextCharFormat):
+class UnderlineFormat (Qt.QTextCharFormat):
 
 	def __init__(self):
-		QtGui.QTextCharFormat.__init__(self)
+		Qt.QTextCharFormat.__init__(self)
 		self.setFontUnderline(True)
 
-class ColorFormat (QtGui.QTextCharFormat):
+class ColorFormat (Qt.QTextCharFormat):
 
 	def __init__(self, color):
-		QtGui.QTextCharFormat.__init__(self)
+		Qt.QTextCharFormat.__init__(self)
 
-		self.setForeground(QtGui.QBrush(QtGui.QColor(color)))
+		self.setForeground(Qt.QBrush(Qt.QColor(color)))
 
 # we only support a subset of the commands
 esc_seq = ("\x1b", "[")
@@ -60,10 +60,10 @@ attr[36]        = 	ColorFormat("cyan")
 attr[37]        = 	ColorFormat("white")
 attr[39]      	= 	None				# default
 
-class QtConsole (Console, QtGui.QTextEdit):
+class QtConsole (Console, Qt.QTextEdit):
 
 	def __init__ (self, parent):
-		QtGui.QTextEdit.__init__(self, parent)
+		Qt.QTextEdit.__init__(self, parent)
 
 		self.pty = None
 		self.running = False
@@ -74,8 +74,8 @@ class QtConsole (Console, QtGui.QTextEdit):
 
 		self.setReadOnly(True)
 
-		QtCore.QObject.connect(self, QtCore.SIGNAL("doSomeWriting"), self._write)
-		QtCore.QObject.connect(self, QtCore.SIGNAL("deletePrevChar()"), self._deletePrev)
+		Qt.QObject.connect(self, Qt.SIGNAL("doSomeWriting"), self._write)
+		Qt.QObject.connect(self, Qt.SIGNAL("deletePrevChar()"), self._deletePrev)
 
 	def _deletePrev (self):
 		self.textCursor().deletePreviousChar()
@@ -87,7 +87,7 @@ class QtConsole (Console, QtGui.QTextEdit):
 			
 			if not self.textCursor().atEnd(): # move cursor and re-set format
 				f = self.currentCharFormat()
-				self.moveCursor(QtGui.QTextCursor.End)
+				self.moveCursor(Qt.QTextCursor.End)
 				self.setCurrentCharFormat(f)
 			
 			# insert the text
@@ -97,7 +97,7 @@ class QtConsole (Console, QtGui.QTextEdit):
 			self.ensureCursorVisible()
 
 	def write(self, text):
-		self.emit(QtCore.SIGNAL("doSomeWriting"), text)
+		self.emit(Qt.SIGNAL("doSomeWriting"), text)
 
 	def start_new_thread (self):
 			self.run = True
@@ -126,7 +126,7 @@ class QtConsole (Console, QtGui.QTextEdit):
 			if s == "": break
 
 			if ord(s) == backspace:
-				self.emit(QtCore.SIGNAL("deletePrevChar()"))
+				self.emit(Qt.SIGNAL("deletePrevChar()"))
 				continue
 
 			if s == esc_seq[0]: # -> 0x27
@@ -198,4 +198,4 @@ class QtConsole (Console, QtGui.QTextEdit):
 		return f
 
 	def virgin_format (self):
-		return QtGui.QTextCharFormat(self.stdFormat)
+		return Qt.QTextCharFormat(self.stdFormat)

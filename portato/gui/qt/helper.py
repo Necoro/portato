@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/qt/__init__.py
+# File: portato/gui/qt/helper.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2007 René 'Necoro' Neumann
@@ -10,10 +10,13 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from PyQt4.Qt import QApplication
-from windows import MainWindow
+from PyQt4 import Qt
 
-def run():
-	app = QApplication([])
-	m = MainWindow()
-	app.exec_()
+def qCheck (check):
+	if check:
+		return Qt.Qt.Checked
+	else:
+		return Qt.Qt.Unchecked
+
+def qIsChecked (check):
+	return check == Qt.Qt.Checked
