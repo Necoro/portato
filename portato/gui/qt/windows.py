@@ -25,6 +25,7 @@ from portato.gui.gui_helper import Database, Config, EmergeQueue
 # own GUI stuff
 from terminal import QtConsole
 from tree import QtTree
+from highlighter import EbuildHighlighter
 from dialogs import *
 from helper import qCheck, qIsChecked
 
@@ -111,6 +112,30 @@ class SearchDialog (Window):
 		s = str(self.comboBox.currentText())
 		self.done(0)
 		self.jumpTo(s)
+
+class EbuildDialog (Window):
+
+	__metaclass__ = WindowMeta
+
+	def __init__ (self, parent, package):
+
+		Window.__init__(self, parent)
+
+		self.setWindowTitle(package.get_cpv())
+
+		self.doc = Qt.QTextDocument()
+		self.hl = EbuildHighlighter(self.doc)
+		
+		try: # read ebuild
+			f = open(package.get_ebuild_path(), "r")
+			lines = f.readlines()
+			f.close()
+		except IOError,e:
+			io_ex_dialog(self, e)
+			return
+
+		self.doc.setPlainText("".join(lines))
+		self.ebuildEdit.setDocument(self.doc)
 
 class PreferenceWindow (Window):
 	"""Window displaying some preferences."""
@@ -202,6 +227,7 @@ class PackageDetails:
 		Qt.QObject.connect(self.window.pkgEmergeBtn, Qt.SIGNAL("clicked()"), self.cb_emerge_clicked)
 		Qt.QObject.connect(self.window.pkgUnmergeBtn, Qt.SIGNAL("clicked()"), self.cb_unmerge_clicked)
 		Qt.QObject.connect(self.window.pkgRevertBtn, Qt.SIGNAL("clicked()"), self.cb_revert_clicked)
+		Qt.QObject.connect(self.window.pkgEbuildBtn, Qt.SIGNAL("clicked()"), self.cb_ebuild_clicked)
 
 		# checkboxes
 		Qt.QObject.connect(self.window.maskedCheck, Qt.SIGNAL("clicked(bool)"), self.cb_masked_clicked)
@@ -326,6 +352,9 @@ class PackageDetails:
 		
 		return self.packages[self.window.versCombo.currentIndex()]
 
+	def cb_ebuild_clicked (self):
+		EbuildDialog(self.window, self.actual_package()).exec_()
+	
 	def cb_emerge_clicked (self):
 		"""Callback for pressed emerge-button. Adds the package to the EmergeQueue."""
 		if not am_i_root():
