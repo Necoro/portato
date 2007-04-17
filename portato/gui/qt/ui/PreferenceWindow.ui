@@ -41,6 +41,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="pkgIconsCheck" >
+        <property name="text" >
+         <string>Use icons in package list</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

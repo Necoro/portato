@@ -35,6 +35,7 @@ class Config:
 	const = {
 			"main_sec" : "Main",
 			"gtk_sec" : "Gtk",
+			"qt_sec" : "Qt",
 			"usePerVersion_opt" : "usePerVersion",
 			"useFile_opt" : "usefile",
 			"maskFile_opt" : "maskfile",
@@ -47,6 +48,7 @@ class Config:
 			"newuse_opt" : "newuse",
 			"syncCmd_opt" : "synccommand",
 			"useTips_opt" : "showusetips",
+			"pkgIcons_opt" : "packageIcons",
 			"system_opt" : "system"
 			}
 	

@@ -70,9 +70,15 @@
          </widget>
         </item>
         <item>
-         <widget class="QListView" name="pkgList" >
+         <widget class="QListWidget" name="pkgList" >
           <property name="editTriggers" >
            <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="showDropIndicator" stdset="0" >
+           <bool>false</bool>
+          </property>
+          <property name="sortingEnabled" >
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -80,7 +86,7 @@
       </widget>
       <widget class="QTabWidget" name="tabWidget" >
        <property name="currentIndex" >
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="pkgTab" >
         <attribute name="title" >
@@ -391,7 +397,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>466</width>
-     <height>31</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >

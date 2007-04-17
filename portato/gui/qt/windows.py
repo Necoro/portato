@@ -150,7 +150,8 @@ class PreferenceWindow (Window):
 			"newUseCheck"	: "newuse_opt",
 			"maskCheck"		: "maskPerVersion_opt",
 			"useCheck"		: "usePerVersion_opt",
-			"testingCheck"	: "testingPerVersion_opt"
+			"testingCheck"	: "testingPerVersion_opt",
+			"pkgIconsCheck"	: ("pkgIcons_opt", "qt_sec")
 			}
 	
 	# all edits in the window
@@ -552,10 +553,9 @@ class MainWindow (Window):
 		self.cfg.modify_external_configs()
 
 		# the two lists
-		self.build_pkg_list()
 		self.build_cat_list()
 		Qt.QObject.connect(self.selCatListModel, Qt.SIGNAL("currentChanged(QModelIndex, QModelIndex)"), self.cb_cat_list_selected)
-		Qt.QObject.connect(self.selPkgListModel, Qt.SIGNAL("currentChanged(QModelIndex, QModelIndex)"), self.cb_pkg_list_selected)
+		Qt.QObject.connect(self.pkgList, Qt.SIGNAL("currentItemChanged(QListWidgetItem*, QListWidgetItem*)"), self.cb_pkg_list_selected)
 
 		# build console
 		self.console = QtConsole(self.consoleTab)
@@ -593,14 +593,26 @@ class MainWindow (Window):
 		self.pkgDetails.update(cp, self.queue)
 
 	def fill_pkg_list (self, cat):
-		self.pkgListModel.setStringList([name for (name,inst) in self.db.get_cat(cat)])
+		use_icons = self.cfg.get_boolean("pkgIcons_opt", section = self.cfg.const["qt_sec"])
+		
+		# installed icon
+		if use_icons:
+			yes = Qt.QApplication.style().standardIcon(Qt.QStyle.SP_DialogYesButton)
+			no = Qt.QApplication.style().standardIcon(Qt.QStyle.SP_DialogNoButton)
 
-	def build_pkg_list (self):
-		self.pkgListModel = Qt.QStringListModel([])
-		self.pkgListModel.sort(0)
-		self.selPkgListModel = Qt.QItemSelectionModel(self.pkgListModel)
-		self.pkgList.setModel(self.pkgListModel)
-		self.pkgList.setSelectionModel(self.selPkgListModel)
+		self.pkgList.clear()
+
+		for name, inst in self.db.get_cat(cat):
+			if use_icons:
+				if inst:
+					icon = yes
+				else:
+					icon = no
+				Qt.QListWidgetItem(icon, name, self.pkgList)
+			else: # use checkboxes
+				item = Qt.QListWidgetItem(name, self.pkgList)
+				item.setCheckState(qCheck(inst))
+				item.setFlags(Qt.Qt.ItemIsSelectable | Qt.Qt.ItemIsEnabled)
 
 	def build_cat_list (self):
 		self.catListModel = Qt.QStringListModel(system.list_categories())
@@ -725,4 +737,5 @@ class MainWindow (Window):
 		self.fill_pkg_list(self.selCatName)
 
 	def cb_pkg_list_selected (self, index, prev):
-		self.pkgDetails.update(self.selCatName+"/"+str(index.data().toString()), self.queue)
+		if not index is None:
+			self.pkgDetails.update(self.selCatName+"/"+str(index.text()), self.queue)
