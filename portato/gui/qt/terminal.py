@@ -101,7 +101,7 @@ class QtConsole (Console, Qt.QTextEdit):
 
 	def start_new_thread (self):
 			self.run = True
-			self.current = Thread(target=self.__run)
+			self.current = Thread(target=self.__run, name="QtTerminal Listener")
 			self.current.setDaemon(True) # close application even if this thread is running
 			self.current.start()
 
@@ -167,9 +167,13 @@ class QtConsole (Console, Qt.QTextEdit):
 					format = self.virgin_format()
 					break
 
-				if attr[s] is not None:
-					format.merge(attr[s])
-				else:
+				try:
+					if attr[s] is not None:
+						format.merge(attr[s])
+					else:
+						format = self.virgin_format()
+						break
+				except KeyError: # no such attribute
 					format = self.virgin_format()
 					break
 

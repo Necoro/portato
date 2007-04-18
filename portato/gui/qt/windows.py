@@ -567,6 +567,7 @@ class MainWindow (Window):
 		Qt.QObject.connect(self, Qt.SIGNAL("doTitleUpdate"), self._title_update)
 
 		# build queueList
+		self.queueList.addAction(self.oneshotAction)
 		self.queueList.setHeaderLabels(["Package", "Additional infos"])
 		self.queueTree = QtTree(self.queueList)
 		Qt.QObject.connect(self.queueList.model(), Qt.SIGNAL("rowsInserted (const QModelIndex&, int, int)"), self.cb_queue_list_items_added)
@@ -628,7 +629,58 @@ class MainWindow (Window):
 	@Qt.pyqtSignature("")
 	def on_prefAction_triggered (self):
 		PreferenceWindow(self, self.cfg).exec_()
-	
+
+	@Qt.pyqtSignature("")
+	@Window.watch_cursor
+	def on_reloadAction_triggered (self):
+		"""Reloads the portage settings and the database."""
+		system.reload_settings()
+		del self.db
+		self.db = Database()
+		self.db.populate()
+
+	@Qt.pyqtSignature("")
+	def on_killAction_triggered (self):
+		self.queue.kill_emerge()
+
+	@Qt.pyqtSignature("")
+	def cb_saveAction_triggered (self):
+		if not am_i_root():
+			not_root_dialog(self)
+		else:
+			flags.write_use_flags()
+			flags.write_testing()
+			flags.write_masked()
+
+	@Qt.pyqtSignature("")
+	def on_syncAction_triggered (self):
+		if not am_i_root():
+			not_root_dialog(self)
+		else:
+			self.tabWidget.setCurrentIndex(self.CONSOLE_PAGE)
+			cmd = self.cfg.get("syncCmd_opt")
+
+			if cmd != "emerge --sync":
+				cmd = cmd.split()
+				self.queue.sync(cmd)
+			else:
+				self.queue.sync()
+
+	@Qt.pyqtSignature("")
+	def on_oneshotAction_triggered (self):
+		current = self.queueList.currentItem()
+
+		if self.queueTree.is_in_emerge(current) and self.queueTree.iter_has_parent(current):
+			pkg = self.queueTree.get_value(current, self.queueTree.get_cpv_column())
+			
+			if not self.cfg.get_local(pkg, "oneshot_opt"):
+				set = True
+			else:
+				set = False
+			
+			self.cfg.set_local(pkg, "oneshot_opt", set)
+			self.queue.append(pkg, update = True, oneshot = set, forceUpdate = True)
+
 	@Qt.pyqtSignature("")
 	@Window.watch_cursor
 	def on_searchBtn_clicked (self):

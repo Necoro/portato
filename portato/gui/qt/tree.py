@@ -70,7 +70,12 @@ class QtTree (Tree):
 	def next_iter (self, it):
 		iter = Qt.QTreeWidgetItemIterator(it)
 		iter += 1 # next iter ...
-		return iter.value()
+		
+		newIt = iter.value()
+		if newIt.parent() != it.parent(): # stop if we left the current parent
+			return None
+		else:
+			return newIt
 
 	def get_value (self, it, column):
 		return str(it.text(column))

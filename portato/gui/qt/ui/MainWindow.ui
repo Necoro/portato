@@ -86,7 +86,7 @@
       </widget>
       <widget class="QTabWidget" name="tabWidget" >
        <property name="currentIndex" >
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="pkgTab" >
         <attribute name="title" >
@@ -315,6 +315,9 @@ p, li { white-space: pre-wrap; }
          </property>
          <item>
           <widget class="QTreeWidget" name="queueList" >
+           <property name="contextMenuPolicy" >
+            <enum>Qt::ActionsContextMenu</enum>
+           </property>
            <property name="editTriggers" >
             <set>QAbstractItemView::NoEditTriggers</set>
            </property>
@@ -400,6 +403,15 @@ p, li { white-space: pre-wrap; }
      <height>27</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <addaction name="prefAction" />
+    <addaction name="reloadAction" />
+    <addaction name="separator" />
+    <addaction name="quitAction" />
+   </widget>
    <widget class="QMenu" name="menuHelp" >
     <property name="title" >
      <string>&amp;?</string>
@@ -414,13 +426,10 @@ p, li { white-space: pre-wrap; }
     <addaction name="unmergeAction" />
     <addaction name="updateAction" />
     <addaction name="separator" />
-   </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>&amp;File</string>
-    </property>
-    <addaction name="prefAction" />
-    <addaction name="quitAction" />
+    <addaction name="syncAction" />
+    <addaction name="saveAction" />
+    <addaction name="separator" />
+    <addaction name="killAction" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menu_Emerge" />
@@ -439,12 +448,15 @@ p, li { white-space: pre-wrap; }
     <string>&amp;Quit</string>
    </property>
    <property name="menuRole" >
-    <enum>QAction::TextHeuristicRole</enum>
+    <enum>QAction::QuitRole</enum>
    </property>
   </action>
   <action name="aboutAction" >
    <property name="text" >
     <string>&amp;About</string>
+   </property>
+   <property name="menuRole" >
+    <enum>QAction::AboutRole</enum>
    </property>
   </action>
   <action name="emergeAction" >
@@ -465,6 +477,34 @@ p, li { white-space: pre-wrap; }
   <action name="prefAction" >
    <property name="text" >
     <string>&amp;Preferences</string>
+   </property>
+   <property name="menuRole" >
+    <enum>QAction::PreferencesRole</enum>
+   </property>
+  </action>
+  <action name="syncAction" >
+   <property name="text" >
+    <string>S&amp;ync</string>
+   </property>
+  </action>
+  <action name="saveAction" >
+   <property name="text" >
+    <string>Save &amp;Flage</string>
+   </property>
+  </action>
+  <action name="killAction" >
+   <property name="text" >
+    <string>Ki&amp;ll Emerge</string>
+   </property>
+  </action>
+  <action name="reloadAction" >
+   <property name="text" >
+    <string>&amp;Reload Portage</string>
+   </property>
+  </action>
+  <action name="oneshotAction" >
+   <property name="text" >
+    <string>&amp;Oneshot</string>
    </property>
   </action>
  </widget>

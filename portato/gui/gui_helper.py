@@ -624,6 +624,7 @@ class EmergeQueue:
 		childIt = self.tree.first_child_iter(parentIt)
 
 		while childIt:
+			debug("childIt", self.tree.get_value(childIt, 0))
 			if (self.tree.iter_has_children(childIt)): # recursive call
 				self.remove_children(childIt, removeNewFlags)
 			temp = childIt
