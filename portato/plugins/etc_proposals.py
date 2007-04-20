@@ -13,8 +13,6 @@
 from portato.helper import debug, am_i_root
 from portato.backend import system
 
-from portato.gui.gtk.dialogs import not_root_dialog
-
 from subprocess import Popen
 from etcproposals.etcproposals_lib import EtcProposals, __version__
 
@@ -41,10 +39,10 @@ def etc_prop (*args, **kwargs):
 		Popen(["etc-proposals", "--frontend", "gtk", "--fastexit"])
 
 def etc_prop_menu (*args, **kwargs):
-	if not am_i_root():
-		not_root_dialog()
-	else:
+	if am_i_root():
 		if float(__version__) < 1.1:
 			Popen("etc-proposals")
 		else:
 			Popen(["etc-proposals", "--frontend", "gtk"])
+	else:
+		debug("Cannot start etc-proposals. Not root!", error = 1)

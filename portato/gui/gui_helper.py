@@ -30,7 +30,7 @@ import time
 import os
 import signal
 
-class Config:
+class Config: # XXX: This needs to be replaced - the const-dict is just messy
 	"""Wrapper around a ConfigParser and for additional local configurations."""
 	const = {
 			"main_sec" : "Main",
@@ -263,7 +263,9 @@ class EmergeQueue:
 		@param console: Output is shown here.
 		@type console: Console
 		@param db: A database instance.
-		@type db: Database"""
+		@type db: Database
+		@param title_update: A function, which will be called whenever there is a title update.
+		@type title_update: function(string)"""
 		
 		# the different queues
 		self.mergequeue = [] # for emerge

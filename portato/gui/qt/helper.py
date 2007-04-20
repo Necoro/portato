@@ -13,10 +13,23 @@
 from PyQt4 import Qt
 
 def qCheck (check):
+	"""Maps True or False to Qt.Checked or Qt.Unchecked.
+	
+	@param check: boolean value
+	@type check: bool
+	@returns: CheckState-Constant
+	@rtype: int"""
+
 	if check:
 		return Qt.Qt.Checked
 	else:
 		return Qt.Qt.Unchecked
 
 def qIsChecked (check):
+	"""Maps Qt.Checked and Qt.Unchecked to True and False.
+	
+	@param check: CheckState-Constant
+	@type check: int
+	@returns: appropriate boolean value
+	@rtype: bool"""
 	return check == Qt.Qt.Checked

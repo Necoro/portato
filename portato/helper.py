@@ -13,7 +13,6 @@
 import traceback, os.path, sys
 from itertools import chain
 
-
 DEBUG = True
 
 def set_debug (d):
@@ -32,7 +31,13 @@ def debug(*args, **kwargs):
 	If debug(obj0, obj1, obj2) is called, the text part of the output 
 	looks like the output from print obj0, obj1, obj2.
 	
-	If you pass the optional keyword-argument "name", it is used for the function-name instead of the original one."""
+	Keywords which can be used:
+		- name: Use the given name instead the correct function name.
+		- file: output file to use
+		- minus: The value given is the amount of frames to ignore in the stack to return the correct function call.
+				 This should be used if you are wrapping the debug call.
+		- warn: Prints the message as a warning. Value of DEBUG is ignored.
+		- error: Prints the message as an error. Value of DEBUG is ignored."""
 
 	
 	if not DEBUG and not ("warn" in kwargs or "error" in kwargs): return

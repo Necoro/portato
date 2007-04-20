@@ -239,12 +239,15 @@ class Plugin:
 class PluginQueue:
 	"""Class managing and loading the plugins."""
 
-	def __init__ (self, load = True):
+	def __init__ (self, frontend, load = True):
 		"""Constructor.
-
+		
+		@param frontend: the frontend used
+		@type frontend: string
 		@param load: if False nothing is loaded
 		@type load: bool"""
 
+		self.frontend = frontend
 		self.list = []
 		self.hooks = {}
 		if load:
@@ -343,12 +346,30 @@ class PluginQueue:
 					
 					elem = list[0]
 
-					plugin = Plugin(p, elem.getAttribute("name"), elem.getAttribute("author"))
-					plugin.parse_hooks(elem.getElementsByTagName("hook"))
-					plugin.set_import(elem.getElementsByTagName("import"))
-					plugin.parse_menus(elem.getElementsByTagName("menu"))
+					frontendOK = None
+					for f in elem.getElementsByTagName("frontend"):
+						if f.hasChildNodes():
+							nodes = f.childNodes
+							if len(nodes) > 1:
+								raise ParseException, "Malformed frontend"
+				
+							if nodes[0].nodeType != nodes[0].TEXT_NODE:
+								raise ParseException, "Malformed frontend"
+
+							fValue = nodes[0].nodeValue.strip()
+							if fValue == self.frontend:
+								frontendOK = True # one positive is enough
+								break
+							elif frontendOK is None: # do not make negative if we already have a positive
+								frontendOK = False
+
+					if frontendOK is None or frontendOK == True:
+						plugin = Plugin(p, elem.getAttribute("name"), elem.getAttribute("author"))
+						plugin.parse_hooks(elem.getElementsByTagName("hook"))
+						plugin.set_import(elem.getElementsByTagName("import"))
+						plugin.parse_menus(elem.getElementsByTagName("menu"))
 					
-					self.list.append(plugin)
+						self.list.append(plugin)
 
 				except ParseException, e:
 					error(e[0],p)
@@ -435,10 +456,10 @@ class PluginQueue:
 
 __plugins = None
 
-def load_plugins():
+def load_plugins(frontend):
 	global __plugins
-	if __plugins is None:
-		__plugins = PluginQueue()
+	if __plugins is None or __plugins.frontend != frontend:
+		__plugins = PluginQueue(frontend)
 
 def get_plugins():
 	return __plugins

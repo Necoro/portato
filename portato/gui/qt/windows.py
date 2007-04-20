@@ -22,6 +22,9 @@ from portato.backend.exceptions import *
 
 from portato.gui.gui_helper import Database, Config, EmergeQueue
 
+# plugins
+from portato import plugin
+
 # own GUI stuff
 from terminal import QtConsole
 from tree import QtTree
@@ -34,6 +37,10 @@ import types
 UI_DIR = DATA_DIR+"ui/"
 
 class WindowMeta (sip.wrappertype, type):
+	"""This is the metaclass of all Qt-Windows. It automatically
+	sets the correct base classes, so they do not have to be set
+	by the programmer.
+	@attention: The class has to have the same name as the .ui-file."""
 
 	def __new__ (cls, name, bases, dict):
 		new_bases = uic.loadUiType(UI_DIR+name+".ui")
@@ -47,6 +54,8 @@ class WindowMeta (sip.wrappertype, type):
 		super(WindowMeta, cls).__init__(name, b+bases, dict)
 
 class Window (object):
+	"""Base class of all Qt-Windows.
+	Sets up the UI and provides the watch_cursor function."""
 
 	def __init__(self, parent = None):
 		self._qt_base.__init__(self, parent)
@@ -72,7 +81,14 @@ class AboutDialog (Window):
 	"""A window showing the "about"-informations."""
 	__metaclass__ = WindowMeta
 
-	def __init__ (self, parent = None):
+	def __init__ (self, parent = None, plugins = []):
+		"""Constructor.
+
+		@param parent: the parent window
+		@type parent: Qt.QWidget
+		@param plugins: The list of plugins (author,name) to show in the "Plugins"-Tab.
+		@type plugins: (string, string)[]"""
+
 		Window.__init__(self, parent)
 
 		self.label.setText("""
@@ -83,6 +99,13 @@ This software is licensed under the terms of the GPLv2.<br>
 Copyright (C) 2006-2007 Ren&eacute; 'Necoro' Neumann &lt;necoro@necoro.net&gt;<br>
 <br>
 <font size=1>Thanks to Fred for support and ideas :P</font>""" % VERSION)
+
+		self.pluginList.setHeaderLabels(["Plugin", "Author"])
+		
+		for p in plugins:
+			Qt.QTreeWidgetItem(self.pluginList, list(p))
+
+		self.pluginList.resizeColumnToContents(0)
 
 		self.adjustSize()
 
@@ -114,10 +137,16 @@ class SearchDialog (Window):
 		self.jumpTo(s)
 
 class EbuildDialog (Window):
-
+	"""Window showing an ebuild."""
 	__metaclass__ = WindowMeta
 
 	def __init__ (self, parent, package):
+		"""Constructor.
+
+		@param parent: parent window
+		@type parent: Qt.QWidget
+		@param package: The package to show the ebuild of.
+		@type package: backend.Package"""
 
 		Window.__init__(self, parent)
 
@@ -164,11 +193,18 @@ class PreferenceWindow (Window):
 			}
 
 	def __init__ (self, parent, cfg):
+		"""Constructor.
+
+		@param parent: parent window
+		@type parent: Qt.QWidget
+		@param cfg: the actual configuration
+		@type cfg: Config"""
 
 		Window.__init__(self, parent)
 
 		self.cfg = cfg
 		
+		# set hintLabel background
 		palette = self.hintLabel.palette()
 		palette.setColor(Qt.QPalette.Active, Qt.QPalette.Window, Qt.QColor(Qt.Qt.yellow))
 		self.hintLabel.setPalette(palette)
@@ -213,6 +249,7 @@ class PreferenceWindow (Window):
 			io_ex_dialog(self, e)
 
 class PackageDetails:
+	"""The tab showing the details of a package."""
 
 	def __init__ (self, window):
 		self.window = window
@@ -288,6 +325,8 @@ class PackageDetails:
 		self.window.tabWidget.setCurrentIndex(self.window.PKG_PAGE)
 
 	def set_combo (self):
+		"""Fills the version combo box with the right items and selects the correct one."""
+
 		self.window.versCombo.clear()
 		self.window.versCombo.addItems([x.get_version() for x in self.packages])
 
@@ -305,6 +344,7 @@ class PackageDetails:
 			self.window.versCombo.setCurrentIndex(0)
 
 	def build_use_list (self):
+		"""Builds the list of use flags."""
 		self.window.useList.clear()
 		self.window.useList.setHeaderLabels(["Enabled","Flag","Description"])
 		
@@ -461,6 +501,10 @@ class PackageDetails:
 	def cb_combo_changed (self):
 		"""Callback for the changed ComboBox.
 		It then rebuilds the useList and the checkboxes."""
+
+		#
+		# ATTENTION: BIG'n'DIRTY :)
+		#
 		
 		# build new
 		self.build_use_list()
@@ -522,6 +566,7 @@ class PackageDetails:
 				self.window.pkgUnmergeBtn.setEnabled(True)
 		
 class MainWindow (Window):
+	"""The application's main window."""
 
 	__metaclass__ = WindowMeta
 
@@ -551,6 +596,16 @@ class MainWindow (Window):
 			raise
 
 		self.cfg.modify_external_configs()
+
+		# set plugins and plugin-menu
+		plugin.load_plugins("qt")
+		menus = plugin.get_plugins().get_plugin_menus()
+		if menus:
+			self.pluginMenu = Qt.QMenu("&Plugins")
+			self.menubar.insertMenu(self.helpMenu.menuAction(), self.pluginMenu)
+			for m in menus:
+				action = self.pluginMenu.addAction(m.label.replace("_","&"))
+				Qt.QObject.connect(action, Qt.SIGNAL("triggered()"), m.call)
 
 		# the two lists
 		self.build_cat_list()
@@ -624,7 +679,13 @@ class MainWindow (Window):
 
 	@Qt.pyqtSignature("")
 	def on_aboutAction_triggered (self):
-		AboutDialog(self).exec_()
+		queue = plugin.get_plugins()
+		if queue is None:
+			queue = []
+		else:
+			queue = queue.get_plugin_data()
+
+		AboutDialog(self, queue).exec_()
 
 	@Qt.pyqtSignature("")
 	def on_prefAction_triggered (self):

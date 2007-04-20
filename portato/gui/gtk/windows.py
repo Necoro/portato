@@ -757,7 +757,7 @@ class MainWindow (Window):
 		self.cfg.modify_external_configs()
 
 		# set plugins and plugin-menu
-		plugin.load_plugins()
+		plugin.load_plugins("gtk")
 		menus = plugin.get_plugins().get_plugin_menus()
 		if menus:
 			self.tree.get_widget("pluginMenuItem").set_no_show_all(False)

@@ -3,7 +3,6 @@
 	author="René 'Necoro' Neumann"
 	name="Etc-proposals plugin">
 	<import>portato.plugins.etc_proposals</import>
-	<frontend>gtk</frontend>
 
 	<hook
 		hook = "after_emerge"
