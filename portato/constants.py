@@ -13,9 +13,9 @@
 CONFIG_DIR = "/etc/portato/"
 CONFIG_LOCATION = CONFIG_DIR+"portato.cfg"
 
-DATA_DIR = "portato/gui/gtk/glade/"
+DATA_DIR = "portato/gui/templates/"
 PLUGIN_DIR = "plugins/"
 VERSION = 9999
 
-FRONTENDS = ["gtk"]
+FRONTENDS = ["gtk" ,"qt"]
 STD_FRONTEND = "gtk"

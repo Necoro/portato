@@ -12,16 +12,18 @@ cmdclass = {}
 
 if "gtk" in FRONTENDS:
 	packages.append("portato.gui.gtk")
-	data_files.append((DATA_DIR, ["portato/gui/gtk/glade/portato.glade"]))
+	data_files.append((DATA_DIR, ["portato/gui/templates/portato.glade"]))
 
 if "qt" in FRONTENDS:
 	packages.append("portato.gui.qt")
-	data_files.append((os.path.join(DATA_DIR,"ui"), [os.path.join("portato/gui/qt/ui",x) for x in os.listdir("portato/gui/qt/ui/") if x.endswith(".ui")]))
+	data_files.append((os.path.join(DATA_DIR,"ui"), [os.path.join("portato/gui/templates/ui",x) for x in os.listdir("portato/gui/templates/ui/") if x.endswith(".ui")]))
 
 setup(name="Portato",
 		version = VERSION,
-		author = "René 'Necoro' Neumann",
+		description = "Frontends to Portage",
 		license = "GPLv2",
+		url = "http://portato.sourceforge.net/",
+		author = "René 'Necoro' Neumann",
 		author_email = "necoro@necoro.net",
 		packages = packages,
 		data_files = data_files,
