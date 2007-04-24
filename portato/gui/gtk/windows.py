@@ -19,7 +19,7 @@ import gobject
 
 # our backend stuff
 from portato.helper import *
-from portato.constants import CONFIG_LOCATION, VERSION, DATA_DIR
+from portato.constants import CONFIG_LOCATION, VERSION, DATA_DIR, APP_ICON
 from portato.backend import flags, system
 from portato.backend.exceptions import *
 
@@ -42,6 +42,7 @@ class Window:
 		self.tree = gtk.glade.XML(GLADE_FILE, root = self.__class__.__name__)
 		self.tree.signal_autoconnect(self)
 		self.window = self.tree.get_widget(self.__class__.__name__)
+		self.window.set_icon_from_file(APP_ICON)
 
 	@staticmethod
 	def watch_cursor (func):
@@ -115,7 +116,7 @@ A Portage-GUI
 This software is licensed under the terms of the GPLv2.
 Copyright (C) 2006-2007 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;
 
-<small>Thanks to Fred for support and ideas :P</small>
+Icon created by wolfden
 """ % VERSION)
 
 		view = self.tree.get_widget("pluginList")

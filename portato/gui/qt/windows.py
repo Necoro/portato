@@ -16,7 +16,7 @@ import sip
 
 # our backend stuff
 from portato.helper import *
-from portato.constants import CONFIG_LOCATION, VERSION, DATA_DIR
+from portato.constants import CONFIG_LOCATION, VERSION, DATA_DIR, APP_ICON
 from portato.backend import flags, system
 from portato.backend.exceptions import *
 
@@ -60,6 +60,7 @@ class Window (object):
 	def __init__(self, parent = None):
 		self._qt_base.__init__(self, parent)
 		self.setupUi(self)
+		self.setWindowIcon(Qt.QIcon(APP_ICON))
 
 	@staticmethod
 	def watch_cursor (func):
@@ -98,7 +99,7 @@ A Portage-GUI<br>
 This software is licensed under the terms of the GPLv2.<br>
 Copyright (C) 2006-2007 Ren&eacute; 'Necoro' Neumann &lt;necoro@necoro.net&gt;<br>
 <br>
-<font size=1>Thanks to Fred for support and ideas :P</font>""" % VERSION)
+Icon created by wolfden""" % VERSION)
 
 		self.pluginList.setHeaderLabels(["Plugin", "Author"])
 		

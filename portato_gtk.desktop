@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Portato (Gtk)
+Icon=portato-icon.png
+Exec=portato gtk
+StartupNotify=true
+Type=Application
+Categories=Application;System;PackageManager
