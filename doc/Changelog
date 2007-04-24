@@ -1,3 +1,6 @@
+next:
+- added confirmation dialogs for quitting while the emerge queue is not empty
+
 0.7.0:
 - showed difference between unmasked and masked but unmasked by yourself
 - added Qt-Frontend

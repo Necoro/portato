@@ -13,6 +13,7 @@ Backend:
 - only remove already merged packages from queue
 - make sure, a package being removed from the queue is not needed as a dependency by another package
 
+
 GUI:
 ====
 

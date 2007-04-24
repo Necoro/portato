@@ -1115,6 +1115,17 @@ class MainWindow (Window):
 	def cb_copy_clicked (self, action):
 		self.console.copy_clipboard()
 
+	def cb_delete (self, *args):
+		"""Looks whether we really want to quit."""
+		if not self.queue.is_empty():
+			ret = queue_not_empty_dialog()
+			if ret == gtk.RESPONSE_CANCEL:
+				return True
+			else:
+				self.queue.kill_emerge()
+
+		return False
+
 	def cb_destroy (self, widget):
 		"""Calls main_quit()."""
 		gtk.main_quit()

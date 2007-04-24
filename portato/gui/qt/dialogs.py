@@ -12,6 +12,9 @@
 
 from PyQt4.QtGui import QMessageBox
 
+def queue_not_empty_dialog(parent):
+	return QMessageBox.question(parent, "Portato", "There are some packages in the emerge queue and/or an emerge process is running.\nDo you really want to quit?", QMessageBox.Ok | QMessageBox.Cancel)
+
 def io_ex_dialog (parent, ex):
 	string = ex.strerror
 	if ex.filename:

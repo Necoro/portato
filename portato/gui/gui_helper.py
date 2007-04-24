@@ -272,6 +272,9 @@ class EmergeQueue:
 		self.unmergequeue = [] # for emerge -C
 		self.oneshotmerge = [] # for emerge --oneshot
 		
+		# the emerge process
+		self.process = None
+
 		# dictionaries with data about the packages in the queue
 		self.iters = {} # iterator in the tree
 		self.deps = {} # all the deps of the package
@@ -361,7 +364,7 @@ class EmergeQueue:
 				while self.tree.iter_has_parent(it):
 					it = self.tree.parent_iter(it)
 				self.remove_with_children(it)
-			raise e
+			raise
 
 		# add iter
 		subIt = self.tree.append(it, self.tree.build_append_value(cpv, oneshot = oneshot, update = update, version = uVersion))
@@ -378,7 +381,7 @@ class EmergeQueue:
 			except backend.BlockedException, e: # BlockedException occured -> delete current tree and re-raise exception
 				debug("Something blocked:", e[0])
 				self.remove_with_children(subIt)
-				raise e
+				raise
 		
 	def append (self, cpv, unmerge = False, update = False, forceUpdate = False, unmask = False, oneshot = False):
 		"""Appends a cpv either to the merge queue or to the unmerge-queue.
@@ -437,26 +440,27 @@ class EmergeQueue:
 		@type oneshot: boolean"""
 
 		if not oneshot:
-			self.mergequeue.append(cpv)
+			if cpv not in self.mergequeue:
+				self.mergequeue.append(cpv)
 		else:
-			self.oneshotmerge.append(cpv)
+			if cpv not in self.oneshotmerge:
+				self.oneshotmerge.append(cpv)
 	
-	def _update_packages(self, packages, process = None):
+	def _update_packages(self, packages):
 		"""This updates the packages-list. It simply makes the db to rebuild the specific category.
 		
 		@param packages: The packages which we emerged.
-		@type packages: list of cpvs
-		@param process: The process we have to wait for before we can do our work.
-		@type process: subprocess.Popen"""
+		@type packages: list of cpvs"""
 		
 		old_title = self.console.get_window_title()
-		if process: 
-			while process.poll() == None:
-				if self.title_update : 
-					title = self.console.get_window_title()
-					if title != old_title:
-						self.title_update(title)
-					time.sleep(0.5)
+		while self.process and self.process.poll() is None:
+			if self.title_update : 
+				title = self.console.get_window_title()
+				if title != old_title:
+					self.title_update(title)
+				time.sleep(0.5)
+
+		self.process = None
 
 		if self.title_update: self.title_update(None)
 
@@ -495,7 +499,7 @@ class EmergeQueue:
 			self.process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False)
 			
 			# start thread waiting for the stop of emerge
-			Thread(name="Emerge-Thread", target=self._update_packages, args=(packages+self.deps.keys(), self.process)).start()
+			Thread(name="Emerge-Thread", target=self._update_packages, args=(packages+self.deps.keys(),)).start()
 			
 			# remove
 			for i in it:
@@ -596,13 +600,16 @@ class EmergeQueue:
 
 	def kill_emerge (self):
 		"""Kills the emerge process."""
-		try:
-			os.kill(self.process.pid, signal.SIGTERM)
-			debug("Process should be killed")
-		except AttributeError:
-			debug("AttributeError occured ==> process not exisiting - ignore")
-		except OSError:
-			debug("OSError occured ==> process already stopped - ignore")
+		if self.process is not None:
+			try:
+				os.kill(self.process.pid, signal.SIGTERM)
+				debug("Process should be killed")
+			except AttributeError:
+				debug("AttributeError occured ==> process not exisiting - ignore")
+			except OSError:
+				debug("OSError occured ==> process already stopped - ignore")
+
+			self.process = None
 
 	def remove_with_children (self, it, removeNewFlags = True):
 		"""Convenience function which removes all children of an iterator and than the iterator itself.
@@ -665,3 +672,12 @@ class EmergeQueue:
 				self.unmergequeue.remove(cpv)
 			
 			self.tree.remove(it)
+
+	def is_empty (self):
+		"""Checks whether the current queue is empty and not working. Therefore it looks, whether the queues are empty,
+		and the process is not running.
+
+		@returns: True if everything is empty and the process is not running.
+		@rtype: bool"""
+
+		return not (self.mergequeue or self.unmergequeue or self.oneshotmerge or self.process)

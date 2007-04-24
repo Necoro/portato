@@ -12,6 +12,12 @@
 
 import gtk
 
+def queue_not_empty_dialog():
+	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, "There are some packages in the emerge queue and/or an emerge process is running.\nDo you really want to quit?")
+	ret = dialog.run()
+	dialog.destroy()
+	return ret
+
 def io_ex_dialog (io_ex):
 	string = io_ex.strerror
 	if io_ex.filename:

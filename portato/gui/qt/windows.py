@@ -852,3 +852,15 @@ class MainWindow (Window):
 	def cb_pkg_list_selected (self, index, prev):
 		if not index is None:
 			self.pkgDetails.update(self.selCatName+"/"+str(index.text()), self.queue)
+
+	def closeEvent (self, event):
+		if not self.queue.is_empty():
+			ret = queue_not_empty_dialog(self)
+			if ret == Qt.QMessageBox.Cancel:
+				event.ignore()
+				return
+			else:
+				self.queue.kill_emerge()
+
+		event.accept()
+
