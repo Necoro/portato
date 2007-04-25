@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<plugin
+	author="René 'Necoro' Neumann"
+	name="No Root">
+	<import>portato.plugins.noroot</import>
+
+	<hook
+		hook = "am_i_root"
+		call = "i_am_root">
+		<connect type="override" />
+	</hook>
+</plugin>

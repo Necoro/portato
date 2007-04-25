@@ -79,10 +79,17 @@ def debug(*args, **kwargs):
 def am_i_root ():
 	"""Returns True if the current user is root, False otherwise.
 	@rtype: boolean"""
-	if os.getuid() == 0:
-		return True
-	else:
-		return False
+
+	from plugin import hook
+
+	@hook("am_i_root")
+	def __am_i_root():
+		if os.getuid() == 0:
+			return True
+		else:
+			return False
+	
+	return __am_i_root()
 
 def flatten (listOfLists):
 	"""Flattens the given list of lists.

@@ -16,6 +16,8 @@ from portato.backend import system
 from subprocess import Popen
 from etcproposals.etcproposals_lib import EtcProposals, __version__
 
+PROG="/usr/sbin/etc-proposals"
+
 class PortatoEtcProposals(EtcProposals):
 	"""Subclassed EtcProposals using portato.backend.system during __init__."""
 
@@ -34,15 +36,15 @@ def etc_prop (*args, **kwargs):
 		debug(l,"files to update")
 
 		if l > 0:
-			Popen("etc-proposals")
+			Popen(PROG)
 	else:
-		Popen(["etc-proposals", "--frontend", "gtk", "--fastexit"])
+		Popen([PROG, "--frontend", "gtk", "--fastexit"])
 
 def etc_prop_menu (*args, **kwargs):
 	if am_i_root():
 		if float(__version__) < 1.1:
-			Popen("etc-proposals")
+			Popen(PROG)
 		else:
-			Popen(["etc-proposals", "--frontend", "gtk"])
+			Popen([PROG, "--frontend", "gtk"])
 	else:
 		debug("Cannot start etc-proposals. Not root!", error = 1)

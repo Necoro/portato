@@ -299,7 +299,7 @@ class PluginQueue:
 				except AttributeError:
 					debug(cmd.hook.call,"cannot be imported", error = 1)
 
-			f(*hargs, **hkwargs) # call function
+			return f(*hargs, **hkwargs) # call function
 
 		def hook_decorator (func):
 			"""This is the real decorator."""
@@ -310,6 +310,8 @@ class PluginQueue:
 
 			def wrapper (*args, **kwargs):
 				
+				ret = None
+
 				# before
 				for cmd in list[0]:
 					debug("Accessing hook '%s' of plugin '%s' (before)" % (hook, cmd.hook.plugin.name))
@@ -317,14 +319,16 @@ class PluginQueue:
 				
 				if list[1]: # override
 					debug("Overriding hook '%s' with plugin '%s'" % (hook, list[1][0].hook.plugin.name))
-					call(list[1][0])
+					ret = call(list[1][0])
 				else: # normal
-					func(*args, **kwargs)
+					ret = func(*args, **kwargs)
 
 				# after
 				for cmd in list[2]:
 					debug("Accessing hook '%s' of plugin '%s' (after)" % (hook, cmd.hook.plugin.name))
 					call(cmd)
+
+				return ret
 
 			return wrapper
 
