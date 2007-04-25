@@ -95,8 +95,11 @@ def grep (pkg, path):
 	if not isinstance(pkg, package.Package):
 		pkg = system.new_package(pkg) # assume it is a cpv or a gentoolkit.Package
 
-	command = "egrep -x -n -r -H '^[<>!=~]{0,2}%s(-[0-9].*)?[[:space:]]?.*$' %s" # %s is replaced in the next line ;)
-	return Popen((command % (pkg.get_cp(), path)), shell = True, stdout = PIPE).communicate()[0].splitlines()
+	if os.path.exists(path):
+		command = "egrep -x -n -r -H '^[<>!=~]{0,2}%s(-[0-9].*)?[[:space:]]?.*$' %s" # %s is replaced in the next line ;)
+		return Popen((command % (pkg.get_cp(), path)), shell = True, stdout = PIPE).communicate()[0].splitlines()
+	else:
+		return []
 
 def get_data(pkg, path):
 	"""This splits up the data of L{grep} and builds tuples in the format (file,line,criterion,list_of_flags).
