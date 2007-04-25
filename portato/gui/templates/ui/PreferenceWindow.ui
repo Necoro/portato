@@ -41,10 +41,39 @@
         </property>
        </widget>
       </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="guiBox" >
+     <property name="title" >
+      <string>Visual Options</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>0</number>
+      </property>
       <item>
        <widget class="QCheckBox" name="pkgIconsCheck" >
         <property name="text" >
          <string>Use icons in package list</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="systrayCheck" >
+        <property name="text" >
+         <string>Show systray icon</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="minimizeCheck" >
+        <property name="text" >
+         <string>Minimize to systray (only if systray icon is activated)</string>
         </property>
        </widget>
       </item>

@@ -181,7 +181,9 @@ class PreferenceWindow (Window):
 			"maskCheck"		: "maskPerVersion_opt",
 			"useCheck"		: "usePerVersion_opt",
 			"testingCheck"	: "testingPerVersion_opt",
-			"pkgIconsCheck"	: ("pkgIcons_opt", "qt_sec")
+			"pkgIconsCheck"	: ("pkgIcons_opt", "qt_sec"),
+			"minimizeCheck"	: ("minimize_opt", "gui_sec"),
+			"systrayCheck"	: ("systray_opt", "gui_sec")
 			}
 	
 	# all edits in the window
@@ -602,7 +604,7 @@ class MainWindow (Window):
 		plugin.load_plugins("qt")
 		menus = plugin.get_plugins().get_plugin_menus()
 		if menus:
-			self.pluginMenu = Qt.QMenu("&Plugins")
+			self.pluginMenu = Qt.QMenu("&Plugins", self)
 			self.menubar.insertMenu(self.helpMenu.menuAction(), self.pluginMenu)
 			for m in menus:
 				action = self.pluginMenu.addAction(m.label.replace("_","&"))
@@ -631,6 +633,9 @@ class MainWindow (Window):
 		Qt.QObject.connect(self.queueList, Qt.SIGNAL("itemActivated (QTreeWidgetItem*, int)"), self.cb_queue_list_item_selected)
 		Qt.QObject.connect(self.queueList, Qt.SIGNAL("itemDoubleClicked (QTreeWidgetItem*, int)"), self.cb_queue_list_item_selected)
 
+		# build systray
+		self.build_systray()
+
 		# set emerge queue
 		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update)
 
@@ -640,8 +645,13 @@ class MainWindow (Window):
 		self.emit(Qt.SIGNAL("doTitleUpdate"), title)
 
 	def _title_update (self, title):
-		if title == None: title = "Console"
-		else: title = ("Console (%s)" % title)
+		
+		if title is None: 
+			if self.systray: self.systray.setToolTip("")
+			title = "Console"
+		else:
+			if self.systray: self.systray.setToolTip(title)
+			title = ("Console (%s)" % title)
 
 		self.tabWidget.setTabText(self.CONSOLE_PAGE, title)
 
@@ -677,6 +687,18 @@ class MainWindow (Window):
 		self.selCatListModel = Qt.QItemSelectionModel(self.catListModel)
 		self.catList.setModel(self.catListModel)
 		self.catList.setSelectionModel(self.selCatListModel)
+
+	def build_systray (self):
+		if self.cfg.get_boolean("systray_opt", self.cfg.const["gui_sec"]):
+			self.systray = Qt.QSystemTrayIcon(Qt.QIcon(APP_ICON), self)
+			self.trayIconMenu = Qt.QMenu(self)
+			self.trayIconMenu.addAction(self.quitAction)
+			self.systray.setContextMenu(self.trayIconMenu)
+			self.systray.show()
+
+			Qt.QObject.connect(self.systray, Qt.SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.cb_systray_activated)
+		else:
+			self.systray = None
 
 	@Qt.pyqtSignature("")
 	def on_aboutAction_triggered (self):
@@ -854,14 +876,33 @@ class MainWindow (Window):
 		if not index is None:
 			self.pkgDetails.update(self.selCatName+"/"+str(index.text()), self.queue)
 
+	def cb_systray_activated (self, reason):
+		if reason != Qt.QSystemTrayIcon.Context: # do not react on context menu calls
+			if self.windowState() & Qt.Qt.WindowMinimized: # window is minimized
+				self.show()
+				self.showNormal()
+			else: # window is not minimized
+				self.setWindowState(self.windowState() | Qt.Qt.WindowMinimized)
+
 	def closeEvent (self, event):
 		if not self.queue.is_empty():
 			ret = queue_not_empty_dialog(self)
 			if ret == Qt.QMessageBox.Cancel:
-				event.ignore()
 				return
 			else:
 				self.queue.kill_emerge()
 
-		event.accept()
+		if self.systray and self.systray.isVisible():
+			self.systray.hide()
+
+		Qt.QMainWindow.closeEvent(self, event)
+
+	def changeEvent (self, event):
+		if event.type() == Qt.QEvent.WindowStateChange:
+			if self.systray and self.cfg.get_boolean("minimize_opt", self.cfg.const["gui_sec"]):
+				if self.windowState() & Qt.Qt.WindowMinimized: # going to be minimized
+					self.hide()
+					return
+			
+		Qt.QMainWindow.changeEvent(self,event)
 

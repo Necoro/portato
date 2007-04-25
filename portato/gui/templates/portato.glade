@@ -7,6 +7,7 @@
     <property name="window_position">GTK_WIN_POS_CENTER</property>
     <signal name="destroy" handler="cb_destroy"/>
     <signal name="delete_event" handler="cb_delete"/>
+    <signal name="window_state_event" handler="cb_minimized"/>
     <child>
       <widget class="GtkVBox" id="mainVB">
         <property name="visible">True</property>
@@ -66,7 +67,7 @@
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">_Close</property>
                         <property name="use_underline">True</property>
-                        <signal name="activate" handler="cb_destroy"/>
+                        <signal name="activate" handler="cb_close"/>
                         <child internal-child="image">
                           <widget class="GtkImage" id="image3">
                             <property name="visible">True</property>
@@ -877,16 +878,6 @@
                         <property name="draw_indicator">True</property>
                       </widget>
                     </child>
-                    <child>
-                      <widget class="GtkCheckButton" id="useTipsCheck">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Turn Use-Tips on</property>
-                        <property name="draw_indicator">True</property>
-                      </widget>
-                      <packing>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
                   </widget>
                 </child>
               </widget>
@@ -902,6 +893,71 @@
               </packing>
             </child>
           </widget>
+        </child>
+        <child>
+          <widget class="GtkFrame" id="visualFrame">
+            <property name="visible">True</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="label_xalign">0</property>
+            <child>
+              <widget class="GtkAlignment" id="alignment7">
+                <property name="visible">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="left_padding">12</property>
+                <child>
+                  <widget class="GtkVBox" id="vbox2">
+                    <property name="visible">True</property>
+                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                    <child>
+                      <widget class="GtkCheckButton" id="useTipsCheck">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Turn Use-Tips on</property>
+                        <property name="draw_indicator">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkCheckButton" id="systrayCheck">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                        <property name="label" translatable="yes">Enable systray</property>
+                        <property name="draw_indicator">True</property>
+                      </widget>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkCheckButton" id="minimizeCheck">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                        <property name="label" translatable="yes">Hide on minimization (only if systray is enabled)</property>
+                        <property name="draw_indicator">True</property>
+                      </widget>
+                      <packing>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkLabel" id="label10">
+                <property name="visible">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">&lt;b&gt;Visual Options&lt;/b&gt;</property>
+                <property name="use_markup">True</property>
+              </widget>
+              <packing>
+                <property name="type">label_item</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="position">1</property>
+          </packing>
         </child>
         <child>
           <widget class="GtkFrame" id="systemFrame">
@@ -963,7 +1019,7 @@
             </child>
           </widget>
           <packing>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>
@@ -1012,7 +1068,7 @@
             </child>
           </widget>
           <packing>
-            <property name="position">2</property>
+            <property name="position">3</property>
           </packing>
         </child>
         <child>
@@ -1063,7 +1119,7 @@
             </child>
           </widget>
           <packing>
-            <property name="position">3</property>
+            <property name="position">4</property>
           </packing>
         </child>
         <child>
@@ -1289,7 +1345,7 @@
             </child>
           </widget>
           <packing>
-            <property name="position">4</property>
+            <property name="position">5</property>
           </packing>
         </child>
         <child>
@@ -1318,7 +1374,7 @@
             </child>
           </widget>
           <packing>
-            <property name="position">5</property>
+            <property name="position">6</property>
           </packing>
         </child>
       </widget>
@@ -1334,6 +1390,19 @@
         <child>
           <placeholder/>
         </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="GtkMenu" id="systrayPopup">
+    <property name="visible">True</property>
+    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+    <child>
+      <widget class="GtkMenuItem" id="closeItemTray">
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="label" translatable="yes">_Close</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="cb_close"/>
       </widget>
     </child>
   </widget>

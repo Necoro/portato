@@ -186,9 +186,11 @@ class PreferenceWindow (AbstractDialog):
 			"deepCheck"				: "deep_opt",
 			"newUseCheck"			: "newuse_opt",
 			"maskPerVersionCheck"	: "maskPerVersion_opt",
+			"minimizeCheck"			: ("minimize_opt", "gui_sec"),
+			"systrayCheck"			: ("systray_opt", "gui_sec"),
+			"testPerVersionCheck"	: "testingPerVersion_opt",
 			"usePerVersionCheck"	: "usePerVersion_opt",
-			"useTipsCheck"			: ("useTips_opt", "gtk_sec"),
-			"testPerVersionCheck"	: "testingPerVersion_opt"
+			"useTipsCheck"			: ("useTips_opt", "gtk_sec")
 			}
 	
 	# all edits in the window
@@ -800,6 +802,15 @@ class MainWindow (Window):
 		# popups
 		self.queuePopup = self.create_popup("queuePopup")
 		self.consolePopup = self.create_popup("consolePopup")
+		self.trayPopup = self.create_popup("systrayPopup")
+
+		# systray
+		if self.cfg.get_boolean("systray_opt", self.cfg.const["gui_sec"]):
+			self.tray = gtk.status_icon_new_from_file(APP_ICON)
+			self.tray.connect("activate", self.cb_systray_activated)
+			self.tray.connect("popup-menu", lambda icon, btn, time: self.trayPopup.popup(None, None, None, btn, time))
+		else:
+			self.tray = None
 
 		# set emerge queue
 		self.queueTree = GtkTree(self.queueList.get_model())
@@ -903,8 +914,13 @@ class MainWindow (Window):
 
 	def title_update (self, title):
 		
-		if title == None: title = "Console"
-		else: title = ("Console (%s)" % title)
+		if self.tray:
+			self.tray.set_tooltip(title)
+		
+		if title == None: 
+			title = "Console"
+		else: 
+			title = ("Console (%s)" % title)
 
 		gobject.idle_add(self.notebook.set_tab_label_text, self.termHB, title)
 
@@ -1126,6 +1142,27 @@ class MainWindow (Window):
 				self.queue.kill_emerge()
 
 		return False
+
+	def cb_minimized (self, window, event):
+		if self.tray and self.cfg.get_boolean("minimize_opt", self.cfg.const["gui_sec"]):
+			if event.changed_mask & gtk.gdk.WINDOW_STATE_ICONIFIED:
+				if event.new_window_state & gtk.gdk.WINDOW_STATE_ICONIFIED:
+					self.window.hide()
+					return True
+		
+		return False
+
+	def cb_systray_activated (self, tray):
+		if self.window.iconify_initially:
+			self.window.deiconify()
+			self.window.show()
+			self.window.window.show()
+		else:
+			self.window.iconify()
+
+	def cb_close (self, *args):
+		if not self.cb_delete(): # do the checks
+			self.window.destroy()
 
 	def cb_destroy (self, widget):
 		"""Calls main_quit()."""

@@ -36,6 +36,7 @@ class Config: # XXX: This needs to be replaced - the const-dict is just messy
 			"main_sec" : "Main",
 			"gtk_sec" : "Gtk",
 			"qt_sec" : "Qt",
+			"gui_sec" : "Gui",
 			"usePerVersion_opt" : "usePerVersion",
 			"useFile_opt" : "usefile",
 			"maskFile_opt" : "maskfile",
@@ -49,7 +50,9 @@ class Config: # XXX: This needs to be replaced - the const-dict is just messy
 			"syncCmd_opt" : "synccommand",
 			"useTips_opt" : "showusetips",
 			"pkgIcons_opt" : "packageIcons",
-			"system_opt" : "system"
+			"system_opt" : "system",
+			"systray_opt" : "showsystray",
+			"minimize_opt" : "hideonminimize"
 			}
 	
 	def __init__ (self, cfgFile):
