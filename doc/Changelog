@@ -6,11 +6,6 @@
 - added systray
 - added "noroot"-plugin, allowing emerges if not root
 
-- added confirmation dialogs for quitting while the emerge queue is not empty
-- added icon and desktop-files
-- added systray
-- added "noroot"-plugin, allowing emerges if not root
-
 0.7.0:
 - showed difference between unmasked and masked but unmasked by yourself
 - added Qt-Frontend

@@ -368,7 +368,7 @@ class PluginQueue:
 								frontendOK = False
 
 					if frontendOK is None or frontendOK == True:
-						plugin = Plugin(p, str(elem.getAttribute("name")), str(elem.getAttribute("author")))
+						plugin = Plugin(p, elem.getAttribute("name"), elem.getAttribute("author"))
 						plugin.parse_hooks(elem.getElementsByTagName("hook"))
 						plugin.set_import(elem.getElementsByTagName("import"))
 						plugin.parse_menus(elem.getElementsByTagName("menu"))
