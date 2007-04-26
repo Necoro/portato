@@ -411,7 +411,7 @@ class EmergeQueue:
 			deps = pkg.get_dep_packages()
 			
 			if update:
-				if not forceUpdate and deps == self.deps[cpv]:
+				if not forceUpdate and cpv in self.deps and deps == self.deps[cpv]:
 					return # nothing changed - return
 				else:
 					hasBeenInQueue = (cpv in self.mergequeue or cpv in self.oneshotmerge)
@@ -588,7 +588,7 @@ class EmergeQueue:
 		if not force: opts += system.get_pretend_option()
 		if options is not None: opts += options
 
-		self._emerge(options, ["world"], [self.emergeIt])
+		self._emerge(opts, ["world"], [self.emergeIt])
 
 	def sync (self, command = None):
 		"""Calls "emerge --sync".
