@@ -12,7 +12,7 @@
 
 from portato.gui.gtk.windows import EbuildWindow
 
-import gtksourceview
+from portato.extern import gtksourceview
 
 class HighlightedEbuildWindow (EbuildWindow):
 	"""An ebuild window with syntax highlighting, using the GtkSourceview."""
