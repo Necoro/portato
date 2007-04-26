@@ -607,6 +607,7 @@ class EmergeQueue:
 			try:
 				os.kill(self.process.pid, signal.SIGTERM)
 				debug("Process should be killed")
+				os.kill(self.process.pid, signal.SIGKILL) # to be sure
 			except AttributeError:
 				debug("AttributeError occured ==> process not exisiting - ignore")
 			except OSError:
