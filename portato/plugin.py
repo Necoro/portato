@@ -180,7 +180,7 @@ class Plugin:
 		@raises ParseException: on parsing errors"""
 
 		for h in hooks:
-			hook = Hook(self, h.getAttribute("hook"), h.getAttribute("call"))
+			hook = Hook(self, str(h.getAttribute("hook")), str(h.getAttribute("call")))
 			hook.parse_connects(h.getElementsByTagName("connect"))
 			self.hooks.append(hook)
 
@@ -193,7 +193,7 @@ class Plugin:
 		@raises ParseException: on parsing errors"""
 
 		for m in menus:
-			menu = Menu(self, m.getAttribute("label"), m.getAttribute("call"))
+			menu = Menu(self, str(m.getAttribute("label")), str(m.getAttribute("call")))
 			self.menus.append(menu)
 	
 	def set_import (self, imports):
@@ -216,7 +216,7 @@ class Plugin:
 			if nodes[0].nodeType != nodes[0].TEXT_NODE:
 				raise ParseException, "Malformed import"
 
-			self._import = nodes[0].nodeValue.strip()
+			self._import = str(nodes[0].nodeValue.strip())
 
 			try: # try loading
 				mod = __import__(self._import)
@@ -368,7 +368,7 @@ class PluginQueue:
 								frontendOK = False
 
 					if frontendOK is None or frontendOK == True:
-						plugin = Plugin(p, elem.getAttribute("name"), elem.getAttribute("author"))
+						plugin = Plugin(p, str(elem.getAttribute("name")), str(elem.getAttribute("author")))
 						plugin.parse_hooks(elem.getElementsByTagName("hook"))
 						plugin.set_import(elem.getElementsByTagName("import"))
 						plugin.parse_menus(elem.getElementsByTagName("menu"))
