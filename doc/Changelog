@@ -1,4 +1,11 @@
-next:
+0.7.1:
+- moved syntax-highlighting plugin for gtk to another package
+(portatosourceview)
+- added confirmation dialogs for quitting while the emerge queue is not empty
+- added icon and desktop-files
+- added systray
+- added "noroot"-plugin, allowing emerges if not root
+
 - added confirmation dialogs for quitting while the emerge queue is not empty
 - added icon and desktop-files
 - added systray
