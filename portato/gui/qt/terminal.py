@@ -12,11 +12,22 @@
 
 from PyQt4 import Qt
 
-from threading import Thread, Lock
+from Queue import Queue
+from threading import Thread
 from os import read
 
 from portato.gui.wrapper import Console
 from portato.helper import debug
+
+class WriteEvent (Qt.QEvent):
+	TYPE = Qt.QEvent.Type(1001)
+
+	def __init__ (self, string):
+		Qt.QEvent.__init__(self, self.TYPE)
+		self.string = string
+
+	def get_string(self):
+		return self.string
 
 class BoldFormat (Qt.QTextCharFormat):
 
@@ -76,20 +87,29 @@ class QtConsole (Console, Qt.QTextEdit):
 		self.pty = None
 		self.running = False
 		self.stdFormat = self.currentCharFormat()
-		self.formatQueue = []
-		self.formatLock = Lock()
+		self.formatQueue = Queue()
 		self.title = None
+		self.writeQueue = ""
 
 		self.setReadOnly(True)
 
 		# we need these two signals, as threads are not allowed to access the GUI
 		# solution: thread sends signal, which is handled by the main loop
-		Qt.QObject.connect(self, Qt.SIGNAL("doSomeWriting"), self._write)
+#		Qt.QObject.connect(self, Qt.SIGNAL("doSomeWriting"), self._write)
 		Qt.QObject.connect(self, Qt.SIGNAL("deletePrevChar()"), self._deletePrev)
 
 	def _deletePrev (self):
 		"""Deletes the previous character."""
 		self.textCursor().deletePreviousChar()
+	
+	def event (self, event):
+		if event.type() == WriteEvent.TYPE:
+			self._write(event.get_string())
+			event.accept()
+			return True
+		
+		event.ignore()
+		return False
 
 	def _write (self, text):
 		"""Writes some text. A text of "\\x1b" signals _write() to reload
@@ -115,7 +135,23 @@ class QtConsole (Console, Qt.QTextEdit):
 
 	def write(self, text):
 		"""Convenience function for emitting the writing signal."""
-		self.emit(Qt.SIGNAL("doSomeWriting"), text)
+		
+		def send (text):
+			Qt.QCoreApplication.postEvent(self, WriteEvent(text))
+		
+		if text is None:
+			send(self.writeQueue)
+			self.writeQueue = ""
+
+		if text == esc_seq[0]:
+			send(self.writeQueue)
+			send(text)
+			self.writeQueue = ""
+		elif len(self.writeQueue) == 4:
+			send(self.writeQueue+text)
+			self.writeQueue = ""
+		else:
+			self.writeQueue = self.writeQueue + text
 
 	def start_new_thread (self):
 		"""Starts a new thread, which will listen for some input.
@@ -174,6 +210,10 @@ class QtConsole (Console, Qt.QTextEdit):
 			if s == "\r": continue
 			self.write(s)
 
+		self.write(None)
+#		self.emit(Qt.SIGNAL("doSomeWriting"), "".join(self.writeQueue))
+#		self.writeQueue = []
+
 	def parse_seq (self, seq):
 		"""Parses a sequence of bytes.
 		If a new attribute has been encountered, a new format is created and added
@@ -225,9 +265,7 @@ class QtConsole (Console, Qt.QTextEdit):
 		@param format: the format to add
 		@type format: Qt.QTextCharFormat"""
 
-		self.formatLock.acquire()
-		self.formatQueue.append(format)
-		self.formatLock.release()
+		self.formatQueue.put(format)
 
 	def get_format (self):
 		"""Returns a format from the queue.
@@ -237,10 +275,7 @@ class QtConsole (Console, Qt.QTextEdit):
 		@returns: the popped format
 		@rtype: Qt.QTextCharFormat"""
 
-		self.formatLock.acquire()
-		f = self.formatQueue.pop(0)
-		self.formatLock.release()
-		return f
+		return self.formatQueue.get()
 
 	def virgin_format (self):
 		"""The normal standard format. It is necessary to create it as a new one for some

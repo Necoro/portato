@@ -914,15 +914,18 @@ class MainWindow (Window):
 
 	def title_update (self, title):
 		
-		if self.tray:
-			self.tray.set_tooltip(title)
-		
-		if title == None: 
-			title = "Console"
-		else: 
-			title = ("Console (%s)" % title)
+		def __update(title):
+			if self.tray:
+				self.tray.set_tooltip(title)
+			
+			if title == None: 
+				title = "Console"
+			else: 
+				title = ("Console (%s)" % title)
 
-		gobject.idle_add(self.notebook.set_tab_label_text, self.termHB, title)
+			self.notebook.set_tab_label_text(self.termHB, title)
+
+		gobject.idle_add(__update, title)
 
 	def cb_cat_list_selection (self, view):
 		"""Callback for a category-list selection. Updates the package list with the packages in the category."""
