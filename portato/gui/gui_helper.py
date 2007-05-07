@@ -232,16 +232,30 @@ class Database:
 		for key in self._db: # sort alphabetically
 			self._db[key].sort(cmp=cmp, key=lambda x: str.lower(x[0]))
 
-	def get_cat (self, cat):
+	def get_cat (self, cat, byName = True):
 		"""Returns the packages in the category.
 		
 		@param cat: category to return the packages from
 		@type cat: string
+		@param byName: selects whether to return the list sorted by name or by installation
+		@type byName: boolean
 		@return: list of tuples: (name, is_installed) or []
 		@rtype: (string, boolean)[]"""
 
 		try:
-			return self._db[cat]
+			if byName:
+				return self._db[cat]
+			else:
+				inst = []
+				ninst = []
+				for p, i in self._db[cat]:
+					if i:
+						inst.append((p,i))
+					else:
+						ninst.append((p,i))
+
+				return inst+ninst
+
 		except KeyError: # cat is in category list - but not in portage
 			debug("Catched KeyError =>", cat, "seems not to be an available category. Have you played with rsync-excludes?")
 			return []

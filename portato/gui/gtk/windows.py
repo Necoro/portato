@@ -108,16 +108,20 @@ class AboutWindow (AbstractDialog):
 		
 		AbstractDialog.__init__(self, parent)
 
-		label = self.tree.get_widget("aboutLabel")
-		label.set_markup("""
+		img = self.tree.get_widget("portatoImage")
+		img.set_from_file(APP_ICON)
+
+		hlabel = self.tree.get_widget("highAboutLabel")
+		hlabel.set_markup("""
 <big><b>Portato v.%s</b></big>
-A Portage-GUI
-		
-This software is licensed under the terms of the GPLv2.
+A Portage-GUI""" % VERSION)
+
+		llabel = self.tree.get_widget("lowAboutLabel")
+		llabel.set_markup("""This software is licensed under the terms of the GPLv2.
 Copyright (C) 2006-2007 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;
 
 Icon created by wolfden
-""" % VERSION)
+""")
 
 		view = self.tree.get_widget("pluginList")
 		store = gtk.ListStore(str,str)
@@ -776,6 +780,7 @@ class MainWindow (Window):
 		vpaned.set_position(mHeight/2)
 
 		# cat and pkg list
+		self.sortPkgListByName = True
 		self.catList = self.tree.get_widget("catList")
 		self.pkgList = self.tree.get_widget("pkgList")
 		self.build_cat_list()
@@ -876,6 +881,8 @@ class MainWindow (Window):
 		self.pkgList.set_model(store)
 		
 		col = gtk.TreeViewColumn("Packages")
+		col.set_clickable(True)
+		col.connect("clicked", self.cb_pkg_list_header_clicked)
 
 		# adding the pixbuf
 		cell = gtk.CellRendererPixbuf()
@@ -900,7 +907,7 @@ class MainWindow (Window):
 		@rtype: gtk.ListStore"""
 
 		if name:
-			for pkg, is_inst in self.db.get_cat(name):
+			for pkg, is_inst in self.db.get_cat(name, self.sortPkgListByName):
 				if is_inst:
 					icon = self.instPixbuf
 				else:
@@ -945,6 +952,12 @@ class MainWindow (Window):
 		if it:
 			package = store.get_value(it, 0)
 			self.show_package(self.selCatName+"/"+package, self.queue)
+		return True
+
+	def cb_pkg_list_header_clicked(self, col):
+		self.sortPkgListByName = not self.sortPkgListByName
+		self.pkgList.get_model().clear()
+		self.fill_pkg_store(self.pkgList.get_model(), self.selCatName)
 		return True
 
 	def cb_row_activated (self, view, path, *args):

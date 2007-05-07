@@ -16,8 +16,6 @@ Backend:
 GUI:
 ====
 
-- allow sorting of packages by installation
-
 GTK:
 ----
 - make oneshot better

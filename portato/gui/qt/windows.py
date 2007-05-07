@@ -611,6 +611,8 @@ class MainWindow (Window):
 				Qt.QObject.connect(action, Qt.SIGNAL("triggered()"), m.call)
 
 		# the two lists
+		self.sortPkgListByName = True
+		self.pkgList.addAction(self.pkgListSortAction)
 		self.build_cat_list()
 		Qt.QObject.connect(self.selCatListModel, Qt.SIGNAL("currentChanged(QModelIndex, QModelIndex)"), self.cb_cat_list_selected)
 		Qt.QObject.connect(self.pkgList, Qt.SIGNAL("currentItemChanged(QListWidgetItem*, QListWidgetItem*)"), self.cb_pkg_list_selected)
@@ -669,7 +671,7 @@ class MainWindow (Window):
 
 		self.pkgList.clear()
 
-		for name, inst in self.db.get_cat(cat):
+		for name, inst in self.db.get_cat(cat, self.sortPkgListByName):
 			if use_icons:
 				if inst:
 					icon = yes
@@ -764,6 +766,11 @@ class MainWindow (Window):
 			
 			self.cfg.set_local(pkg, "oneshot_opt", set)
 			self.queue.append(pkg, update = True, oneshot = set, forceUpdate = True)
+
+	@Qt.pyqtSignature("bool")
+	def on_pkgListSortAction_triggered (self, checked):
+		self.sortPkgListByName = checked
+		self.fill_pkg_list(self.selCatName)
 
 	@Qt.pyqtSignature("")
 	@Window.watch_cursor

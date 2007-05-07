@@ -1,3 +1,8 @@
+next:
+- fixed bugs
+- QtTerminal now uses events instead of signals (faster)
+- ability to show packages by installation status
+
 0.7.1:
 - moved syntax-highlighting plugin for gtk to another package
 (portatosourceview)
