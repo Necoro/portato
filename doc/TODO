@@ -23,6 +23,7 @@ GTK:
 
 Qt:
 ---
+- better terminal
 - find a way to use markup in CheckBoxes, Lists etc.
 - some hangups ...
 - color chooser for the ebuild hl-colors

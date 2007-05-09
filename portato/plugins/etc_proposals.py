@@ -16,6 +16,12 @@ from portato.backend import system
 from subprocess import Popen
 from etcproposals.etcproposals_lib import EtcProposals, __version__
 
+try:
+	from etcproposals.etcproposals_info import FRONTEND, VERSIONS
+except ImportError:
+	FRONTEND = None
+	VERSIONS = None
+
 PROG="/usr/sbin/etc-proposals"
 
 class PortatoEtcProposals(EtcProposals):
@@ -28,6 +34,17 @@ class PortatoEtcProposals(EtcProposals):
 			self._add_update_proposals(dir)
 		self.sort()
 
+def get_frontend ():
+	if FRONTEND is None:
+		return ["--frontend", "gtk"]
+	else:
+		cmds = dict(zip([x.name for x in FRONTEND], [[x.command] for x in FRONTEND]))
+		names = [x.shortname for x in VERSIONS] # need this too, because etcproposals stores frontends in FRONTEND which cannot be launched
+		
+		for f in ["gtk2", "qt4"]:
+			if f in names:
+				return cmds[f]
+
 def etc_prop (*args, **kwargs):
 	"""Entry point for this plugin."""
 
@@ -38,13 +55,23 @@ def etc_prop (*args, **kwargs):
 		if l > 0:
 			Popen(PROG)
 	else:
-		Popen([PROG, "--frontend", "gtk", "--fastexit"])
+		f = get_frontend()
+
+		if f:
+			Popen([PROG, "--fastexit"]+f)
+		else:
+			debug("Cannot start etc-proposals. No graphical frontend installed!", error = 1)
 
 def etc_prop_menu (*args, **kwargs):
 	if am_i_root():
 		if float(__version__) < 1.1:
 			Popen(PROG)
 		else:
-			Popen([PROG, "--frontend", "gtk"])
+			f = get_frontend()
+
+			if f:
+				Popen([PROG]+f)
+			else:
+				debug("Cannot start etc-proposals. No graphical frontend installed!", error = 1)
 	else:
 		debug("Cannot start etc-proposals. Not root!", error = 1)

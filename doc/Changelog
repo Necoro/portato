@@ -1,4 +1,4 @@
-next:
+0.7.3:
 - fixed bugs
 - QtTerminal now uses events instead of signals (faster)
 - ability to show packages by installation status
