@@ -50,6 +50,10 @@ class PortagePackage (Package):
 		dir,ovl = self._settings.porttree.dbapi.findname2(self._cpv)
 		return ovl != self._settings.settings["PORTDIR"]
 
+	def get_overlay_path (self):
+		dir,ovl = self._settings.porttree.dbapi.findname2(self._cpv)
+		return ovl
+
 	def is_in_system (self):
 		return (self._status != None)
 

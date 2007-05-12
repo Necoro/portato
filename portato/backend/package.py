@@ -241,6 +241,12 @@ class Package:
 		@rtype: boolean"""
 
 		raise NotImplementedError
+
+	def get_overlay_path(self):
+		"""Returns the path to the current overlay.
+		@rtype: string"""
+
+		raise NotImplementedError
 		
 	def is_in_system (self):
 		"""Returns False if the package could not be found in the portage system.

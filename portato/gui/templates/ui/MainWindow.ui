@@ -89,7 +89,7 @@
       </widget>
       <widget class="QTabWidget" name="tabWidget" >
        <property name="currentIndex" >
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="pkgTab" >
         <attribute name="title" >
@@ -119,6 +119,9 @@
            </property>
            <property name="alignment" >
             <set>Qt::AlignCenter</set>
+           </property>
+           <property name="wordWrap" >
+            <bool>true</bool>
            </property>
           </widget>
          </item>

@@ -311,9 +311,13 @@ class PackageDetails:
 			desc = "<no description>"
 		else:
 			desc = "<b>%s</b>" % desc
+
+		name = "<i><u>%s</i></u>" % self.actual_package().get_cp()
+		if self.actual_package().is_overlay():
+			name = "%s\n<i>%s</i>" % (name, self.actual_package().get_overlay_path())
 		
 		self.window.descLabel.setText(desc)
-		self.window.nameLabel.setText("<i><u>%s</i></u>" % self.actual_package().get_cp())
+		self.window.nameLabel.setText(name)
 
 		# disable buttons when emerging is not allowed
 		if not self.queue or not self.doEmerge: 

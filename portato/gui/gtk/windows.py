@@ -367,7 +367,7 @@ class PackageTable:
 		self.descLabel = self.tree.get_widget("descLabel")
 		self.notInSysLabel = self.tree.get_widget("notInSysLabel")
 		self.missingLabel = self.tree.get_widget("missingLabel")
-		
+
 		# buttons
 		self.emergeBtn = self.tree.get_widget("pkgEmergeBtn")
 		self.unmergeBtn = self.tree.get_widget("pkgUnmergeBtn")
@@ -419,10 +419,15 @@ class PackageTable:
 		else:
 			desc = "<b>"+desc+"</b>"
 			use_markup = True
-		desc = "<i><u>"+self.actual_package().get_cp()+"</u></i>\n\n"+desc
+		name = "<i><u>"+self.actual_package().get_cp()+"</u></i>"
+		if self.actual_package().is_overlay():
+			name = "%s\n<i>(Overlay: %s)</i>" % (name, self.actual_package().get_overlay_path())
+
+		desc = "%s\n\n%s" % (name, desc)
+
 		self.descLabel.set_use_markup(use_markup)
 		self.descLabel.set_label(desc)
-		
+
 		if not self.queue or not self.doEmerge: 
 			self.emergeBtn.set_sensitive(False)
 			self.unmergeBtn.set_sensitive(False)

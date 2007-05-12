@@ -13,8 +13,13 @@ Backend:
 - only remove already merged packages from queue
 - make sure, a package being removed from the queue is not needed as a dependency by another package
 
+- filter "--ask" from EMERGE_DEFAULT_OPTS
+
 GUI:
 ====
+
+- show current emerge process in Window-Title (similar to the Console)
+- return from console after finishing emerge
 
 GTK:
 ----
