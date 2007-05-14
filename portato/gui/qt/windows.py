@@ -314,7 +314,10 @@ class PackageDetails:
 
 		name = "<i><u>%s</i></u>" % self.actual_package().get_cp()
 		if self.actual_package().is_overlay():
-			name = "%s\n<i>%s</i>" % (name, self.actual_package().get_overlay_path())
+			self.window.overlayLabel.setText("(%s)" % self.actual_package().get_overlay_path())
+			self.window.overlayLabel.show()
+		else:
+			self.window.overlayLabel.hide()
 		
 		self.window.descLabel.setText(desc)
 		self.window.nameLabel.setText(name)

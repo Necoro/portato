@@ -113,6 +113,16 @@
           </widget>
          </item>
          <item>
+          <widget class="QLabel" name="overlayLabel" >
+           <property name="text" >
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="descLabel" >
            <property name="text" >
             <string>TextLabel</string>
