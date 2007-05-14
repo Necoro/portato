@@ -283,6 +283,12 @@ class Package:
 		@rtype: boolean"""
 
 		raise NotImplementedError
+
+	def get_masking_reason (self):
+		"""Returns the reason for masking the package. If this is not possible for the system, return None.
+
+		@returns: the reason for masking the package
+		@rtype: string"""
 		
 	def get_all_use_flags (self, installed = False):
 		"""Returns a list of _all_ useflags for this package, i.e. all useflags you can set for this package.

@@ -18,7 +18,6 @@ GUI:
 
 - show current emerge process in Window-Title (similar to the Console)
 - return from console after finishing emerge
-- show reason for masked packages
 
 Main Point: user preferences:
 	- window size / location

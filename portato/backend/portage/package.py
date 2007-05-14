@@ -112,6 +112,14 @@ class PortagePackage (Package):
 
 			return False
 
+	def get_masking_reason(self):
+		reason = portage.getmaskingreason(self.get_cpv(), settings = self._settings.settings)
+
+		if reason:
+			return reason[:-1] # strip of last \n
+		else:
+			return reason
+
 	def get_all_use_flags (self, installed = False):
 		if installed or not self.is_in_system():
 			tree = self._settings.vartree

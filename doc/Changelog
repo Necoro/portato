@@ -1,6 +1,7 @@
 next:
 - added name of overlay the package comes from
 - filtering "--ask" from EMERGE_DEFAULT_OPTS
+- show reason for a package being masked as a tooltip
 
 0.7.3:
 - fixed bugs

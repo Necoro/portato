@@ -545,6 +545,9 @@ class PackageDetails:
 				self.window.pkgEmergeBtn.setEnabled(True)
 			self.window.installedCheck.setCheckState(qCheck(pkg.is_installed()))
 			
+			masking_reason = pkg.get_masking_reason() or "" # set to "" if the reason is None
+			self.window.maskedCheck.setToolTip(masking_reason)
+
 			if pkg.is_masked(use_changed = False) and not pkg.is_masked(use_changed = True):
 				self.window.maskedCheck.setText("(Masked)")
 			else:

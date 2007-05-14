@@ -581,6 +581,7 @@ class PackageTable:
 				self.emergeBtn.set_sensitive(True)
 			self.installedCheck.set_active(pkg.is_installed())
 			
+			gtk.Tooltips().set_tip(self.maskedCheck, pkg.get_masking_reason()) # this returns None if it is not masked =)
 			if pkg.is_masked(use_changed = False) and not pkg.is_masked(use_changed = True):
 				self.maskedCheck.set_label("<i>(Masked)</i>")
 				self.maskedCheck.get_child().set_use_markup(True)
