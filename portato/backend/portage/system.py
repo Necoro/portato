@@ -66,8 +66,14 @@ class PortageSystem (SystemInterface):
 
 		if default_opts:
 			opt_list = default_opts.split()
-			if "--ask" in opt_list:
-				opt_list.remove("--ask")
+			changed = False
+
+			for option in ["--ask", "-a", "--pretend", "-p"]:
+				if option in opt_list:
+					opt_list.remove(option)
+					changed = True
+			
+			if changed:
 				opts.update(EMERGE_DEFAULT_OPTS = " ".join(opt_list))
 
 		return opts
