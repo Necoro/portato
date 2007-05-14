@@ -1,5 +1,6 @@
 next:
 - added name of overlay the package comes from
+- filtering "--ask" from EMERGE_DEFAULT_OPTS
 
 0.7.3:
 - fixed bugs

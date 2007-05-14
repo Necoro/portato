@@ -513,7 +513,7 @@ class EmergeQueue:
 			self.console.set_pty(master)
 			
 			# start emerge
-			self.process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False)
+			self.process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False, env = system.get_environment())
 			
 			# start thread waiting for the stop of emerge
 			Thread(name="Emerge-Thread", target=self._update_packages, args=(packages+self.deps.keys(),)).start()

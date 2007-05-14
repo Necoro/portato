@@ -291,3 +291,11 @@ class SystemInterface:
 		@rtype: string[]"""
 
 		raise NotImplementedError
+
+	def get_environment (self):
+		"""Returns a dictionary of environment variables to set prior to do an emerge.
+
+		@returns: environment variables
+		@rtype: dict{string : string}"""
+
+		raise NotImplementedError

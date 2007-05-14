@@ -60,6 +60,18 @@ class PortageSystem (SystemInterface):
 	def get_unmerge_option (self):
 		return ["--unmerge"]
 
+	def get_environment (self):
+		default_opts = self.get_global_settings("EMERGE_DEFAULT_OPTS")
+		opts = dict(os.environ)
+
+		if default_opts:
+			opt_list = default_opts.split()
+			if "--ask" in opt_list:
+				opt_list.remove("--ask")
+				opts.update(EMERGE_DEFAULT_OPTS = " ".join(opt_list))
+
+		return opts
+
 	def find_lambda (self, name):
 		"""Returns the function needed by all the find_all_*-functions. Returns None if no name is given.
 		
