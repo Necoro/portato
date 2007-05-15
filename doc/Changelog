@@ -2,6 +2,8 @@ next:
 - added name of overlay the package comes from
 - filtering "--ask" from EMERGE_DEFAULT_OPTS
 - show reason for a package being masked as a tooltip
+- added settings: gtk: console font
+- show emerge progress in window title
 
 0.7.3:
 - fixed bugs

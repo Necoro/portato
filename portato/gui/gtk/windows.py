@@ -193,6 +193,7 @@ class PreferenceWindow (AbstractDialog):
 			"minimizeCheck"			: ("minimize_opt", "gui_sec"),
 			"systrayCheck"			: ("systray_opt", "gui_sec"),
 			"testPerVersionCheck"	: "testingPerVersion_opt",
+			"titleUpdateCheck"		: ("updateTitle_opt", "gui_sec"),
 			"usePerVersionCheck"	: "usePerVersion_opt",
 			"useTipsCheck"			: ("useTips_opt", "gtk_sec")
 			}
@@ -206,31 +207,23 @@ class PreferenceWindow (AbstractDialog):
 			"syncCommandEdit"	: "syncCmd_opt"
 			}
 
-	# mapping from the radio buttons to the system name
-	# widget name -> option
-	system_radios = {
-			"portageRadio" : "portage",
-			"pkgCoreRadio" : "pkgcore",
-			"paludisRadio" : "paludis"
-			}
-
-	# mapping from the system name to the radio button
-	# option -> widget name
-	systems = {}
-	systems.update(zip(system_radios.values(), system_radios.keys()))
-
-	def __init__ (self, parent, cfg):
+	def __init__ (self, parent, cfg, set_console_font):
 		"""Constructor.
 
 		@param parent: parent window
 		@type parent: gtk.Window
 		@param cfg: configuration object
-		@type cfg: gui_helper.Config"""
+		@type cfg: gui_helper.Config
+		@param set_console_font: function to call to set the console font
+		@type set_console_font: function(string)"""
 		
 		AbstractDialog.__init__(self, parent)
 
 		# our config
 		self.cfg = cfg
+
+		# the console font setter
+		self.set_console_font = set_console_font
 		
 		# set the bg-color of the hint
 		hintEB = self.tree.get_widget("hintEB")
@@ -251,8 +244,9 @@ class PreferenceWindow (AbstractDialog):
 			self.tree.get_widget(edit).\
 					set_text(self.cfg.get(self.edits[edit]))
 
-		# the system radios
-		self.tree.get_widget(self.systems[self.cfg.get("system_opt").lower()]).set_active(True)
+		# the console font button
+		self.consoleFontBtn = self.tree.get_widget("consoleFontBtn")
+		self.consoleFontBtn.set_font_name(self.cfg.get("consolefont_opt", section = self.cfg.const["gtk_sec"]))
 
 		self.window.show_all()
 
@@ -269,10 +263,10 @@ class PreferenceWindow (AbstractDialog):
 		for edit in self.edits:
 			self.cfg.set(self.edits[edit],self.tree.get_widget(edit).get_text())
 
-		for radio in self.system_radios:
-			if self.tree.get_widget(radio).get_active():
-				self.cfg.set("system_opt", self.system_radios[radio])
-					
+		font = self.consoleFontBtn.get_font_name()
+		self.cfg.set("consolefont_opt", font, section = self.cfg.const["gtk_sec"])
+		self.set_console_font(font)
+
 	def cb_ok_clicked(self, button):
 		"""Saves, writes to config-file and closes the window."""
 		self._save()
@@ -743,9 +737,12 @@ class MainWindow (Window):
 	def __init__ (self):	
 		"""Build up window"""
 
+		# the title
+		self.main_title = "Portato (%s)" % VERSION
+
 		# main window stuff
 		Window.__init__(self)
-		self.window.set_title(("Portato (%s)" % VERSION))
+		self.window.set_title(self.main_title)
 		mHeight = 800
 		if gtk.gdk.screen_height() <= 800: mHeight = 600
 		self.window.set_geometry_hints (self.window, min_width = 600, min_height = mHeight, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
@@ -836,7 +833,7 @@ class MainWindow (Window):
 		
 		self.console.set_scrollback_lines(1024)
 		self.console.set_scroll_on_output(True)
-		self.console.set_font_from_string("Monospace 11")
+		self.console.set_font_from_string(self.cfg.get("consolefont_opt", self.cfg.const["gtk_sec"]))
 		self.console.connect("button-press-event", self.cb_right_click)
 		termScroll = gtk.VScrollbar(self.console.get_adjustment())
 		self.termHB.pack_start(self.console, True, True)
@@ -927,11 +924,26 @@ class MainWindow (Window):
 
 	def title_update (self, title):
 		
+		def window_title_update (title):
+			if title is None or not self.cfg.get_boolean("updateTitle_opt", self.cfg.const["gui_sec"]):
+				self.window.set_title(self.main_title)
+			else:
+				title = title.strip()
+				if title[0] == '*':
+					self.window.set_title(self.main_title)
+				else:
+					space_idx = title.rfind(" ")
+					if space_idx != -1:
+						title = title[:space_idx]
+
+					self.window.set_title(("Portato >>> %s" % title))
+
 		def __update(title):
 			if self.tray:
 				self.tray.set_tooltip(title)
 			
-			if title == None: 
+			window_title_update(title)
+			if title is None: 
 				title = "Console"
 			else: 
 				title = ("Console (%s)" % title)
@@ -1100,7 +1112,7 @@ class MainWindow (Window):
 					SearchWindow(self.window, packages, self.jump_to)
 
 	def cb_preferences_clicked (self, button):
-		PreferenceWindow(self.window, self.cfg)
+		PreferenceWindow(self.window, self.cfg, self.console.set_font_from_string)
 		return True
 
 	def cb_about_clicked (self, button):

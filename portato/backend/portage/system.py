@@ -63,6 +63,7 @@ class PortageSystem (SystemInterface):
 	def get_environment (self):
 		default_opts = self.get_global_settings("EMERGE_DEFAULT_OPTS")
 		opts = dict(os.environ)
+		opts.update(TERM = "xterm") # emulate terminal :)
 
 		if default_opts:
 			opt_list = default_opts.split()

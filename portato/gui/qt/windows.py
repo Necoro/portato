@@ -183,7 +183,8 @@ class PreferenceWindow (Window):
 			"testingCheck"	: "testingPerVersion_opt",
 			"pkgIconsCheck"	: ("pkgIcons_opt", "qt_sec"),
 			"minimizeCheck"	: ("minimize_opt", "gui_sec"),
-			"systrayCheck"	: ("systray_opt", "gui_sec")
+			"systrayCheck"	: ("systray_opt", "gui_sec"),
+			"titleUpdateCheck" : ("updateTitle_opt", "gui_sec")
 			}
 	
 	# all edits in the window
@@ -591,7 +592,8 @@ class MainWindow (Window):
 	def __init__ (self):
 		Window.__init__(self)
 
-		self.setWindowTitle(("Portato (%s)" % VERSION))
+		self.main_title = "Portato (%s)" % VERSION
+		self.setWindowTitle(self.main_title)
 		self.statusbar.showMessage("Portato - A Portage GUI")
 
 		self.doUpdate = False
@@ -658,6 +660,21 @@ class MainWindow (Window):
 
 	def _title_update (self, title):
 		
+		def window_update (title):
+			if title is None or not self.cfg.get_boolean("updateTitle_opt", self.cfg.const["gui_sec"]):
+				self.setWindowTitle(self.main_title)
+			else:
+				title = title.strip()
+				if title[0] == '*':
+					self.setWindowTitle(self.main_title)
+				else:
+					space_idx = title.rfind(" ")
+					if space_idx != -1:
+						title = title[:space_idx]
+
+					self.setWindowTitle(("Portato >>> %s" % title))
+
+		window_update(title)
 		if title is None: 
 			if self.systray: self.systray.setToolTip("")
 			title = "Console"

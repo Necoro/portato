@@ -49,10 +49,12 @@ class Config: # XXX: This needs to be replaced - the const-dict is just messy
 			"newuse_opt" : "newuse",
 			"syncCmd_opt" : "synccommand",
 			"useTips_opt" : "showusetips",
+			"consolefont_opt" : "consolefont",
 			"pkgIcons_opt" : "packageIcons",
 			"system_opt" : "system",
 			"systray_opt" : "showsystray",
-			"minimize_opt" : "hideonminimize"
+			"minimize_opt" : "hideonminimize",
+			"updateTitle_opt" : "updatetitle"
 			}
 	
 	def __init__ (self, cfgFile):

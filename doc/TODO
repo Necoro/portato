@@ -16,7 +16,6 @@ Backend:
 GUI:
 ====
 
-- show current emerge process in Window-Title (similar to the Console)
 - return from console after finishing emerge
 
 Main Point: user preferences:
