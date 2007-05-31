@@ -163,7 +163,7 @@ class PortagePackage (Package):
 
 		return retlist
 
-	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"]):
+	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"], with_criterions = False):
 		dep_pkgs = [] # the package list
 		
 		# change the useflags, because we have internally changed some, but not made them visible for portage
@@ -192,6 +192,14 @@ class PortagePackage (Package):
 		
 		deps = deps[1]
 
+		def create_dep_pkgs_data (dep, pkg):
+			"""Returns the data to enter into the dep_pkgs list, which is either the package cpv or a tuple
+			consisting of the cpv and the criterion."""
+			if with_criterions:
+				return (pkg.get_cpv(), dep)
+			else:
+				return pkg.get_cpv()
+
 		for dep in deps:
 			if dep[0] == '!': # blocking sth
 				dep = dep[1:]
@@ -212,13 +220,13 @@ class PortagePackage (Package):
 				for i in range(len(list)-1,0,-1):
 					p = list[i]
 					if not p.is_masked():
-						dep_pkgs.append(p.get_cpv())
+						dep_pkgs.append(create_dep_pkgs_data(dep, p))
 						done = True
 						break
 				if not done:
-					dep_pkgs.append(list[-1].get_cpv())
+					dep_pkgs.append(create_dep_pkgs_data(dep, list[-1]))
 			else:
-				dep_pkgs.append(pkg.get_cpv())
+				dep_pkgs.append(create_dep_pkgs_data(dep, pkg))
 
 		return dep_pkgs
 
@@ -262,7 +270,4 @@ class PortagePackage (Package):
 			return portage.pkgcmp(v1[1:],v2[1:])
 
 	def matches (self, criterion):
-		if portage.match_from_list(criterion, [self.get_cpv()]) == []:
-			return False
-		else:
-			return True
+		return system.cpv_matches(self.get_cpv(), criterion)

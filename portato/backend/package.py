@@ -304,6 +304,9 @@ class Package:
 	def get_matched_dep_packages (self, depvar):
 		"""This function looks for all dependencies which are resolved. In normal case it makes only sense for installed packages, but should work for uninstalled ones too.
 
+		@param depvar: the dependency variables (RDEPEND, PDEPEND, DEPEND) to use
+		@type depvar: string[]
+		
 		@returns: unique list of dependencies resolved (with elements like "<=net-im/foobar-1.2.3")
 		@rtype: string[]
 
@@ -311,11 +314,16 @@ class Package:
 
 		raise NotImplementedError
 		
-	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"]):
+	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"], with_criterions = False):
 		"""Returns a cpv-list of packages on which this package depends and which have not been installed yet. This does not check the dependencies in a recursive manner.
 
-		@returns: list of cpvs on which the package depend
-		@rtype: string[]
+		@param depvar: the dependency variables (RDEPEND, PDEPEND, DEPEND) to use
+		@type depvar: string[]
+		@param with_criterions: return also the criterions
+		@type with_criterions: boolean
+		
+		@returns: list of cpvs on which the package depend (and if wanted also the criterions)
+		@rtype: string[] or (string, string)[]
 
 		@raises portato.BlockedException: when a package in the dependency-list is blocked by an installed one
 		@raises portato.PackageNotFoundException: when a package in the dependency list could not be found in the system
@@ -362,7 +370,12 @@ class Package:
 		raise NotImplementedError
 
 	def compare_version(self, other):
-		"""Compares this package's version to another's CPV; returns -1, 0, 1"""
+		"""Compares this package's version to another's CPV; returns -1, 0, 1.
+		
+		@param other: the other package
+		@type other: Package
+		@returns: -1, 0 or 1
+		@rtype: int"""
 
 		raise NotImplementedError
 

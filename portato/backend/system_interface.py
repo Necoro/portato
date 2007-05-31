@@ -21,6 +21,18 @@ class SystemInterface:
 		@rtype: string[]"""
 
 		raise NotImplementedError
+
+	def cpv_matches (self, cpv, criterion):
+		"""Checks whether a cpv matches a specific criterion.
+
+		@param cpv: cpv to check
+		@type cpv: string
+		@param criterion: criterion to check against
+		@type criterion: string
+		@returns: match result
+		@rtype: boolean"""
+
+		raise NotImplementedError
 	
 	def find_best(self, list):
 		"""Returns the best package out of a list of packages.

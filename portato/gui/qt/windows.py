@@ -70,9 +70,12 @@ class Window (object):
 
 			Qt.QApplication.setOverrideCursor(Qt.Qt.WaitCursor)
 			try:
-				ret = func(*args, **kwargs)
-			finally:
-				Qt.QApplication.restoreOverrideCursor()
+				try:
+					ret = func(*args, **kwargs)
+				finally:
+					Qt.QApplication.restoreOverrideCursor()
+			except TypeError:
+				pass # invalid signature called
 
 			return ret
 
@@ -743,8 +746,8 @@ class MainWindow (Window):
 	def on_prefAction_triggered (self):
 		PreferenceWindow(self, self.cfg).exec_()
 
-	@Qt.pyqtSignature("")
 	@Window.watch_cursor
+	@Qt.pyqtSignature("")
 	def on_reloadAction_triggered (self):
 		"""Reloads the portage settings and the database."""
 		system.reload_settings()
@@ -800,12 +803,17 @@ class MainWindow (Window):
 		self.fill_pkg_list(self.selCatName)
 
 	@Qt.pyqtSignature("")
-	@Window.watch_cursor
 	def on_searchBtn_clicked (self):
 		"""Do a search."""
 		text = str(self.searchEdit.text())
+		
 		if text != "":
-			packages = system.find_all_packages(text, withVersion = False)
+
+			@Window.watch_cursor
+			def get_packages():
+				return system.find_all_packages(text, withVersion = False)
+
+			packages = get_packages()
 
 			if packages == []:
 				nothing_found_dialog(self)
@@ -865,8 +873,8 @@ class MainWindow (Window):
 		self.tabWidget.setCurrentIndex(self.CONSOLE_PAGE)
 		self.queue.unmerge(force = True)
 
-	@Qt.pyqtSignature("")
 	@Window.watch_cursor
+	@Qt.pyqtSignature("")
 	def on_updateBtn_clicked (self):
 		if not am_i_root():
 			not_root_dialog(self)

@@ -79,6 +79,12 @@ class PortageSystem (SystemInterface):
 
 		return opts
 
+	def cpv_matches (self, cpv, criterion):
+		if portage.match_from_list(criterion, [self.get_cpv()]) == []:
+			return False
+		else:
+			return True
+
 	def find_lambda (self, name):
 		"""Returns the function needed by all the find_all_*-functions. Returns None if no name is given.
 		
