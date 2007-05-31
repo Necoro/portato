@@ -425,7 +425,7 @@ class PackageDetails:
 			self.window.tabWidget.setCurrentIndex(self.window.QUEUE_PAGE)
 		return True
 
-	def cb_revert_clicked (self, button):
+	def cb_revert_clicked (self):
 		"""Callback for pressed revert-button."""
 		self.actual_package().remove_new_use_flags()
 		self.actual_package().remove_new_masked()
