@@ -929,6 +929,7 @@ class MainWindow (Window):
 		if not self.queue.is_empty():
 			ret = queue_not_empty_dialog(self)
 			if ret == Qt.QMessageBox.Cancel:
+				event.ignore()
 				return
 			else:
 				self.queue.kill_emerge()
