@@ -4,6 +4,7 @@ next:
 - show reason for a package being masked as a tooltip
 - added settings: gtk: console font
 - show emerge progress in window title
+- work with PyQt-4.2
 
 0.7.3:
 - fixed bugs
