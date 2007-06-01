@@ -281,6 +281,12 @@ class PackageDetails:
 		# useflags
 		Qt.QObject.connect(self.window.useList, Qt.SIGNAL("itemClicked(QTreeWidgetItem*, int)"), self.cb_use_flag_changed)
 
+	def _show_tab (self):
+		# first update -> show
+		if self.window.pkgTab.isHidden():
+			self.window.tabWidget.insertTab(0, self.window.pkgTab, "Package")
+			self.window.pkgTab.setHidden(False)
+
 	def update (self, cp, queue = None, version = None, doEmerge = True, instantChange = None):
 		"""Updates the table to show the contents for the package.
 		
@@ -330,11 +336,8 @@ class PackageDetails:
 		if not self.queue or not self.doEmerge: 
 			self.window.pkgEmergeBtn.setEnabled(False)
 			self.window.pkgUnmergeBtn.setEnabled(False)
-		
-		# first update -> show
-		if self.window.pkgTab.isHidden():
-			self.window.tabWidget.insertTab(0, self.window.pkgTab, "Package")
-			self.window.pkgTab.setHidden(False)
+
+		self._show_tab()
 
 		self.window.tabWidget.setCurrentIndex(self.window.PKG_PAGE)
 
@@ -808,12 +811,8 @@ class MainWindow (Window):
 		text = str(self.searchEdit.text())
 		
 		if text != "":
-
-			@Window.watch_cursor
-			def get_packages():
-				return system.find_all_packages(text, withVersion = False)
-
-			packages = get_packages()
+			packages = Window.watch_cursor(system.find_all_packages)\
+					(text, withVersion = False) # show watch cursor during this process
 
 			if packages == []:
 				nothing_found_dialog(self)
@@ -937,6 +936,7 @@ class MainWindow (Window):
 		if self.systray and self.systray.isVisible():
 			self.systray.hide()
 
+		self.pkgDetails._show_tab() # workaround for segfault with PyQt-4.2
 		Qt.QMainWindow.closeEvent(self, event)
 
 	def changeEvent (self, event):
