@@ -80,7 +80,7 @@ class PortageSystem (SystemInterface):
 		return opts
 
 	def cpv_matches (self, cpv, criterion):
-		if portage.match_from_list(criterion, [self.get_cpv()]) == []:
+		if portage.match_from_list(criterion, [cpv]) == []:
 			return False
 		else:
 			return True
