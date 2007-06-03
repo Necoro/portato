@@ -10,8 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net> et.al.
 
-import traceback, os.path, sys
-from itertools import chain
+import traceback, os.path, sys, types
 
 DEBUG = True
 
@@ -99,7 +98,14 @@ def flatten (listOfLists):
 	@returns: flattend list
 	@rtype: list"""
 
-	return list(chain(*listOfLists))
+	if type(listOfLists) != types.ListType:
+		return [listOfLists]
+
+	ret = []
+	for r in listOfLists:
+		ret.extend(flatten(r))
+
+	return ret
 
 def unique_array(s):
 	"""Stolen from portage_utils:
