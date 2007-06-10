@@ -8,10 +8,14 @@ Backend:
 
 - bugs in update world (Necoro, 04/20/07: are there any more bugs?)
 - fix for flag handling, when reverting flags (Necoro, 04/20/07: what did i mean by this?)
+- do not alert a block, if a package blocks a version of one package which is updated to a new one not being blocked anymore
 
 - save/restore queue on exit/start
 - only remove already merged packages from queue
 - make sure, a package being removed from the queue is not needed as a dependency by another package
+
+- use configobj instead of our selfwritten config-parser (check first if this is really a good point)
+- rewrite the Configuration-handling (esp the Config class)
 
 GUI:
 ====
@@ -20,7 +24,7 @@ GUI:
 
 Main Point: user preferences:
 	- window size / location
-	- farben und schriftgrößen
+	- colors and font sizes
 
 GTK:
 ----
