@@ -321,6 +321,7 @@
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">_Search</property>
                 <property name="use_underline">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="cb_search_clicked" object="searchEntry"/>
               </widget>
               <packing>
@@ -353,6 +354,7 @@
                     <child>
                       <widget class="GtkScrolledWindow" id="catScroll">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                         <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                         <child>
@@ -367,6 +369,7 @@
                     <child>
                       <widget class="GtkScrolledWindow" id="pkgScroll">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                         <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                         <child>
@@ -393,6 +396,7 @@
               </widget>
               <packing>
                 <property name="resize">False</property>
+                <property name="shrink">True</property>
               </packing>
             </child>
             <child>
@@ -404,72 +408,51 @@
                     <property name="n_rows">4</property>
                     <property name="n_columns">2</property>
                     <child>
-                      <widget class="GtkScrolledWindow" id="useListScroll">
+                      <widget class="GtkHBox" id="checkHB">
                         <property name="visible">True</property>
-                        <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                        <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                        <property name="spacing">1</property>
+                        <property name="homogeneous">True</property>
                         <child>
-                          <widget class="GtkTreeView" id="useList">
+                          <widget class="GtkCheckButton" id="installedCheck">
                             <property name="visible">True</property>
+                            <property name="no_show_all">True</property>
+                            <property name="label" translatable="yes">Installed</property>
+                            <property name="response_id">0</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="button_press_event" handler="cb_button_pressed"/>
                           </widget>
+                          <packing>
+                            <property name="fill">False</property>
+                          </packing>
                         </child>
-                      </widget>
-                      <packing>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
-                        <property name="x_padding">5</property>
-                        <property name="y_padding">5</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkVBox" id="comboVB">
-                        <property name="visible">True</property>
                         <child>
-                          <placeholder/>
+                          <widget class="GtkCheckButton" id="maskedCheck">
+                            <property name="visible">True</property>
+                            <property name="no_show_all">True</property>
+                            <property name="label" translatable="yes">Masked</property>
+                            <property name="response_id">0</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="cb_masked_toggled"/>
+                          </widget>
+                          <packing>
+                            <property name="fill">False</property>
+                            <property name="position">1</property>
+                          </packing>
                         </child>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="y_options">GTK_FILL</property>
-                        <property name="x_padding">5</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="descLabel">
-                        <property name="visible">True</property>
-                        <property name="justify">GTK_JUSTIFY_CENTER</property>
-                        <property name="wrap">True</property>
-                      </widget>
-                      <packing>
-                        <property name="right_attach">2</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                        <property name="y_padding">10</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="missingLabel">
-                        <property name="visible">True</property>
-                        <property name="no_show_all">True</property>
-                        <property name="label" translatable="yes">&lt;span foreground='red'&gt;&lt;b&gt;MISSING KEYWORD&lt;/b&gt;&lt;/span&gt;</property>
-                        <property name="use_markup">True</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="y_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="notInSysLabel">
-                        <property name="visible">True</property>
-                        <property name="no_show_all">True</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Installed, but not in portage anymore&lt;/b&gt;</property>
-                        <property name="use_markup">True</property>
+                        <child>
+                          <widget class="GtkCheckButton" id="testingCheck">
+                            <property name="visible">True</property>
+                            <property name="no_show_all">True</property>
+                            <property name="label" translatable="yes">Testing</property>
+                            <property name="response_id">0</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="cb_testing_toggled"/>
+                          </widget>
+                          <packing>
+                            <property name="fill">False</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -489,6 +472,7 @@
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">_Emerge</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="cb_package_emerge_clicked"/>
                           </widget>
                         </child>
@@ -497,6 +481,7 @@
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">_Unmerge</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="cb_package_unmerge_clicked"/>
                           </widget>
                           <packing>
@@ -508,6 +493,7 @@
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">Re_vert</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="cb_package_revert_clicked"/>
                           </widget>
                           <packing>
@@ -519,6 +505,7 @@
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">E_build</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="cb_package_ebuild_clicked"/>
                           </widget>
                           <packing>
@@ -534,48 +521,11 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkHBox" id="checkHB">
+                      <widget class="GtkLabel" id="notInSysLabel">
                         <property name="visible">True</property>
-                        <property name="spacing">1</property>
-                        <property name="homogeneous">True</property>
-                        <child>
-                          <widget class="GtkCheckButton" id="installedCheck">
-                            <property name="visible">True</property>
-                            <property name="no_show_all">True</property>
-                            <property name="label" translatable="yes">Installed</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="button_press_event" handler="cb_button_pressed"/>
-                          </widget>
-                          <packing>
-                            <property name="fill">False</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkCheckButton" id="maskedCheck">
-                            <property name="visible">True</property>
-                            <property name="no_show_all">True</property>
-                            <property name="label" translatable="yes">Masked</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="cb_masked_toggled"/>
-                          </widget>
-                          <packing>
-                            <property name="fill">False</property>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkCheckButton" id="testingCheck">
-                            <property name="visible">True</property>
-                            <property name="no_show_all">True</property>
-                            <property name="label" translatable="yes">Testing</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="cb_testing_toggled"/>
-                          </widget>
-                          <packing>
-                            <property name="fill">False</property>
-                            <property name="position">2</property>
-                          </packing>
-                        </child>
+                        <property name="no_show_all">True</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Installed, but not in portage anymore&lt;/b&gt;</property>
+                        <property name="use_markup">True</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -583,6 +533,68 @@
                         <property name="top_attach">1</property>
                         <property name="bottom_attach">2</property>
                         <property name="y_options">GTK_FILL</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="missingLabel">
+                        <property name="visible">True</property>
+                        <property name="no_show_all">True</property>
+                        <property name="label" translatable="yes">&lt;span foreground='red'&gt;&lt;b&gt;MISSING KEYWORD&lt;/b&gt;&lt;/span&gt;</property>
+                        <property name="use_markup">True</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="y_options">GTK_FILL</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="descLabel">
+                        <property name="visible">True</property>
+                        <property name="justify">GTK_JUSTIFY_CENTER</property>
+                        <property name="wrap">True</property>
+                      </widget>
+                      <packing>
+                        <property name="right_attach">2</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                        <property name="y_padding">10</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkVBox" id="comboVB">
+                        <property name="visible">True</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="y_options">GTK_FILL</property>
+                        <property name="x_padding">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkScrolledWindow" id="useListScroll">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                        <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                        <child>
+                          <widget class="GtkTreeView" id="useList">
+                            <property name="visible">True</property>
+                          </widget>
+                        </child>
+                      </widget>
+                      <packing>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="x_padding">5</property>
+                        <property name="y_padding">5</property>
                       </packing>
                     </child>
                   </widget>
@@ -608,6 +620,7 @@
                     <child>
                       <widget class="GtkScrolledWindow" id="queueScroll">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                         <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                         <child>
@@ -632,6 +645,7 @@
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">E_merge</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="cb_emerge_clicked"/>
                           </widget>
                         </child>
@@ -640,6 +654,7 @@
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">_Unmerge</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="cb_unmerge_clicked"/>
                           </widget>
                           <packing>
@@ -651,6 +666,7 @@
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">Update _World</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="cb_update_clicked"/>
                           </widget>
                           <packing>
@@ -662,6 +678,7 @@
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">_Remove</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="cb_remove_clicked"/>
                           </widget>
                           <packing>
@@ -723,6 +740,10 @@
                   </packing>
                 </child>
               </widget>
+              <packing>
+                <property name="resize">True</property>
+                <property name="shrink">True</property>
+              </packing>
             </child>
           </widget>
           <packing>
@@ -820,6 +841,7 @@
             <child>
               <widget class="GtkScrolledWindow" id="pluginListScroll">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                 <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                 <child>
@@ -854,6 +876,7 @@
             <property name="visible">True</property>
             <property name="label" translatable="yes">_OK</property>
             <property name="use_underline">True</property>
+            <property name="response_id">0</property>
             <signal name="clicked" handler="close"/>
           </widget>
           <packing>
@@ -914,6 +937,7 @@
                               <widget class="GtkCheckButton" id="debugCheck">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">Debug</property>
+                                <property name="response_id">0</property>
                                 <property name="draw_indicator">True</property>
                               </widget>
                             </child>
@@ -948,6 +972,7 @@
                               <widget class="GtkCheckButton" id="deepCheck">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">--deep</property>
+                                <property name="response_id">0</property>
                                 <property name="draw_indicator">True</property>
                               </widget>
                               <packing>
@@ -958,6 +983,7 @@
                               <widget class="GtkCheckButton" id="newUseCheck">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">--newuse</property>
+                                <property name="response_id">0</property>
                                 <property name="draw_indicator">True</property>
                               </widget>
                               <packing>
@@ -1058,108 +1084,48 @@
                               <placeholder/>
                             </child>
                             <child>
-                              <widget class="GtkEntry" id="useFileEdit">
-                                <property name="visible">True</property>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="useEditLabel">
+                              <widget class="GtkLabel" id="maskLabel">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
-                                <property name="label" translatable="yes">File name to use, if package.use is a directory: </property>
+                                <property name="xpad">5</property>
+                                <property name="label" translatable="yes">&lt;u&gt;&lt;i&gt;Masking Keywords&lt;/i&gt;&lt;/u&gt;</property>
+                                <property name="use_markup">True</property>
                                 <property name="single_line_mode">True</property>
                               </widget>
                               <packing>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
+                                <property name="top_attach">7</property>
+                                <property name="bottom_attach">8</property>
+                                <property name="y_padding">5</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkCheckButton" id="usePerVersionCheck">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Add only exact version to package.use</property>
-                                <property name="draw_indicator">True</property>
-                              </widget>
-                              <packing>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">2</property>
-                                <property name="bottom_attach">3</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkCheckButton" id="testPerVersionCheck">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Add only exact version to package.keywords</property>
-                                <property name="draw_indicator">True</property>
-                              </widget>
-                              <packing>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">5</property>
-                                <property name="bottom_attach">6</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="testEditLabel">
+                              <widget class="GtkLabel" id="testLabel">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
-                                <property name="label" translatable="yes">File name to use, if package.keywords is a directory: </property>
+                                <property name="xpad">5</property>
+                                <property name="label" translatable="yes">&lt;u&gt;&lt;i&gt;Testing Keywords&lt;/i&gt;&lt;/u&gt;</property>
+                                <property name="use_markup">True</property>
                                 <property name="single_line_mode">True</property>
                               </widget>
                               <packing>
-                                <property name="top_attach">6</property>
-                                <property name="bottom_attach">7</property>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="y_padding">5</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkEntry" id="testFileEdit">
-                                <property name="visible">True</property>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">6</property>
-                                <property name="bottom_attach">7</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkEntry" id="maskFileEdit">
-                                <property name="visible">True</property>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">9</property>
-                                <property name="bottom_attach">10</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="maskEditLabel">
+                              <widget class="GtkLabel" id="useLabel">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
-                                <property name="label" translatable="yes">File name to use, if package.mask/package.unmask is a directory: </property>
+                                <property name="xpad">5</property>
+                                <property name="label" translatable="yes">&lt;u&gt;&lt;i&gt;Use-Flags&lt;/i&gt;&lt;/u&gt;</property>
+                                <property name="use_markup">True</property>
                                 <property name="single_line_mode">True</property>
                               </widget>
                               <packing>
-                                <property name="top_attach">9</property>
-                                <property name="bottom_attach">10</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkCheckButton" id="maskPerVersionCheck">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Add only exact version to package.mask/package.unmask</property>
-                                <property name="draw_indicator">True</property>
-                              </widget>
-                              <packing>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">8</property>
-                                <property name="bottom_attach">9</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="y_padding">6</property>
                               </packing>
                             </child>
                             <child>
@@ -1196,48 +1162,111 @@
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="useLabel">
+                              <widget class="GtkCheckButton" id="maskPerVersionCheck">
                                 <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="xpad">5</property>
-                                <property name="label" translatable="yes">&lt;u&gt;&lt;i&gt;Use-Flags&lt;/i&gt;&lt;/u&gt;</property>
-                                <property name="use_markup">True</property>
-                                <property name="single_line_mode">True</property>
+                                <property name="label" translatable="yes">Add only exact version to package.mask/package.unmask</property>
+                                <property name="response_id">0</property>
+                                <property name="draw_indicator">True</property>
                               </widget>
                               <packing>
-                                <property name="top_attach">1</property>
-                                <property name="bottom_attach">2</property>
-                                <property name="y_padding">6</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">8</property>
+                                <property name="bottom_attach">9</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="testLabel">
+                              <widget class="GtkLabel" id="maskEditLabel">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
-                                <property name="xpad">5</property>
-                                <property name="label" translatable="yes">&lt;u&gt;&lt;i&gt;Testing Keywords&lt;/i&gt;&lt;/u&gt;</property>
-                                <property name="use_markup">True</property>
+                                <property name="label" translatable="yes">File name to use, if package.mask/package.unmask is a directory: </property>
                                 <property name="single_line_mode">True</property>
                               </widget>
                               <packing>
-                                <property name="top_attach">4</property>
-                                <property name="bottom_attach">5</property>
-                                <property name="y_padding">5</property>
+                                <property name="top_attach">9</property>
+                                <property name="bottom_attach">10</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="maskLabel">
+                              <widget class="GtkEntry" id="maskFileEdit">
+                                <property name="visible">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">9</property>
+                                <property name="bottom_attach">10</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkEntry" id="testFileEdit">
+                                <property name="visible">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="testEditLabel">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
-                                <property name="xpad">5</property>
-                                <property name="label" translatable="yes">&lt;u&gt;&lt;i&gt;Masking Keywords&lt;/i&gt;&lt;/u&gt;</property>
-                                <property name="use_markup">True</property>
+                                <property name="label" translatable="yes">File name to use, if package.keywords is a directory: </property>
                                 <property name="single_line_mode">True</property>
                               </widget>
                               <packing>
-                                <property name="top_attach">7</property>
-                                <property name="bottom_attach">8</property>
-                                <property name="y_padding">5</property>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkCheckButton" id="testPerVersionCheck">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Add only exact version to package.keywords</property>
+                                <property name="response_id">0</property>
+                                <property name="draw_indicator">True</property>
+                              </widget>
+                              <packing>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkCheckButton" id="usePerVersionCheck">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Add only exact version to package.use</property>
+                                <property name="response_id">0</property>
+                                <property name="draw_indicator">True</property>
+                              </widget>
+                              <packing>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="useEditLabel">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="label" translatable="yes">File name to use, if package.use is a directory: </property>
+                                <property name="single_line_mode">True</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkEntry" id="useFileEdit">
+                                <property name="visible">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
                               </packing>
                             </child>
                           </widget>
@@ -1293,6 +1322,7 @@
                         <property name="can_focus">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="label" translatable="yes">Show emerge progress in title - similar to the console tab</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
@@ -1303,6 +1333,7 @@
                       <widget class="GtkCheckButton" id="useTipsCheck">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Turn Use-Tips on</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
@@ -1316,6 +1347,7 @@
                         <property name="can_focus">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="label" translatable="yes">Enable systray</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
@@ -1329,6 +1361,7 @@
                         <property name="can_focus">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="label" translatable="yes">Hide on minimization (only if systray is enabled)</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
@@ -1355,6 +1388,7 @@
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="response_id">0</property>
                             <property name="title" translatable="yes">Chose a console font</property>
                             <property name="use_font">True</property>
                             <property name="use_size">True</property>
@@ -1400,19 +1434,22 @@
             <property name="homogeneous">True</property>
             <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
             <child>
-              <widget class="GtkButton" id="okBtn">
+              <widget class="GtkButton" id="cancelBtn">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">_OK</property>
-                <property name="use_underline">True</property>
-                <signal name="clicked" handler="cb_ok_clicked"/>
+                <property name="label" translatable="yes">gtk-cancel</property>
+                <property name="use_stock">True</property>
+                <property name="response_id">0</property>
+                <signal name="clicked" handler="cb_cancel_clicked"/>
               </widget>
             </child>
             <child>
-              <widget class="GtkButton" id="cancelBtn">
+              <widget class="GtkButton" id="okBtn">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">_Cancel</property>
-                <property name="use_underline">True</property>
-                <signal name="clicked" handler="cb_cancel_clicked"/>
+                <property name="label" translatable="yes">gtk-apply</property>
+                <property name="use_stock">True</property>
+                <property name="yalign">0.51999998092651367</property>
+                <property name="response_id">0</property>
+                <signal name="clicked" handler="cb_ok_clicked"/>
               </widget>
               <packing>
                 <property name="position">1</property>
@@ -1431,6 +1468,7 @@
     <child>
       <widget class="GtkScrolledWindow" id="ebuildScroll">
         <property name="visible">True</property>
+        <property name="can_focus">False</property>
         <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
         <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
         <child>
