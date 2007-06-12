@@ -18,7 +18,8 @@ PLUGIN_DIR = "plugins/"
 VERSION = 9999
 
 ICON_DIR = "icons/"
-APP_ICON = ICON_DIR+"/portato-icon.png"
+APP_ICON = ICON_DIR+"/portato-icon.svg"
+APP_ICON_PNG = ICON_DIR+"/portato-icon.png"
 
 FRONTENDS = ["gtk" ,"qt"]
 STD_FRONTEND = "gtk"
