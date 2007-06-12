@@ -7,7 +7,7 @@ from portato.constants import VERSION, DATA_DIR, FRONTENDS, ICON_DIR
 
 packages = ["portato", "portato.gui", "portato.plugins", "portato.backend", "portato.backend.portage"]
 ext_modules = []
-data_files = [(ICON_DIR, ["icons/portato-icon.png", "icons/portato-icon.svg"])]
+data_files = [(ICON_DIR, ["icons/portato-icon.png"])]
 cmdclass = {}
 
 if "gtk" in FRONTENDS:

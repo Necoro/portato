@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Portato (Qt)
-Icon=portato-icon.svg
+Icon=portato-icon
 Exec=kdesu -t --nonewdcop -c portato qt
 StartupNotify=true
 Type=Application

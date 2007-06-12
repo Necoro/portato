@@ -725,7 +725,7 @@ class MainWindow (Window):
 
 	def build_systray (self):
 		if self.cfg.get_boolean("systray_opt", self.cfg.const["gui_sec"]):
-			self.systray = Qt.QSystemTrayIcon(Qt.QIcon(APP_ICON_PNG), self) # use this until Qt supports proper SVG images in the systray
+			self.systray = Qt.QSystemTrayIcon(Qt.QIcon(APP_ICON), self) # use this until Qt supports proper SVG images in the systray
 			self.trayIconMenu = Qt.QMenu(self)
 			self.trayIconMenu.addAction(self.quitAction)
 			self.systray.setContextMenu(self.trayIconMenu)
