@@ -120,7 +120,7 @@ A Portage-GUI""" % VERSION)
 		llabel.set_markup("""This software is licensed under the terms of the GPLv2.
 Copyright (C) 2006-2007 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;
 
-Icon created by wolfden
+Icon created by P4R4D0X
 """)
 
 		view = self.tree.get_widget("pluginList")

@@ -102,7 +102,7 @@ A Portage-GUI<br>
 This software is licensed under the terms of the GPLv2.<br>
 Copyright (C) 2006-2007 Ren&eacute; 'Necoro' Neumann &lt;necoro@necoro.net&gt;<br>
 <br>
-Icon created by wolfden""" % VERSION)
+Icon created by P4R4D0X""" % VERSION)
 
 		self.pluginList.setHeaderLabels(["Plugin", "Author"])
 		
