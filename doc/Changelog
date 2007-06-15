@@ -2,6 +2,7 @@ next:
 - new icon by p4r4d0x
 - sync command now accepts "&&"
 - added ebuild-viewer
+- use optparse to parse cmdline options
 
 0.7.4.2:
 - bugfix in PortageSystem
