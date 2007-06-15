@@ -633,10 +633,8 @@ class EmergeQueue:
 			try:
 				idx = cmd.index("&&")
 			except ValueError: # no && in there -> normal behavior
-				debug("w/o &&", cmd)
 				self._emerge([],[],[], command = cmd)
 			else:
-				debug("with &&", cmd[:idx])
 				self._emerge([],[],[], command = cmd[:idx])
 
 				if startThread:

@@ -1,3 +1,7 @@
+next:
+- new icon by p4r4d0x
+- sync command now accepts "&&"
+
 0.7.4.2:
 - bugfix in PortageSystem
 
