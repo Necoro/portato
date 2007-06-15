@@ -26,10 +26,11 @@ def show_ebuild (pkg):
 	app = QApplication([])
 	
 	def _show (pkg):
+		pkg = system.new_package(pkg)
 		hook = plugin.hook("open_ebuild", pkg, None)
 		
-		ew = hook(EbuildDialog)(None, system.new_package(pkg))
-		ew.setWindowTitle("Portato Ebuild Viewer - %s" % pkg)
+		ew = hook(EbuildDialog)(None, pkg)
+		ew.setWindowTitle("Portato Ebuild Viewer - %s" % pkg.get_cpv())
 		ew.exec_()
 		
 	s = SearchDialog(None, [x.get_cpv() for x in system.sort_package_list(system.find_all_packages(pkg, True))], _show)

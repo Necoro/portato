@@ -25,11 +25,12 @@ def show_ebuild (pkg):
 	def _show (pkg):
 		gtk.main_quit()
 
+		pkg = system.new_package(pkg)
 		hook = plugin.hook("open_ebuild", pkg, None)
 		
-		ew = hook(EbuildWindow)(None, system.new_package(pkg))
+		ew = hook(EbuildWindow)(None, pkg)
 		ew.window.connect("destroy", lambda *x: gtk.main_quit())
-		ew.window.set_title("Portato Ebuild Viewer - %s" % pkg)
+		ew.window.set_title("Portato Ebuild Viewer - %s" % pkg.get_cpv())
 		
 		gtk.main()
 	
