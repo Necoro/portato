@@ -411,7 +411,8 @@ class PackageDetails:
 		return self.packages[self.window.versCombo.currentIndex()]
 
 	def cb_ebuild_clicked (self):
-		EbuildDialog(self.window, self.actual_package()).exec_()
+		hook = plugin.hook("open_ebuild", self.actual_package(), self.window)
+		hook(EbuildDialog)(self.window, self.actual_package()).exec_()
 	
 	def cb_emerge_clicked (self):
 		"""Callback for pressed emerge-button. Adds the package to the EmergeQueue."""

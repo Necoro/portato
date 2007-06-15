@@ -10,8 +10,31 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from windows import MainWindow
+import gtk
+from portato import plugin
+from portato.backend import system
+from windows import MainWindow, SearchWindow, EbuildWindow
 
 def run ():
 	m = MainWindow()
 	m.main()
+
+def show_ebuild (pkg):
+	plugin.load_plugins("gtk")
+	
+	def _show (pkg):
+		gtk.main_quit()
+
+		hook = plugin.hook("open_ebuild", pkg, None)
+		
+		ew = hook(EbuildWindow)(None, system.new_package(pkg))
+		ew.window.connect("destroy", lambda *x: gtk.main_quit())
+		ew.window.set_title("Portato Ebuild Viewer - %s" % pkg)
+		
+		gtk.main()
+	
+	s = SearchWindow(None, [x.get_cpv() for x in system.sort_package_list(system.find_all_packages(pkg, True))], _show)
+	s.window.set_title("Portato Ebuild Viewer - Search")
+	s.window.connect("destroy", lambda *x: gtk.main_quit())
+	
+	gtk.main()

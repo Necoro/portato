@@ -17,6 +17,8 @@ import sys
 
 def main ():
 	uimod = STD_FRONTEND
+	do_ebuild = False
+	ebuild_pkg = None
 
 	for arg in sys.argv[1:]:
 		if arg in ("--help","--version","-h","-v"):
@@ -29,18 +31,24 @@ There is NO WARRANTY, to the extent permitted by law.
 Written by René 'Necoro' Neumann <necoro@necoro.net>""" % VERSION
 			sys.exit(0)
 		
-		if arg == "--check": # run pychecker
+		elif arg == "--check": # run pychecker
 			import os
 			os.environ['PYCHECKER'] = "--limit 50"
 			import pychecker.checker
-			continue
 		
-		uimod = arg
-		break
+		elif arg in ("--ebuild", "-e"):
+			do_ebuild = True
+		
+		elif do_ebuild:
+			ebuild_pkg = arg
+			do_ebuild = False
+		
+		else:
+			uimod = arg
 
 	if uimod in FRONTENDS:
 		try:
-			exec ("from portato.gui.%s import run" % uimod)
+			exec ("from portato.gui.%s import run, show_ebuild" % uimod)
 		except ImportError, e:
 			print "'%s' should be installed, but cannot be imported. This is definitly a bug. (%s)" % (uimod, e[0])
 			sys.exit(1)
@@ -51,7 +59,10 @@ Written by René 'Necoro' Neumann <necoro@necoro.net>""" % VERSION
 		print
 		sys.exit(1)
 	
-	run()
+	if ebuild_pkg:
+		show_ebuild(ebuild_pkg)
+	else:
+		run()
 
 if __name__ == "__main__":
 	main()
