@@ -30,31 +30,18 @@ import time
 import os
 import signal
 
-class Config: # XXX: This needs to be replaced - the const-dict is just messy
+class Config:
 	"""Wrapper around a ConfigParser and for additional local configurations."""
+	# this const-dict holds all the values which are named differently in the sourcecode and in the cfg-file
+	# note: the keys are lowered before being looked up
 	const = {
-			"main_sec" : "Main",
-			"gtk_sec" : "Gtk",
-			"qt_sec" : "Qt",
-			"gui_sec" : "Gui",
-			"usePerVersion_opt" : "usePerVersion",
-			"useFile_opt" : "usefile",
-			"maskFile_opt" : "maskfile",
-			"maskPerVersion_opt" : "maskPerVersion",
-			"testingFile_opt" : "keywordfile",
-			"testingPerVersion_opt" : "keywordperversion",
-			"debug_opt" : "debug",
-			"oneshot_opt" : "oneshot",
-			"deep_opt" : "deep",
-			"newuse_opt" : "newuse",
-			"syncCmd_opt" : "synccommand",
-			"useTips_opt" : "showusetips",
-			"consolefont_opt" : "consolefont",
-			"pkgIcons_opt" : "packageIcons",
-			"system_opt" : "system",
-			"systray_opt" : "showsystray",
-			"minimize_opt" : "hideonminimize",
-			"updateTitle_opt" : "updatetitle"
+			"minimize" : "hideonminimize",
+			"pkgicons" : "packageIcons",
+			"synccmd" : "synccommand",
+			"systray" : "showsystray",
+			"testingfile" : "keywordfile",
+			"testingperversion" : "keywordperversion",
+			"usetips" : "showusetips"
 			}
 	
 	def __init__ (self, cfgFile):
@@ -72,62 +59,58 @@ class Config: # XXX: This needs to be replaced - the const-dict is just messy
 		# local configs
 		self.local = {}
 
-	def get(self, name, section=const["main_sec"], constName = True):
+	def __get_val (self, name):
+		try:
+			return self.const[name.lower()]
+		except KeyError:
+			return name
+
+	def get(self, name, section="MAIN"):
 		"""Gets an option.
 		
 		@param name: name of the option
 		@type name: string
 		@param section: section to look in; default is Main-Section
 		@type section: string
-		@param constName: If True (the default), the option names are first looked up in the const-dict.
-		@type constName: boolean
 		@return: the option's value
 		@rtype: string"""
 
-		if constName:
-			name = self.const[name]
+		return self._cfg.get(self.__get_val(name), self.__get_val(section))
 
-		return self._cfg.get(name, section)
-
-	def get_boolean(self, name, section=const["main_sec"], constName = True):
+	def get_boolean(self, name, section="MAIN"):
 		"""Gets a boolean option.
 			
 		@param name: name of the option
 		@type name: string
 		@param section: section to look in; default is Main-Section
 		@type section: string
-		@param constName: If True (the default), the option names are first looked up in the const-dict.
-		@type constName: boolean
 		@return: the option's value
 		@rtype: boolean"""
 
-		if constName:
-			name = self.const[name]
-
-		return self._cfg.get_boolean(name, section)
+		return self._cfg.get_boolean(self.__get_val(name), self.__get_val(section))
 
 	def modify_flags_config (self):
 		"""Sets the internal config of the L{flags}-module.
 		@see: L{flags.set_config()}"""
 
 		flagCfg = {
-				"usefile": self.get("useFile_opt"), 
-				"usePerVersion" : self.get_boolean("usePerVersion_opt"),
-				"maskfile" : self.get("maskFile_opt"),
-				"maskPerVersion" : self.get_boolean("maskPerVersion_opt"),
-				"testingfile" : self.get("testingFile_opt"),
-				"testingPerVersion" : self.get_boolean("testingPerVersion_opt")}
+				"usefile": self.get("useFile"), 
+				"usePerVersion" : self.get_boolean("usePerVersion"),
+				"maskfile" : self.get("maskFile"),
+				"maskPerVersion" : self.get_boolean("maskPerVersion"),
+				"testingfile" : self.get("testingFile"),
+				"testingPerVersion" : self.get_boolean("testingPerVersion")}
 		flags.set_config(flagCfg)
 
 	def modify_debug_config (self):
 		"""Sets the external debug-config.
 		@see: L{helper.set_debug()}"""
-		set_debug(self.get_boolean("debug_opt"))
+		set_debug(self.get_boolean("debug"))
 
 	def modify_system_config (self):
 		"""Sets the system config.
 		@see: L{backend.set_system()}"""
-		set_system(self.get("system_opt"))
+		set_system(self.get("system"))
 	
 	def modify_external_configs (self):
 		"""Convenience function setting all external configs."""
@@ -167,7 +150,7 @@ class Config: # XXX: This needs to be replaced - the const-dict is just messy
 
 		return self.local[cpv][name]
 
-	def set(self, name, val, section=const["main_sec"], constName = True):
+	def set(self, name, val, section = "MAIN"):
 		"""Sets an option.
 		
 		@param name: name of the option
@@ -175,16 +158,11 @@ class Config: # XXX: This needs to be replaced - the const-dict is just messy
 		@param val: value to set the option to
 		@type val: string
 		@param section: section to look in; default is Main-Section
-		@type section: string
-		@param constName: If True (the default), the option names are first looked up in the const-dict.
-		@type constName: boolean"""
+		@type section: string"""
 
-		if constName:
-			name = self.const[name]
+		self._cfg.set(self.__get_val(name), val, self.__get_val(section))
 
-		self._cfg.set(name, val, section)
-
-	def set_boolean (self, name, val, section=const["main_sec"], constName = True):
+	def set_boolean (self, name, val, section = "MAIN"):
 		"""Sets a boolean option.
 		
 		@param name: name of the option
@@ -192,14 +170,9 @@ class Config: # XXX: This needs to be replaced - the const-dict is just messy
 		@param val: value to set the option to
 		@type val: boolean
 		@param section: section to look in; default is Main-Section
-		@type section: string
-		@param constName: If True (the default), the option names are first looked up in the const-dict.
-		@type constName: boolean"""
+		@type section: string"""
 
-		if constName:
-			name = self.const[name]
-
-		self._cfg.set_boolean(name, val, section)
+		self._cfg.set_boolean(self.__get_val(name), val, self.__get_val(section))
 
 	def write(self):
 		"""Writes to the config file and modify any external configs."""

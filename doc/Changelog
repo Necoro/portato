@@ -3,6 +3,7 @@ next:
 - sync command now accepts "&&"
 - added ebuild-viewer
 - use optparse to parse cmdline options
+- better config-handling
 
 0.7.4.2:
 - bugfix in PortageSystem

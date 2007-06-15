@@ -14,9 +14,6 @@ Backend:
 - only remove already merged packages from queue
 - make sure, a package being removed from the queue is not needed as a dependency by another package
 
-- use configobj instead of our selfwritten config-parser (check first if this is really a good point)
-- rewrite the Configuration-handling (esp the Config class)
-
 GUI:
 ====
 

@@ -178,25 +178,25 @@ class PreferenceWindow (Window):
 	# all checkboxes in the window
 	# widget name -> option name
 	checkboxes = {
-			"debugCheck"	: "debug_opt",
-			"deepCheck"		: "deep_opt",
-			"newUseCheck"	: "newuse_opt",
-			"maskCheck"		: "maskPerVersion_opt",
-			"useCheck"		: "usePerVersion_opt",
-			"testingCheck"	: "testingPerVersion_opt",
-			"pkgIconsCheck"	: ("pkgIcons_opt", "qt_sec"),
-			"minimizeCheck"	: ("minimize_opt", "gui_sec"),
-			"systrayCheck"	: ("systray_opt", "gui_sec"),
-			"titleUpdateCheck" : ("updateTitle_opt", "gui_sec")
+			"debugCheck"	: "debug",
+			"deepCheck"		: "deep",
+			"newUseCheck"	: "newuse",
+			"maskCheck"		: "maskPerVersion",
+			"useCheck"		: "usePerVersion",
+			"testingCheck"	: "testingPerVersion",
+			"pkgIconsCheck"	: ("pkgIcons", "QT"),
+			"minimizeCheck"	: ("minimize", "GUI"),
+			"systrayCheck"	: ("systray", "GUI"),
+			"titleUpdateCheck" : ("updateTitle", "GUI")
 			}
 	
 	# all edits in the window
 	# widget name -> option name
 	edits = {
-			"maskEdit"		: "maskFile_opt",
-			"testingEdit"	: "testingFile_opt",
-			"useEdit"		: "useFile_opt",
-			"syncCmdEdit"	: "syncCmd_opt"
+			"maskEdit"		: "maskFile",
+			"testingEdit"	: "testingFile",
+			"useEdit"		: "useFile",
+			"syncCmdEdit"	: "syncCmd"
 			}
 
 	def __init__ (self, parent, cfg):
@@ -221,7 +221,7 @@ class PreferenceWindow (Window):
 			val = self.checkboxes[box]
 			box = self.__getattribute__(box)
 			if type(val) == types.TupleType:
-				box.setCheckState(qCheck(self.cfg.get_boolean(val[0], section = self.cfg.const[val[1]])))
+				box.setCheckState(qCheck(self.cfg.get_boolean(val[0], section = val[1])))
 			else:
 				box.setCheckState(qCheck(self.cfg.get_boolean(val)))
 
@@ -239,7 +239,7 @@ class PreferenceWindow (Window):
 			val = self.checkboxes[box]
 			box = self.__getattribute__(box)
 			if type(val) == types.TupleType:
-				self.cfg.set_boolean(val[0], qIsChecked(box.checkState()), section = self.cfg.const[val[1]])
+				self.cfg.set_boolean(val[0], qIsChecked(box.checkState()), section = val[1])
 			else:
 				self.cfg.set_boolean(val, qIsChecked(box.checkState()))
 
@@ -668,7 +668,7 @@ class MainWindow (Window):
 	def _title_update (self, title):
 		
 		def window_update (title):
-			if title is None or not self.cfg.get_boolean("updateTitle_opt", self.cfg.const["gui_sec"]):
+			if title is None or not self.cfg.get_boolean("updateTitle", "GUI"):
 				self.setWindowTitle(self.main_title)
 			else:
 				title = title.strip()
@@ -696,7 +696,7 @@ class MainWindow (Window):
 		self.pkgDetails.update(cp, self.queue)
 
 	def fill_pkg_list (self, cat):
-		use_icons = self.cfg.get_boolean("pkgIcons_opt", section = self.cfg.const["qt_sec"])
+		use_icons = self.cfg.get_boolean("pkgIcons", section = "QT")
 		
 		# installed icon
 		if use_icons:
@@ -725,7 +725,7 @@ class MainWindow (Window):
 		self.catList.setSelectionModel(self.selCatListModel)
 
 	def build_systray (self):
-		if self.cfg.get_boolean("systray_opt", self.cfg.const["gui_sec"]):
+		if self.cfg.get_boolean("systray", "GUI"):
 			self.systray = Qt.QSystemTrayIcon(Qt.QIcon(APP_ICON), self) # use this until Qt supports proper SVG images in the systray
 			self.trayIconMenu = Qt.QMenu(self)
 			self.trayIconMenu.addAction(self.quitAction)
@@ -778,7 +778,7 @@ class MainWindow (Window):
 			not_root_dialog(self)
 		else:
 			self.tabWidget.setCurrentIndex(self.CONSOLE_PAGE)
-			cmd = self.cfg.get("syncCmd_opt")
+			cmd = self.cfg.get("syncCmd")
 
 			if cmd != "emerge --sync":
 				cmd = cmd.split()
@@ -793,12 +793,12 @@ class MainWindow (Window):
 		if self.queueTree.is_in_emerge(current) and self.queueTree.iter_has_parent(current):
 			pkg = self.queueTree.get_value(current, self.queueTree.get_cpv_column())
 			
-			if not self.cfg.get_local(pkg, "oneshot_opt"):
+			if not self.cfg.get_local(pkg, "oneshot"):
 				set = True
 			else:
 				set = False
 			
-			self.cfg.set_local(pkg, "oneshot_opt", set)
+			self.cfg.set_local(pkg, "oneshot", set)
 			self.queue.append(pkg, update = True, oneshot = set, forceUpdate = True)
 
 	@Qt.pyqtSignature("bool")
@@ -863,7 +863,7 @@ class MainWindow (Window):
 		if not self.doUpdate:
 			self.queue.emerge(force=True, options = ["--nospinner"])
 		else:
-			self.queue.update_world(force=True, newuse = self.cfg.get_boolean("newuse_opt"), deep = self.cfg.get_boolean("deep_opt"), options = ["--nospinner"])
+			self.queue.update_world(force=True, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"), options = ["--nospinner"])
 			self.doUpdate = False
 
 	@Qt.pyqtSignature("")
@@ -880,7 +880,7 @@ class MainWindow (Window):
 			not_root_dialog(self)
 	
 		else:
-			updating = system.update_world(newuse = self.cfg.get_boolean("newuse_opt"), deep = self.cfg.get_boolean("deep_opt"))
+			updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
 
 			debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating],"--> length:",len(updating))
 			try:
@@ -943,7 +943,7 @@ class MainWindow (Window):
 
 	def changeEvent (self, event):
 		if event.type() == Qt.QEvent.WindowStateChange:
-			if self.systray and self.cfg.get_boolean("minimize_opt", self.cfg.const["gui_sec"]):
+			if self.systray and self.cfg.get_boolean("minimize", "GUI"):
 				if self.windowState() & Qt.Qt.WindowMinimized: # going to be minimized
 					self.hide()
 					return

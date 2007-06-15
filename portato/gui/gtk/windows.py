@@ -186,25 +186,25 @@ class PreferenceWindow (AbstractDialog):
 	# all checkboxes in the window
 	# widget name -> option name
 	checkboxes = {
-			"debugCheck"			: "debug_opt",
-			"deepCheck"				: "deep_opt",
-			"newUseCheck"			: "newuse_opt",
-			"maskPerVersionCheck"	: "maskPerVersion_opt",
-			"minimizeCheck"			: ("minimize_opt", "gui_sec"),
-			"systrayCheck"			: ("systray_opt", "gui_sec"),
-			"testPerVersionCheck"	: "testingPerVersion_opt",
-			"titleUpdateCheck"		: ("updateTitle_opt", "gui_sec"),
-			"usePerVersionCheck"	: "usePerVersion_opt",
-			"useTipsCheck"			: ("useTips_opt", "gtk_sec")
+			"debugCheck"			: "debug",
+			"deepCheck"				: "deep",
+			"newUseCheck"			: "newuse",
+			"maskPerVersionCheck"	: "maskPerVersion",
+			"minimizeCheck"			: ("minimize", "GUI"),
+			"systrayCheck"			: ("systray", "GUI"),
+			"testPerVersionCheck"	: "testingPerVersion",
+			"titleUpdateCheck"		: ("updateTitle", "GUI"),
+			"usePerVersionCheck"	: "usePerVersion",
+			"useTipsCheck"			: ("useTips", "GTK")
 			}
 	
 	# all edits in the window
 	# widget name -> option name
 	edits = {
-			"maskFileEdit"		: "maskFile_opt",
-			"testFileEdit"		: "testingFile_opt",
-			"useFileEdit"		: "useFile_opt",
-			"syncCommandEdit"	: "syncCmd_opt"
+			"maskFileEdit"		: "maskFile",
+			"testFileEdit"		: "testingFile",
+			"useFileEdit"		: "useFile",
+			"syncCommandEdit"	: "syncCmd"
 			}
 
 	def __init__ (self, parent, cfg, set_console_font):
@@ -234,7 +234,7 @@ class PreferenceWindow (AbstractDialog):
 			val = self.checkboxes[box]
 			if type(val) == types.TupleType:
 				self.tree.get_widget(box).\
-						set_active(self.cfg.get_boolean(val[0], section = self.cfg.const[val[1]]))
+						set_active(self.cfg.get_boolean(val[0], section = val[1]))
 			else:
 				self.tree.get_widget(box).\
 						set_active(self.cfg.get_boolean(val))
@@ -246,7 +246,7 @@ class PreferenceWindow (AbstractDialog):
 
 		# the console font button
 		self.consoleFontBtn = self.tree.get_widget("consoleFontBtn")
-		self.consoleFontBtn.set_font_name(self.cfg.get("consolefont_opt", section = self.cfg.const["gtk_sec"]))
+		self.consoleFontBtn.set_font_name(self.cfg.get("consolefont", section = "GTK"))
 
 		self.window.show_all()
 
@@ -256,7 +256,7 @@ class PreferenceWindow (AbstractDialog):
 		for box in self.checkboxes:
 			val = self.checkboxes[box]
 			if type(val) == types.TupleType:
-				self.cfg.set_boolean(val[0], self.tree.get_widget(box).get_active(), section = self.cfg.const[val[1]])
+				self.cfg.set_boolean(val[0], self.tree.get_widget(box).get_active(), section = val[1])
 			else:
 				self.cfg.set_boolean(val, self.tree.get_widget(box).get_active())
 
@@ -264,7 +264,7 @@ class PreferenceWindow (AbstractDialog):
 			self.cfg.set(self.edits[edit],self.tree.get_widget(edit).get_text())
 
 		font = self.consoleFontBtn.get_font_name()
-		self.cfg.set("consolefont_opt", font, section = self.cfg.const["gtk_sec"])
+		self.cfg.set("consolefont", font, section = "GTK")
 		self.set_console_font(font)
 
 	def cb_ok_clicked(self, button):
@@ -813,7 +813,7 @@ class MainWindow (Window):
 		self.trayPopup = self.create_popup("systrayPopup")
 
 		# systray
-		if self.cfg.get_boolean("systray_opt", self.cfg.const["gui_sec"]):
+		if self.cfg.get_boolean("systray", "GUI"):
 			self.tray = gtk.status_icon_new_from_file(APP_ICON)
 			self.tray.connect("activate", self.cb_systray_activated)
 			self.tray.connect("popup-menu", lambda icon, btn, time: self.trayPopup.popup(None, None, None, btn, time))
@@ -833,7 +833,7 @@ class MainWindow (Window):
 		
 		self.console.set_scrollback_lines(1024)
 		self.console.set_scroll_on_output(True)
-		self.console.set_font_from_string(self.cfg.get("consolefont_opt", self.cfg.const["gtk_sec"]))
+		self.console.set_font_from_string(self.cfg.get("consolefont", "GTK"))
 		self.console.connect("button-press-event", self.cb_right_click)
 		termScroll = gtk.VScrollbar(self.console.get_adjustment())
 		self.termHB.pack_start(self.console, True, True)
@@ -925,7 +925,7 @@ class MainWindow (Window):
 	def title_update (self, title):
 		
 		def window_title_update (title):
-			if title is None or not self.cfg.get_boolean("updateTitle_opt", self.cfg.const["gui_sec"]):
+			if title is None or not self.cfg.get_boolean("updateTitle", "GUI"):
 				self.window.set_title(self.main_title)
 			else:
 				title = title.strip()
@@ -1011,7 +1011,7 @@ class MainWindow (Window):
 		if not self.doUpdate:
 			self.queue.emerge(force=True)
 		else:
-			self.queue.update_world(force=True, newuse = self.cfg.get_boolean("newuse_opt"), deep = self.cfg.get_boolean("deep_opt"))
+			self.queue.update_world(force=True, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
 			self.doUpdate = False
 		
 	def cb_unmerge_clicked (self, button):
@@ -1027,7 +1027,7 @@ class MainWindow (Window):
 			not_root_dialog()
 		
 		else:
-			updating = system.update_world(newuse = self.cfg.get_boolean("newuse_opt"), deep = self.cfg.get_boolean("deep_opt"))
+			updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
 
 			debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating],"--> length:",len(updating))
 			try:
@@ -1073,7 +1073,7 @@ class MainWindow (Window):
 			not_root_dialog()
 		else:
 			self.notebook.set_current_page(self.CONSOLE_PAGE)
-			cmd = self.cfg.get("syncCmd_opt")
+			cmd = self.cfg.get("syncCmd")
 
 			if cmd != "emerge --sync":
 				cmd = cmd.split()
@@ -1152,12 +1152,12 @@ class MainWindow (Window):
 		store, it = sel.get_selected()
 		if it:
 			package = store.get_value(it, 0)
-			if not self.cfg.get_local(package, "oneshot_opt"):
+			if not self.cfg.get_local(package, "oneshot"):
 				set = True
 			else:
 				set = False
 			
-			self.cfg.set_local(package, "oneshot_opt", set)
+			self.cfg.set_local(package, "oneshot", set)
 			self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
 
 	def cb_kill_clicked (self, action):
@@ -1178,7 +1178,7 @@ class MainWindow (Window):
 		return False
 
 	def cb_minimized (self, window, event):
-		if self.tray and self.cfg.get_boolean("minimize_opt", self.cfg.const["gui_sec"]):
+		if self.tray and self.cfg.get_boolean("minimize", "GUI"):
 			if event.changed_mask & gtk.gdk.WINDOW_STATE_ICONIFIED:
 				if event.new_window_state & gtk.gdk.WINDOW_STATE_ICONIFIED:
 					self.window.hide()

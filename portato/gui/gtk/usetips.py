@@ -36,7 +36,7 @@ class UseTips (TreeViewTooltips):
 		
 		# check config
 		if self.cfg is not None:
-			if not self.cfg.get_boolean("useTips_opt", section = self.cfg.const["gtk_sec"]):
+			if not self.cfg.get_boolean("useTips", "GTK"):
 				return None
 		
 		store = view.get_model()
