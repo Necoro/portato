@@ -338,7 +338,13 @@ class EmergeQueue:
 			pkg = pkg[0]
 
 		elif unmask: # no pkg returned, but we are allowed to unmask it
-			pkg = system.find_packages("="+cpv, masked = True)[0]
+			pkg = system.find_packages("="+cpv, masked = True)
+
+			if not pkg:
+				raise backend.PackageNotFoundException(cpv) # also not found
+			else:
+				pkg = pkg[0]
+
 			if pkg.is_testing(use_keywords = True):
 				pkg.set_testing(True)
 			if pkg.is_masked():
@@ -367,6 +373,7 @@ class EmergeQueue:
 		if cpv in self.deps:
 			return # in list already and therefore it's already in the tree too	
 		
+		# try to find an already installed instance
 		update = False
 		uVersion = None
 		try:
@@ -374,7 +381,7 @@ class EmergeQueue:
 			if not pkg.is_installed():
 				old = system.find_installed_packages(pkg.get_slot_cp())
 				if old: 
-					old = old[0] # assume we have only one there; FIXME: slotted packages
+					old = old[0] # assume we have only one there
 					update = True
 					uVersion = old.get_version()
 
@@ -518,7 +525,8 @@ class EmergeQueue:
 			self.process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False, env = system.get_environment())
 			
 			# start thread waiting for the stop of emerge
-			Thread(name="Emerge-Thread", target=self._update_packages, args=(packages+self.deps.keys(),)).start()
+			if packages:
+				Thread(name="Emerge-Thread", target=self._update_packages, args=(packages+self.deps.keys(),)).start()
 			
 			# remove
 			for i in it:
@@ -615,7 +623,29 @@ class EmergeQueue:
 		if command is None:
 			command = system.get_sync_command()
 		
-		self._emerge([],[],[], command = command)
+		def threaded_sync (cmd):
+			ret = self.process.wait()
+			self.process = None
+			if ret == 0:
+				__sync(cmd, False)
+		
+		def __sync(cmd, startThread = True):
+			try:
+				idx = cmd.index("&&")
+			except ValueError: # no && in there -> normal behavior
+				debug("w/o &&", cmd)
+				self._emerge([],[],[], command = cmd)
+			else:
+				debug("with &&", cmd[:idx])
+				self._emerge([],[],[], command = cmd[:idx])
+
+				if startThread:
+					Thread(name = "SyncThread", target = threaded_sync, args = (cmd[idx+1:],)).start()
+				else:
+					threaded_sync(cmd[idx+1:])
+
+		__sync(command)
+
 
 	def kill_emerge (self):
 		"""Kills the emerge process."""
