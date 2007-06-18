@@ -861,9 +861,9 @@ class MainWindow (Window):
 			system.reload_settings()
 		
 		if not self.doUpdate:
-			self.queue.emerge(force=True, options = ["--nospinner"])
+			self.queue.emerge(force=True)
 		else:
-			self.queue.update_world(force=True, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"), options = ["--nospinner"])
+			self.queue.update_world(force=True, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
 			self.doUpdate = False
 
 	@Qt.pyqtSignature("")

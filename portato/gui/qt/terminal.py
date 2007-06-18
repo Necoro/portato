@@ -29,6 +29,12 @@ class WriteEvent (Qt.QEvent):
 	def get_string(self):
 		return self.string
 
+class DeleteEvent (Qt.QEvent):
+	TYPE = Qt.QEvent.Type(1002)
+
+	def __init__ (self):
+		Qt.QEvent.__init__(self, self.TYPE)
+
 class BoldFormat (Qt.QTextCharFormat):
 
 	def __init__(self):
@@ -62,15 +68,15 @@ attr = {}
 attr[0]			=  	None 				# normal
 attr[1]			=  	BoldFormat()	 	# bold
 attr[4]    		=  	UnderlineFormat()	# underline
-attr[30]        =  	ColorFormat("black")
+attr[30]        =  	ColorFormat("white") # should be black - but is inverted
 attr[31]        =	ColorFormat("red")
-attr[32]        = 	ColorFormat("green")
+attr[32]        = 	ColorFormat("lime") # lime looks better on black than normal green
 attr[33]       	= 	ColorFormat("yellow")
 attr[34]        = 	ColorFormat("blue")
 attr[35]      	= 	ColorFormat("magenta")
 attr[36]        = 	ColorFormat("cyan")
 attr[37]        = 	ColorFormat("white")
-attr[39]      	= 	None				# default
+attr[39]      	= 	None				# default - use white too
 
 class QtConsole (Console, Qt.QTextEdit):
 	"""Self implemented emulation of a terminal emulation.
@@ -86,17 +92,21 @@ class QtConsole (Console, Qt.QTextEdit):
 
 		self.pty = None
 		self.running = False
-		self.stdFormat = self.currentCharFormat()
 		self.formatQueue = Queue()
 		self.title = None
 		self.writeQueue = ""
 
-		self.setReadOnly(True)
+		# set black bg
+		self.palette().setColor(Qt.QPalette.Base, Qt.QColor("black"))
+		self.setBackgroundRole(Qt.QPalette.Base)
+		self.setAutoFillBackground(True)
+		
+		
+		self.stdFormat = self.currentCharFormat()
+		self.stdFormat.merge(attr[30])
+		self.setCurrentCharFormat(self.stdFormat)
 
-		# we need these two signals, as threads are not allowed to access the GUI
-		# solution: thread sends signal, which is handled by the main loop
-#		Qt.QObject.connect(self, Qt.SIGNAL("doSomeWriting"), self._write)
-		Qt.QObject.connect(self, Qt.SIGNAL("deletePrevChar()"), self._deletePrev)
+		self.setReadOnly(True)
 
 	def _deletePrev (self):
 		"""Deletes the previous character."""
@@ -105,6 +115,11 @@ class QtConsole (Console, Qt.QTextEdit):
 	def event (self, event):
 		if event.type() == WriteEvent.TYPE:
 			self._write(event.get_string())
+			event.accept()
+			return True
+
+		elif event.type() == DeleteEvent.TYPE:
+			self._deletePrev()
 			event.accept()
 			return True
 		
@@ -183,7 +198,7 @@ class QtConsole (Console, Qt.QTextEdit):
 			if s == "": break # nothing read -> finish
 
 			if ord(s) == backspace: # BS
-				self.emit(Qt.SIGNAL("deletePrevChar()"))
+				Qt.QCoreApplication.postEvent(self, DeleteEvent())
 				continue
 
 			if s == esc_seq[0]: # -> 0x27
