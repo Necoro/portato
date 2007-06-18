@@ -21,7 +21,10 @@ from portato.backend.system_interface import SystemInterface
 
 class PortageSystem (SystemInterface):
 	"""This class provides access to the portage-system."""
-	
+
+	# pre-compile the RE removing the ".svn" and "CVS" entries
+	unwantedPkgsRE = re.compile(r".*(\.svn|CVS)$")
+
 	def __init__ (self):
 		"""Constructor."""
 		self.settings = PortageSettings()
@@ -222,7 +225,8 @@ class PortageSystem (SystemInterface):
 		t += self.settings.vartree.dbapi.cp_all()
 		if name:
 			t = filter(self.find_lambda(name),t)
-		t = unique_array(t)
+		
+		t = filter(lambda x: not self.unwantedPkgsRE.match(x), unique_array(t))
 		
 		if (withVersion):
 			t2 = []

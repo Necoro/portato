@@ -100,10 +100,10 @@ class QtConsole (Console, Qt.QTextEdit):
 		self.palette().setColor(Qt.QPalette.Base, Qt.QColor("black"))
 		self.setBackgroundRole(Qt.QPalette.Base)
 		self.setAutoFillBackground(True)
-		
-		
+				
+		# set standard char format to "white"
 		self.stdFormat = self.currentCharFormat()
-		self.stdFormat.merge(attr[30])
+		self.stdFormat.merge(ColorFormat("white"))
 		self.setCurrentCharFormat(self.stdFormat)
 
 		self.setReadOnly(True)
