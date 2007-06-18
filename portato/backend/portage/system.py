@@ -188,8 +188,8 @@ class PortageSystem (SystemInterface):
 				if pkg:
 					resolved.append(pkg)
 				else:
-					unresolved.append(cpv)
-		return (resolved, self.geneticize_list(unresolved))
+					unresolved.append(self.find_best_match(cpv, True))
+		return (resolved, unresolved)
 	
 	def find_system_packages (self):
 		pkglist = self.settings.settings.packages
@@ -263,6 +263,38 @@ class PortageSystem (SystemInterface):
 	def reload_settings (self):
 		self.settings.load()
 
+	def get_new_packages (self, packages):
+		"""Gets a list of packages and returns the best choice for each in the portage tree.
+
+		@param packages: the list of packages
+		@type packages: string[]
+		@returns: the list of packages
+		@rtype: backend.Package[]"""
+
+		new_packages = []
+		for p in packages:
+			inst = self.find_installed_packages(p)
+			if len(inst) > 1:
+				myslots = set()
+				for i in inst: # get the slots of the installed packages
+					myslots.add(i.get_package_settings("SLOT"))
+
+				myslots.add(self.find_best_match(p).get_package_settings("SLOT")) # add the slot of the best package in portage
+				for slot in myslots:
+					new_packages.append(\
+							self.find_best(\
+							[x.get_cpv() for x in self.find_packages("%s:%s" % (i.get_cp(), slot))]\
+							))
+			else:
+				new_packages.append(self.find_best_match(p))
+
+		return new_packages
+
+	def get_updated_packages (self):
+		packages = self.get_new_packages(self.find_all_installed_packages(withVersion = False))
+		packages = [x for x in packages if x is not None and not x.is_installed()]
+		return packages
+
 	def update_world (self, newuse = False, deep = False):
 		# read world file
 		world = open(portage.WORLD_FILE)
@@ -276,27 +308,7 @@ class PortageSystem (SystemInterface):
 
 		# append system packages
 		packages.extend(unique_array([p.get_cp() for p in self.find_all_system_packages()]))
-
-		def get_new_packages (packages):
-			new_packages = []
-			for p in packages:
-				inst = self.find_installed_packages(p)
-				if len(inst) > 1:
-					myslots = set()
-					for i in inst: # get the slots of the installed packages
-						myslots.add(i.get_package_settings("SLOT"))
-
-					myslots.add(self.find_best_match(p).get_package_settings("SLOT")) # add the slot of the best package in portage
-					for slot in myslots:
-						new_packages.append(\
-								self.find_best(\
-								[x.get_cpv() for x in self.find_packages("%s:%s" % (i.get_cp(), slot))]\
-								))
-				else:
-					new_packages.append(self.find_best_match(p))
-
-			return new_packages
-							
+		
 		checked = []
 		updating = []
 		raw_checked = []
@@ -354,7 +366,7 @@ class PortageSystem (SystemInterface):
 					for i in p.get_matched_dep_packages(state[0]):
 						if i not in raw_checked:
 							raw_checked.append(i)
-							bm = get_new_packages([i])
+							bm = self.get_new_packages([i])
 							if not bm: 
 								debug("Bug? No best match could be found:",i)
 							else:
@@ -362,7 +374,7 @@ class PortageSystem (SystemInterface):
 									if not pkg: continue
 									check(pkg, state[1])
 
-		for p in get_new_packages(packages):
+		for p in self.get_new_packages(packages):
 			if not p: continue # if a masked package is installed we have "None" here
 			check(p, True)
 		

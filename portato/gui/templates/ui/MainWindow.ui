@@ -416,7 +416,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>466</width>
-     <height>27</height>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu" >
@@ -441,6 +441,7 @@ p, li { white-space: pre-wrap; }
     <addaction name="emergeAction" />
     <addaction name="unmergeAction" />
     <addaction name="updateAction" />
+    <addaction name="updateListAction" />
     <addaction name="separator" />
     <addaction name="syncAction" />
     <addaction name="saveAction" />
@@ -532,6 +533,11 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="text" >
     <string>Sort by Name</string>
+   </property>
+  </action>
+  <action name="updateListAction" >
+   <property name="text" >
+    <string>Show &amp;new packages</string>
    </property>
   </action>
  </widget>

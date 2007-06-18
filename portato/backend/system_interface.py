@@ -191,6 +191,15 @@ class SystemInterface:
 
 		raise NotImplementedError
 
+	def get_updated_packages (self):
+		"""Returns the packages for which a newer package is available in the portage tree and installable (thus not masked).
+		This differs from update_world as it takes all installed packages into account but ignores changed useflags.
+
+		@returns: the list of new packages
+		@rtype: backend.Package[]"""
+
+		raise NotImplementedError
+
 	def get_use_desc (self, flag, package = None):
 		"""Returns the description of a specific useflag or None if no desc was found. 
 		If a package is given (in the <cat>/<name> format) the local use descriptions are searched too.

@@ -48,7 +48,7 @@ class PortagePackage (Package):
 
 	def is_overlay(self):
 		dir,ovl = self._settings.porttree.dbapi.findname2(self._cpv)
-		return ovl != self._settings.settings["PORTDIR"]
+		return ovl != self._settings.settings["PORTDIR"] and str(ovl) != "0"
 
 	def get_overlay_path (self):
 		dir,ovl = self._settings.porttree.dbapi.findname2(self._cpv)

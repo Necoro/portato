@@ -140,6 +140,45 @@ class SearchDialog (Window):
 		self.done(0)
 		self.jumpTo(s)
 
+class UpdateDialog (Window):
+	"""Dialog showing updateble packages."""
+	__metaclass__ = WindowMeta
+
+	def __init__ (self, parent, packages, queue, jump_to):
+		Window.__init__(self, parent)
+		
+		self.queue = queue
+		self.jump = jump_to
+
+		self.packages = system.sort_package_list(packages)
+		for p in self.packages:
+			Qt.QListWidgetItem(p.get_cpv(), self.packageList)
+
+		self.adjustSize()
+
+	@Qt.pyqtSignature("QListWidgetItem*, QListWidgetItem*")
+	def on_packageList_currentItemChanged (self, index, prev):
+		cpv = str(index.text())
+		pkg = system.new_package(cpv)
+		self.jump(pkg.get_cp(), pkg.get_version())
+
+	@Qt.pyqtSignature("")
+	def on_installAllBtn_clicked (self):
+		world = [x.get_cp() for x in system.find_all_world_packages()]
+		for p in self.packages:
+			not_in_world = p.get_cp() not in world
+			try:
+				try:
+					self.queue.append(p.get_cpv(), unmerge = False, oneshot = not_in_world)
+				except PackageNotFoundException, e:
+					if unmask_dialog(self, e[0]) == Qt.QMessageBox.Yes :
+						self.queue.append(p.get_cpv(), unmerge = False, unmask = True, oneshot = not_in_world)
+
+			except BlockedException, e:
+				blocked_dialog(self, e[0], e[1])
+
+		self.accept()
+
 class EbuildDialog (Window):
 	"""Window showing an ebuild."""
 	__metaclass__ = WindowMeta
@@ -691,9 +730,9 @@ class MainWindow (Window):
 
 		self.tabWidget.setTabText(self.CONSOLE_PAGE, title)
 
-	def jump_to (self, cp):
+	def jump_to (self, cp, version = None):
 		"""Is called when we want to jump to a specific package."""
-		self.pkgDetails.update(cp, self.queue)
+		self.pkgDetails.update(cp, self.queue, version = version)
 
 	def fill_pkg_list (self, cat):
 		use_icons = self.cfg.get_boolean("pkgIcons", section = "QT")
@@ -785,6 +824,10 @@ class MainWindow (Window):
 				self.queue.sync(cmd)
 			else:
 				self.queue.sync()
+
+	@Qt.pyqtSignature("")
+	def on_updateListAction_triggered (self):
+		Window.watch_cursor(UpdateDialog)(self, system.get_updated_packages(), self.queue, self.jump_to).exec_()
 
 	@Qt.pyqtSignature("")
 	def on_oneshotAction_triggered (self):
