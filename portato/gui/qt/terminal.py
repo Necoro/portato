@@ -16,6 +16,14 @@ from Queue import Queue
 from threading import Thread
 from os import read
 
+try:
+	from curses.ascii import ctrl
+except ImportError: # emulate ctrl-behavior for known values
+	def ctrl (val):
+		if val == "H": return '\x08'
+		elif val == "W": return '\x17'
+		else: debug("unknown error passed to emulated ctrl:",val)
+
 from portato.gui.wrapper import Console
 from portato.helper import debug
 
@@ -31,9 +39,11 @@ class WriteEvent (Qt.QEvent):
 
 class DeleteEvent (Qt.QEvent):
 	TYPE = Qt.QEvent.Type(1002)
+	(DEL_CHAR, DEL_WORD, DEL_LINE, DEL_LINE_REVERT) = range(4)
 
-	def __init__ (self):
+	def __init__ (self, type = DEL_CHAR):
 		Qt.QEvent.__init__(self, self.TYPE)
+		self.del_type = type
 
 class BoldFormat (Qt.QTextCharFormat):
 
@@ -59,7 +69,10 @@ esc_seq = ("\x1b", "[")
 reset_seq = "39;49;00"
 seq_end = "m"
 seq_sep = ";"
-backspace = 8
+backspace = ctrl("H")
+backword = ctrl("W")
+cr = "\r"
+
 title_seq = ("\x1b", "]")
 title_end = "\x07"
 
@@ -95,6 +108,9 @@ class QtConsole (Console, Qt.QTextEdit):
 		self.formatQueue = Queue()
 		self.title = None
 		self.writeQueue = ""
+		self.isOk = False
+
+		self.setCurrentFont(Qt.QFont("Monospace",11))
 
 		# set black bg
 		self.palette().setColor(Qt.QPalette.Base, Qt.QColor("black"))
@@ -108,9 +124,24 @@ class QtConsole (Console, Qt.QTextEdit):
 
 		self.setReadOnly(True)
 
-	def _deletePrev (self):
-		"""Deletes the previous character."""
-		self.textCursor().deletePreviousChar()
+	def _deletePrev (self, type):
+		"""Deletes the previous character/word."""
+		if type == DeleteEvent.DEL_CHAR: # just the prev char
+			self.textCursor().deletePreviousChar()
+		
+		elif type == DeleteEvent.DEL_WORD:
+			self.textCursor().select(Qt.QTextCursor.WordUnderCursor)
+			self.textCursor().removeSelectedText()
+		
+		elif type == DeleteEvent.DEL_LINE:
+			self.moveCursor(Qt.QTextCursor.StartOfLine, Qt.QTextCursor.KeepAnchor)
+			self.textCursor().removeSelectedText()
+			self.setLineWrapMode(Qt.QTextEdit.NoWrap)
+			self.isOk = True
+		
+		elif type == DeleteEvent.DEL_LINE_REVERT:
+			self.setLineWrapMode(Qt.QTextEdit.WidgetWidth)
+			self.isOk = False
 	
 	def event (self, event):
 		if event.type() == WriteEvent.TYPE:
@@ -119,7 +150,7 @@ class QtConsole (Console, Qt.QTextEdit):
 			return True
 
 		elif event.type() == DeleteEvent.TYPE:
-			self._deletePrev()
+			self._deletePrev(event.del_type)
 			event.accept()
 			return True
 		
@@ -136,17 +167,16 @@ class QtConsole (Console, Qt.QTextEdit):
 		if text == esc_seq[0]: # \x1b -> reload format
 			self.setCurrentCharFormat(self.get_format())
 		else:
-			
-			if not self.textCursor().atEnd(): # move cursor and re-set format
+			if not self.textCursor().atEnd() and not self.isOk: # move cursor and re-set format
 				f = self.currentCharFormat()
 				self.moveCursor(Qt.QTextCursor.End)
 				self.setCurrentCharFormat(f)
 			
 			# insert the text
-			self.textCursor().insertText(text)
+			self.insertPlainText(text)
 			
 			# scroll down if needed
-			self.ensureCursorVisible()
+			if not self.isOk: self.ensureCursorVisible()
 
 	def write(self, text):
 		"""Convenience function for emitting the writing signal."""
@@ -158,13 +188,15 @@ class QtConsole (Console, Qt.QTextEdit):
 			send(self.writeQueue)
 			self.writeQueue = ""
 
-		if text == esc_seq[0]:
+		elif text == esc_seq[0]:
 			send(self.writeQueue)
 			send(text)
 			self.writeQueue = ""
+		
 		elif len(self.writeQueue) == 4:
 			send(self.writeQueue+text)
 			self.writeQueue = ""
+		
 		else:
 			self.writeQueue = self.writeQueue + text
 
@@ -192,16 +224,38 @@ class QtConsole (Console, Qt.QTextEdit):
 	def __run (self):
 		"""This function is mainly a loop, which looks for some new input at the terminal,
 		and parses it for text attributes."""
+
+		got_cr = False
 		
 		while self.run:
 			s = read(self.pty, 1)
 			if s == "": break # nothing read -> finish
 
-			if ord(s) == backspace: # BS
-				Qt.QCoreApplication.postEvent(self, DeleteEvent())
-				continue
+			if self.isOk and s == "\n":
+				self.write(None)
+				Qt.QCoreApplication.postEvent(self, DeleteEvent(DeleteEvent.DEL_LINE_REVERT))
 
-			if s == esc_seq[0]: # -> 0x27
+			if got_cr:
+				got_cr = False
+				if s == "\n": # got \r\n, which is ok
+					self.write(s)
+					continue
+				else:
+					self.write(None)
+					Qt.QCoreApplication.postEvent(self, DeleteEvent(DeleteEvent.DEL_LINE))
+
+			if s == backspace: # BS
+				self.write(None)
+				Qt.QCoreApplication.postEvent(self, DeleteEvent())
+			
+			elif s == backword:
+				self.write(None)
+				Qt.QCoreApplication.postEvent(self, DeleteEvent(DeleteEvent.DEL_WORD))
+
+			elif s == cr: # CR -> make the line being deleted
+				got_cr = True
+
+			elif s == esc_seq[0]: # -> 0x27
 				s = read(self.pty, 1)
 				if s == esc_seq[1]: # -> [
 					while True:
@@ -209,7 +263,6 @@ class QtConsole (Console, Qt.QTextEdit):
 						s += _s
 						if _s == seq_end: break
 					self.parse_seq(s[1:-1])
-					continue
 
 				elif s == title_seq[1]: # -> ]
 					while True:
@@ -218,16 +271,13 @@ class QtConsole (Console, Qt.QTextEdit):
 						if _s == title_end: break
 					
 					self.parse_title(s[1:-1])
-					continue
 				else:
 					self.write(esc_seq[0]+s)
 			
-			if s == "\r": continue
-			self.write(s)
-
+			elif not got_cr:
+				self.write(s)
+			
 		self.write(None)
-#		self.emit(Qt.SIGNAL("doSomeWriting"), "".join(self.writeQueue))
-#		self.writeQueue = []
 
 	def parse_seq (self, seq):
 		"""Parses a sequence of bytes.
