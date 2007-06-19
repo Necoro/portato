@@ -41,7 +41,7 @@
       <widget class="QPushButton" name="closeBtn" >
        <property name="sizePolicy" >
         <sizepolicy>
-         <hsizetype>1</hsizetype>
+         <hsizetype>5</hsizetype>
          <vsizetype>0</vsizetype>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
@@ -53,17 +53,32 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="installAllBtn" >
+      <widget class="QPushButton" name="selectAllBtn" >
        <property name="sizePolicy" >
         <sizepolicy>
-         <hsizetype>1</hsizetype>
+         <hsizetype>5</hsizetype>
          <vsizetype>0</vsizetype>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="text" >
-        <string>Install all</string>
+        <string>Select All</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="installBtn" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>5</hsizetype>
+         <vsizetype>0</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text" >
+        <string>Install Selected</string>
        </property>
       </widget>
      </item>

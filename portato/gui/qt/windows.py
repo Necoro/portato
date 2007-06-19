@@ -151,8 +151,11 @@ class UpdateDialog (Window):
 		self.jump = jump_to
 
 		self.packages = system.sort_package_list(packages)
+		self.items = []
 		for p in self.packages:
-			Qt.QListWidgetItem(p.get_cpv(), self.packageList)
+			item = Qt.QListWidgetItem(p.get_cpv(), self.packageList)
+			item.setCheckState(qCheck(False))
+			self.items.append(item)
 
 		self.adjustSize()
 
@@ -163,21 +166,29 @@ class UpdateDialog (Window):
 		self.jump(pkg.get_cp(), pkg.get_version())
 
 	@Qt.pyqtSignature("")
-	def on_installAllBtn_clicked (self):
+	def on_installBtn_clicked (self):
 		world = [x.get_cp() for x in system.find_all_world_packages()]
-		for p in self.packages:
-			not_in_world = p.get_cp() not in world
+		for item in [x for x in self.items if qIsChecked(x.checkState())]:
+			cpv = str(item.text())
+			cp = "/".join(system.split_cpv(cpv)[:2])
+			not_in_world = cp not in world
+
 			try:
 				try:
-					self.queue.append(p.get_cpv(), unmerge = False, oneshot = not_in_world)
+					self.queue.append(cpv, unmerge = False, oneshot = not_in_world)
 				except PackageNotFoundException, e:
 					if unmask_dialog(self, e[0]) == Qt.QMessageBox.Yes :
-						self.queue.append(p.get_cpv(), unmerge = False, unmask = True, oneshot = not_in_world)
+						self.queue.append(cpv, unmerge = False, unmask = True, oneshot = not_in_world)
 
 			except BlockedException, e:
 				blocked_dialog(self, e[0], e[1])
 
 		self.accept()
+
+	@Qt.pyqtSignature("")
+	def on_selectAllBtn_clicked (self):
+		for item in self.items:
+			item.setCheckState(qCheck(True))
 
 class EbuildDialog (Window):
 	"""Window showing an ebuild."""
