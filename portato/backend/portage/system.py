@@ -274,19 +274,25 @@ class PortageSystem (SystemInterface):
 		new_packages = []
 		for p in packages:
 			inst = self.find_installed_packages(p)
+			
+			best_p = self.find_best_match(p)
+			if best_p is None:
+				debug("No best match for",p,"-- It seems not to be in the tree anymore.",warn = True)
+				continue
+
 			if len(inst) > 1:
 				myslots = set()
 				for i in inst: # get the slots of the installed packages
 					myslots.add(i.get_package_settings("SLOT"))
 
-				myslots.add(self.find_best_match(p).get_package_settings("SLOT")) # add the slot of the best package in portage
+				myslots.add(best_p.get_package_settings("SLOT")) # add the slot of the best package in portage
 				for slot in myslots:
 					new_packages.append(\
 							self.find_best(\
 							[x.get_cpv() for x in self.find_packages("%s:%s" % (i.get_cp(), slot))]\
 							))
 			else:
-				new_packages.append(self.find_best_match(p))
+				new_packages.append(best_p)
 
 		return new_packages
 
