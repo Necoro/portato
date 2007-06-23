@@ -1,4 +1,4 @@
-next:
+0.7.5:
 - new icon by p4r4d0x
 - sync command now accepts "&&"
 - added ebuild-viewer
