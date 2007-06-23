@@ -140,6 +140,92 @@ Icon created by P4R4D0X
 
 		self.window.show_all()
 
+class UpdateWindow (AbstractDialog):
+
+	def __init__ (self, parent, packages, queue, jump_to):
+		AbstractDialog.__init__(self, parent)
+		
+		self.queue = queue
+		self.jump = jump_to
+
+		self.packages = system.sort_package_list(packages)
+
+		self.build_list()
+
+		self.window.show_all()
+
+	def build_list (self):
+
+		store = gtk.ListStore(bool, str)
+		self.view = self.tree.get_widget("packageList")
+		self.view.set_model(store)
+
+		cell = gtk.CellRendererText()
+		tCell = gtk.CellRendererToggle()
+		tCell.set_property("activatable", True)
+		tCell.connect("toggled", self.cb_check_toggled) # emulate the normal toggle behavior ...
+		
+		self.view.append_column(gtk.TreeViewColumn("Enabled", tCell, active = 0))
+		self.view.append_column(gtk.TreeViewColumn("Package", cell, text = 1))
+
+		for p in self.packages:
+			store.append([False, p.get_cpv()])
+
+	def cb_select_all_clicked (self, btn):
+		model = self.view.get_model()
+		iter = model.get_iter_first()
+		
+		while iter:
+			model.set_value(iter, 0, True)
+			iter = model.iter_next(iter)
+
+		return True
+
+	def cb_install_clicked (self, btn):
+		model = self.view.get_model()
+		iter = model.get_iter_first()
+		if iter is None: return
+
+		items = []
+		while iter:
+			if model.get_value(iter, 0):
+				items.append(model.get_value(iter, 1))
+			iter = model.iter_next(iter)
+		
+		world = [x.get_cp() for x in system.find_all_world_packages()]
+		for item in items:
+			cp = "/".join(system.split_cpv(item)[:2])
+			not_in_world = cp not in world
+			try:
+				try:
+					self.queue.append(item, unmerge = False, oneshot = not_in_world)
+				except PackageNotFoundException, e:
+					if unmask_dialog(e[0]) == gtk.RESPONSE_YES :
+						self.queue.append(item, unmerge = False, unmask = True, oneshot = not_in_world)
+
+			except BlockedException, e:
+				blocked_dialog(e[0], e[1])
+
+		self.close()
+		return True
+
+	def cb_package_selected (self, view):
+		sel = view.get_selection()
+		store, it = sel.get_selected()
+		if it:
+			package = system.new_package(store.get_value(it, 1))
+
+			self.jump(package.get_cp(), package.get_version())
+
+		return True
+
+	def cb_check_toggled (self, cell, path):
+		# for whatever reason we have to define normal toggle behavior explicitly
+		store = self.view.get_model()
+		store[path][0] = not store[path][0]
+		return True
+
+
 class SearchWindow (AbstractDialog):
 	"""A window showing the results of a search process."""
 	
@@ -918,9 +1004,9 @@ class MainWindow (Window):
 				store.append([pkg, icon])
 		return store
 
-	def jump_to (self, cp):
+	def jump_to (self, cp, version = None):
 		"""Is called when we want to jump to a specific package."""
-		self.show_package(cp, self.queue)
+		self.show_package(cp, self.queue, version = version)
 
 	def title_update (self, title):
 		
@@ -1122,6 +1208,11 @@ class MainWindow (Window):
 		else:
 			queue = queue.get_plugin_data()
 		AboutWindow(self.window, queue)
+		return True
+
+	@Window.watch_cursor
+	def cb_show_updates_clicked (self, button):
+		UpdateWindow(self.window, system.get_updated_packages(), self.queue, self.jump_to)
 		return True
 
 	def cb_right_click (self, object, event):

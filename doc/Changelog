@@ -5,6 +5,8 @@ next:
 - use optparse to parse cmdline options
 - better config-handling
 - changed Qt-Terminal colors
+- Qt-Terminal is now able to handle the wget-bar correctly
+- added a window showing the updatable packages
 
 0.7.4.2:
 - bugfix in PortageSystem

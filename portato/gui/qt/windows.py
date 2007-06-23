@@ -141,7 +141,7 @@ class SearchDialog (Window):
 		self.jumpTo(s)
 
 class UpdateDialog (Window):
-	"""Dialog showing updateble packages."""
+	"""Dialog showing updatable packages."""
 	__metaclass__ = WindowMeta
 
 	def __init__ (self, parent, packages, queue, jump_to):
