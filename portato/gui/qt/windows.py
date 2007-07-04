@@ -280,6 +280,11 @@ class PreferenceWindow (Window):
 			_edit = self.__getattribute__(edit)
 			_edit.setText(self.cfg.get(self.edits[edit]))
 
+		# the font choser
+		self.consoleFontFam = self.cfg.get("consolefontfamily", "QT")
+		self.consoleFontSize = self.cfg.get("consolefontsize", "QT")
+		self.fontBtn.setText(self.consoleFontFam+" "+self.consoleFontSize)
+
 		Qt.QObject.connect(self, Qt.SIGNAL("accepted()"), self.finish)
 
 	def _save (self):
@@ -297,6 +302,9 @@ class PreferenceWindow (Window):
 			_edit = self.__getattribute__(edit)
 			self.cfg.set(self.edits[edit], _edit.text())
 
+		self.cfg.set("consolefontfamily", self.consoleFontFam, "QT")
+		self.cfg.set("consolefontsize", self.consoleFontSize, "QT")
+
 	def finish (self):
 		"""Saves and writes to config-file."""
 		self._save()
@@ -304,6 +312,14 @@ class PreferenceWindow (Window):
 			self.cfg.write()
 		except IOError, e:
 			io_ex_dialog(self, e)
+
+	@Qt.pyqtSignature("")
+	def on_fontBtn_clicked(self):
+		font, ok = Qt.QFontDialog.getFont(Qt.QFont(self.consoleFontFam, int(self.consoleFontSize)), self, "Console Font")
+		if ok:
+			self.consoleFontFam = font.family()
+			self.consoleFontSize = str(font.pointSize())
+			self.fontBtn.setText(self.consoleFontFam+" "+self.consoleFontSize)
 
 class PackageDetails:
 	"""The tab showing the details of a package."""
@@ -671,7 +687,7 @@ class MainWindow (Window):
 
 		# set plugins and plugin-menu
 		plugin.load_plugins("qt")
-		menus = plugin.get_plugins().get_plugin_menus()
+		menus = plugin.get_plugin_queue().get_plugin_menus()
 		if menus:
 			self.pluginMenu = Qt.QMenu("&Plugins", self)
 			self.menubar.insertMenu(self.helpMenu.menuAction(), self.pluginMenu)
@@ -688,6 +704,7 @@ class MainWindow (Window):
 
 		# build console
 		self.console = QtConsole(self.consoleTab)
+		self.console.setCurrentFont(Qt.QFont(self.cfg.get("consolefontfamily", "QT"), int(self.cfg.get("consolefontsize", "QT"))))
 		self.consoleLayout = Qt.QVBoxLayout()
 		self.consoleLayout.setMargin(0)
 		self.consoleLayout.setSpacing(0)
@@ -788,7 +805,7 @@ class MainWindow (Window):
 
 	@Qt.pyqtSignature("")
 	def on_aboutAction_triggered (self):
-		queue = plugin.get_plugins()
+		queue = plugin.get_plugin_queue()
 		if queue is None:
 			queue = []
 		else:
@@ -799,6 +816,9 @@ class MainWindow (Window):
 	@Qt.pyqtSignature("")
 	def on_prefAction_triggered (self):
 		PreferenceWindow(self, self.cfg).exec_()
+		
+		# set font as it might has changed
+		self.console.setCurrentFont(Qt.QFont(self.cfg.get("consolefontfamily", "QT"), int(self.cfg.get("consolefontsize", "QT"))))
 
 	@Window.watch_cursor
 	@Qt.pyqtSignature("")

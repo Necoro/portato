@@ -108,9 +108,7 @@ class QtConsole (Console, Qt.QTextEdit):
 		self.formatQueue = Queue()
 		self.title = None
 		self.writeQueue = ""
-		self.isOk = False
-
-		self.setCurrentFont(Qt.QFont("Monospace",11))
+		self.isNotWrapping = False
 
 		# set black bg
 		self.palette().setColor(Qt.QPalette.Base, Qt.QColor("black"))
@@ -137,11 +135,11 @@ class QtConsole (Console, Qt.QTextEdit):
 			self.moveCursor(Qt.QTextCursor.StartOfLine, Qt.QTextCursor.KeepAnchor)
 			self.textCursor().removeSelectedText()
 			self.setLineWrapMode(Qt.QTextEdit.NoWrap)
-			self.isOk = True
+			self.isNotWrapping = True
 		
 		elif type == DeleteEvent.DEL_LINE_REVERT:
 			self.setLineWrapMode(Qt.QTextEdit.WidgetWidth)
-			self.isOk = False
+			self.isNotWrapping = False
 	
 	def event (self, event):
 		if event.type() == WriteEvent.TYPE:
@@ -167,7 +165,7 @@ class QtConsole (Console, Qt.QTextEdit):
 		if text == esc_seq[0]: # \x1b -> reload format
 			self.setCurrentCharFormat(self.get_format())
 		else:
-			if not self.textCursor().atEnd() and not self.isOk: # move cursor and re-set format
+			if not self.textCursor().atEnd() and not self.isNotWrapping: # move cursor and re-set format
 				f = self.currentCharFormat()
 				self.moveCursor(Qt.QTextCursor.End)
 				self.setCurrentCharFormat(f)
@@ -176,7 +174,7 @@ class QtConsole (Console, Qt.QTextEdit):
 			self.insertPlainText(text)
 			
 			# scroll down if needed
-			if not self.isOk: self.ensureCursorVisible()
+			if not self.isNotWrapping: self.ensureCursorVisible()
 
 	def write(self, text):
 		"""Convenience function for emitting the writing signal."""
@@ -231,7 +229,7 @@ class QtConsole (Console, Qt.QTextEdit):
 			s = read(self.pty, 1)
 			if s == "": break # nothing read -> finish
 
-			if self.isOk and s == "\n":
+			if self.isNotWrapping and s == "\n":
 				self.write(None)
 				Qt.QCoreApplication.postEvent(self, DeleteEvent(DeleteEvent.DEL_LINE_REVERT))
 
