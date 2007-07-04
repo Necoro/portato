@@ -170,6 +170,7 @@ class Plugin:
 		self._import = None
 		self.hooks = []
 		self.menus = []
+		self.enabled = True
 
 	def parse_hooks (self, hooks):
 		"""Gets a list of <hook>-elements and parses them.
@@ -236,6 +237,16 @@ class Plugin:
 		@rtype: string"""
 		return self._import
 
+	def set_disabled (self, nodes):
+		if nodes:
+			self.set_enabled(False)
+
+	def is_enabled (self):
+		return self.enabled
+
+	def set_enabled (self, e):
+		self.enabled = e
+
 class PluginQueue:
 	"""Class managing and loading the plugins."""
 
@@ -253,11 +264,14 @@ class PluginQueue:
 		if load:
 			self._load()
 
-	def get_plugin_data (self):
-		return [(x.name, x.author) for x in self.list]
+	def get_plugins (self, list_disabled = True):
+		return [x for x in self.list if (x.is_enabled() or list_disabled)]
 
-	def get_plugin_menus (self):
-		return flatten([x.menus for x in self.list])
+	def get_plugin_data (self, list_disabled = False):
+		return [(x.name, x.author) for x in self.list if (x.is_enabled() or list_disabled)]
+
+	def get_plugin_menus (self, list_disabled = False):
+		return flatten([x.menus for x in self.list if (x.is_enabled() or list_disabled)])
 
 	def hook (self, hook, *hargs, **hkwargs):
 		"""This is a method taking care of calling the plugins.
@@ -303,10 +317,20 @@ class PluginQueue:
 
 		def hook_decorator (func):
 			"""This is the real decorator."""
+			
 			if hook in self.hooks:
 				list = self.hooks[hook]
 			else:
 				list = ([],[],[])
+
+			# remove disabled
+			_list = ([],[],[])
+			for i in range(len(list)):
+				for cmd in list[i]:
+					if cmd.hook.plugin.is_enabled():
+						_list[i].append(cmd)
+			
+			list = _list
 
 			def wrapper (*args, **kwargs):
 				
@@ -372,6 +396,7 @@ class PluginQueue:
 						plugin.parse_hooks(elem.getElementsByTagName("hook"))
 						plugin.set_import(elem.getElementsByTagName("import"))
 						plugin.parse_menus(elem.getElementsByTagName("menu"))
+						plugin.set_disabled(elem.getElementsByTagName("disabled"))
 					
 						self.list.append(plugin)
 
@@ -465,7 +490,7 @@ def load_plugins(frontend):
 	if __plugins is None or __plugins.frontend != frontend:
 		__plugins = PluginQueue(frontend)
 
-def get_plugins():
+def get_plugin_queue():
 	return __plugins
 
 def hook(hook, *args, **kwargs):

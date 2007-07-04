@@ -123,10 +123,12 @@ Copyright (C) 2006-2007 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;
 Icon created by P4R4D0X
 """)
 
+		self.plugins = plugins
+
 		view = self.tree.get_widget("pluginList")
-		store = gtk.ListStore(str,str)
+		self.store = gtk.ListStore(str,str,bool)
 		
-		view.set_model(store)
+		view.set_model(self.store)
 		
 		cell = gtk.CellRendererText()
 		col = gtk.TreeViewColumn("Plugin", cell, markup = 0)
@@ -135,10 +137,21 @@ Icon created by P4R4D0X
 		col = gtk.TreeViewColumn("Authors", cell, text = 1)
 		view.append_column(col)
 
-		for p in [("<b>"+n+"</b>",a) for n,a in plugins]:
-			store.append(p)
+		bcell = gtk.CellRendererToggle()
+		bcell.connect("toggled", self.cb_plugin_toggled)
+		col = gtk.TreeViewColumn("Enabled", bcell, active = 2)
+		view.append_column(col)
+		
+		for p in [("<b>"+p.name+"</b>", p.author, p.is_enabled()) for p in plugins]:
+			self.store.append(p)
 
 		self.window.show_all()
+
+	def cb_plugin_toggled (self, cell, path):
+		path = int(path)
+		self.store[path][2] = not self.store[path][2]
+
+		self.plugins[path].set_enabled(self.store[path][2])
 
 class UpdateWindow (AbstractDialog):
 
@@ -854,7 +867,7 @@ class MainWindow (Window):
 
 		# set plugins and plugin-menu
 		plugin.load_plugins("gtk")
-		menus = plugin.get_plugins().get_plugin_menus()
+		menus = plugin.get_plugin_queue().get_plugin_menus()
 		if menus:
 			self.tree.get_widget("pluginMenuItem").set_no_show_all(False)
 			pluginMenu = self.tree.get_widget("pluginMenu")
@@ -1202,11 +1215,10 @@ class MainWindow (Window):
 		return True
 
 	def cb_about_clicked (self, button):
-		queue = plugin.get_plugins()
+		queue = plugin.get_plugin_queue().get_plugins()
 		if queue is None:
 			queue = []
-		else:
-			queue = queue.get_plugin_data()
+		
 		AboutWindow(self.window, queue)
 		return True
 
