@@ -6,7 +6,7 @@ from distutils.core import setup, Extension
 from portato.constants import VERSION, DATA_DIR, FRONTENDS, ICON_DIR, PLUGIN_DIR
 
 def plugin_list (*args):
-	return [("plugins/%s.xml" % x) for x in *args]
+	return [("plugins/%s.xml" % x) for x in args]
 
 packages = ["portato", "portato.gui", "portato.plugins", "portato.backend", "portato.backend.portage"]
 ext_modules = []
