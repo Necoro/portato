@@ -15,7 +15,7 @@ CONFIG_LOCATION = CONFIG_DIR+"portato.cfg"
 
 DATA_DIR = "portato/gui/templates/"
 PLUGIN_DIR = "plugins/"
-VERSION = 9999
+VERSION = "9999"
 
 ICON_DIR = "icons/"
 APP_ICON = ICON_DIR+"/portato-icon.png"

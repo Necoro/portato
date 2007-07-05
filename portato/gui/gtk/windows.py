@@ -100,6 +100,20 @@ class AbstractDialog (Window):
 class AboutWindow (AbstractDialog):
 	"""A window showing the "about"-informations."""
 
+	def __init__ (self, parent):
+
+		AbstractDialog.__init__(self, parent)
+
+		img = gtk.Image()
+		img.set_from_file(APP_ICON)
+
+		self.window.set_version(VERSION)
+		self.window.set_logo(img.get_pixbuf())
+
+		self.window.show_all()
+
+class PluginWindow (AbstractDialog):
+	
 	def __init__ (self, parent, plugins):
 		"""Constructor.
 
@@ -107,23 +121,8 @@ class AboutWindow (AbstractDialog):
 		@type parent: gtk.Window"""
 		
 		AbstractDialog.__init__(self, parent)
-
-		img = self.tree.get_widget("portatoImage")
-		img.set_from_file(APP_ICON)
-
-		hlabel = self.tree.get_widget("highAboutLabel")
-		hlabel.set_markup("""
-<big><b>Portato v.%s</b></big>
-A Portage-GUI""" % VERSION)
-
-		llabel = self.tree.get_widget("lowAboutLabel")
-		llabel.set_markup("""This software is licensed under the terms of the GPLv2.
-Copyright (C) 2006-2007 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;
-
-Icon created by P4R4D0X
-""")
-
 		self.plugins = plugins
+		self.changedPlugins = {}
 
 		view = self.tree.get_widget("pluginList")
 		self.store = gtk.ListStore(str,str,bool)
@@ -151,7 +150,14 @@ Icon created by P4R4D0X
 		path = int(path)
 		self.store[path][2] = not self.store[path][2]
 
-		self.plugins[path].set_enabled(self.store[path][2])
+		self.changedPlugins.update({self.plugins[path] : self.store[path][2]})
+
+	def cb_ok_clicked (self, btn):
+		for plugin, val in self.changedPlugins.iteritems():
+			plugin.set_enabled(val)
+
+		self.close()
+		return True
 
 class UpdateWindow (AbstractDialog):
 
@@ -1215,11 +1221,15 @@ class MainWindow (Window):
 		return True
 
 	def cb_about_clicked (self, button):
+		AboutWindow(self.window)
+		return True
+
+	def cb_plugins_clicked (self, btn):
 		queue = plugin.get_plugin_queue().get_plugins()
 		if queue is None:
 			queue = []
 		
-		AboutWindow(self.window, queue)
+		PluginWindow(self.window, queue)
 		return True
 
 	@Window.watch_cursor
