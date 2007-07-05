@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<plugin
+	author="René 'Necoro' Neumann"
+	name="Shutdown">
+	<import>portato.plugins.shutdown</import>
+
+	<hook
+		hook = "after_emerge"
+		call = "shutdown">
+		<connect type="after" />
+	</hook>
+
+	<disabled />
+</plugin>

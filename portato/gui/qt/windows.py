@@ -81,19 +81,59 @@ class Window (object):
 
 		return wrapper
 
+class PluginDialog (Window):
+	__metaclass__ = WindowMeta
+
+	def __init__ (self, parent, plugins):
+
+		Window.__init__(self, parent)
+		
+		self.pluginList.setHeaderLabels(["Plugin", "Author"])
+		self.plugins = {}
+		self.changedPlugins = {}
+		
+		for p in plugins:
+			item = Qt.QTreeWidgetItem(self.pluginList, [p.name,p.author])
+			item.setCheckState(0, qCheck(p.is_enabled()))
+			self.plugins.update({self.create_key(p.name,p.author) : p}) # create a list of plugins
+
+		self.pluginList.resizeColumnToContents(0)
+
+		Qt.QObject.connect(self.pluginList, Qt.SIGNAL("itemClicked(QTreeWidgetItem*, int)"), self.cb_plugin_toggled)
+
+	def create_key (self, name, author):
+		return str(name + "_" + author)
+
+	def cb_plugin_toggled (self, item, col):
+		if col != 0:
+			return
+
+		self.changedPlugins.update({ \
+				self.create_key(str(item.text(0)), str(item.text(1))) : \
+				qIsChecked(item.checkState(0))\
+				})
+
+	@Qt.pyqtSignature("")
+	def on_buttonBox_accepted(self):
+		for pluginKey, value in self.changedPlugins.iteritems():
+			self.plugins[pluginKey].set_enabled(value)
+
+		self.accept()
+
 class AboutDialog (Window):
 	"""A window showing the "about"-informations."""
 	__metaclass__ = WindowMeta
 
-	def __init__ (self, parent = None, plugins = []):
+	def __init__ (self, parent = None):
 		"""Constructor.
 
 		@param parent: the parent window
-		@type parent: Qt.QWidget
-		@param plugins: The list of plugins (author,name) to show in the "Plugins"-Tab.
-		@type plugins: (string, string)[]"""
+		@type parent: Qt.QWidget"""
 
 		Window.__init__(self, parent)
+
+		self.pix = Qt.QPixmap(APP_ICON)
+		self.imgLabel.setPixmap(self.pix) # yes we have to use a label for the image ...
 
 		self.label.setText("""
 <font size=5><b>Portato v.%s</b></font><br><br>
@@ -104,15 +144,7 @@ Copyright (C) 2006-2007 Ren&eacute; 'Necoro' Neumann &lt;necoro@necoro.net&gt;<b
 <br>
 Icon created by P4R4D0X""" % VERSION)
 
-		self.pluginList.setHeaderLabels(["Plugin", "Author"])
 		
-		for p in plugins:
-			Qt.QTreeWidgetItem(self.pluginList, list(p))
-
-		self.pluginList.resizeColumnToContents(0)
-
-		self.adjustSize()
-
 class SearchDialog (Window):
 	"""A window showing the results of a search process."""
 	__metaclass__ = WindowMeta
@@ -805,13 +837,15 @@ class MainWindow (Window):
 
 	@Qt.pyqtSignature("")
 	def on_aboutAction_triggered (self):
-		queue = plugin.get_plugin_queue()
+		AboutDialog(self).exec_()
+
+	@Qt.pyqtSignature("")
+	def on_pluginAction_triggered (self):
+		queue = plugin.get_plugin_queue().get_plugins()
 		if queue is None:
 			queue = []
-		else:
-			queue = queue.get_plugin_data()
 
-		AboutDialog(self, queue).exec_()
+		PluginDialog(self, queue).exec_()
 
 	@Qt.pyqtSignature("")
 	def on_prefAction_triggered (self):
