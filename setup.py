@@ -3,11 +3,14 @@
 
 import os, os.path
 from distutils.core import setup, Extension
-from portato.constants import VERSION, DATA_DIR, FRONTENDS, ICON_DIR
+from portato.constants import VERSION, DATA_DIR, FRONTENDS, ICON_DIR, PLUGIN_DIR
+
+def plugin_list (*args):
+	return [("plugins/%s.xml" % x) for x in *args]
 
 packages = ["portato", "portato.gui", "portato.plugins", "portato.backend", "portato.backend.portage"]
 ext_modules = []
-data_files = [(ICON_DIR, ["icons/portato-icon.png"])]
+data_files = [(ICON_DIR, ["icons/portato-icon.png"]), (PLUGIN_DIR, plugin_list("shutdown"))]
 cmdclass = {}
 
 if "gtk" in FRONTENDS:
