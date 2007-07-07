@@ -477,9 +477,9 @@ class EmergeQueue:
 		"""Calls emerge and updates the terminal.
 		
 		@param options: options to send to emerge
-		@type options: list
+		@type options: string[]
 		@param packages: packages to emerge
-		@type packages: list
+		@type packages: string[]
 		@param it: Iterators which point to these entries whose children will be removed after completion.
 		@type it: Iterator[]
 		@param command: the command to execute - default is "/usr/bin/python /usr/bin/emerge"

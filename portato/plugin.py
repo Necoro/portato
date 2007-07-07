@@ -10,6 +10,8 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+"""A module containing the management of the plugin system."""
+
 import os, os.path
 from xml.dom.minidom import parse
 
@@ -505,11 +507,19 @@ class PluginQueue:
 __plugins = None
 
 def load_plugins(frontend):
+	"""Loads the plugins for a given frontend.
+	@param frontend: The frontend. See L{constants.FRONTENDS} for the correct list of values.
+	@type frontend: string"""
+
 	global __plugins
 	if __plugins is None or __plugins.frontend != frontend:
 		__plugins = PluginQueue(frontend)
 
 def get_plugin_queue():
+	"""Returns the actual L{PluginQueue}. If it is C{None}, they are not being loaded yet.
+
+	@returns: the actual L{PluginQueue} or C{None}
+	@rtype: PluginQueue"""
 	return __plugins
 
 def hook(hook, *args, **kwargs):

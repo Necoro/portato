@@ -750,7 +750,7 @@ class PackageTable:
 		return True
 
 	def cb_package_ebuild_clicked(self, button):
-		hook = plugin.hook("open_ebuild", self.actual_package(), self.window)
+		hook = plugin.hook("open_ebuild", package = self.actual_package(), parent = self.window)
 		hook(EbuildWindow)(self.window, self.actual_package())
 		return True
 

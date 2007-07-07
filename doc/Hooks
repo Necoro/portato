@@ -1,0 +1,40 @@
+List of hooks currently being supported by Portato
+==================================================
+
+am_i_root
+---------
+Called: When checking whether the current user is root (ie. uid == 0).
+Parameters: None
+Return if override: Boolean signaling whether we are root.
+
+
+emerge:
+-------
+Called: When emerge or every other command given by e.g. the synccmd preference is being called.
+Parameters:
+	- string[] packages: Packages to emerge (includes "world", "system").
+	- string[] command: The exact command to execute.
+	- portato.gui.wrapper.Console console: The console the output will be written to.
+
+Return if override: Nothing
+
+
+after_emerge:
+-------------
+Called: When the emerge process (or other - see emerge hook) is finished. 
+Parameters:
+	- string[] packages: The list of cpv's (plus "world", "system") which have been emerged. (Or not if it failed.)
+	- int retcode: The return code of the command.
+
+Return if override: Nothing
+Comment: This uses an extra hook as emerge is started in an extra thread and thus all plugins being wanting to come "after" will be called while emerge is still running.
+
+open_ebuild:
+------------
+Called: When an ebuild window is opened.
+Parameters:
+	- portato.backend.Package package: The current package whose is going to be displayed.
+	- Window parent: The parent window. Exact type depends on the frontend.
+
+Return if override: Window-object which can be called by the frontends. Please see the explicit code to see what is expected.
+Comment: If you want to override - do this only for ONE specific frontend.
