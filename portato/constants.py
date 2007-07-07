@@ -10,6 +10,30 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+"""
+Constants used through out the program. Mainly different pathes.
+These should be set during the installation.
+
+@var CONFIG_DIR: The configuration directory.
+@type CONFIG_DIR: string
+@var CONFIG_LOCATION: L{CONFIG_DIR} plus name of the config file.
+@type CONFIG_LOCATION: string
+@var DATA_DIR: Directory which contains several data files (e.g. ui-files).
+@type DATA_DIR: string
+@var PLUGIN_DIR: Directory containing the plugin xmls.
+@type PLUGIN_DIR: string
+@var VERSION: the current version
+@type VERSION: string
+@var ICON_DIR: directory containing the icons
+@type ICON_DIR: string
+@var APP_ICON: the path of the application icon
+@type APP_ICON: string
+@var FRONTENDS: the list of frontends which are installed
+@type FRONTENDS: string[]
+@var STD_FRONTEND: the frontend uses as the default, i.e. if no other one is given on the cmdline
+@type STD_FRONTEND: string
+"""
+
 CONFIG_DIR = "/etc/portato/"
 CONFIG_LOCATION = CONFIG_DIR+"portato.cfg"
 

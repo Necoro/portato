@@ -459,11 +459,10 @@ class EmergeQueue:
 					self.title_update(title)
 				time.sleep(0.5)
 
-		self.process = None
 
 		if self.title_update: self.title_update(None)
 
-		@plugin.hook("after_emerge", packages)
+		@plugin.hook("after_emerge", packages = packages, retcode = self.process.returncode)
 		def update_packages():
 			for p in packages:
 				if p in ["world", "system"]: continue
@@ -472,6 +471,7 @@ class EmergeQueue:
 				debug("Category %s refreshed" % cat)
 
 		update_packages()
+		self.process = None
 
 	def _emerge (self, options, packages, it, command = None):
 		"""Calls emerge and updates the terminal.
@@ -485,7 +485,7 @@ class EmergeQueue:
 		@param command: the command to execute - default is "/usr/bin/python /usr/bin/emerge"
 		@type command: string[]"""
 
-		@plugin.hook("emerge", packages, command)
+		@plugin.hook("emerge", packages = packages, command = command, console = self.console)
 		def sub_emerge(command):
 			if command is None:
 				command = system.get_merge_command()

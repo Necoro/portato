@@ -3,12 +3,32 @@
 # File: portato/config_parser.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006 René 'Necoro' Neumann
+# Copyright (C) 2006-2007 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
+
+"""A simple parser for configuration files in ini-style.
+
+The main difference to other simple ini-parsers is, that it does not
+write the whole structure into the file, but only the changed values.
+Thus it keeps comments and structuring of the file.
+
+@var DELIMITER: list of delimiters allowed
+@type DELIMITER: string[]
+
+@var COMMENT: comment marks allowed
+@type COMMENT: string[]
+
+@var TRUE: Regular expression for all TRUE values allowed.
+Currently supported are the values (case insensitive): true, 1, on, wahr, ja, yes.
+@var FALSE: Regular expression for all FALSE values allowed.
+Currently supported are the values (case insensitive): false, 0, off, falsch, nein, no,
+@var SECTION: Regular expression allowing the recognition of a section header.
+@var EXPRESSION: Regular expression defining a normal option-value pair.
+"""
 
 from helper import debug
 
@@ -25,7 +45,18 @@ SECTION = re.compile("\s*\[(\w+)\]\s*")
 EXPRESSION = re.compile(r"\s*(\w+)\s*[:=]\s*(.*)\s*")
 
 class Value (object):
-	"""Class defining a value of a key."""
+	"""Class defining a value of a key.
+	
+	@ivar value: The specific value. This is a property.
+	@type value: arbitrary
+	@ivar line: The line in the config file.
+	@type line: int
+	@ivar boolean: The boolean meaning of this value. Set this to C{None} if this is not a boolean.
+	@type boolean: boolean
+	@ivar changed: Set to True if the value has been changed.
+	@type changed: boolean
+	@ivar old: The old value.
+	@type old: arbitrary"""
 
 	def __init__ (self, value, line, bool = None):
 		"""Constructor.
@@ -34,7 +65,7 @@ class Value (object):
 		@type value: string
 		@param line: the line in the config file
 		@type line: int
-		@param bool: boolean meaning of the value
+		@param bool: The boolean meaning of the value. Set this to C{None} if this is not a boolean.
 		@type bool: boolean"""
 
 		self.__value = value
@@ -82,7 +113,19 @@ class Value (object):
 	value = property(get,set)
 	
 class ConfigParser:
-	"""The newly implemented Config-Parser."""
+	"""The parser class.
+
+	@cvar true_false: A mapping from the truth values to their opposits.
+	@type true_false: string -> string
+	
+	@ivar file: the file to scan
+	@type file: string
+	@ivar cache: caches the content of the file
+	@type cache: string[]
+	@ivar vars: the found options grouped by section
+	@type vars: string -> (string -> L{Value})
+	@ivar pos: the positions of the values grouped by lineno
+	@type pos: int -> (int, int)"""
 
 	# generates the complementary true-false-pairs
 	true_false = {

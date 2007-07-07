@@ -411,6 +411,8 @@ class PluginQueue:
 		"""Creates the lists of connects in a way, that all dependencies are fullfilled."""
 		unresolved_before = {} 
 		unresolved_after = {}
+		star_before = {} # should be _before_ all other
+		star_after = {} # should be _after_ all other
 
 		for plugin in self.list: # plugins
 			for hook in plugin.hooks: # hooks in plugin
@@ -423,6 +425,11 @@ class PluginQueue:
 					if connect.is_before_type():
 						if connect.depend_plugin is None: # no dependency -> straight add
 							self.hooks[hook.hook][0].append(connect)
+						elif connect.depend_plugin == "*":
+							if not hook.hook in star_before:
+								star_before[hook.hook] = []
+
+							star_before[hook.hook].append(connect)
 						else:
 							named = [x.plugin.name for x in self.hooks[hook.hook][0]]
 							if connect.depend_plugin in named:
@@ -437,6 +444,11 @@ class PluginQueue:
 					elif connect.is_after_type():
 						if connect.depend_plugin is None: # no dependency -> straight add
 							self.hooks[hook.hook][2].append(connect)
+						elif connect.depend_plugin == "*":
+							if not hook.hook in star_after:
+								star_after[hook.hook] = []
+
+							star_after[hook.hook].append(connect)
 						else:
 							named = [x.plugin.name for x in self.hooks[hook.hook][2]]
 							if connect.depend_plugin in named:
@@ -457,13 +469,20 @@ class PluginQueue:
 		
 		self._resolve_unresolved(unresolved_before, unresolved_after)
 
+		for hook in star_before:
+			self.hooks[hook][0][0:0] = star_before[hook] # prepend the list
+
+		for hook in star_after:
+			self.hooks[hook][2].extend(star_after[hook]) # append the list
+
+
 	def _resolve_unresolved (self, before, after):
 		def resolve(hook, list, idx, add):
 			if not list: 
 				return
 			
 			changed = False
-			for connect in list:
+			for connect in list[:]:
 				named = [x.plugin.name for x in self.hooks[hook][idx]]
 				if connect.depend_plugin in named:
 					changed = True

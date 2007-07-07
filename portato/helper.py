@@ -10,6 +10,13 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net> et.al.
 
+"""
+Some nice functions used in the program.
+
+@var DEBUG: Boolean controlling whether to printout debug messages.
+@type DEBUG: boolean
+"""
+
 import traceback, os.path, sys, types
 
 DEBUG = True
@@ -30,15 +37,13 @@ def debug(*args, **kwargs):
 	If debug(obj0, obj1, obj2) is called, the text part of the output 
 	looks like the output from print obj0, obj1, obj2.
 	
-	Keywords which can be used:
-		- name: Use the given name instead the correct function name.
-		- file: output file to use
-		- minus: The value given is the amount of frames to ignore in the stack to return the correct function call.
-				 This should be used if you are wrapping the debug call.
-		- warn: Prints the message as a warning. Value of DEBUG is ignored.
-		- error: Prints the message as an error. Value of DEBUG is ignored."""
+	@keyword name: Use the given name instead the correct function name.
+	@keyword file: Output file to use.
+	@keyword minus: The value given is the amount of frames to ignore in the stack to return the correct function call.
+	This should be used if you are wrapping the debug call.
+	@keyword warn: Prints the message as a warning. Value of DEBUG is ignored.
+	@keyword error: Prints the message as an error. Value of DEBUG is ignored."""
 
-	
 	if not DEBUG and not ("warn" in kwargs or "error" in kwargs): return
 	
 	stack = traceback.extract_stack()
