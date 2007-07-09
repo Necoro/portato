@@ -13,8 +13,9 @@
 from PyQt4 import Qt
 
 from Queue import Queue
-from threading import Thread
-from os import read
+from threading import Thread, currentThread
+from os import read, close
+import errno
 
 try:
 	from curses.ascii import ctrl
@@ -44,6 +45,13 @@ class DeleteEvent (Qt.QEvent):
 	def __init__ (self, type = DEL_CHAR):
 		Qt.QEvent.__init__(self, self.TYPE)
 		self.del_type = type
+
+class SetPtyEvent (Qt.QEvent):
+	TYPE = Qt.QEvent.Type(1003)
+
+	def __init__ (self, pty):
+		Qt.QEvent.__init__(self, self.TYPE)
+		self.pty = pty
 
 class BoldFormat (Qt.QTextCharFormat):
 
@@ -112,6 +120,11 @@ class QtConsole (Console, Qt.QTextEdit):
 
 		# set black bg
 		self.palette().setColor(Qt.QPalette.Base, Qt.QColor("black"))
+
+		# set highlighting colors ... XXX: for some reasons this does not work ... Qt sucks
+		self.palette().setColor(Qt.QPalette.Highlight, Qt.QColor("white"))
+		self.palette().setColor(Qt.QPalette.HighlightedText, Qt.QColor("black"))
+
 		self.setBackgroundRole(Qt.QPalette.Base)
 		self.setAutoFillBackground(True)
 				
@@ -149,6 +162,11 @@ class QtConsole (Console, Qt.QTextEdit):
 
 		elif event.type() == DeleteEvent.TYPE:
 			self._deletePrev(event.del_type)
+			event.accept()
+			return True
+
+		elif event.type() == SetPtyEvent.TYPE:
+			self.set_pty(event.pty)
 			event.accept()
 			return True
 		
@@ -207,6 +225,10 @@ class QtConsole (Console, Qt.QTextEdit):
 		self.current.start()
 
 	def set_pty (self, pty):
+		if currentThread().getName() != "MainThread":
+			Qt.QCoreApplication.postEvent(self, SetPtyEvent(pty))
+			return
+
 		if not self.running:
 			self.pty = pty
 			self.start_new_thread()
@@ -215,6 +237,7 @@ class QtConsole (Console, Qt.QTextEdit):
 		else: # quit current thread
 			self.run = False
 			self.clear()
+			close(self.pty)
 
 			self.pty = pty # set this after clearing to lose no chars :)
 			self.start_new_thread()
@@ -226,7 +249,13 @@ class QtConsole (Console, Qt.QTextEdit):
 		got_cr = False
 		
 		while self.run:
-			s = read(self.pty, 1)
+			try:
+				s = read(self.pty, 1)
+			except OSError, e: # bug in Python with the subprocess module
+				if e.errno == errno.EINTR:
+					continue
+				raise
+
 			if s == "": break # nothing read -> finish
 
 			if self.isNotWrapping and s == "\n":

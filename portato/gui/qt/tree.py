@@ -72,7 +72,7 @@ class QtTree (Tree):
 		iter += 1 # next iter ...
 		
 		newIt = iter.value()
-		if newIt.parent() != it.parent(): # stop if we left the current parent
+		if not newIt or newIt.parent() != it.parent(): # stop if we left the current parent
 			return None
 		else:
 			return newIt

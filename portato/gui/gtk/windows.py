@@ -154,7 +154,7 @@ class PluginWindow (AbstractDialog):
 
 	def cb_ok_clicked (self, btn):
 		for plugin, val in self.changedPlugins.iteritems():
-			plugin.set_enabled(val)
+			plugin.set_option("disabled", not val)
 
 		self.close()
 		return True

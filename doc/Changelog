@@ -1,5 +1,8 @@
 next:
 - consolefont changeble for Qt
+- added "shutdown" plugin
+- added "resume-loop" plugin
+- changed plugin-structures
 
 0.7.5:
 - new icon by p4r4d0x

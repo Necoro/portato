@@ -459,8 +459,10 @@ class EmergeQueue:
 					self.title_update(title)
 				time.sleep(0.5)
 
-
 		if self.title_update: self.title_update(None)
+
+		if self.process is None: # someone resetted this
+			return
 
 		@plugin.hook("after_emerge", packages = packages, retcode = self.process.returncode)
 		def update_packages():

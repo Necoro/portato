@@ -116,7 +116,7 @@ class PluginDialog (Window):
 	@Qt.pyqtSignature("")
 	def on_buttonBox_accepted(self):
 		for pluginKey, value in self.changedPlugins.iteritems():
-			self.plugins[pluginKey].set_enabled(value)
+			self.plugins[pluginKey].set_option("disabled", not value)
 
 		self.accept()
 

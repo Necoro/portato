@@ -7,11 +7,11 @@
 	<hook
 		hook = "after_emerge"
 		call = "shutdown">
-		<connect type="after">
-			<!-- after everything else -->
-			*
-		</connect>
+		<connect type="after">*</connect>
 	</hook>
 
-	<disabled />
+	<options>
+		<option>disabled</option>
+	</options>
+
 </plugin>

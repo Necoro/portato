@@ -25,6 +25,43 @@ def error (reason, p):
 	reason = "("+reason+")"
 	debug("Malformed plugin:", p, reason, minus=1, error = 1)
 
+class Options (object):
+	"""The <options>-element."""
+
+	__options = ("disabled", "blocking")
+
+	def __init__ (self, options = None):
+
+		self.disabled = False
+		self.blocking = False
+
+		if options:
+			self.parse(options)
+
+	def parse (self, options):
+		for opt in options:
+			if opt.hasChildNodes():
+				nodes = opt.childNodes
+			
+				if len(nodes) > 1:
+					raise ParseException, "Malformed option"
+			
+				if nodes[0].nodeType != nodes[0].TEXT_NODE:
+					raise ParseException, "Malformed option"
+
+				type = str(nodes[0].nodeValue.strip())
+
+				if type in self.__options:
+					self.set(type, True)
+			else:
+				raise ParseException, "Malformed option"
+
+	def get (self, name):
+		return self.__getattribute__(name)
+
+	def set (self, name, value):
+		return self.__setattr__(name, value)
+
 class Menu:
 	"""A single <menu>-element."""
 	def __init__ (self, plugin, label, call):
@@ -172,7 +209,7 @@ class Plugin:
 		self._import = None
 		self.hooks = []
 		self.menus = []
-		self.enabled = True
+		self.options = Options()
 
 	def parse_hooks (self, hooks):
 		"""Gets a list of <hook>-elements and parses them.
@@ -198,6 +235,11 @@ class Plugin:
 		for m in menus:
 			menu = Menu(self, str(m.getAttribute("label")), str(m.getAttribute("call")))
 			self.menus.append(menu)
+
+	def parse_options (self, options):
+		if options:
+			for o in options:
+				self.options.parse(o.getElementsByTagName("option"))
 	
 	def set_import (self, imports):
 		"""This gets a list of imports and parses them - setting the import needed to call the plugin.
@@ -239,15 +281,14 @@ class Plugin:
 		@rtype: string"""
 		return self._import
 
-	def set_disabled (self, nodes):
-		if nodes:
-			self.set_enabled(False)
+	def get_option(self, name):
+		return self.options.get(name)
+
+	def set_option (self, name, value):
+		return self.options.set(name, value)
 
 	def is_enabled (self):
-		return self.enabled
-
-	def set_enabled (self, e):
-		self.enabled = e
+		return not self.get_option("disabled")
 
 class PluginQueue:
 	"""Class managing and loading the plugins."""
@@ -398,7 +439,7 @@ class PluginQueue:
 						plugin.parse_hooks(elem.getElementsByTagName("hook"))
 						plugin.set_import(elem.getElementsByTagName("import"))
 						plugin.parse_menus(elem.getElementsByTagName("menu"))
-						plugin.set_disabled(elem.getElementsByTagName("disabled"))
+						plugin.parse_options(elem.getElementsByTagName("options"))
 					
 						self.list.append(plugin)
 
@@ -428,6 +469,8 @@ class PluginQueue:
 						if connect.depend_plugin is None: # no dependency -> straight add
 							self.hooks[hook.hook][0].append(connect)
 						elif connect.depend_plugin == "*":
+							self.hooks[hook.hook][0][0:0] = [connect]
+						elif connect.depend_plugin == "-*":
 							if not hook.hook in star_before:
 								star_before[hook.hook] = []
 
@@ -451,6 +494,8 @@ class PluginQueue:
 								star_after[hook.hook] = []
 
 							star_after[hook.hook].append(connect)
+						elif connect.depend_plugin == "-*":
+							self.hooks[hook.hook][2][0:0] = [connect]
 						else:
 							named = [x.plugin.name for x in self.hooks[hook.hook][2]]
 							if connect.depend_plugin in named:
@@ -472,7 +517,7 @@ class PluginQueue:
 		self._resolve_unresolved(unresolved_before, unresolved_after)
 
 		for hook in star_before:
-			self.hooks[hook][0][0:0] = star_before[hook] # prepend the list
+			self.hooks[hook][0].extend(star_before[hook]) # append the list
 
 		for hook in star_after:
 			self.hooks[hook][2].extend(star_after[hook]) # append the list

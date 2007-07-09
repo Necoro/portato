@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<plugin
+	author="René 'Necoro' Neumann"
+	name="Emerge Resume Loop">
+	<import>portato.plugins.resume_loop</import>
+
+	<hook
+		hook = "emerge"
+		call = "set_console">
+		<connect/>
+	</hook>
+
+	<hook
+		hook = "after_emerge"
+		call = "resume_loop">
+		<connect type="before">*</connect>
+	</hook>
+
+	<options>
+		<option>disabled</option>
+	</options>
+</plugin>
