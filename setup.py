@@ -26,7 +26,7 @@ def ui_file_list ():
 
 packages = ["portato", "portato.gui", "portato.plugins", "portato.backend", "portato.backend.portage"]
 ext_modules = []
-data_files = [(ICON_DIR, ["icons/portato-icon.png"]), (PLUGIN_DIR, plugin_list("shutdown"))]
+data_files = [(ICON_DIR, ["icons/portato-icon.png"]), (PLUGIN_DIR, plugin_list("shutdown", "resume_loop"))]
 cmdclass = {}
 
 if "gtk" in FRONTENDS:
