@@ -12,6 +12,6 @@
 
 import os
 
-def shutdown (*args):
+def shutdown (*args, **kwargs):
 	"""Shutdown the computer. May not work if not root."""
 	os.system("shutdown -h now")

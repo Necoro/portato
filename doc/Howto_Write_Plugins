@@ -10,7 +10,7 @@ General
 
 So - how is a plugin is working in general? Portato defines a set of hooks (see the Hooks file for a complete list) to which your plugin can connect. For each hook you have three choices: To connect before, after or instead of the function being hooked. (Of course you can connect several times to one hook ...) The latter one should be used only if you really know what you are doing as it is likely that Portato won't work any longer after this. Also have in mind, that only one plugin can override. Thus: if several plugins want to override one hook, a randomly chosen one will get the allowance.
 
-For each of the "before" and "after" mode a queue exists, holding the plugins to execute. A plugin is allowed to state another plugin which should be executed after (in "before" mode) or before (in "after" mode) your plugin. The star * exists to note that this should be applied to ALL other plugins. Portato TRIES to satisfy your request...
+For each of the "before" and "after" mode a queue exists, holding the plugins to execute. A plugin is allowed to state another plugin which should be executed after (in "before" mode) or before (in "after" mode) your plugin. The star * exists to note that this should be applied to ALL other plugins. (And "-*" does exactly the opposite.) Portato TRIES to satisfy your request...
 
 When you now have chosen the connect(s) to chose you write an appropriate function (or better: a Python callable) which will be given in the XML-definition to be called by Portato with the hook's arguments. (Hint: All arguments will be passed as keyword parameters. So you can easily pick the ones you need and add a "**kwargs" argument, which will take the rest. As a nice side effect you do not have to reflect any API changes which will come with additional parameters :)).
 
@@ -32,6 +32,10 @@ At the point of writing this, there is no XSD or DTD - so you cannot validate th
         call = "the_calling_function">
         <connect type="after" />
     </hook>
+
+	<options>
+		<option>disabled</option
+	</options
 </plugin>
 
 Notes:
@@ -39,6 +43,7 @@ Notes:
 - The author and name attributes are mandatory.
 - If you want to specify a dependency plugin the connect tag has to be like: <connect type = "after"> The other plugin we depend on </connect>.
 - It is possible of course to have more than one "hook" tag.
+- The options tag is optional. For a complete list of options, see below.
 
 Additional Tags
 ---------------
@@ -49,6 +54,8 @@ Menu:
 
 		Note, that the underscore in front of a character will make it be underlined in the menu and thus accessible by a shortcut.
 
-Disabled:
-		Sometimes you don't want the plugin to be enabled by default but only if the user explicitly says so. This can be archieved by just adding the "disabled" tag:
-		<disabled />
+Options
+--------
+
+disabled:
+		Disable the plugin by default, i.e. the user has to enable it, if he wants to use it.
