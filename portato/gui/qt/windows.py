@@ -742,6 +742,10 @@ class MainWindow (Window):
 		self.consoleLayout.setSpacing(0)
 		self.consoleTab.setLayout(self.consoleLayout)
 		self.consoleLayout.addWidget(self.console)
+		
+		self.console.addAction(self.killAction)
+		self.console.addAction(self.pauseAction)
+
 		Qt.QObject.connect(self, Qt.SIGNAL("doTitleUpdate"), self._title_update)
 
 		# build queueList
@@ -863,6 +867,13 @@ class MainWindow (Window):
 		self.db = Database()
 		self.db.populate()
 
+	@Qt.pyqtSignature("bool")
+	def on_pauseAction_triggered (self, checked):
+		if checked:
+			self.queue.stop_emerge()
+		else:
+			self.queue.continue_emerge()
+	
 	@Qt.pyqtSignature("")
 	def on_killAction_triggered (self):
 		self.queue.kill_emerge()

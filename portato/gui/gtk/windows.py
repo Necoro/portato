@@ -1273,6 +1273,14 @@ class MainWindow (Window):
 			self.cfg.set_local(package, "oneshot", set)
 			self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
 
+	def cb_stop_cont_toggled (self, cb):
+		if not cb.get_active():
+			self.queue.continue_emerge()
+		else:
+			self.queue.stop_emerge()
+
+		return False
+	
 	def cb_kill_clicked (self, action):
 		self.queue.kill_emerge()
 

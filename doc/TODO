@@ -1,13 +1,15 @@
 Documentation:
 ==============
 
-- document the structure of plugin-XMLs
-
 Backend:
 ========
 
+- add Paludis support
+
 - bugs in update world (Necoro, 04/20/07: are there any more bugs?)
 - fix for flag handling, when reverting flags (Necoro, 04/20/07: what did i mean by this?)
+	==> rewrite flags handling in an object oriented manner
+
 - do not alert a block, if a package blocks a version of one package which is updated to a new one not being blocked anymore
 
 - save/restore queue on exit/start

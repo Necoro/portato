@@ -624,15 +624,25 @@ class EmergeQueue:
 		"""Kills the emerge process."""
 		if self.process is not None:
 			try:
-				os.kill(self.process.pid, signal.SIGTERM)
+				send_signal_to_group(signal.SIGTERM)
 				debug("Process should be killed")
-				os.kill(self.process.pid, signal.SIGKILL) # to be sure
 			except AttributeError:
 				debug("AttributeError occured ==> process not exisiting - ignore")
 			except OSError:
 				debug("OSError occured ==> process already stopped - ignore")
 
 			self.process = None
+
+	def stop_emerge (self):
+		if self.process is not None:
+			# use SIGTSTP in favor of SIGSTOP, as SIGSTOP cannot be blocked and would stop the GUI too
+			send_signal_to_group(signal.SIGTSTP) 
+			debug("Process should be stopped")
+
+	def continue_emerge (self):
+		if self.process is not None:
+			send_signal_to_group(signal.SIGCONT)
+			debug("Process should continue")
 
 	def remove_with_children (self, it, removeNewFlags = True):
 		"""Convenience function which removes all children of an iterator and than the iterator itself.

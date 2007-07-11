@@ -118,6 +118,8 @@ class QtConsole (Console, Qt.QTextEdit):
 		self.writeQueue = ""
 		self.isNotWrapping = False
 
+		self.setContextMenuPolicy(Qt.Qt.ActionsContextMenu)
+
 		# set black bg
 		self.palette().setColor(Qt.QPalette.Base, Qt.QColor("black"))
 

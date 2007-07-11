@@ -428,6 +428,13 @@ p, li { white-space: pre-wrap; }
     <addaction name="separator" />
     <addaction name="quitAction" />
    </widget>
+   <widget class="QMenu" name="helpMenu" >
+    <property name="title" >
+     <string>&amp;?</string>
+    </property>
+    <addaction name="aboutAction" />
+    <addaction name="pluginAction" />
+   </widget>
    <widget class="QMenu" name="emergeMenu" >
     <property name="title" >
      <string>&amp;Emerge</string>
@@ -441,13 +448,7 @@ p, li { white-space: pre-wrap; }
     <addaction name="saveAction" />
     <addaction name="separator" />
     <addaction name="killAction" />
-   </widget>
-   <widget class="QMenu" name="helpMenu" >
-    <property name="title" >
-     <string>&amp;?</string>
-    </property>
-    <addaction name="aboutAction" />
-    <addaction name="pluginAction" />
+    <addaction name="pauseAction" />
    </widget>
    <addaction name="fileMenu" />
    <addaction name="emergeMenu" />
@@ -544,6 +545,14 @@ p, li { white-space: pre-wrap; }
   <action name="pluginAction" >
    <property name="text" >
     <string>Plugins</string>
+   </property>
+  </action>
+  <action name="pauseAction" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Emerge &amp;paused</string>
    </property>
   </action>
  </widget>

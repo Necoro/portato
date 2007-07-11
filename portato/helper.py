@@ -18,6 +18,7 @@ Some nice functions used in the program.
 """
 
 import traceback, os.path, sys, types
+import os, signal
 
 DEBUG = True
 
@@ -79,6 +80,21 @@ def debug(*args, **kwargs):
 		f.close()
 	else:
 		print >> outfile, text
+
+def send_signal_to_group (sig):
+	"""Sends a signal to all processes of our process group (w/o ourselves).
+	
+	@param sig: signal number to send
+	@type sig: int"""
+
+	def handler (sig, stack):
+		"""Ignores the signal exactly one time and then restores the default."""
+		signal.signal(sig, signal.SIG_DFL)
+	
+	signal.signal(sig, handler)
+	
+	pgid = os.getpgrp()
+	os.killpg(pgid, sig)
 
 def am_i_root ():
 	"""Returns True if the current user is root, False otherwise.
