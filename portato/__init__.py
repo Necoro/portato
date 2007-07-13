@@ -52,6 +52,6 @@ formatter = OutputFormatter("%(message)s (%(filename)s:%(lineno)s)")
 
 handler = logging.StreamHandler()
 handler.setFormatter(formatter)
-logging.getLogger().addHandler(handler)
-
-logging.getLogger().setLevel(logging.DEBUG)
+logging.getLogger("portatoLogger").addHandler(handler)
+logging.getLogger("portatoLogger").setLevel(logging.DEBUG)
+logging.getLogger("portatoLogger").propagate = False

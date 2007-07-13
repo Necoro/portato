@@ -510,7 +510,18 @@ class PackageTable:
 				self.comboVB.remove(c)
 		self.comboVB.pack_start(self.vCombo)
 
-		# the label (must be here, because it depends on the combo box)
+		if not self.queue or not self.doEmerge: 
+			self.emergeBtn.set_sensitive(False)
+			self.unmergeBtn.set_sensitive(False)
+		
+		# current status
+		self.cb_combo_changed(self.vCombo)
+		self.table.show_all()
+
+	def hide (self):
+		self.table.hide_all()
+
+	def set_desc_label (self):
 		desc = self.actual_package().get_package_settings("DESCRIPTION").replace("&","&amp;")
 		if not desc: 
 			desc = "<no description>"
@@ -526,17 +537,6 @@ class PackageTable:
 
 		self.descLabel.set_use_markup(use_markup)
 		self.descLabel.set_label(desc)
-
-		if not self.queue or not self.doEmerge: 
-			self.emergeBtn.set_sensitive(False)
-			self.unmergeBtn.set_sensitive(False)
-		
-		# current status
-		self.cb_combo_changed(self.vCombo)
-		self.table.show_all()
-
-	def hide (self):
-		self.table.hide_all()
 
 	def fill_use_list(self, store):
 		"""Fills a given ListStore with the use-flag data.
@@ -644,6 +644,8 @@ class PackageTable:
 		"""Callback for the changed ComboBox.
 		It then rebuilds the useList and the checkboxes."""
 		
+		self.set_desc_label()
+
 		# remove old useList
 		w = self.useListScroll.get_child()
 		if w:

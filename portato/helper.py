@@ -15,10 +15,15 @@ Some nice functions used in the program.
 """
 
 import types, os, signal, logging
-from logging import debug, info, warning, error, critical, exception
+
+debug 		= logging.getLogger("portatoLogger").debug
+info 		= logging.getLogger("portatoLogger").info
+warning 	= logging.getLogger("portatoLogger").warning
+error 		= logging.getLogger("portatoLogger").error
+critical 	= logging.getLogger("portatoLogger").critical
 
 def set_log_level (lvl):
-	logging.getLogger().setLevel(lvl)
+	logging.getLogger("portatoLogger").setLevel(lvl)
 
 def send_signal_to_group (sig):
 	"""Sends a signal to all processes of our process group (w/o ourselves).

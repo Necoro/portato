@@ -412,7 +412,16 @@ class PackageDetails:
 		# comboBox
 		self.set_combo()
 
-		# the labels
+		# disable buttons when emerging is not allowed
+		if not self.queue or not self.doEmerge: 
+			self.window.pkgEmergeBtn.setEnabled(False)
+			self.window.pkgUnmergeBtn.setEnabled(False)
+
+		self._show_tab()
+
+		self.window.tabWidget.setCurrentIndex(self.window.PKG_PAGE)
+
+	def set_labels (self):
 		desc = self.actual_package().get_package_settings("DESCRIPTION").replace("&","&amp;")
 		
 		if not desc: 
@@ -429,15 +438,6 @@ class PackageDetails:
 		
 		self.window.descLabel.setText(desc)
 		self.window.nameLabel.setText(name)
-
-		# disable buttons when emerging is not allowed
-		if not self.queue or not self.doEmerge: 
-			self.window.pkgEmergeBtn.setEnabled(False)
-			self.window.pkgUnmergeBtn.setEnabled(False)
-
-		self._show_tab()
-
-		self.window.tabWidget.setCurrentIndex(self.window.PKG_PAGE)
 
 	def set_combo (self):
 		"""Fills the version combo box with the right items and selects the correct one."""
@@ -622,6 +622,9 @@ class PackageDetails:
 		# ATTENTION: BIG'n'DIRTY :)
 		#
 		
+		# labels
+		self.set_labels()
+
 		# build new
 		self.build_use_list()
 		pkg = self.actual_package()
