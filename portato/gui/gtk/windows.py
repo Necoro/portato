@@ -609,7 +609,6 @@ class PackageTable:
 					combo.set_active(i)
 					break
 		except AttributeError: # no package found
-#			debug('catched AttributeError => no "best package" found. Selected first one.')
 			combo.set_active(0)
 
 		combo.connect("changed", self.cb_combo_changed)
@@ -638,7 +637,7 @@ class PackageTable:
 			try:
 				self.queue.append(self.actual_package().get_cpv(), unmerge = True)
 			except PackageNotFoundException, e:
-				debug("Package could not be found",e[0], error = 1)
+				error("Package could not be found: %s", e[0])
 				#masked_dialog(e[0])
 
 	def cb_combo_changed (self, combo):
@@ -1105,9 +1104,9 @@ class MainWindow (Window):
 			flags.write_use_flags()
 		
 		if len(flags.new_masked)>0 or len(flags.new_unmasked)>0 or len(flags.newTesting)>0:
-			debug("new masked:",flags.new_masked)
-			debug("new unmasked:", flags.new_unmasked)
-			debug("new testing:", flags.newTesting)
+			debug("new masked: %s",flags.new_masked)
+			debug("new unmasked: %s", flags.new_unmasked)
+			debug("new testing: %s", flags.newTesting)
 			changed_flags_dialog("masking keywords")
 			flags.write_masked()
 			flags.write_testing()
@@ -1134,7 +1133,7 @@ class MainWindow (Window):
 		else:
 			updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
 
-			debug("updating list:", [(x.get_cpv(), y.get_cpv()) for x,y in updating],"--> length:",len(updating))
+			debug("updating list: %s --> length: %s", [(x.get_cpv(), y.get_cpv()) for x,y in updating], len(updating))
 			try:
 				try:
 					for pkg, old_pkg in updating:

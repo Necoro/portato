@@ -17,16 +17,17 @@ from threading import Thread, currentThread
 from os import read, close
 import errno
 
+from portato.gui.wrapper import Console
+from portato.helper import debug
+
 try:
 	from curses.ascii import ctrl
 except ImportError: # emulate ctrl-behavior for known values
 	def ctrl (val):
 		if val == "H": return '\x08'
 		elif val == "W": return '\x17'
-		else: debug("unknown error passed to emulated ctrl:",val)
+		else: debug("unknown error passed to emulated ctrl: %s",val)
 
-from portato.gui.wrapper import Console
-from portato.helper import debug
 
 class WriteEvent (Qt.QEvent):
 	TYPE = Qt.QEvent.Type(1001)

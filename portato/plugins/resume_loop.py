@@ -13,7 +13,7 @@
 import pty
 from subprocess import call, STDOUT
 from portato.backend import system
-from portato.helper import debug
+from portato.helper import debug, warning
 
 console = None
 command = "until emerge --resume --skipfirst; do : ; done"
@@ -24,11 +24,11 @@ def set_console (*args, **kwargs):
 
 def resume_loop (retcode, *args, **kwargs):
 	if retcode is None:
-		debug("Resume-loop called while process is still running!", warn = True)
+		warning("Resume-loop called while process is still running!")
 	elif retcode == 0:
 		# everything ok - ignore
 		#pass
-		debug("Everything is ok")
+		debug("Everything is ok.")
 	else:
 		if console is None:
 			debug("No console for the resume loop...")

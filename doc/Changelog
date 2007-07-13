@@ -3,6 +3,8 @@ next:
 - added "shutdown" plugin
 - added "resume-loop" plugin
 - changed plugin-structures
+- added ability of pausing the emerge process
+- nicier log output
 
 0.7.5:
 - new icon by p4r4d0x

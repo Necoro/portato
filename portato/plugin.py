@@ -16,14 +16,10 @@ import os, os.path
 from xml.dom.minidom import parse
 
 from constants import PLUGIN_DIR
-from helper import debug, flatten
+from helper import *
 
 class ParseException (Exception):
 	pass
-
-def error (reason, p):
-	reason = "("+reason+")"
-	debug("Malformed plugin:", p, reason, minus=1, error = 1)
 
 class Options (object):
 	"""The <options>-element."""
@@ -343,18 +339,18 @@ class PluginQueue:
 				try:
 					mod = __import__(imp, globals(), locals(), [cmd.hook.call])
 				except ImportError:
-					debug(imp,"cannot be imported", error = 1)
+					error("%s cannot be imported.", imp)
 					return
 
 				try:
 					f = eval("mod."+cmd.hook.call) # build function
 				except AttributeError:
-					debug(cmd.hook.call,"cannot be imported", error = 1)
+					error("%s cannot be imported.", cmd.hook.call)
 			else:
 				try:
 					f = eval(cmd.hook.call)
 				except AttributeError:
-					debug(cmd.hook.call,"cannot be imported", error = 1)
+					error("%s cannot be imported", cmd.hook.call)
 
 			return f(*hargs, **hkwargs) # call function
 
@@ -381,18 +377,18 @@ class PluginQueue:
 
 				# before
 				for cmd in list[0]:
-					debug("Accessing hook '%s' of plugin '%s' (before)" % (hook, cmd.hook.plugin.name))
+					debug("Accessing hook '%s' of plugin '%s' (before).", hook, cmd.hook.plugin.name)
 					call(cmd)
 				
 				if list[1]: # override
-					debug("Overriding hook '%s' with plugin '%s'" % (hook, list[1][0].hook.plugin.name))
+					info("Overriding hook '%s' with plugin '%s'.", hook, list[1][0].hook.plugin.name)
 					ret = call(list[1][0])
 				else: # normal
 					ret = func(*args, **kwargs)
 
 				# after
 				for cmd in list[2]:
-					debug("Accessing hook '%s' of plugin '%s' (after)" % (hook, cmd.hook.plugin.name))
+					debug("Accessing hook '%s' of plugin '%s' (after).", hook, cmd.hook.plugin.name)
 					call(cmd)
 
 				return ret
@@ -413,7 +409,7 @@ class PluginQueue:
 				try:
 					list = doc.getElementsByTagName("plugin")
 					if len(list) != 1:
-						raise ParseException, "Number of plugin elements unequal to 1"
+						raise ParseException, "Number of plugin elements unequal to 1."
 					
 					elem = list[0]
 
@@ -444,7 +440,7 @@ class PluginQueue:
 						self.list.append(plugin)
 
 				except ParseException, e:
-					error(e[0],p)
+					error("Malformed plugin \"%s\". Reason: %s", p, e[0])
 			finally:
 				doc.unlink()
 
@@ -509,7 +505,7 @@ class PluginQueue:
 					# type = "override"
 					elif connect.is_override_type():
 						if self.hooks[hook.hook][1]:
-							debug("For hook '%s' an override is already defined by plugin '%s'!" % (hook.hook, self.hooks[hook.hook][1][0]), warn = 1)
+							warn("For hook '%s' an override is already defined by plugin '%s'!", hook.hook, self.hooks[hook.hook][1][0])
 						
 						self.hooks[hook.hook][1][:1] = [connect]
 						continue
@@ -540,7 +536,7 @@ class PluginQueue:
 				resolve(hook, list, idx, add)
 
 			for l in list:
-				debug("Command for hook '%s' in plugin '%s' could not be added due to missing dependant: '%s'!"% (hook, l.hook.plugin.name, l.depend_plugin), warn = 1)
+				warn("Command for hook '%s' in plugin '%s' could not be added due to missing dependant: '%s'!", hook, l.hook.plugin.name, l.depend_plugin)
 
 		for hook in before:
 			resolve(hook, before[hook], 0, 0)

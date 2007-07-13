@@ -86,7 +86,7 @@ class PortagePackage (Package):
 				if status == "masked": return True
 				elif status == "unmasked": return False
 				else:
-					debug("BUG in flags.new_masking_status. It returns", status, error = True)
+					error("BUG in flags.new_masking_status. It returns \'%s\'", status)
 			else: # we have not touched the status
 				if self._status and ("profile" in self._status or "package.mask" in self._status):
 					return True

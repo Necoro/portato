@@ -207,7 +207,7 @@ class ConfigParser:
 				self.vars[section][key] = Value(val, count, bool = bool)
 				self.pos[count] = match.span(2)
 			else: # neither comment nor empty nor expression nor section => error
-				debug("Unrecognized line in configuration:", line, error = 1)
+				error("Unrecognized line in configuration: %s", line)
 
 	def get (self, key, section = "MAIN"):
 		"""Returns the value of a given key in a section.

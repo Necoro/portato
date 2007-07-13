@@ -29,6 +29,7 @@ import pty
 import time
 import os
 import signal
+import logging
 
 class Config:
 	"""Wrapper around a ConfigParser and for additional local configurations."""
@@ -103,9 +104,12 @@ class Config:
 		flags.set_config(flagCfg)
 
 	def modify_debug_config (self):
-		"""Sets the external debug-config.
-		@see: L{helper.set_debug()}"""
-		set_debug(self.get_boolean("debug"))
+		if self.get_boolean("debug"):
+			level = logging.DEBUG
+		else:
+			level = logging.INFO
+
+		set_log_level(level)
 
 	def modify_system_config (self):
 		"""Sets the system config.
@@ -232,7 +236,7 @@ class Database:
 				return inst+ninst
 
 		except KeyError: # cat is in category list - but not in portage
-			debug("Catched KeyError =>", cat, "seems not to be an available category. Have you played with rsync-excludes?")
+			info("Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?", cat)
 			return []
 
 	def reload (self, cat):
@@ -378,7 +382,7 @@ class EmergeQueue:
 			try:
 				self.update_tree(subIt, d, unmask)
 			except backend.BlockedException, e: # BlockedException occured -> delete current tree and re-raise exception
-				debug("Something blocked:", e[0])
+				debug("Something blocked: %s", e[0])
 				self.remove_with_children(subIt)
 				raise
 		
@@ -470,7 +474,7 @@ class EmergeQueue:
 				if p in ["world", "system"]: continue
 				cat = system.split_cpv(p)[0] # get category
 				self.db.reload(cat)
-				debug("Category %s refreshed" % cat)
+				debug("Category %s refreshed", cat)
 
 		update_packages()
 		self.process = None
@@ -687,14 +691,14 @@ class EmergeQueue:
 				try:
 					del self.deps[cpv]
 				except KeyError: # this seems to be removed due to a BlockedException - so no deps here atm ;)
-					debug("Catched KeyError =>", cpv, "seems not to be in self.deps. Should be no harm in normal cases.")
+					debug("Catched KeyError => %s seems not to be in self.deps. Should be no harm in normal cases.", cpv)
 				try:
 					self.mergequeue.remove(cpv)
 				except ValueError: # this is a dependency - ignore
 					try:
 						self.oneshotmerge.remove(cpv)
 					except ValueError:
-						debug("Catched ValueError =>", cpv, "seems not to be in merge-queue. Should be no harm.")
+						debug("Catched ValueError => %s seems not to be in merge-queue. Should be no harm.", cpv)
 				
 				if removeNewFlags: # remove the changed flags
 					flags.remove_new_use_flags(cpv)

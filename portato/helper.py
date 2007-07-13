@@ -12,74 +12,13 @@
 
 """
 Some nice functions used in the program.
-
-@var DEBUG: Boolean controlling whether to printout debug messages.
-@type DEBUG: boolean
 """
 
-import traceback, os.path, sys, types
-import os, signal
+import types, os, signal, logging
+from logging import debug, info, warning, error, critical, exception
 
-DEBUG = True
-
-def set_debug (d):
-	"""Sets the global DEBUG variable. Do not set it by your own - always use this function.
-
-	@param d: True to enable debugging; False otherwise
-	@type d: boolean"""
-
-	global DEBUG
-	DEBUG = d
-
-def debug(*args, **kwargs):
-	"""Prints a debug message including filename and lineno.
-	A variable number of positional arguments are allowed.
-
-	If debug(obj0, obj1, obj2) is called, the text part of the output 
-	looks like the output from print obj0, obj1, obj2.
-	
-	@keyword name: Use the given name instead the correct function name.
-	@keyword file: Output file to use.
-	@keyword minus: The value given is the amount of frames to ignore in the stack to return the correct function call.
-	This should be used if you are wrapping the debug call.
-	@keyword warn: Prints the message as a warning. Value of DEBUG is ignored.
-	@keyword error: Prints the message as an error. Value of DEBUG is ignored."""
-
-	if not DEBUG and not ("warn" in kwargs or "error" in kwargs): return
-	
-	stack = traceback.extract_stack()
-	minus = -2
-	if "minus" in kwargs:
-		minus = minus - kwargs["minus"]
-	a, b, c, d = stack[minus]
-	a = os.path.basename(a)
-	out = []
-	for obj in args:
-		out.append(str(obj))
-	text = ' '.join(out)
-	if "name" in kwargs:
-		text = 'In %s (%s:%s): %s' % (kwargs["name"], a, b, text)
-	else:
-		text = 'In %s (%s:%s): %s' % (c, a, b, text)
-	
-	outfile = sys.stdout
-	surround = "DEBUG"
-
-	if "warn" in kwargs:
-		outfile = sys.stderr
-		surround = "WARNING"
-	elif "error" in kwargs:
-		outfile = sys.stderr
-		surround = "ERROR"
-
-	text = ("***%s*** %s ***%s***" % (surround, text, surround))
-	
-	if "file" in kwargs:
-		f = open(kwargs["file"], "a+")
-		f.write(text+"\n")
-		f.close()
-	else:
-		print >> outfile, text
+def set_log_level (lvl):
+	logging.getLogger().setLevel(lvl)
 
 def send_signal_to_group (sig):
 	"""Sends a signal to all processes of our process group (w/o ourselves).

@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from portato.helper import debug, am_i_root
+from portato.helper import *
 from portato.backend import system
 
 from subprocess import Popen
@@ -50,7 +50,7 @@ def etc_prop (*args, **kwargs):
 
 	if float(__version__) < 1.1:
 		l = len(PortatoEtcProposals())
-		debug(l,"files to update")
+		debug("%s files to update.", l)
 
 		if l > 0:
 			Popen(PROG)
@@ -60,7 +60,7 @@ def etc_prop (*args, **kwargs):
 		if f:
 			Popen([PROG, "--fastexit"]+f)
 		else:
-			debug("Cannot start etc-proposals. No graphical frontend installed!", error = 1)
+			error("Cannot start etc-proposals. No graphical frontend installed!")
 
 def etc_prop_menu (*args, **kwargs):
 	if am_i_root():
@@ -72,6 +72,6 @@ def etc_prop_menu (*args, **kwargs):
 			if f:
 				Popen([PROG]+f)
 			else:
-				debug("Cannot start etc-proposals. No graphical frontend installed!", error = 1)
+				error("Cannot start etc-proposals. No graphical frontend installed!")
 	else:
-		debug("Cannot start etc-proposals. Not root!", error = 1)
+		error("Cannot start etc-proposals. Not root!")

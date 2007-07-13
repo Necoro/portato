@@ -217,7 +217,7 @@ def set_use_flag (pkg, flag):
 	if not cpv in newUseFlags:
 		newUseFlags[cpv] = []
 
-	debug("data: "+str(data))
+	debug("data: %s", str(data))
 	# add a useflag / delete one
 	added = False
 	for file, line, crit, flags in data:
@@ -256,7 +256,7 @@ def set_use_flag (pkg, flag):
 			newUseFlags[cpv].append((path, -1, flag, False))
 
 	newUseFlags[cpv] = unique_array(newUseFlags[cpv])
-	debug("newUseFlags: "+str(newUseFlags))
+	debug("newUseFlags: %s", str(newUseFlags))
 
 def remove_new_use_flags (cpv):
 	"""Removes all new use-flags for a specific package.
@@ -429,7 +429,7 @@ def set_masked (pkg, masked = True):
 		return
 
 	data = get_data(pkg, path)
-	debug("data:", str(data))
+	debug("data: %s", str(data))
 	done = False
 	for file, line, crit, flags in data:
 		if pkg.matches(crit):
@@ -452,7 +452,7 @@ def set_masked (pkg, masked = True):
 	
 	link_neq[cpv].append((file, "-1"))
 	link_neq[cpv] = unique_array(link_neq[cpv])
-	debug("new_(un)masked: "+str(link_neq))
+	debug("new_(un)masked: %s",str(link_neq))
 
 def remove_new_masked (cpv):
 	if isinstance(cpv, package.Package):
@@ -478,7 +478,7 @@ def new_masking_status (cpv):
 			for file, line in list[cpv]:
 				_ret = (int(line) == -1)
 				if ret is not None and _ret != ret:
-					debug("Conflicting values for masking status!", list, error = True)
+					error("Conflicting values for masking status: %s", list)
 				else:
 					ret = _ret
 		return ret
@@ -635,7 +635,7 @@ def set_testing (pkg, enable):
 
 	if not enable:
 		test = get_data(pkg, CONST.testing_path())
-		debug("data (test): "+str(test))
+		debug("data (test): %s", str(test))
 		for file, line, crit, flags in test:
 			if pkg.matches(crit) and flags[0] == "~"+arch:
 				newTesting[cpv].append((file, line))
@@ -647,7 +647,7 @@ def set_testing (pkg, enable):
 		newTesting[cpv].append((file, "-1"))
 
 	newTesting[cpv] = unique_array(newTesting[cpv])
-	debug("newTesting: "+str(newTesting))
+	debug("newTesting: %s",str(newTesting))
 
 def write_testing ():
 	global arch, newTesting
