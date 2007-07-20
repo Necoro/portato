@@ -371,19 +371,18 @@ class PluginQueue:
 							elif frontendOK is None: # do not make negative if we already have a positive
 								frontendOK = False
 
-					if frontendOK is None or frontendOK is True:
+					if frontendOK is None or frontendOK == True:
 						plugin = Plugin(p, elem.getElementsByTagName("name")[0], elem.getElementsByTagName("author")[0])
-						plugin.parse_hooks(elem.getElementsByTagName("hook")[0])
+						plugin.parse_hooks(elem.getElementsByTagName("hooks")[0])
 						plugin.set_import(elem.getElementsByTagName("import"))
 						plugin.parse_menus(elem.getElementsByTagName("menu"))
 						plugin.parse_options(elem.getElementsByTagName("options"))
 					
 						self.list.append(plugin)
-
+						info("Plugin '%s' loaded.", p)
+				
 				except PluginImportException, e:
 					error("Loading plugin '%s' failed: Could not import %s", p, e[0])
-				else:
-					info("Plugin '%s' loaded.", p)
 			finally:
 				doc.unlink()
 
