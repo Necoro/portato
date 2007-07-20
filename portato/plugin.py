@@ -14,11 +14,12 @@
 
 import os, os.path
 from xml.dom.minidom import parse
+from lxml import etree
 
-from constants import PLUGIN_DIR
+from constants import PLUGIN_DIR, XSD_LOCATION
 from helper import *
 
-class ParseException (Exception):
+class PluginImportException (ImportError):
 	pass
 
 class Options (object):
@@ -36,21 +37,10 @@ class Options (object):
 
 	def parse (self, options):
 		for opt in options:
-			if opt.hasChildNodes():
-				nodes = opt.childNodes
-			
-				if len(nodes) > 1:
-					raise ParseException, "Malformed option"
-			
-				if nodes[0].nodeType != nodes[0].TEXT_NODE:
-					raise ParseException, "Malformed option"
-
-				type = str(nodes[0].nodeValue.strip())
-
-				if type in self.__options:
-					self.set(type, True)
-			else:
-				raise ParseException, "Malformed option"
+			nodes = opt.childNodes
+			type = str(nodes[0].nodeValue.strip())
+			if type in self.__options:
+				self.set(type, True)
 
 	def get (self, name):
 		return self.__getattribute__(name)
@@ -70,13 +60,7 @@ class Menu:
 		@param call: the function to call relative to the import statement
 		@type call: string
 
-		@raises ParseException: on parsing errors"""
-
-		if not label:
-			raise ParseException, "label attribute missing"
-
-		if not call:
-			raise ParseException, "call attribute missing"
+		@raises PluginImportException: if the plugin's import could not be imported"""
 
 		self.label = label
 		self.plugin = plugin
@@ -86,17 +70,17 @@ class Menu:
 			try:
 				mod = __import__(imp, globals(), locals(), [call])
 			except ImportError:
-				raise ParseException, imp+" cannot be imported"
+				raise PluginImportException, imp
 
 			try:
 				self.call = eval("mod."+call) # build function
 			except AttributeError:
-				raise ParseException, call+" cannot be imported"
+				raise PluginImportException, imp
 		else:
 			try:
 				self.call = eval(call)
 			except AttributeError:
-				raise ParseException, call+" cannot be imported"
+				raise PluginImportException, imp
 
 class Connect:
 	"""A single <connect>-element."""
@@ -109,12 +93,7 @@ class Connect:
 		@param type: the type of the connect ("before", "after", "override")
 		@type type: string
 		@param depend_plugin: a plugin we are dependant on
-		@type depend_plugin: string or None
-		
-		@raises ParseException: on parsing errors"""
-
-		if not type in ["before", "after", "override"]:
-			raise ParseException, "Unknown connect type %s" % type
+		@type depend_plugin: string or None"""
 
 		self.type = type
 		self.hook = hook
@@ -140,16 +119,8 @@ class Hook:
 		@param hook: the hook to add to
 		@type hook: string
 		@param call: the call to make
-		@type call: string
+		@type call: string"""
 
-		@raises ParseException: on parsing errors"""
-
-		if not hook: 
-			raise ParseException, "hook attribute missing"
-
-		if not call: 
-			raise ParseException, "call attribute missing"
-		
 		self.plugin = plugin
 		self.hook = hook
 		self.call = call
@@ -159,13 +130,8 @@ class Hook:
 		"""This gets a list of <connect>-elements and parses them.
 		
 		@param connects: the list of <connect>'s
-		@type connects: NodeList
+		@type connects: NodeList"""
 		
-		@raises ParseException: on parsing errors"""
-		
-		if not connects:
-			raise ParseException, "No connect elements in hook"
-
 		for c in connects:
 			type = c.getAttribute("type")
 			if type == '': 
@@ -175,12 +141,6 @@ class Hook:
 			dep_plugin = None
 			if c.hasChildNodes():
 				nodes = c.childNodes
-				if len(nodes) > 1:
-					raise ParseException, "Malformed connect"
-				
-				if nodes[0].nodeType != nodes[0].TEXT_NODE:
-					raise ParseException, "Malformed connect"
-
 				dep_plugin = nodes[0].nodeValue.strip()
 
 			connect = Connect(self, type, dep_plugin)
@@ -195,42 +155,39 @@ class Plugin:
 		@param file: the file name of the plugin.xml
 		@type file: string
 		@param name: the name of the plugin
-		@type name: string
+		@type name: Node
 		@param author: the author of the plugin
-		@type author: string"""
+		@type author: Node"""
 
 		self.file = file
-		self.name = name
-		self.author = author
+		self.name = name.firstChild.nodeValue.strip()
+		self.author = author.firstChild.nodeValue.strip()
 		self._import = None
 		self.hooks = []
 		self.menus = []
 		self.options = Options()
 
 	def parse_hooks (self, hooks):
-		"""Gets a list of <hook>-elements and parses them.
+		"""Gets an <hooks>-elements and parses it.
 
-		@param hooks: the list of elements
-		@type hooks: NodeList
-		
-		@raises ParseException: on parsing errors"""
+		@param hooks: the hooks node
+		@type hooks: Node"""
 
-		for h in hooks:
-			hook = Hook(self, str(h.getAttribute("hook")), str(h.getAttribute("call")))
+		for h in hooks.getElementsByTagName("hook"):
+			hook = Hook(self, str(h.getAttribute("type")), str(h.getAttribute("call")))
 			hook.parse_connects(h.getElementsByTagName("connect"))
 			self.hooks.append(hook)
 
 	def parse_menus (self, menus):
-		"""Gets a list of <menu>-elements and parses them.
+		"""Get a list of <menu>-elements and parses them.
 
-		@param menus: the list of elements
-		@type menus: NodeList
+		@param menus: the menu nodelist
+		@type menus: NodeList"""
 
-		@raises ParseException: on parsing errors"""
-
-		for m in menus:
-			menu = Menu(self, str(m.getAttribute("label")), str(m.getAttribute("call")))
-			self.menus.append(menu)
+		if menus:
+			for item in menus[0].getElementsByTagName("item"):
+				menu = Menu(self, item.firstChild.nodeValue.strip(), str(item.getAttribute("call")))
+				self.menus.append(menu)
 
 	def parse_options (self, options):
 		if options:
@@ -243,29 +200,16 @@ class Plugin:
 		@param imports: list of imports
 		@type imports: NodeList
 		
-		@raises ParseException: on parsing errors"""
+		@raises PluginImportException: if the plugin's import could not be imported"""
 
-		if len(imports) > 1:
-			raise ParseException, "More than one import statement."
-
-		if imports[0].hasChildNodes():
-			nodes = imports[0].childNodes
-			
-			if len(nodes) > 1:
-				raise ParseException, "Malformed import"
-			
-			if nodes[0].nodeType != nodes[0].TEXT_NODE:
-				raise ParseException, "Malformed import"
-
-			self._import = str(nodes[0].nodeValue.strip())
+		if imports:
+			self._import = str(imports[0].firstChild.nodeValue.strip())
 
 			try: # try loading
 				mod = __import__(self._import)
 				del mod
 			except ImportError:
-				raise ParseException, self._import+" cannot be imported"
-		else:
-			raise ParseException, "Malformed import"
+				raise PluginImportException, self._import
 
 	def needs_import (self):
 		"""Returns True if an import is required prior to calling the plugin.
@@ -401,46 +345,45 @@ class PluginQueue:
 		"""Load the plugins."""
 		plugins = filter(lambda x: x.endswith(".xml"), os.listdir(PLUGIN_DIR))
 		plugins = map(lambda x: os.path.join(PLUGIN_DIR, x), plugins)
+		schema = etree.XMLSchema(file = XSD_LOCATION)
 
 		for p in plugins:
+			
+			if not schema.validate(etree.parse(p)):
+				error("Loading plugin '%s' failed. Plugin does not comply to schema.", p)
+				continue
+
 			doc = parse(p)
 			
 			try:
 				try:
 					list = doc.getElementsByTagName("plugin")
-					if len(list) != 1:
-						raise ParseException, "Number of plugin elements unequal to 1."
-					
 					elem = list[0]
 
 					frontendOK = None
-					for f in elem.getElementsByTagName("frontend"):
-						if f.hasChildNodes():
-							nodes = f.childNodes
-							if len(nodes) > 1:
-								raise ParseException, "Malformed frontend"
-				
-							if nodes[0].nodeType != nodes[0].TEXT_NODE:
-								raise ParseException, "Malformed frontend"
-
-							fValue = nodes[0].nodeValue.strip()
-							if fValue == self.frontend:
+					frontends = elem.getElementsByTagName("frontends")
+					if frontends:
+						nodes = f.childNodes
+						for f in nodes[0].nodeValue.strip().split():
+							if f == self.frontend:
 								frontendOK = True # one positive is enough
 								break
 							elif frontendOK is None: # do not make negative if we already have a positive
 								frontendOK = False
 
-					if frontendOK is None or frontendOK == True:
-						plugin = Plugin(p, elem.getAttribute("name"), elem.getAttribute("author"))
-						plugin.parse_hooks(elem.getElementsByTagName("hook"))
+					if frontendOK is None or frontendOK is True:
+						plugin = Plugin(p, elem.getElementsByTagName("name")[0], elem.getElementsByTagName("author")[0])
+						plugin.parse_hooks(elem.getElementsByTagName("hook")[0])
 						plugin.set_import(elem.getElementsByTagName("import"))
 						plugin.parse_menus(elem.getElementsByTagName("menu"))
 						plugin.parse_options(elem.getElementsByTagName("options"))
 					
 						self.list.append(plugin)
 
-				except ParseException, e:
-					error("Malformed plugin \"%s\". Reason: %s", p, e[0])
+				except PluginImportException, e:
+					error("Loading plugin '%s' failed: Could not import %s", p, e[0])
+				else:
+					info("Plugin '%s' loaded.", p)
 			finally:
 				doc.unlink()
 

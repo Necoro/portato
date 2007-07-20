@@ -1,17 +1,19 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<plugin
-	author="René 'Necoro' Neumann"
-	name="Etc-proposals plugin">
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<plugin xmlns="http://portato.sourceforge.net/plugin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://portato.sourceforge.net/plugin http://portato.sourceforge.net/plugin.xsd">
+
+	<author>René 'Necoro' Neumann</author>
+	<name>Etc-proposals plugin</name>
+
 	<import>portato.plugins.etc_proposals</import>
 
-	<hook
-		hook = "after_emerge"
-		call = "etc_prop">
-		<connect type="after" />
-	</hook>
+	<hooks>
+		<hook type = "after_emerge"	call = "etc_prop">
+			<connect type="after" />
+		</hook>
+	</hooks>
 
-	<menu
-		label= "Et_c-Proposals"
-		call = "etc_prop_menu" 
-		/>
+	<menu>
+		<item call="etc_prop_menu">Et_c-Proposals</item>
+	</menu>
+
 </plugin>

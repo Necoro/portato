@@ -13,7 +13,7 @@
 
 import os, os.path
 from distutils.core import setup, Extension
-from portato.constants import VERSION, DATA_DIR, FRONTENDS, ICON_DIR, PLUGIN_DIR
+from portato.constants import VERSION, DATA_DIR, FRONTENDS, ICON_DIR, PLUGIN_DIR, XSD_DIR
 
 def plugin_list (*args):
 	"""Creates a list of correct plugin pathes out of the arguments."""
@@ -26,7 +26,7 @@ def ui_file_list ():
 
 packages = ["portato", "portato.gui", "portato.plugins", "portato.backend", "portato.backend.portage"]
 ext_modules = []
-data_files = [(ICON_DIR, ["icons/portato-icon.png"]), (PLUGIN_DIR, plugin_list("shutdown", "resume_loop"))]
+data_files = [(ICON_DIR, ["icons/portato-icon.png"]), (PLUGIN_DIR, plugin_list("shutdown", "resume_loop")), (XSD_DIR, ["plugin.xsd"])]
 cmdclass = {}
 
 if "gtk" in FRONTENDS:

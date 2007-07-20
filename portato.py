@@ -12,7 +12,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from portato.constants import VERSION, FRONTENDS, STD_FRONTEND
+from portato.constants import VERSION, FRONTENDS, STD_FRONTEND, XSD_LOCATION
 from optparse import OptionParser
 import sys
 
@@ -36,6 +36,9 @@ def main ():
 
 	parser.add_option("-e", "--ebuild", action = "store", dest = "ebuild",
 			help = "opens the ebuild viewer instead of launching Portato")
+
+	parser.add_option("-x", "--validate", action = "store", dest = "validate", metavar="PLUGIN",
+			help = "validates the given plugin xml instead of launching Portato")
 
 	# run parser
 	(options, args) = parser.parse_args()
@@ -62,6 +65,14 @@ def main ():
 
 	if options.ebuild:
 		show_ebuild(options.ebuild)
+	elif options.validate:
+		from lxml import etree
+		if etree.XMLSchema(file = XSD_LOCATION).validate(etree.parse(options.validate)):
+			print "Passed validation."
+			return
+		else:
+			print "Verification failed."
+			sys.exit(3)
 	else:
 		run()
 

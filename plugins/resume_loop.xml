@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<plugin
-	author="René 'Necoro' Neumann"
-	name="Emerge Resume Loop">
+<plugin xmlns="http://portato.sourceforge.net/plugin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://portato.sourceforge.net/plugin http://portato.sourceforge.net/plugin.xsd">
+	<author>René 'Necoro' Neumann</author>
+	<name>Emerge Resume Loop</name>
 	<import>portato.plugins.resume_loop</import>
 
-	<hook
-		hook = "emerge"
-		call = "set_console">
-		<connect/>
-	</hook>
+	<hooks>
+		<hook type="emerge" call="set_console">
+			<connect />
+		</hook>
 
-	<hook
-		hook = "after_emerge"
-		call = "resume_loop">
-		<connect type="before">*</connect>
-	</hook>
+		<hook type="after_emerge" call="resume_loop">
+			<connect type="before">*</connect>
+		</hook>
+	</hooks>
 
 	<options>
 		<option>disabled</option>
 	</options>
+
 </plugin>
