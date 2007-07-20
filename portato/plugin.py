@@ -363,7 +363,7 @@ class PluginQueue:
 					frontendOK = None
 					frontends = elem.getElementsByTagName("frontends")
 					if frontends:
-						nodes = f.childNodes
+						nodes = frontends[0].childNodes
 						for f in nodes[0].nodeValue.strip().split():
 							if f == self.frontend:
 								frontendOK = True # one positive is enough
