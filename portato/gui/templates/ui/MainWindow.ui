@@ -428,13 +428,6 @@ p, li { white-space: pre-wrap; }
     <addaction name="separator" />
     <addaction name="quitAction" />
    </widget>
-   <widget class="QMenu" name="helpMenu" >
-    <property name="title" >
-     <string>&amp;?</string>
-    </property>
-    <addaction name="aboutAction" />
-    <addaction name="pluginAction" />
-   </widget>
    <widget class="QMenu" name="emergeMenu" >
     <property name="title" >
      <string>&amp;Emerge</string>
@@ -449,6 +442,14 @@ p, li { white-space: pre-wrap; }
     <addaction name="separator" />
     <addaction name="killAction" />
     <addaction name="pauseAction" />
+   </widget>
+   <widget class="QMenu" name="helpMenu" >
+    <property name="title" >
+     <string>&amp;?</string>
+    </property>
+    <addaction name="aboutAction" />
+    <addaction name="pluginAction" />
+    <addaction name="logAction" />
    </widget>
    <addaction name="fileMenu" />
    <addaction name="emergeMenu" />
@@ -544,7 +545,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="pluginAction" >
    <property name="text" >
-    <string>Plugins</string>
+    <string>&amp;Plugins</string>
    </property>
   </action>
   <action name="pauseAction" >
@@ -553,6 +554,11 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="text" >
     <string>Emerge &amp;paused</string>
+   </property>
+  </action>
+  <action name="logAction" >
+   <property name="text" >
+    <string>Show &amp;Logs</string>
    </property>
   </action>
  </widget>

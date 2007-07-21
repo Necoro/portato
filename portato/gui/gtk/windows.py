@@ -33,7 +33,7 @@ from wrapper import GtkTree, GtkConsole
 from usetips import UseTips
 
 # other
-import types
+import types, logging
 
 GLADE_FILE = DATA_DIR+"portato.glade"
 
@@ -832,6 +832,44 @@ class PackageTable:
 	
 		return True
 
+class LogWindow (AbstractDialog, logging.Handler):
+
+	def __init__ (self, parent):
+		AbstractDialog.__init__(self, parent)
+		logging.Handler.__init__(self, logging.INFO)
+
+		self.logView = self.tree.get_widget("logView")
+		logging.getLogger("portatoLogger").addHandler(self)
+
+		self.deleteIsOk = False
+	
+	def format (self, record):
+		
+		if (record.levelno > logging.INFO):
+			return "%s: %s" % (record.levelname, record.getMessage())
+		else:
+			return record.getMessage()
+
+	def emit (self, record):
+		self.logView.get_buffer().insert_at_cursor(self.format(record)+"\n")
+
+	def show (self):
+		self.window.show()
+	
+	def close (self):
+		self.window.hide()
+
+	def destroy (self):
+		self.deleteIsOk = True
+		self.window.destroy()
+
+	def cb_delete (self, *args):
+		if not self.deleteIsOk:
+			self.close()
+			return True
+		else:
+			return False
+
 class MainWindow (Window):
 	"""Application main window."""
 
@@ -852,12 +890,15 @@ class MainWindow (Window):
 		mHeight = 800
 		if gtk.gdk.screen_height() <= 800: mHeight = 600
 		self.window.set_geometry_hints (self.window, min_width = 600, min_height = mHeight, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
-
+		
 		# booleans
 		self.doUpdate = False
 
 		# installed pixbuf
 		self.instPixbuf = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
+		
+		# get the logging window as soon as possible
+		self.logWindow = LogWindow(self.window)
 		
 		# package db
 		self.db = Database()
@@ -1232,7 +1273,10 @@ class MainWindow (Window):
 		
 		PluginWindow(self.window, queue)
 		return True
-
+	
+	def cb_show_log_clicked (self, btn):
+		self.logWindow.show()
+	
 	@Window.watch_cursor
 	def cb_show_updates_clicked (self, button):
 		UpdateWindow(self.window, system.get_updated_packages(), self.queue, self.jump_to)
@@ -1322,6 +1366,7 @@ class MainWindow (Window):
 
 	def cb_destroy (self, widget):
 		"""Calls main_quit()."""
+		self.logWindow.destroy()
 		gtk.main_quit()
 	
 	def main (self):

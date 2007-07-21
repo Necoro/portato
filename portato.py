@@ -67,12 +67,17 @@ def main ():
 		show_ebuild(options.ebuild)
 	elif options.validate:
 		from lxml import etree
-		if etree.XMLSchema(file = XSD_LOCATION).validate(etree.parse(options.validate)):
-			print "Passed validation."
-			return
-		else:
-			print "Verification failed."
+		try:
+			etree.XMLSchema(file = XSD_LOCATION).assertValid(etree.parse(options.validate))
+		except etree.XMLSyntaxError, e:
+			print "Verification failed. XML syntax error: %s." % e[0]
 			sys.exit(3)
+		except etree.DocumentInvalid:
+			print "Verification failed. Does not comply with schema."
+			sys.exit(3)
+		else:
+			print "Verification succeeded."
+			return
 	else:
 		run()
 

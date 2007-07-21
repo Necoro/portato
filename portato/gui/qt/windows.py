@@ -32,7 +32,7 @@ from highlighter import EbuildHighlighter
 from dialogs import *
 from helper import qCheck, qIsChecked
 
-import types
+import types, logging
 
 UI_DIR = DATA_DIR+"ui/"
 
@@ -251,6 +251,27 @@ class EbuildDialog (Window):
 
 		self.doc.setPlainText("".join(lines))
 		self.ebuildEdit.setDocument(self.doc)
+
+class LogDialog (Window, logging.Handler):
+
+	__metaclass__ = WindowMeta
+
+	def __init__ (self, parent):
+		Window.__init__(self, parent)
+
+		self.setAttribute(Qt.Qt.WA_DeleteOnClose, False)
+		logging.Handler.__init__(self, logging.INFO)
+		logging.getLogger("portatoLogger").addHandler(self)
+
+	def format (self, record):
+		
+		if (record.levelno > logging.INFO):
+			return "%s: %s" % (record.levelname, record.getMessage())
+		else:
+			return record.getMessage()
+
+	def emit (self, record):
+		self.logView.insertPlainText(self.format(record)+"\n")
 
 class PreferenceWindow (Window):
 	"""Window displaying some preferences."""
@@ -707,6 +728,9 @@ class MainWindow (Window):
 		self.doUpdate = False
 		self.pkgDetails = PackageDetails(self)
 		
+		# set the logger as early as possible
+		self.logDialog = LogDialog(self)
+		
 		# package db
 		self.db = Database()
 		self.db.populate()
@@ -842,6 +866,10 @@ class MainWindow (Window):
 		else:
 			self.systray = None
 
+	@Qt.pyqtSignature("")
+	def on_logAction_triggered (self):
+		self.logDialog.show()
+	
 	@Qt.pyqtSignature("")
 	def on_aboutAction_triggered (self):
 		AboutDialog(self).exec_()

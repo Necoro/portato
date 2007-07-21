@@ -349,8 +349,13 @@ class PluginQueue:
 
 		for p in plugins:
 			
-			if not schema.validate(etree.parse(p)):
-				error("Loading plugin '%s' failed. Plugin does not comply to schema.", p)
+			try:
+				schema.assertValid(etree.parse(p))
+			except etree.XMLSyntaxError:
+				error("Loading plugin '%s' failed. Invalid XML syntax.", p)
+				continue
+			except etree.DocumentInvalid:
+				error("Loading plugin '%s' failed. Plugin does not comply with schema.", p)
 				continue
 
 			doc = parse(p)
