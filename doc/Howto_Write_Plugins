@@ -16,31 +16,31 @@ When you now have chosen the connect(s) to chose you write an appropriate functi
 
 Finally: Add an import tag stating the module to import to execute the function(s) given - and you are done. 
 
+If you are finished with your plugin, you can check if it complies with the XML Schema by doing: "portato -x $PLUGIN_FILE".
+
 Sample XML
 ----------
 
-At the point of writing this, there is no XSD or DTD - so you cannot validate the file. But this will change at some point of time ;).
-
 <?xml version="1.0" encoding="UTF-8" ?>
-<plugin
-    author="Joe Smith"
-    name="Some small sample plugin">
+<plugin xmlns="http://portato.sourceforge.net/plugin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://portato.sourceforge.net/plugin http://portato.sourceforge.net/plugin.xsd">
+    <author>Joe Smith</author>
+    <name>Some small sample plugin</name>
+
     <import>plugins.sample.small</import>
 
-    <hook
-        hook = "a_hook"
-        call = "the_calling_function">
-        <connect type="after" />
-    </hook>
+    <hooks>
+		<hook type = "a_hook" call = "the_calling_function">
+        	<connect type="after" />
+		</hook
+    </hooks>
 
 	<options>
-		<option>disabled</option
+		<option>disabled</option>
 	</options
 </plugin>
 
 Notes:
 
-- The author and name attributes are mandatory.
 - If you want to specify a dependency plugin the connect tag has to be like: <connect type = "after"> The other plugin we depend on </connect>.
 - It is possible of course to have more than one "hook" tag.
 - The options tag is optional. For a complete list of options, see below.
@@ -49,10 +49,20 @@ Additional Tags
 ---------------
 
 Menu: 
-		It is possible, that your plugin gets an entry in the "Plugin"-menu. Therefore you have to provide (one or more) "menu" tags:
-		<menu label="The Small _Plugin" call = "the_calling_menu_function" />
+		It is possible, that your plugin gets an entry in the "Plugin"-menu. Therefore you have to provide a "menu" tag and one or more "item" tags:
+		
+		<menu>
+			<item call = "the_calling_menu_function">
+				A small _Plugin
+			</item>
+		</menu>
 
 		Note, that the underscore in front of a character will make it be underlined in the menu and thus accessible by a shortcut.
+
+Frontends:
+		Sometimes, your plugin will only work with a specific frontend - you can therefore add a "frontends" tag with the list of frontends supported:
+		
+		<frontends>gtk qt4</frontends>
 
 Options
 --------
