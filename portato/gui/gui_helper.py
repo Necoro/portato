@@ -491,7 +491,7 @@ class EmergeQueue:
 		@param command: the command to execute - default is "/usr/bin/python /usr/bin/emerge"
 		@type command: string[]"""
 
-		@plugin.hook("emerge", packages = packages, command = command, console = self.console)
+		@plugin.hook("emerge", packages = packages, command = command, console = self.console, title_update = self.title_update)
 		def sub_emerge(command):
 			if command is None:
 				command = system.get_merge_command()

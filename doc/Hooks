@@ -15,6 +15,7 @@ Parameters:
 	- string[] packages: Packages to emerge (includes "world", "system").
 	- string[] command: The exact command to execute.
 	- portato.gui.wrapper.Console console: The console the output will be written to.
+	- function(string) -> None title_update: Function which updates the console title in the GUIs.
 
 Return if override: Nothing
 

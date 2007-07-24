@@ -5,6 +5,7 @@ next:
 - changed plugin-structures
 - added ability of pausing the emerge process
 - nicier log output
+- log viewers
 
 0.7.5:
 - new icon by p4r4d0x

@@ -10,17 +10,19 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-import pty
-from subprocess import call, STDOUT
+import pty, time
+from subprocess import Popen, STDOUT
 from portato.backend import system
 from portato.helper import debug, warning
 
 console = None
+title_update = None
 command = "until emerge --resume --skipfirst; do : ; done"
 
-def set_console (*args, **kwargs):
-	global console
+def set_data (*args, **kwargs):
+	global console, title_update
 	console = kwargs["console"]
+	title_update = kwargs["title_update"]
 
 def resume_loop (retcode, *args, **kwargs):
 	if retcode is None:
@@ -36,4 +38,15 @@ def resume_loop (retcode, *args, **kwargs):
 			# open tty
 			(master, slave) = pty.openpty()
 			console.set_pty(master)
-			call(command, stdout = slave, stderr = STDOUT, shell = True, env = system.get_environment())
+			p = Popen(command, stdout = slave, stderr = STDOUT, shell = True, env = system.get_environment())
+
+			# update titles
+			old_title = console.get_window_title()		
+			while p and p.poll() is None:
+				if title_update : 
+					title = console.get_window_title()
+					if title != old_title:
+						title_update(title)
+					time.sleep(0.5)
+
+			if title_update: title_update(None)

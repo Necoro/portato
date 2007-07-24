@@ -5,7 +5,7 @@
 	<import>portato.plugins.resume_loop</import>
 
 	<hooks>
-		<hook type="emerge" call="set_console">
+		<hook type="emerge" call="set_data">
 			<connect />
 		</hook>
 
