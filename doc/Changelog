@@ -6,6 +6,7 @@ next:
 - added ability of pausing the emerge process
 - nicier log output
 - log viewers
+- changed design / added link
 
 0.7.5:
 - new icon by p4r4d0x

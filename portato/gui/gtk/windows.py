@@ -34,6 +34,7 @@ from usetips import UseTips
 
 # other
 import types, logging
+from subprocess import Popen
 
 GLADE_FILE = DATA_DIR+"portato.glade"
 
@@ -309,7 +310,8 @@ class PreferenceWindow (AbstractDialog):
 			"maskFileEdit"		: "maskFile",
 			"testFileEdit"		: "testingFile",
 			"useFileEdit"		: "useFile",
-			"syncCommandEdit"	: "syncCmd"
+			"syncCommandEdit"	: "syncCmd",
+			"browserEdit"		: ("browserCmd", "GUI")
 			}
 
 	def __init__ (self, parent, cfg, set_console_font):
@@ -335,8 +337,7 @@ class PreferenceWindow (AbstractDialog):
 		hintEB.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#f3f785"))
 
 		# the checkboxes
-		for box in self.checkboxes:
-			val = self.checkboxes[box]
+		for box, val in self.checkboxes.iteritems():
 			if type(val) == types.TupleType:
 				self.tree.get_widget(box).\
 						set_active(self.cfg.get_boolean(val[0], section = val[1]))
@@ -345,9 +346,13 @@ class PreferenceWindow (AbstractDialog):
 						set_active(self.cfg.get_boolean(val))
 
 		# the edits
-		for edit in self.edits:
-			self.tree.get_widget(edit).\
-					set_text(self.cfg.get(self.edits[edit]))
+		for edit, val in self.edits.iteritems():
+			if type(val) == types.TupleType:
+				self.tree.get_widget(edit).\
+						set_text(self.cfg.get(val[0], section = val[1]))
+			else:
+				self.tree.get_widget(edit).\
+					set_text(self.cfg.get(val))
 
 		# the console font button
 		self.consoleFontBtn = self.tree.get_widget("consoleFontBtn")
@@ -358,19 +363,23 @@ class PreferenceWindow (AbstractDialog):
 	def _save(self):
 		"""Sets all options in the Config-instance."""
 		
-		for box in self.checkboxes:
-			val = self.checkboxes[box]
+		for box, val in self.checkboxes.iteritems():
 			if type(val) == types.TupleType:
 				self.cfg.set_boolean(val[0], self.tree.get_widget(box).get_active(), section = val[1])
 			else:
 				self.cfg.set_boolean(val, self.tree.get_widget(box).get_active())
 
-		for edit in self.edits:
-			self.cfg.set(self.edits[edit],self.tree.get_widget(edit).get_text())
+		for edit, val in self.edits.iteritems():
+			if type(val) == types.TupleType:
+				self.cfg.set(val[0], self.tree.get_widget(edit).get_text(), section = val[1])
+			else:
+				self.cfg.set(val,self.tree.get_widget(edit).get_text())
 
 		font = self.consoleFontBtn.get_font_name()
 		self.cfg.set("consolefont", font, section = "GTK")
 		self.set_console_font(font)
+		
+		gtk.link_button_set_uri_hook(lambda btn, x: Popen([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
 
 	def cb_ok_clicked(self, button):
 		"""Saves, writes to config-file and closes the window."""
@@ -454,8 +463,9 @@ class PackageTable:
 		# the table
 		self.table = self.tree.get_widget("PackageTable")
 		
-		# the combo vb
-		self.comboVB = self.tree.get_widget("comboVB")
+		# the version list
+		self.versList = self.tree.get_widget("versionList")
+		self.build_vers_list()
 
 		# chechboxes
 		self.installedCheck = self.tree.get_widget("installedCheck")
@@ -466,6 +476,9 @@ class PackageTable:
 		self.descLabel = self.tree.get_widget("descLabel")
 		self.notInSysLabel = self.tree.get_widget("notInSysLabel")
 		self.missingLabel = self.tree.get_widget("missingLabel")
+		
+		# link
+		self.pkgLinkBox = self.tree.get_widget("pkgLinkBox")
 
 		# buttons
 		self.emergeBtn = self.tree.get_widget("pkgEmergeBtn")
@@ -502,20 +515,15 @@ class PackageTable:
 		self.instPackages = system.sort_package_list(system.find_installed_packages(cp, masked = True))
 
 		# version-combo-box
-		self.vCombo = self.build_vers_combo()
-		if not self.doEmerge: self.vCombo.set_sensitive(False)
-		children = self.comboVB.get_children()
-		if children:
-			for c in children: 
-				self.comboVB.remove(c)
-		self.comboVB.pack_start(self.vCombo)
+		self.versList.get_model().clear()
+		self.fill_vers_list()
 
 		if not self.queue or not self.doEmerge: 
 			self.emergeBtn.set_sensitive(False)
 			self.unmergeBtn.set_sensitive(False)
 		
 		# current status
-		self.cb_combo_changed(self.vCombo)
+		self.cb_vers_list_changed(None)
 		self.table.show_all()
 
 	def hide (self):
@@ -589,14 +597,43 @@ class PackageTable:
 			view.set_child_visible(True)
 		return view
 
-	def build_vers_combo (self):
-		"""Creates the combo box with the different versions."""
-		combo = gtk.combo_box_new_text()
+	def build_vers_list (self):
+		"""Builds the package list.
 
-		# append versions
-		for s in [x.get_version() for x in self.packages]:
-			combo.append_text(s)
+		@param name: name of the selected catetegory
+		@type name: string"""
+
+		store = gtk.ListStore(gtk.gdk.Pixbuf, str)
+
+		# build view
+		self.versList.set_model(store)
+		col = gtk.TreeViewColumn("Versions")
+
+		# adding the pixbuf
+		cell = gtk.CellRendererPixbuf()
+		col.pack_start(cell, False)
+		col.add_attribute(cell, "pixbuf", 0)
+
+		# adding the package name
+		cell = gtk.CellRendererText()
+		col.pack_start(cell, True)
+		col.add_attribute(cell, "text", 1)
+
+		self.versList.append_column(col)
 		
+	def fill_vers_list (self):
+		
+		store = self.versList.get_model()
+		# append versions
+		for vers, inst in [(x.get_version(), x.is_installed()) for x in self.packages]:
+			if inst:
+				icon = self.main.instPixbuf
+			else:
+				icon = None
+			store.append([icon, vers])
+		
+		sel = self.versList.get_selection()
+
 		# activate the first one
 		try:
 			best_version = ""
@@ -606,14 +643,10 @@ class PackageTable:
 				best_version = system.find_best_match(self.packages[0].get_cp(), (self.instPackages != [])).get_version()
 			for i in range(len(self.packages)):
 				if self.packages[i].get_version() == best_version:
-					combo.set_active(i)
+					sel.select_path((i,))
 					break
 		except AttributeError: # no package found
-			combo.set_active(0)
-
-		combo.connect("changed", self.cb_combo_changed)
-		
-		return combo
+			sel.select_path((0,))
 
 	def actual_package (self):
 		"""Returns the actual selected package.
@@ -621,7 +654,8 @@ class PackageTable:
 		@returns: the actual selected package
 		@rtype: backend.Package"""
 		
-		return self.packages[self.vCombo.get_active()]
+		model, iter = self.versList.get_selection().get_selected()
+		return self.packages[model.get_path(iter)[0]]
 
 	def _update_keywords (self, emerge, update = False):
 		if emerge:
@@ -640,11 +674,14 @@ class PackageTable:
 				error("Package could not be found: %s", e[0])
 				#masked_dialog(e[0])
 
-	def cb_combo_changed (self, combo):
-		"""Callback for the changed ComboBox.
-		It then rebuilds the useList and the checkboxes."""
+	def cb_vers_list_changed (self, treeselection):
 		
 		self.set_desc_label()
+
+		for c in self.pkgLinkBox.get_children():
+			self.pkgLinkBox.remove(c)
+
+		self.pkgLinkBox.add(gtk.LinkButton(self.actual_package().get_package_settings("HOMEPAGE")))
 
 		# remove old useList
 		w = self.useListScroll.get_child()
@@ -912,6 +949,7 @@ class MainWindow (Window):
 			raise
 
 		self.cfg.modify_external_configs()
+		gtk.link_button_set_uri_hook(lambda btn, x: Popen([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
 
 		# set plugins and plugin-menu
 		plugin.load_plugins("gtk")
@@ -927,7 +965,7 @@ class MainWindow (Window):
 
 		# set vpaned position
 		vpaned = self.tree.get_widget("vpaned")
-		vpaned.set_position(mHeight/2)
+		vpaned.set_position(int(mHeight/2.5))
 
 		# cat and pkg list
 		self.sortPkgListByName = True
@@ -1024,7 +1062,7 @@ class MainWindow (Window):
 		@param name: name of the selected catetegory
 		@type name: string"""
 		
-		store = gtk.ListStore(str, gtk.gdk.Pixbuf)
+		store = gtk.ListStore(gtk.gdk.Pixbuf, str)
 		self.fill_pkg_store(store,name)
 		
 		# build view
@@ -1037,12 +1075,12 @@ class MainWindow (Window):
 		# adding the pixbuf
 		cell = gtk.CellRendererPixbuf()
 		col.pack_start(cell, False)
-		col.add_attribute(cell, "pixbuf", 1)
+		col.add_attribute(cell, "pixbuf", 0)
 		
 		# adding the package name
 		cell = gtk.CellRendererText()
 		col.pack_start(cell, True)
-		col.add_attribute(cell, "text", 0)
+		col.add_attribute(cell, "text", 1)
 		
 		self.pkgList.append_column(col)
 
@@ -1062,7 +1100,7 @@ class MainWindow (Window):
 					icon = self.instPixbuf
 				else:
 					icon = None
-				store.append([pkg, icon])
+				store.append([icon, pkg])
 		return store
 
 	def jump_to (self, cp, version = None):
@@ -1115,7 +1153,7 @@ class MainWindow (Window):
 		sel = view.get_selection()
 		store, it = sel.get_selected()
 		if it:
-			package = store.get_value(it, 0)
+			package = store.get_value(it, 1)
 			self.show_package(self.selCatName+"/"+package, self.queue)
 		return True
 

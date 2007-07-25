@@ -115,7 +115,7 @@ class Config:
 		"""Sets the system config.
 		@see: L{backend.set_system()}"""
 		set_system(self.get("system"))
-	
+
 	def modify_external_configs (self):
 		"""Convenience function setting all external configs."""
 		self.modify_debug_config()
