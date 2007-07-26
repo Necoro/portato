@@ -487,8 +487,8 @@ class PackageTable:
 		self.ebuildBtn = self.tree.get_widget("pkgEbuildBtn")
 		
 		# useList
-		self.useListScroll = self.tree.get_widget("useListScroll")
-		self.useList = None
+		self.useList = self.tree.get_widget("useList")
+		self.build_use_list()
 
 	def update (self, cp, queue = None, version = None, doEmerge = True, instantChange = False):
 		"""Updates the table to show the contents for the package.
@@ -511,8 +511,11 @@ class PackageTable:
 		self.instantChange = instantChange
 
 		# packages and installed packages
-		self.packages = system.sort_package_list(system.find_packages(cp, masked = True))
-		self.instPackages = system.sort_package_list(system.find_installed_packages(cp, masked = True))
+		if not self.doEmerge:
+			self.instPackages = self.packages = system.find_packages("=%s-%s" % (cp, version), masked = True)
+		else:
+			self.packages = system.sort_package_list(system.find_packages(cp, masked = True))
+			self.instPackages = system.sort_package_list(system.find_installed_packages(cp, masked = True))
 
 		# version-combo-box
 		self.versList.get_model().clear()
@@ -546,11 +549,7 @@ class PackageTable:
 		self.descLabel.set_use_markup(use_markup)
 		self.descLabel.set_label(desc)
 
-	def fill_use_list(self, store):
-		"""Fills a given ListStore with the use-flag data.
-		
-		@param store: the store to fill
-		@type store: gtk.ListStore"""
+	def fill_use_list(self):
 
 		pkg = self.actual_package()
 		pkg_flags = pkg.get_all_use_flags()
@@ -558,6 +557,8 @@ class PackageTable:
 	
 		actual_exp = None
 		actual_exp_it = None
+
+		store = self.useList.get_model()
 
 		for use in pkg_flags:
 			exp = pkg.use_expanded(use, suggest = actual_exp)
@@ -571,31 +572,22 @@ class PackageTable:
 
 			store.append(actual_exp_it, [pkg.is_use_flag_enabled(use), use, system.get_use_desc(use, self.cp)])
 		
-		return store
-
 	def build_use_list (self):
 		"""Builds the useList."""
 		store = gtk.TreeStore(bool, str, str)
-		self.fill_use_list(store)
+		self.useList.set_model(store)
 
 		# build view
-		view = gtk.TreeView(store)
 		cell = gtk.CellRendererText()
 		tCell = gtk.CellRendererToggle()
 		tCell.set_property("activatable", True)
 		tCell.connect("toggled", self.cb_use_flag_toggled, store)
-		view.append_column(gtk.TreeViewColumn("Enabled", tCell, active = 0))
-		view.append_column(gtk.TreeViewColumn("Flags", cell, text = 1))
-		view.append_column(gtk.TreeViewColumn("Description", cell, markup = 2))
+		self.useList.append_column(gtk.TreeViewColumn("Enabled", tCell, active = 0))
+		self.useList.append_column(gtk.TreeViewColumn("Flags", cell, text = 1))
+		self.useList.append_column(gtk.TreeViewColumn("Description", cell, markup = 2))
 
-		view.set_search_column(1)
-		view.set_enable_tree_lines(True)
-
-		if store.iter_n_children(None) == 0: # if there are no nodes in the list ...
-			view.set_child_visible(False) # ... do not show the list
-		else:
-			view.set_child_visible(True)
-		return view
+		self.useList.set_search_column(1)
+		self.useList.set_enable_tree_lines(True)
 
 	def build_vers_list (self):
 		"""Builds the package list.
@@ -675,23 +667,19 @@ class PackageTable:
 				#masked_dialog(e[0])
 
 	def cb_vers_list_changed (self, treeselection):
+
+		pkg = self.actual_package()
 		
 		self.set_desc_label()
 
 		for c in self.pkgLinkBox.get_children():
 			self.pkgLinkBox.remove(c)
 
-		self.pkgLinkBox.add(gtk.LinkButton(self.actual_package().get_package_settings("HOMEPAGE")))
+		self.pkgLinkBox.add(gtk.LinkButton(pkg.get_package_settings("HOMEPAGE")))
 
-		# remove old useList
-		w = self.useListScroll.get_child()
-		if w:
-			self.useListScroll.remove(w)
-		
-		# build new
-		self.useList = self.build_use_list()
-		self.useListScroll.add(self.useList)
-		pkg = self.actual_package()
+		# set use list
+		self.useList.get_model().clear()
+		self.fill_use_list()
 		
 		#
 		# rebuild the buttons and checkboxes in all the different manners which are possible
@@ -1008,6 +996,8 @@ class MainWindow (Window):
 		# set emerge queue
 		self.queueTree = GtkTree(self.queueList.get_model())
 		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update)
+
+		self.window.maximize()
 
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)

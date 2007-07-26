@@ -42,6 +42,9 @@ class PortagePackage (Package):
 			self._status = portage.getmaskingstatus(self.get_cpv(), settings = self._settings.settings)
 		except KeyError: # package is not located in the system
 			self._status = None
+		
+		if self._status and len(self._status) == 1 and self._status[0] == "corrupted":
+			self._status = None
 	
 	def is_installed(self):
 		return self._settings.vartree.dbapi.cpv_exists(self._cpv)
