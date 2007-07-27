@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>466</width>
+    <width>532</width>
     <height>695</height>
    </rect>
   </property>
@@ -136,6 +136,25 @@
           </widget>
          </item>
          <item>
+          <widget class="QLabel" name="pkgLink" >
+           <property name="text" >
+            <string>TextLabel</string>
+           </property>
+           <property name="textFormat" >
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="openExternalLinks" >
+            <bool>true</bool>
+           </property>
+           <property name="textInteractionFlags" >
+            <enum>Qt::TextBrowserInteraction</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
           <layout class="QHBoxLayout" >
            <property name="margin" >
             <number>0</number>
@@ -143,18 +162,6 @@
            <property name="spacing" >
             <number>6</number>
            </property>
-           <item>
-            <widget class="QComboBox" name="versCombo" >
-             <property name="sizePolicy" >
-              <sizepolicy>
-               <hsizetype>3</hsizetype>
-               <vsizetype>0</vsizetype>
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
            <item>
             <widget class="QLabel" name="missingLabel" >
              <property name="sizePolicy" >
@@ -167,11 +174,27 @@
              </property>
              <property name="text" >
               <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; color:#ff0000;">MISSING KEYWORD&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+														p, li { white-space: pre-wrap; }
+														&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
+														&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; color:#ff0000;">MISSING KEYWORD&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+             </property>
+             <property name="alignment" >
+              <set>Qt::AlignCenter</set>
              </property>
             </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
            <item>
             <widget class="QLabel" name="notInSysLabel" >
@@ -185,6 +208,9 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="text" >
               <string>&lt;b>Installed, but not in portage anymore&lt;/b></string>
+             </property>
+             <property name="alignment" >
+              <set>Qt::AlignCenter</set>
              </property>
             </widget>
            </item>
@@ -239,44 +265,83 @@ p, li { white-space: pre-wrap; }
           </layout>
          </item>
          <item>
-          <widget class="QTreeWidget" name="useList" >
-           <property name="horizontalScrollBarPolicy" >
-            <enum>Qt::ScrollBarAsNeeded</enum>
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
            </property>
-           <property name="editTriggers" >
-            <set>QAbstractItemView::NoEditTriggers</set>
+           <property name="spacing" >
+            <number>6</number>
            </property>
-           <property name="textElideMode" >
-            <enum>Qt::ElideNone</enum>
-           </property>
-           <property name="rootIsDecorated" >
-            <bool>true</bool>
-           </property>
-           <property name="sortingEnabled" >
-            <bool>false</bool>
-           </property>
-           <property name="allColumnsShowFocus" >
-            <bool>false</bool>
-           </property>
-           <property name="columnCount" >
-            <number>3</number>
-           </property>
-           <column>
-            <property name="text" >
-             <string>1</string>
-            </property>
-           </column>
-           <column>
-            <property name="text" >
-             <string>1</string>
-            </property>
-           </column>
-           <column>
-            <property name="text" >
-             <string>2</string>
-            </property>
-           </column>
-          </widget>
+           <item>
+            <widget class="QListWidget" name="versList" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>0</hsizetype>
+               <vsizetype>7</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize" >
+              <size>
+               <width>150</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="horizontalScrollBarPolicy" >
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTreeWidget" name="useList" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>3</hsizetype>
+               <vsizetype>7</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="horizontalScrollBarPolicy" >
+              <enum>Qt::ScrollBarAlwaysOn</enum>
+             </property>
+             <property name="editTriggers" >
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="textElideMode" >
+              <enum>Qt::ElideNone</enum>
+             </property>
+             <property name="rootIsDecorated" >
+              <bool>true</bool>
+             </property>
+             <property name="sortingEnabled" >
+              <bool>false</bool>
+             </property>
+             <property name="allColumnsShowFocus" >
+              <bool>false</bool>
+             </property>
+             <property name="columnCount" >
+              <number>3</number>
+             </property>
+             <column>
+              <property name="text" >
+               <string>1</string>
+              </property>
+             </column>
+             <column>
+              <property name="text" >
+               <string>1</string>
+              </property>
+             </column>
+             <column>
+              <property name="text" >
+               <string>2</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <layout class="QHBoxLayout" >
@@ -415,7 +480,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>466</width>
+     <width>532</width>
      <height>31</height>
     </rect>
    </property>

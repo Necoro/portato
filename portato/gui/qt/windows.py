@@ -33,6 +33,7 @@ from dialogs import *
 from helper import qCheck, qIsChecked
 
 import types, logging
+from subprocess import Popen
 
 UI_DIR = DATA_DIR+"ui/"
 
@@ -339,7 +340,7 @@ class PreferenceWindow (Window):
 		self.fontBtn.setText(self.consoleFontFam+" "+self.consoleFontSize)
 
 		Qt.QObject.connect(self, Qt.SIGNAL("accepted()"), self.finish)
-
+	
 	def _save (self):
 		"""Sets all options in the Config-instance."""
 		
@@ -385,7 +386,7 @@ class PackageDetails:
 		self.window.installedCheck.blockSignals(True)
 
 		# combo
-		Qt.QObject.connect(self.window.versCombo, Qt.SIGNAL("currentIndexChanged(int)"), self.cb_combo_changed)
+		Qt.QObject.connect(self.window.versList, Qt.SIGNAL("currentRowChanged(int)"), self.cb_combo_changed)
 		
 		# buttons
 		Qt.QObject.connect(self.window.pkgEmergeBtn, Qt.SIGNAL("clicked()"), self.cb_emerge_clicked)
@@ -427,11 +428,14 @@ class PackageDetails:
 		self.instantChange = instantChange
 		
 		# packages and installed packages
-		self.packages = system.sort_package_list(system.find_packages(cp, masked = True))
-		self.instPackages = system.sort_package_list(system.find_installed_packages(cp, masked = True))
+		if not self.doEmerge:
+			self.instPackages = self.packages = system.find_packages("=%s-%s" % (cp, version), masked = True)
+		else:
+			self.packages = system.sort_package_list(system.find_packages(cp, masked = True))
+			self.instPackages = system.sort_package_list(system.find_installed_packages(cp, masked = True))
 
 		# comboBox
-		self.set_combo()
+		self.set_vers_list()
 
 		# disable buttons when emerging is not allowed
 		if not self.queue or not self.doEmerge: 
@@ -459,12 +463,31 @@ class PackageDetails:
 		
 		self.window.descLabel.setText(desc)
 		self.window.nameLabel.setText(name)
+		self.window.pkgLink.setText('<a href="%(link)s">%(link)s</a>' % { "link" : self.actual_package().get_package_settings("HOMEPAGE")})
 
-	def set_combo (self):
+	def set_vers_list (self):
 		"""Fills the version combo box with the right items and selects the correct one."""
 
-		self.window.versCombo.clear()
-		self.window.versCombo.addItems([x.get_version() for x in self.packages])
+		use_icons = self.window.cfg.get_boolean("pkgIcons", section = "QT")
+		
+		# installed icon
+		if use_icons:
+			yes = Qt.QApplication.style().standardIcon(Qt.QStyle.SP_DialogYesButton)
+			no = Qt.QApplication.style().standardIcon(Qt.QStyle.SP_DialogNoButton)
+
+		self.window.versList.clear()
+
+		for vers, inst in [(x.get_version(), x.is_installed()) for x in self.packages]:
+			if use_icons:
+				if inst:
+					icon = yes
+				else:
+					icon = no
+				Qt.QListWidgetItem(icon, vers, self.window.versList)
+			else: # use checkboxes
+				item = Qt.QListWidgetItem(vers, self.window.versList)
+				item.setCheckState(qCheck(inst))
+				item.setFlags(Qt.Qt.ItemIsSelectable | Qt.Qt.ItemIsEnabled)
 
 		try:
 			best_version = ""
@@ -475,9 +498,9 @@ class PackageDetails:
 			
 			for i in range(len(self.packages)):
 				if self.packages[i].get_version() == best_version:
-					self.window.versCombo.setCurrentIndex(i)
+					self.window.versList.setCurrentRow(i)
 		except AttributeError:
-			self.window.versCombo.setCurrentIndex(0)
+			self.window.versList.setCurrentRow(0)
 
 	def build_use_list (self):
 		"""Builds the list of use flags."""
@@ -527,7 +550,7 @@ class PackageDetails:
 		@returns: the actual selected package
 		@rtype: backend.Package"""
 		
-		return self.packages[self.window.versCombo.currentIndex()]
+		return self.packages[self.window.versList.currentIndex().row()]
 
 	def cb_ebuild_clicked (self):
 		hook = plugin.hook("open_ebuild", package = self.actual_package(), parent = self.window)
@@ -790,7 +813,7 @@ class MainWindow (Window):
 		# set emerge queue
 		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update)
 
-		self.show()
+		self.showMaximized()
 	
 	def title_update (self, title):
 		self.emit(Qt.SIGNAL("doTitleUpdate"), title)
@@ -884,7 +907,7 @@ class MainWindow (Window):
 
 	@Qt.pyqtSignature("")
 	def on_prefAction_triggered (self):
-		PreferenceWindow(self, self.cfg).exec_()
+		PreferenceWindow(self, self.cfg).show()
 		
 		# set font as it might has changed
 		self.console.setCurrentFont(Qt.QFont(self.cfg.get("consolefontfamily", "QT"), int(self.cfg.get("consolefontsize", "QT"))))
