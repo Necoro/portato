@@ -5,6 +5,7 @@ Backend:
 ========
 
 - add Paludis support
+- add pkgcore support
 
 - bugs in update world (Necoro, 04/20/07: are there any more bugs?)
 - fix for flag handling, when reverting flags (Necoro, 04/20/07: what did i mean by this?)
@@ -30,7 +31,7 @@ GTK:
 - make oneshot better
 - better infos in queue for "newuse"
 
-Qt:
+Qt (stopped):
 ---
 - better terminal
 - find a way to use markup in CheckBoxes, Lists etc.

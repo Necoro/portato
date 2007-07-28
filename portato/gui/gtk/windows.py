@@ -40,7 +40,7 @@ GLADE_FILE = DATA_DIR+"portato.glade"
 
 class Window:
 	def __init__ (self):
-		self.tree = gtk.glade.XML(GLADE_FILE, root = self.__class__.__name__)
+		self.tree = self.get_tree(self.__class__.__name__)
 		self.tree.signal_autoconnect(self)
 		self.window = self.tree.get_widget(self.__class__.__name__)
 		self.window.set_icon_from_file(APP_ICON)
@@ -64,10 +64,19 @@ class Window:
 			return ret
 		return wrapper
 
-	def create_popup (self, name):
-		popupTree = gtk.glade.XML(GLADE_FILE, root = name)
-		popupTree.signal_autoconnect(self)
-		return popupTree.get_widget(name)
+	def get_tree (self, name):
+		return gtk.glade.XML(GLADE_FILE, root = name)
+
+class Popup:
+
+	def __init__ (self, name, parent):
+		self.tree = gtk.glade.XML(GLADE_FILE, root = name)
+		self.tree.signal_autoconnect(parent)
+		self._popup = self.tree.get_widget(name)
+
+	def popup (self, *args):
+		self._popup.popup(*args)
+
 
 class AbstractDialog (Window):
 	"""A class all our dialogs get derived from. It sets useful default vars and automatically handles the ESC-Button."""
@@ -261,27 +270,45 @@ class SearchWindow (AbstractDialog):
 		
 		AbstractDialog.__init__(self, parent)
 		
-		self.list = list # list to show
 		self.jump_to = jump_to # function to call for jumping
+		self.list = list
+		self.list.sort()
 		
 		# combo box
-		self.combo = gtk.combo_box_new_text()
-		for x in list:
-			self.combo.append_text(x)
-		self.combo.set_active(0) # first item
-		self.combo.connect("key-press-event", self.cb_key_pressed_combo)
-		
-		self.window.add(self.combo)
+		self.searchList = self.tree.get_widget("searchList")
+		self.build_sort_list()
+		self.searchList.get_selection().select_path(0)
 
 		# finished --> show
 		self.window.show_all()
+
+	def build_sort_list (self):
+		"""Builds the sort list."""
+		
+		store = gtk.ListStore(str)
+		self.searchList.set_model(store)
+
+		# build categories
+		for p in self.list:
+			store.append(["%s/<b>%s</b>" % tuple(p.split("/"))])
+
+		cell = gtk.CellRendererText()
+		col = gtk.TreeViewColumn("Results", cell, markup = 0)
+		self.searchList.append_column(col)
+
+	def ok (self, *args):
+		self.jump()
+		self.close()
+	
+	def jump (self, *args):
+		model, iter = self.searchList.get_selection().get_selected()
+		self.jump_to(self.list[model.get_path(iter)[0]])
 
 	def cb_key_pressed_combo (self, widget, event):
 		"""Emulates a ok-button-click."""
 		keyname = gtk.gdk.keyval_name(event.keyval)
 		if keyname == "Return": # take it as an "OK" if Enter is pressed
-			self.window.destroy()
-			self.jump_to(self.list[self.combo.get_active()])
+			self.jump()
 			return True
 		else:
 			return False
@@ -500,7 +527,7 @@ class PackageTable:
 		@param version: if not None, specifies the version to select
 		@type version: string
 		@param doEmerge: if False, the emerge buttons are disabled
-		@type doEmerge: False
+		@type doEmerge: boolean
 		@param instantChange: if True the changed keywords are updated instantly
 		@type instantChange: boolean"""
 		
@@ -953,7 +980,7 @@ class MainWindow (Window):
 
 		# set vpaned position
 		vpaned = self.tree.get_widget("vpaned")
-		vpaned.set_position(int(mHeight/2.5))
+		vpaned.set_position(int(mHeight/2))
 
 		# cat and pkg list
 		self.sortPkgListByName = True
@@ -981,9 +1008,19 @@ class MainWindow (Window):
 		self.packageTable.hide()
 
 		# popups
-		self.queuePopup = self.create_popup("queuePopup")
-		self.consolePopup = self.create_popup("consolePopup")
-		self.trayPopup = self.create_popup("systrayPopup")
+		self.queuePopup = Popup("queuePopup", self)
+		self.consolePopup = Popup("consolePopup", self)
+		self.trayPopup = Popup("systrayPopup", self)
+
+		# pause menu items
+		self.emergePaused = False
+		self.pauseItems = {}
+		self.pauseItems["tray"] = self.trayPopup.tree.get_widget("pauseItemTray")
+		self.pauseItems["popup"] = self.consolePopup.tree.get_widget("pauseItemPopup")
+		self.pauseItems["menu"] = self.tree.get_widget("pauseItemMenu")
+
+		for k,v in self.pauseItems.items():
+			self.pauseItems[k] = (v, v.connect_after("activate", self.cb_pause_emerge(k)))
 
 		# systray
 		if self.cfg.get_boolean("systray", "GUI"):
@@ -996,7 +1033,7 @@ class MainWindow (Window):
 		# set emerge queue
 		self.queueTree = GtkTree(self.queueList.get_model())
 		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update)
-
+	
 		self.window.maximize()
 
 	def show_package (self, *args, **kwargs):
@@ -1275,8 +1312,12 @@ class MainWindow (Window):
 	@Window.watch_cursor
 	def cb_search_clicked (self, entry):
 		"""Do a search."""
-		if entry.get_text() != "":
-			packages = system.find_all_packages(entry.get_text(), withVersion = False)
+		text = entry.get_text()
+		if text != "":
+			if "/" not in text:
+				text = "/"+text # only look for package names
+
+			packages = system.find_all_packages(text, withVersion = False)
 
 			if packages == []:
 				nothing_found_dialog()
@@ -1346,16 +1387,33 @@ class MainWindow (Window):
 			self.cfg.set_local(package, "oneshot", set)
 			self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
 
-	def cb_stop_cont_toggled (self, cb):
-		if not cb.get_active():
-			self.queue.continue_emerge()
-		else:
-			self.queue.stop_emerge()
 
-		return False
-	
-	def cb_kill_clicked (self, action):
+	def cb_pause_emerge (self, curr):
+		def pause (cb):
+			debug("pause")
+			self.emergePaused = cb.get_active()
+			if not self.emergePaused:
+				self.queue.continue_emerge()
+			else:
+				self.queue.stop_emerge()
+
+			for v in self.pauseItems.itervalues():
+				v[0].handler_block(v[1])
+
+			for k, v in self.pauseItems.iteritems():
+				if k != curr:
+					v[0].set_active(self.emergePaused)
+
+			for v in self.pauseItems.itervalues():
+				v[0].handler_unblock(v[1])
+			
+			return False
+		return pause
+
+	def cb_kill_clicked (self, action):		
 		self.queue.kill_emerge()
+		if self.emergePaused:
+			self.pauseItems["menu"][0].set_active(False)
 
 	def cb_copy_clicked (self, action):
 		self.console.copy_clipboard()

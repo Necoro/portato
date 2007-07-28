@@ -1,5 +1,5 @@
 next:
-- consolefont changeble for Qt
+- removed Qt-Frontend
 - added "shutdown" plugin
 - added "resume-loop" plugin
 - changed plugin-structures
@@ -7,6 +7,7 @@ next:
 - nicier log output
 - log viewers
 - changed design / added link
+- improved search
 
 0.7.5:
 - new icon by p4r4d0x
