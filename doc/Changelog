@@ -1,4 +1,4 @@
-next:
+0.8.0:
 - removed Qt-Frontend
 - added "shutdown" plugin
 - added "resume-loop" plugin
