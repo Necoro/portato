@@ -35,6 +35,7 @@ from usetips import UseTips
 # other
 import types, logging
 from subprocess import Popen
+from threading import Thread
 
 GLADE_FILE = DATA_DIR+"portato.glade"
 
@@ -1159,6 +1160,8 @@ class MainWindow (Window):
 				title = "Console"
 			else: 
 				title = ("Console (%s)" % title)
+			
+			return False
 
 			self.notebook.set_tab_label_text(self.termHB, title)
 
@@ -1233,28 +1236,49 @@ class MainWindow (Window):
 		self.queue.unmerge(force=True)
 		return True
 
-	@Window.watch_cursor
 	def cb_update_clicked (self, action):
 		if not am_i_root():
 			not_root_dialog()
-		
 		else:
-			updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
+			
+			def __update():
+				
+				def cb_idle_append (pkg, unmask):
+					self.queue.append(pkg.get_cpv(), unmask = unmask)
+					return False
 
-			debug("updating list: %s --> length: %s", [(x.get_cpv(), y.get_cpv()) for x,y in updating], len(updating))
-			try:
-				try:
-					for pkg, old_pkg in updating:
-						self.queue.append(pkg.get_cpv(), unmask = False)
-				except PackageNotFoundException, e:
+				def cb_idle_unmask_dialog (e, updating):
 					if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
 						for pkg, old_pkg in updating:
 							self.queue.append(pkg.get_cpv(), unmask = True)
-			
-			except BlockedException, e:
-				blocked_dialog(e[0], e[1])
-				self.queue.remove_children(self.queue.emergeIt)
-			if len(updating): self.doUpdate = True
+					return False
+
+				def cb_idle_blocked(e):
+					blocked_dialog(e[0], e[1])
+					self.queue.remove_children(self.queue.emergeIt)
+					return False
+
+				watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
+				self.window.window.set_cursor(watch)
+				try:
+					updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
+					debug("updating list: %s --> length: %s", [(x.get_cpv(), y.get_cpv()) for x,y in updating], len(updating))
+					try:
+						try:
+							for pkg, old_pkg in updating:
+								gobject.idle_add(cb_idle_append, pkg, False)
+						except PackageNotFoundException, e:
+							gobject.idle_add(cb_idle_unmask_dialog, e, updating)
+					
+					except BlockedException, e:
+						gobject.idle_add(cb_idle_blocked(e))
+					
+					if len(updating): self.doUpdate = True
+				finally:
+					self.window.window.set_cursor(None)
+				
+			Thread(name="Update-Thread", target=__update).start()
+		
 		return True
 
 	def cb_remove_clicked (self, button):
@@ -1315,7 +1339,7 @@ class MainWindow (Window):
 		text = entry.get_text()
 		if text != "":
 			if "/" not in text:
-				text = "/"+text # only look for package names
+				text = "/.*"+text # only look for package names
 
 			packages = system.find_all_packages(text, withVersion = False)
 
@@ -1346,9 +1370,26 @@ class MainWindow (Window):
 	def cb_show_log_clicked (self, btn):
 		self.logWindow.show()
 	
-	@Window.watch_cursor
 	def cb_show_updates_clicked (self, button):
-		UpdateWindow(self.window, system.get_updated_packages(), self.queue, self.jump_to)
+		def __update():
+			def cb_idle():
+				UpdateWindow(self.window, packages, self.queue, self.jump_to)
+				return False
+			
+			def cb_idle_watch(packages):
+				try:
+					packages.extend(system.get_updated_packages())
+				finally:
+					self.window.window.set_cursor(None)
+			
+			watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
+			self.window.window.set_cursor(watch)
+			
+			packages = []
+			gobject.idle_add(cb_idle_watch, packages)
+			gobject.idle_add(cb_idle)
+		
+		Thread(name="Show Updates Thread", target = __update).start()
 		return True
 
 	def cb_right_click (self, object, event):
@@ -1390,7 +1431,6 @@ class MainWindow (Window):
 
 	def cb_pause_emerge (self, curr):
 		def pause (cb):
-			debug("pause")
 			self.emergePaused = cb.get_active()
 			if not self.emergePaused:
 				self.queue.continue_emerge()

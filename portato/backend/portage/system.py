@@ -92,14 +92,17 @@ class PortageSystem (SystemInterface):
 		"""Returns the function needed by all the find_all_*-functions. Returns None if no name is given.
 		
 		@param name: name to build the function of
-		@type name: string
+		@type name: string or RE
 		@returns: 
 					1. None if no name is given
 					2. a lambda function
 		@rtype: function"""
 		
 		if name != None:
-			return lambda x: re.match(".*"+name+".*",x)
+			if isinstance(name, str):
+				return lambda x: re.match(".*"+name+".*",x)
+			else: # assume regular expression
+				return lambda x: name.match(x)
 		else:
 			return lambda x: True
 
@@ -376,7 +379,7 @@ class PortageSystem (SystemInterface):
 							raw_checked.append(i)
 							bm = self.get_new_packages([i])
 							if not bm: 
-								warning("Bug? No best match could be found for %s.",i)
+								warning("Bug? No best match could be found for '%s'. Needed by: '%s'.", i, p.get_cpv())
 							else:
 								for pkg in bm: 
 									if not pkg: continue
