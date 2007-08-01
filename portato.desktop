@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Portato (Gtk)
+Name=Portato
 Icon=portato-icon
 Exec=gksu -D "Portato (GTK)" -u root portato gtk
 StartupNotify=true
