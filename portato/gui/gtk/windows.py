@@ -1307,6 +1307,7 @@ class MainWindow (Window):
 		return True
 
 	def cb_sync_clicked (self, action):
+		raise Exception, "Bla"
 		if not am_i_root():
 			not_root_dialog()
 		else:

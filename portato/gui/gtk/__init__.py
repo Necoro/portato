@@ -14,14 +14,20 @@ import gtk
 from portato import plugin
 from portato.backend import system
 from windows import MainWindow, SearchWindow, EbuildWindow
+from uncaughtException import register_ex_handler
 
 def run ():
-	m = MainWindow()
-	m.main()
+	try:
+		m = MainWindow()
+		register_ex_handler()
+		m.main()
+	except KeyboardInterrupt:
+		pass
 
 def show_ebuild (pkg):
 	plugin.load_plugins("gtk")
-	
+	register_ex_handler()
+
 	def _show (pkg):
 		gtk.main_quit()
 
