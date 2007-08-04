@@ -554,7 +554,7 @@ class PackageTable:
 			self.unmergeBtn.set_sensitive(False)
 		
 		# current status
-		self.cb_vers_list_changed(None)
+		self.cb_vers_list_changed()
 		self.table.show_all()
 
 	def hide (self):
@@ -694,7 +694,7 @@ class PackageTable:
 				error("Package could not be found: %s", e[0])
 				#masked_dialog(e[0])
 
-	def cb_vers_list_changed (self, treeselection):
+	def cb_vers_list_changed (self, *args):
 
 		pkg = self.actual_package()
 		
@@ -780,7 +780,9 @@ class PackageTable:
 		self.actual_package().remove_new_use_flags()
 		self.actual_package().remove_new_masked()
 		self.actual_package().remove_new_testing()
-		self.cb_combo_changed(self.vCombo)
+		self.versList.get_model().clear()
+		self.fill_vers_list()
+		self.cb_vers_list_changed()
 		if self.instantChange:
 			self._update_keywords(True, update = True)
 		return True

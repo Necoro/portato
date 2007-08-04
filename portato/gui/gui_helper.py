@@ -491,6 +491,16 @@ class EmergeQueue:
 		@param command: the command to execute - default is "/usr/bin/python /usr/bin/emerge"
 		@type command: string[]"""
 
+		if self.process is not None:
+			def wait():
+				while self.process is not None:
+					time.sleep(0.5)
+
+				self._emerge(options, packages, it, command)
+
+			Thread(name="Waiting-Thread", target=wait).start()
+			return
+
 		@plugin.hook("emerge", packages = packages, command = command, console = self.console, title_update = self.title_update)
 		def sub_emerge(command):
 			if command is None:
@@ -532,7 +542,7 @@ class EmergeQueue:
 			return list, its
 
 		# oneshot-queue
-		if len(self.oneshotmerge) != 0:
+		if self.oneshotmerge:
 			# prepare package-list for oneshot
 			list, its = prepare(self.oneshotmerge)
 			
@@ -543,7 +553,7 @@ class EmergeQueue:
 			self._emerge(s, list, its)
 		
 		# normal queue
-		if len(self.mergequeue) != 0:
+		if self.mergequeue:
 			# prepare package-list
 			list, its = prepare(self.mergequeue)
 
