@@ -6,11 +6,12 @@ cd i18n
 for ITEM in *.po; do
 	ITEM2=${ITEM/.po/}
 	LANG=${ITEM2/_??/}
-	mkdir ${LANG}/LC_MESSAGES -p
 
 	if [ $1 == "-emerge" ]; then
-		msgfmt ${ITEM} -o portato.${LANG}
+		mkdir po -p
+		msgfmt ${ITEM} -o po/portato.${LANG}
 	else
+		mkdir ${LANG}/LC_MESSAGES -p
 		msgfmt ${ITEM} -o ${LANG}/LC_MESSAGES/portato.mo
 	fi
 done
