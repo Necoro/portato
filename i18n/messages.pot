@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-04 22:21-0700\n"
+"POT-Creation-Date: 2007-08-05 00:07-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,7 +34,7 @@ msgid "gtk-quit"
 msgstr ""
 
 #: portato/gui/templates/portato.glade:81
-#: portato/gui/templates/portato.glade:514
+#: portato/gui/templates/portato.glade:569
 msgid "_Emerge"
 msgstr ""
 
@@ -44,7 +44,7 @@ msgid "E_merge"
 msgstr ""
 
 #: portato/gui/templates/portato.glade:104
-#: portato/gui/templates/portato.glade:523
+#: portato/gui/templates/portato.glade:578
 #: portato/gui/templates/portato.glade:728
 msgid "_Unmerge"
 msgstr ""
@@ -115,37 +115,37 @@ msgstr ""
 msgid "gtk-find"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:461
+#: portato/gui/templates/portato.glade:472
+msgid "<b>Installed, but not in portage anymore</b>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:551
+msgid "<span foreground='red'><b>MISSING KEYWORD</b></span>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:590
+msgid "Re_vert"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:602
+msgid "E_build"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:628
 msgid "Installed"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:474 portato/gui/gtk/windows.py:741
+#: portato/gui/templates/portato.glade:641 portato/gui/gtk/windows.py:741
 #: portato/gui/gtk/windows.py:744 portato/gui/gtk/windows.py:747
 #: portato/gui/gtk/windows.py:852 portato/gui/gtk/windows.py:855
 #: portato/gui/gtk/windows.py:862 portato/gui/gtk/windows.py:866
 msgid "Masked"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:488 portato/gui/gtk/windows.py:754
+#: portato/gui/templates/portato.glade:655 portato/gui/gtk/windows.py:754
 #: portato/gui/gtk/windows.py:757 portato/gui/gtk/windows.py:824
 #: portato/gui/gtk/windows.py:829
 msgid "Testing"
-msgstr ""
-
-#: portato/gui/templates/portato.glade:535
-msgid "Re_vert"
-msgstr ""
-
-#: portato/gui/templates/portato.glade:547
-msgid "E_build"
-msgstr ""
-
-#: portato/gui/templates/portato.glade:568
-msgid "<span foreground='red'><b>MISSING KEYWORD</b></span>"
-msgstr ""
-
-#: portato/gui/templates/portato.glade:647
-msgid "<b>Installed, but not in portage anymore</b>"
 msgstr ""
 
 #: portato/gui/templates/portato.glade:682 portato/gui/gtk/windows.py:201
@@ -169,7 +169,7 @@ msgid "Portato - A Portage GUI"
 msgstr ""
 
 #: portato/gui/templates/portato.glade:852
-msgid "Search"
+msgid "Search Results"
 msgstr ""
 
 #: portato/gui/templates/portato.glade:892
@@ -202,14 +202,6 @@ msgstr ""
 msgid "<b>General Options</b>"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1037
-msgid "--deep"
-msgstr ""
-
-#: portato/gui/templates/portato.glade:1048
-msgid "--newuse"
-msgstr ""
-
 #: portato/gui/templates/portato.glade:1064
 msgid "<b>Update World Options</b>"
 msgstr ""
@@ -222,19 +214,31 @@ msgstr ""
 msgid "<b>Sync Options</b>"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1154
-msgid "<u><i>Masking Keywords</i></u>"
+#: portato/gui/templates/portato.glade:1164
+msgid "File name to use, if package.use is a directory: "
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1169
-msgid "<u><i>Testing Keywords</i></u>"
+#: portato/gui/templates/portato.glade:1175
+msgid "Add only exact version to package.use"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1184
-msgid "<u><i>Use-Flags</i></u>"
+#: portato/gui/templates/portato.glade:1188
+msgid "Add only exact version to package.keywords"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1206
+#: portato/gui/templates/portato.glade:1202
+msgid "File name to use, if package.keywords is a directory: "
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1236
+msgid "File name to use, if package.mask/package.unmask is a directory: "
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1247
+msgid "Add only exact version to package.mask/package.unmask"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1269
 msgid ""
 "<u>You may use the following placeholders:</u>\n"
 "\n"
@@ -243,28 +247,16 @@ msgid ""
 "<i>$(cat-1)/$(cat-2)</i>: first/second part of the category"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1230
-msgid "Add only exact version to package.mask/package.unmask"
+#: portato/gui/templates/portato.glade:1295
+msgid "<u><i>Use-Flags</i></u>"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1244
-msgid "File name to use, if package.mask/package.unmask is a directory: "
+#: portato/gui/templates/portato.glade:1310
+msgid "<u><i>Testing Keywords</i></u>"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1278
-msgid "File name to use, if package.keywords is a directory: "
-msgstr ""
-
-#: portato/gui/templates/portato.glade:1289
-msgid "Add only exact version to package.keywords"
-msgstr ""
-
-#: portato/gui/templates/portato.glade:1302
-msgid "Add only exact version to package.use"
-msgstr ""
-
-#: portato/gui/templates/portato.glade:1316
-msgid "File name to use, if package.use is a directory: "
+#: portato/gui/templates/portato.glade:1325
+msgid "<u><i>Masking Keywords</i></u>"
 msgstr ""
 
 #: portato/gui/templates/portato.glade:1342
@@ -384,7 +376,7 @@ msgid "This is an expanded use flag and cannot be selected"
 msgstr ""
 
 #: portato/gui/gtk/windows.py:616
-msgid "Flags"
+msgid "Flag"
 msgstr ""
 
 #: portato/gui/gtk/windows.py:617
@@ -415,6 +407,14 @@ msgstr ""
 #: portato/gui/gtk/windows.py:1166
 #, python-format
 msgid "Console (%(title)s)"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:1218
+msgid "use flags"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:1225
+msgid "masking keywords"
 msgstr ""
 
 #: portato/gui/gtk/uncaughtException.py:28
@@ -615,13 +615,13 @@ msgstr ""
 
 #: portato.py:78
 #, python-format
-msgid "Verification failed. XML syntax error: %s."
+msgid "Validation failed. XML syntax error: %s."
 msgstr ""
 
 #: portato.py:81
-msgid "Verification failed. Does not comply with schema."
+msgid "Validation failed. Does not comply with schema."
 msgstr ""
 
 #: portato.py:84
-msgid "Verification succeeded."
+msgid "Validation succeeded."
 msgstr ""

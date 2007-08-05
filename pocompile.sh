@@ -4,8 +4,7 @@
 # Copied from porthole :)
 cd i18n
 for ITEM in *.po; do
-	ITEM2=${ITEM/.po/}
-	LANG=${ITEM2/_??/}
+	LANG=${ITEM/.po/}
 
 	if [ $1 == "-emerge" ]; then
 		mkdir mo -p

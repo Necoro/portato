@@ -613,7 +613,7 @@ class PackageTable:
 		tCell.set_property("activatable", True)
 		tCell.connect("toggled", self.cb_use_flag_toggled, store)
 		self.useList.append_column(gtk.TreeViewColumn(_("Enabled"), tCell, active = 0))
-		self.useList.append_column(gtk.TreeViewColumn(_("Flags"), cell, text = 1))
+		self.useList.append_column(gtk.TreeViewColumn(_("Flag"), cell, text = 1))
 		self.useList.append_column(gtk.TreeViewColumn(_("Description"), cell, markup = 2))
 
 		self.useList.set_search_column(1)
@@ -1215,14 +1215,14 @@ class MainWindow (Window):
 		self.notebook.set_current_page(self.CONSOLE_PAGE)
 		
 		if len(flags.newUseFlags) > 0:
-			changed_flags_dialog("use flags")
+			changed_flags_dialog(_("use flags"))
 			flags.write_use_flags()
 		
 		if len(flags.new_masked)>0 or len(flags.new_unmasked)>0 or len(flags.newTesting)>0:
 			debug("new masked: %s",flags.new_masked)
 			debug("new unmasked: %s", flags.new_unmasked)
 			debug("new testing: %s", flags.newTesting)
-			changed_flags_dialog("masking keywords")
+			changed_flags_dialog(_("masking keywords"))
 			flags.write_masked()
 			flags.write_testing()
 			system.reload_settings()

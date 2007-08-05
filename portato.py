@@ -75,13 +75,13 @@ def main ():
 		try:
 			etree.XMLSchema(file = XSD_LOCATION).assertValid(etree.parse(options.validate))
 		except etree.XMLSyntaxError, e:
-			print _("Verification failed. XML syntax error: %s.") % e[0]
+			print _("Validation failed. XML syntax error: %s.") % e[0]
 			sys.exit(3)
 		except etree.DocumentInvalid:
-			print _("Verification failed. Does not comply with schema.")
+			print _("Validation failed. Does not comply with schema.")
 			sys.exit(3)
 		else:
-			print _("Verification succeeded.")
+			print _("Validation succeeded.")
 			return
 	else:
 		run()
