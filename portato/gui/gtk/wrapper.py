@@ -33,13 +33,14 @@ class GtkTree (Tree):
 		string = ""
 
 		if oneshot:
-			string += "<i>oneshot</i>"
+			string += "<i>%s</i>" % _("oneshot")
 			if update: string += "; "
 
 		if update:
-			string += "<i>updating</i>"
 			if version is not None:
-				string += "<i> from version %s</i>" % version
+				string += "<i>%s</i>" % (_("updating from version %s") % version)
+			else:
+				string += "<i>%s</i>" % _("updating")
 
 		return [cpv, string]
 

@@ -1,0 +1,623 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-08-04 21:44-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: portato/gui/templates/portato.glade:20
+msgid "_File"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:28
+msgid "_Preferences"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:46
+msgid "Re_load Portage"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:68
+#: portato/gui/templates/portato.glade:1575
+msgid "gtk-quit"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:81
+#: portato/gui/templates/portato.glade:514
+msgid "_Emerge"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:89
+#: portato/gui/templates/portato.glade:719 portato/gui/gtk/windows.py:764
+msgid "E_merge"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:104
+#: portato/gui/templates/portato.glade:523
+#: portato/gui/templates/portato.glade:728
+msgid "_Unmerge"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:118
+#: portato/gui/templates/portato.glade:740
+msgid "Update _World"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:127
+msgid "Show Updatable P_ackages"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:140
+msgid "_Sync"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:155
+msgid "Save _Flags"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:176
+#: portato/gui/templates/portato.glade:269
+#: portato/gui/templates/portato.glade:1550
+msgid "Emerge _Paused"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:183
+#: portato/gui/templates/portato.glade:251
+#: portato/gui/templates/portato.glade:1557
+msgid "_Kill Emerge"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:206
+msgid "_Queue"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:214
+msgid "Oneshot"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:226
+msgid "_Console"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:234
+msgid "_Copy"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:280
+#: portato/gui/templates/portato.glade:318
+msgid "_Plugins"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:292
+msgid "_?"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:300
+msgid "_About"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:334
+msgid "Show _Log"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:364
+msgid "gtk-find"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:461
+msgid "Installed"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:474 portato/gui/gtk/windows.py:741
+#: portato/gui/gtk/windows.py:744 portato/gui/gtk/windows.py:747
+#: portato/gui/gtk/windows.py:852 portato/gui/gtk/windows.py:855
+#: portato/gui/gtk/windows.py:862 portato/gui/gtk/windows.py:866
+msgid "Masked"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:488 portato/gui/gtk/windows.py:754
+#: portato/gui/gtk/windows.py:757 portato/gui/gtk/windows.py:824
+#: portato/gui/gtk/windows.py:829
+msgid "Testing"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:535
+msgid "Re_vert"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:547
+msgid "E_build"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:568
+msgid "<span foreground='red'><b>MISSING KEYWORD</b></span>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:647
+msgid "<b>Installed, but not in portage anymore</b>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:682 portato/gui/gtk/windows.py:201
+msgid "Package"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:752
+msgid "_Remove"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:777 portato/gui/gtk/windows.py:1067
+msgid "Queue"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:805 portato/gui/gtk/windows.py:1164
+msgid "Console"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:835
+msgid "Portato - A Portage GUI"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:852
+msgid "Search"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:892
+#: portato/gui/templates/portato.glade:1502
+#: portato/gui/templates/portato.glade:1706
+msgid "gtk-cancel"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:904
+msgid "gtk-jump-to"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:919
+msgid "gtk-ok"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:940
+msgid "Preferences"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:975
+msgid "Debug"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:988
+msgid "Browser command: "
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1014
+msgid "<b>General Options</b>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1037
+msgid "--deep"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1048
+msgid "--newuse"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1064
+msgid "<b>Update World Options</b>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1092
+msgid "Sync command: "
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1113
+msgid "<b>Sync Options</b>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1154
+msgid "<u><i>Masking Keywords</i></u>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1169
+msgid "<u><i>Testing Keywords</i></u>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1184
+msgid "<u><i>Use-Flags</i></u>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1206
+msgid ""
+"<u>You may use the following placeholders:</u>\n"
+"\n"
+"<i>$(cat)</i>: category\n"
+"<i>$(pkg)</i>: package name\n"
+"<i>$(cat-1)/$(cat-2)</i>: first/second part of the category"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1230
+msgid "Add only exact version to package.mask/package.unmask"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1244
+msgid "File name to use, if package.mask/package.unmask is a directory: "
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1278
+msgid "File name to use, if package.keywords is a directory: "
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1289
+msgid "Add only exact version to package.keywords"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1302
+msgid "Add only exact version to package.use"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1316
+msgid "File name to use, if package.use is a directory: "
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1342
+msgid "<b>Use Flag and Keyword Options</b>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1363
+msgid "General"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1387
+msgid "Show emerge progress in title - similar to the console tab"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1398
+msgid "Turn Use-Tips on"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1412
+msgid "Enable systray"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1426
+msgid "Hide on minimization (only if systray is enabled)"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1445
+msgid "Console Font"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1455
+msgid "Chose a console font"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1483
+msgid "Visual"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1511
+#: portato/gui/templates/portato.glade:1718
+msgid "gtk-apply"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1584
+msgid "Updateble Packages"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1619
+msgid "_Close"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1631
+msgid "Select _All"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1646
+msgid "_Install Selected"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1667
+msgid "Plugins"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1739
+msgid "About Portato"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1749
+msgid ""
+"This software is licensed under the terms of the GPLv2.\n"
+"Copyright (C) 2006-2007 René 'Necoro' Neumann <necoro@necoro.net>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1751
+msgid "A Portage GUI"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1782
+msgid "Logging Output"
+msgstr ""
+
+#: portato/plugins/resume_loop.py:30
+msgid "Resume-loop called while process is still running!"
+msgstr ""
+
+#: portato/plugins/etc_proposals.py:64 portato/plugins/etc_proposals.py:76
+msgid "Cannot start etc-proposals. No graphical frontend installed!"
+msgstr ""
+
+#: portato/plugins/etc_proposals.py:78
+msgid "Cannot start etc-proposals. Not root!"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:146
+msgid "Plugin"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:149
+msgid "Authors"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:154 portato/gui/gtk/windows.py:200
+#: portato/gui/gtk/windows.py:615
+msgid "Enabled"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:299
+msgid "Results"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:568
+msgid "<no description>"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:597
+msgid "This is an expanded use flag and cannot be selected"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:616
+msgid "Flags"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:617
+msgid "Description"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:696
+#, python-format
+msgid "Package could not be found: %s"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:767
+msgid "Re_merge"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:1070
+msgid "Options"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:1088
+msgid "Categories"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:1103
+msgid "Packages"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:1166
+#, python-format
+msgid "Console (%(title)s)"
+msgstr ""
+
+#: portato/gui/gtk/uncaughtException.py:28
+msgid ""
+"A programming error has been detected during the execution of this program."
+msgstr ""
+
+#: portato/gui/gtk/uncaughtException.py:29
+msgid "Bug Detected"
+msgstr ""
+
+#: portato/gui/gtk/uncaughtException.py:30
+msgid ""
+"It probably isn't fatal, but should be reported to the developers "
+"nonetheless."
+msgstr ""
+
+#: portato/gui/gtk/uncaughtException.py:32
+msgid "Show Details"
+msgstr ""
+
+#: portato/gui/gtk/uncaughtException.py:79
+#, python-format
+msgid ""
+"An uncaught exception has occured:\n"
+"%s"
+msgstr ""
+
+#: portato/gui/gtk/wrapper.py:36
+msgid "oneshot"
+msgstr ""
+
+#: portato/gui/gtk/wrapper.py:41
+#, python-format
+msgid "updating from version %s"
+msgstr ""
+
+#: portato/gui/gtk/wrapper.py:43
+msgid "updating"
+msgstr ""
+
+#: portato/gui/gtk/dialogs.py:17
+msgid ""
+"There are some packages in the emerge queue and/or an emerge process is "
+"running.\n"
+"Do you really want to quit?"
+msgstr ""
+
+#: portato/gui/gtk/dialogs.py:33
+#, python-format
+msgid ""
+"%(blocked)s is blocked by %(blocks)s.\n"
+"Please unmerge the blocking package."
+msgstr ""
+
+#: portato/gui/gtk/dialogs.py:45
+#, python-format
+msgid ""
+"%s seems to be masked.\n"
+"Do you want to unmask it and its dependencies?"
+msgstr ""
+
+#: portato/gui/gtk/dialogs.py:51
+msgid "Package not found!"
+msgstr ""
+
+#: portato/gui/gtk/dialogs.py:58
+#, python-format
+msgid ""
+"You have changed %s. Portato will write these changes into the appropriate "
+"files. Please backup them if you think it is necessairy."
+msgstr ""
+
+#: portato/gui/gtk/dialogs.py:64
+msgid "You cannot remove dependencies. :)"
+msgstr ""
+
+#: portato/gui/gtk/dialogs.py:70
+msgid "Do you really want to clear the whole queue?"
+msgstr ""
+
+#: portato/gui/gui_helper.py:239
+#, python-format
+msgid ""
+"Catched KeyError => %s seems not to be an available category. Have you "
+"played with rsync-excludes?"
+msgstr ""
+
+#: portato/backend/portage/package.py:93
+#, python-format
+msgid "BUG in flags.new_masking_status. It returns '%s'"
+msgstr ""
+
+#: portato/backend/portage/system.py:286
+#, python-format
+msgid "No best match for %s. It seems not to be in the tree anymore."
+msgstr ""
+
+#: portato/backend/portage/system.py:343
+#, python-format
+msgid "Found a not installed dependency: %s."
+msgstr ""
+
+#: portato/backend/portage/system.py:383
+#, python-format
+msgid ""
+"Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
+msgstr ""
+
+#: portato/backend/flags.py:482
+#, python-format
+msgid "Conflicting values for masking status: %s"
+msgstr ""
+
+#: portato/config_parser.py:211
+#, python-format
+msgid "Unrecognized line in configuration: %s"
+msgstr ""
+
+#: portato/plugin.py:287 portato/plugin.py:293 portato/plugin.py:298
+#, python-format
+msgid "%s cannot be imported."
+msgstr ""
+
+#: portato/plugin.py:325
+#, python-format
+msgid "Accessing hook '%(hook)s' of plugin '%(plugin)s' (before)."
+msgstr ""
+
+#: portato/plugin.py:329
+#, python-format
+msgid "Overriding hook '%(hook)s' with plugin '%(plugin)s'."
+msgstr ""
+
+#: portato/plugin.py:336
+#, python-format
+msgid "Accessing hook '%(hook)s' of plugin '%(plugin)s' (after)."
+msgstr ""
+
+#: portato/plugin.py:356
+#, python-format
+msgid "Loading plugin '%s' failed. Invalid XML syntax."
+msgstr ""
+
+#: portato/plugin.py:359
+#, python-format
+msgid "Loading plugin '%s' failed. Plugin does not comply with schema."
+msgstr ""
+
+#: portato/plugin.py:388
+#, python-format
+msgid "Plugin '%s' loaded."
+msgstr ""
+
+#: portato/plugin.py:391
+#, python-format
+msgid "Loading plugin '%(plugin)s' failed: Could not import %(import)s"
+msgstr ""
+
+#: portato/plugin.py:456
+#, python-format
+msgid ""
+"For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"
+msgstr ""
+
+#: portato.py:38
+msgid "runs pychecker (should only be used by developers)"
+msgstr ""
+
+#: portato.py:41
+#, python-format
+msgid "the frontend to use - possible values are: %s [default: %%default]"
+msgstr ""
+
+#: portato.py:44
+msgid "opens the ebuild viewer instead of launching Portato"
+msgstr ""
+
+#: portato.py:47
+msgid "validates the given plugin xml instead of launching Portato"
+msgstr ""
+
+#: portato.py:60
+#, python-format
+msgid "Unknown frontend '%(frontend)s'. Correct frontends are: %(list)s"
+msgstr ""
+
+#: portato.py:68
+#, python-format
+msgid ""
+"'%(frontend)s' should be installed, but cannot be imported. This is "
+"definitly a bug. (%(error)s)"
+msgstr ""
+
+#: portato.py:78
+#, python-format
+msgid "Verification failed. XML syntax error: %s."
+msgstr ""
+
+#: portato.py:81
+msgid "Verification failed. Does not comply with schema."
+msgstr ""
+
+#: portato.py:84
+msgid "Verification succeeded."
+msgstr ""

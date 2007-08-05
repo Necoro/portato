@@ -236,7 +236,7 @@ class Database:
 				return inst+ninst
 
 		except KeyError: # cat is in category list - but not in portage
-			info("Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?", cat)
+			info(_("Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?"), cat)
 			return []
 
 	def reload (self, cat):

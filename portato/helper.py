@@ -22,6 +22,9 @@ warning 	= logging.getLogger("portatoLogger").warning
 error 		= logging.getLogger("portatoLogger").error
 critical 	= logging.getLogger("portatoLogger").critical
 
+def N_ (s):
+	return s
+
 def set_log_level (lvl):
 	logging.getLogger("portatoLogger").setLevel(lvl)
 

@@ -12,6 +12,7 @@
 
 import pty, time
 from subprocess import Popen, STDOUT
+from gettext import lgettext as _
 from portato.backend import system
 from portato.helper import debug, warning
 
@@ -26,7 +27,7 @@ def set_data (*args, **kwargs):
 
 def resume_loop (retcode, *args, **kwargs):
 	if retcode is None:
-		warning("Resume-loop called while process is still running!")
+		warning(_("Resume-loop called while process is still running!"))
 	elif retcode == 0:
 		# everything ok - ignore
 		#pass

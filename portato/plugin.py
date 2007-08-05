@@ -15,6 +15,7 @@
 import os, os.path
 from xml.dom.minidom import parse
 from lxml import etree
+from gettext import lgettext as _
 
 from constants import PLUGIN_DIR, XSD_LOCATION
 from helper import *
@@ -283,18 +284,18 @@ class PluginQueue:
 				try:
 					mod = __import__(imp, globals(), locals(), [cmd.hook.call])
 				except ImportError:
-					error("%s cannot be imported.", imp)
+					error(_("%s cannot be imported."), imp)
 					return
 
 				try:
 					f = eval("mod."+cmd.hook.call) # build function
 				except AttributeError:
-					error("%s cannot be imported.", cmd.hook.call)
+					error(_("%s cannot be imported."), cmd.hook.call)
 			else:
 				try:
 					f = eval(cmd.hook.call)
 				except AttributeError:
-					error("%s cannot be imported", cmd.hook.call)
+					error(_("%s cannot be imported."), cmd.hook.call)
 
 			return f(*hargs, **hkwargs) # call function
 
@@ -321,18 +322,18 @@ class PluginQueue:
 
 				# before
 				for cmd in list[0]:
-					debug("Accessing hook '%s' of plugin '%s' (before).", hook, cmd.hook.plugin.name)
+					debug(_("Accessing hook '%(hook)s' of plugin '%(plugin)s' (before)."), {"hook" : hook, "plugin": cmd.hook.plugin.name})
 					call(cmd)
 				
 				if list[1]: # override
-					info("Overriding hook '%s' with plugin '%s'.", hook, list[1][0].hook.plugin.name)
+					info(_("Overriding hook '%(hook)s' with plugin '%(plugin)s'."), {"hook": hook, "plugin": list[1][0].hook.plugin.name})
 					ret = call(list[1][0])
 				else: # normal
 					ret = func(*args, **kwargs)
 
 				# after
 				for cmd in list[2]:
-					debug("Accessing hook '%s' of plugin '%s' (after).", hook, cmd.hook.plugin.name)
+					debug(_("Accessing hook '%(hook)s' of plugin '%(plugin)s' (after)."), {"hook":hook, "plugin": cmd.hook.plugin.name})
 					call(cmd)
 
 				return ret
@@ -352,10 +353,10 @@ class PluginQueue:
 			try:
 				schema.assertValid(etree.parse(p))
 			except etree.XMLSyntaxError:
-				error("Loading plugin '%s' failed. Invalid XML syntax.", p)
+				error(_("Loading plugin '%s' failed. Invalid XML syntax."), p)
 				continue
 			except etree.DocumentInvalid:
-				error("Loading plugin '%s' failed. Plugin does not comply with schema.", p)
+				error(_("Loading plugin '%s' failed. Plugin does not comply with schema."), p)
 				continue
 
 			doc = parse(p)
@@ -384,10 +385,10 @@ class PluginQueue:
 						plugin.parse_options(elem.getElementsByTagName("options"))
 					
 						self.list.append(plugin)
-						info("Plugin '%s' loaded.", p)
+						info(_("Plugin '%s' loaded."), p)
 				
 				except PluginImportException, e:
-					error("Loading plugin '%s' failed: Could not import %s", p, e[0])
+					error(_("Loading plugin '%(plugin)s' failed: Could not import %(import)s"), {"plugin": p, "import": e[0]})
 			finally:
 				doc.unlink()
 
@@ -452,7 +453,7 @@ class PluginQueue:
 					# type = "override"
 					elif connect.is_override_type():
 						if self.hooks[hook.hook][1]:
-							warn("For hook '%s' an override is already defined by plugin '%s'!", hook.hook, self.hooks[hook.hook][1][0])
+							warn(_("For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"), {"hook": hook.hook, "plugin": self.hooks[hook.hook][1][0]})
 						
 						self.hooks[hook.hook][1][:1] = [connect]
 						continue
@@ -483,7 +484,7 @@ class PluginQueue:
 				resolve(hook, list, idx, add)
 
 			for l in list:
-				warn("Command for hook '%s' in plugin '%s' could not be added due to missing dependant: '%s'!", hook, l.hook.plugin.name, l.depend_plugin)
+				warn("Command for hook '%(hook)s' in plugin '%(plugin)s' could not be added due to missing dependant: '%(dep)s'!", {"hook": hook, "plugin": l.hook.plugin.name, "dep": l.depend_plugin})
 
 		for hook in before:
 			resolve(hook, before[hook], 0, 0)

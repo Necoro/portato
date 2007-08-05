@@ -31,6 +31,7 @@ Currently supported are the values (case insensitive): false, 0, off, falsch, ne
 """
 
 from helper import debug
+from gettext import lgettext as _
 
 import re
 import types
@@ -207,7 +208,7 @@ class ConfigParser:
 				self.vars[section][key] = Value(val, count, bool = bool)
 				self.pos[count] = match.span(2)
 			else: # neither comment nor empty nor expression nor section => error
-				error("Unrecognized line in configuration: %s", line)
+				error(_("Unrecognized line in configuration: %s"), line)
 
 	def get (self, key, section = "MAIN"):
 		"""Returns the value of a given key in a section.

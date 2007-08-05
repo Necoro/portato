@@ -12,47 +12,52 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from portato.constants import VERSION, FRONTENDS, STD_FRONTEND, XSD_LOCATION
+from portato.constants import VERSION, FRONTENDS, STD_FRONTEND, XSD_LOCATION, LOCALE_DIR, APP
 from optparse import OptionParser
-import sys
+import sys, os
+import gettext, locale
 
 def get_frontend_list ():
 	return ", ".join(["'%s'" % x for x in FRONTENDS])
 
 def main ():
+	# set gettext stuff
+	locale.setlocale(locale.LC_ALL, '')
+	gettext.bindtextdomain(APP, LOCALE_DIR)
+	gettext.textdomain(APP)
+	_ = gettext.lgettext
 
 	# build the parser
-	desc = """Portato - A Portage GUI."""
+	desc = "Portato - A Portage GUI."
 	usage = "%prog [options] [frontend]"
 	vers =  "%%prog v. %s" % VERSION
 
 	parser = OptionParser(version = vers, prog = "Portato", description = desc, usage = usage)
 	
 	parser.add_option("--check", action = "store_true", dest = "check", default = False,
-			help = "runs pychecker (should only be used by developers)")
+			help = _("runs pychecker (should only be used by developers)"))
 	
 	parser.add_option("-f", "--frontend", action = "store", choices = FRONTENDS, default = STD_FRONTEND, dest = "frontend",
-			help = "the frontend to use - possible values are: %s [default: %%default]" % get_frontend_list())
+			help = _("the frontend to use - possible values are: %s [default: %%default]") % get_frontend_list())
 
 	parser.add_option("-e", "--ebuild", action = "store", dest = "ebuild",
-			help = "opens the ebuild viewer instead of launching Portato")
+			help = _("opens the ebuild viewer instead of launching Portato"))
 
 	parser.add_option("-x", "--validate", action = "store", dest = "validate", metavar="PLUGIN",
-			help = "validates the given plugin xml instead of launching Portato")
+			help = _("validates the given plugin xml instead of launching Portato"))
 
 	# run parser
 	(options, args) = parser.parse_args()
 
 	# evaluate parser's results
 	if options.check: # run pychecker
-		import os
 		os.environ['PYCHECKER'] = "--limit 50"
 		import pychecker.checker
 	
 	if len(args): # additional arguments overwrite given frontend
 		arg = args[0]
 		if arg not in FRONTENDS:
-			print "Unknown frontend '%s'. Correct frontends are: %s" % (arg, get_frontend_list())
+			print _("Unknown frontend '%(frontend)s'. Correct frontends are: %(list)s") % {"frontend": arg, "list": get_frontend_list()}
 			sys.exit(2)
 		else:
 			options.frontend = arg
@@ -60,7 +65,7 @@ def main ():
 	try:
 		exec ("from portato.gui.%s import run, show_ebuild" % options.frontend)
 	except ImportError, e:
-		print "'%s' should be installed, but cannot be imported. This is definitly a bug. (%s)" % (options.frontend, e[0])
+		print _("'%(frontend)s' should be installed, but cannot be imported. This is definitly a bug. (%(error)s)") % {"frontend": options.frontend, "error": e[0]}
 		sys.exit(1)
 
 	if options.ebuild:
@@ -70,13 +75,13 @@ def main ():
 		try:
 			etree.XMLSchema(file = XSD_LOCATION).assertValid(etree.parse(options.validate))
 		except etree.XMLSyntaxError, e:
-			print "Verification failed. XML syntax error: %s." % e[0]
+			print _("Verification failed. XML syntax error: %s.") % e[0]
 			sys.exit(3)
 		except etree.DocumentInvalid:
-			print "Verification failed. Does not comply with schema."
+			print _("Verification failed. Does not comply with schema.")
 			sys.exit(3)
 		else:
-			print "Verification succeeded."
+			print _("Verification succeeded.")
 			return
 	else:
 		run()

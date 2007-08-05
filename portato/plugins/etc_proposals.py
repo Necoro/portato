@@ -14,6 +14,7 @@ from portato.helper import *
 from portato.backend import system
 
 from subprocess import Popen
+from gettext import lgettext as _
 from etcproposals.etcproposals_lib import EtcProposals, __version__
 
 try:
@@ -60,7 +61,7 @@ def etc_prop (*args, **kwargs):
 		if f:
 			Popen([PROG, "--fastexit"]+f)
 		else:
-			error("Cannot start etc-proposals. No graphical frontend installed!")
+			error(_("Cannot start etc-proposals. No graphical frontend installed!"))
 
 def etc_prop_menu (*args, **kwargs):
 	if am_i_root():
@@ -72,6 +73,6 @@ def etc_prop_menu (*args, **kwargs):
 			if f:
 				Popen([PROG]+f)
 			else:
-				error("Cannot start etc-proposals. No graphical frontend installed!")
+				error(_("Cannot start etc-proposals. No graphical frontend installed!"))
 	else:
-		error("Cannot start etc-proposals. Not root!")
+		error(_("Cannot start etc-proposals. Not root!"))

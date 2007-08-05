@@ -39,6 +39,7 @@ These should be set during the installation.
 """
 from os.path import join as pjoin
 
+APP = "portato"
 VERSION = "9999"
 
 CONFIG_DIR = "/etc/portato/"
@@ -52,6 +53,8 @@ XSD_LOCATION = pjoin(XSD_DIR, "plugin.xsd")
 
 ICON_DIR = "icons/"
 APP_ICON = pjoin(ICON_DIR, "portato-icon.png")
+
+LOCALE_DIR = "i18n/"
 
 FRONTENDS = ["gtk" ,"qt"]
 STD_FRONTEND = "gtk"

@@ -12,6 +12,7 @@
 
 import re, os
 import types
+from gettext import lgettext as _
 import portage
 
 import package
@@ -282,7 +283,7 @@ class PortageSystem (SystemInterface):
 			
 			best_p = self.find_best_match(p)
 			if best_p is None:
-				warning("No best match for %s. It seems not to be in the tree anymore." % p)
+				warning(_("No best match for %s. It seems not to be in the tree anymore.") % p)
 				continue
 
 			if len(inst) > 1:
@@ -339,7 +340,7 @@ class PortageSystem (SystemInterface):
 					oldList = self.sort_package_list(self.find_installed_packages(p.get_cp()))
 					if not oldList:
 						if add_not_installed:
-							info("Found a not installed dependency: %s." % p.get_cpv())
+							info(_("Found a not installed dependency: %s.") % p.get_cpv())
 							oldList = [p]
 						else:
 							return
@@ -379,7 +380,7 @@ class PortageSystem (SystemInterface):
 							raw_checked.append(i)
 							bm = self.get_new_packages([i])
 							if not bm: 
-								warning("Bug? No best match could be found for '%s'. Needed by: '%s'.", i, p.get_cpv())
+								warning(_("Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."), {"package" : i, "cpv": p.get_cpv()})
 							else:
 								for pkg in bm: 
 									if not pkg: continue

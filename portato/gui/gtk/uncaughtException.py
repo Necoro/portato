@@ -17,17 +17,19 @@ import sys
 import gtk, pango
 from StringIO import StringIO
 import traceback
+from gettext import lgettext as _
+
 from portato.helper import error
 
 class UncaughExceptionDialog(gtk.MessageDialog):
 
 	def __init__(self, type, value, tb):
 
-		super(UncaughExceptionDialog,self).__init__(parent=None, flags=0,  type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_NONE, message_format="A programming error has been detected during the execution of this program.")
-		self.set_title("Bug Detected")
-		self.format_secondary_text("It probably isn't fatal, but should be reported to the developers nonetheless.")
+		super(UncaughExceptionDialog,self).__init__(parent=None, flags=0,  type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_NONE, message_format=_("A programming error has been detected during the execution of this program."))
+		self.set_title(_("Bug Detected"))
+		self.format_secondary_text(_("It probably isn't fatal, but should be reported to the developers nonetheless."))
 
-		self.add_button("Show Details", 1)
+		self.add_button(_("Show Details"), 1)
 		self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
 		# Details
@@ -74,7 +76,7 @@ def get_trace(type, value, tb):
 def register_ex_handler():
 	
 	def handler(*args):
-		error("An uncaught exception has occured: %s", get_trace(*args))
+		error(_("An uncaught exception has occured:\n%s"), get_trace(*args))
 		UncaughExceptionDialog(*args).run()
 
 	sys.excepthook = handler

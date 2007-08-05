@@ -13,6 +13,7 @@
 import os
 import os.path
 from subprocess import Popen, PIPE # needed for grep
+from gettext import lgettext as _
 
 from portato.helper import *
 from portato.backend import system
@@ -478,7 +479,7 @@ def new_masking_status (cpv):
 			for file, line in list[cpv]:
 				_ret = (int(line) == -1)
 				if ret is not None and _ret != ret:
-					error("Conflicting values for masking status: %s", list)
+					error(_("Conflicting values for masking status: %s"), list)
 				else:
 					ret = _ret
 		return ret

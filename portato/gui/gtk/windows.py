@@ -12,14 +12,13 @@
 
 # gtk stuff
 import pygtk
-pygtk.require("2.0")
 import gtk
 import gtk.glade
 import gobject
 
 # our backend stuff
 from portato.helper import *
-from portato.constants import CONFIG_LOCATION, VERSION, DATA_DIR, APP_ICON
+from portato.constants import CONFIG_LOCATION, VERSION, DATA_DIR, APP_ICON, APP, LOCALE_DIR
 from portato.backend import flags, system
 from portato.backend.exceptions import *
 
@@ -36,7 +35,10 @@ from usetips import UseTips
 import types, logging
 from subprocess import Popen
 from threading import Thread
+from gettext import lgettext as _
 
+gtk.glade.bindtextdomain (APP, LOCALE_DIR)
+gtk.glade.textdomain (APP)
 GLADE_FILE = DATA_DIR+"portato.glade"
 
 class Window:
@@ -66,7 +68,7 @@ class Window:
 		return wrapper
 
 	def get_tree (self, name):
-		return gtk.glade.XML(GLADE_FILE, root = name)
+		return gtk.glade.XML(GLADE_FILE, name)
 
 class Popup:
 
@@ -141,15 +143,15 @@ class PluginWindow (AbstractDialog):
 		view.set_model(self.store)
 		
 		cell = gtk.CellRendererText()
-		col = gtk.TreeViewColumn("Plugin", cell, markup = 0)
+		col = gtk.TreeViewColumn(_("Plugin"), cell, markup = 0)
 		view.append_column(col)
 		
-		col = gtk.TreeViewColumn("Authors", cell, text = 1)
+		col = gtk.TreeViewColumn(_("Authors"), cell, text = 1)
 		view.append_column(col)
 
 		bcell = gtk.CellRendererToggle()
 		bcell.connect("toggled", self.cb_plugin_toggled)
-		col = gtk.TreeViewColumn("Enabled", bcell, active = 2)
+		col = gtk.TreeViewColumn(_("Enabled"), bcell, active = 2)
 		view.append_column(col)
 		
 		for p in [("<b>"+p.name+"</b>", p.author, p.is_enabled()) for p in plugins]:
@@ -195,8 +197,8 @@ class UpdateWindow (AbstractDialog):
 		tCell.set_property("activatable", True)
 		tCell.connect("toggled", self.cb_check_toggled) # emulate the normal toggle behavior ...
 		
-		self.view.append_column(gtk.TreeViewColumn("Enabled", tCell, active = 0))
-		self.view.append_column(gtk.TreeViewColumn("Package", cell, text = 1))
+		self.view.append_column(gtk.TreeViewColumn(_("Enabled"), tCell, active = 0))
+		self.view.append_column(gtk.TreeViewColumn(_("Package"), cell, text = 1))
 
 		for p in self.packages:
 			store.append([False, p.get_cpv()])
@@ -294,7 +296,7 @@ class SearchWindow (AbstractDialog):
 			store.append(["%s/<b>%s</b>" % tuple(p.split("/"))])
 
 		cell = gtk.CellRendererText()
-		col = gtk.TreeViewColumn("Results", cell, markup = 0)
+		col = gtk.TreeViewColumn(_("Results"), cell, markup = 0)
 		self.searchList.append_column(col)
 
 	def ok (self, *args):
@@ -563,7 +565,7 @@ class PackageTable:
 	def set_desc_label (self):
 		desc = self.actual_package().get_package_settings("DESCRIPTION").replace("&","&amp;")
 		if not desc: 
-			desc = "<no description>"
+			desc = _("<no description>")
 			use_markup = False
 		else:
 			desc = "<b>"+desc+"</b>"
@@ -592,7 +594,7 @@ class PackageTable:
 			exp = pkg.use_expanded(use, suggest = actual_exp)
 			if exp is not None:
 				if exp != actual_exp:
-					actual_exp_it = store.append(None, [None, exp, "<i>This is an expanded use flag and cannot be selected</i>"])
+					actual_exp_it = store.append(None, [None, exp, "<i>%s</i>" % _("This is an expanded use flag and cannot be selected")])
 					actual_exp = exp
 			else:
 				actual_exp_it = None
@@ -610,9 +612,9 @@ class PackageTable:
 		tCell = gtk.CellRendererToggle()
 		tCell.set_property("activatable", True)
 		tCell.connect("toggled", self.cb_use_flag_toggled, store)
-		self.useList.append_column(gtk.TreeViewColumn("Enabled", tCell, active = 0))
-		self.useList.append_column(gtk.TreeViewColumn("Flags", cell, text = 1))
-		self.useList.append_column(gtk.TreeViewColumn("Description", cell, markup = 2))
+		self.useList.append_column(gtk.TreeViewColumn(_("Enabled"), tCell, active = 0))
+		self.useList.append_column(gtk.TreeViewColumn(_("Flags"), cell, text = 1))
+		self.useList.append_column(gtk.TreeViewColumn(_("Description"), cell, markup = 2))
 
 		self.useList.set_search_column(1)
 		self.useList.set_enable_tree_lines(True)
@@ -627,7 +629,7 @@ class PackageTable:
 
 		# build view
 		self.versList.set_model(store)
-		col = gtk.TreeViewColumn("Versions")
+		col = gtk.TreeViewColumn(("Versions"))
 
 		# adding the pixbuf
 		cell = gtk.CellRendererPixbuf()
@@ -691,7 +693,7 @@ class PackageTable:
 			try:
 				self.queue.append(self.actual_package().get_cpv(), unmerge = True)
 			except PackageNotFoundException, e:
-				error("Package could not be found: %s", e[0])
+				error(_("Package could not be found: %s"), e[0])
 				#masked_dialog(e[0])
 
 	def cb_vers_list_changed (self, *args):
@@ -736,33 +738,33 @@ class PackageTable:
 			
 			gtk.Tooltips().set_tip(self.maskedCheck, pkg.get_masking_reason()) # this returns None if it is not masked =)
 			if pkg.is_masked(use_changed = False) and not pkg.is_masked(use_changed = True):
-				self.maskedCheck.set_label("<i>(Masked)</i>")
+				self.maskedCheck.set_label("<i>(%s)</i>" % _("Masked"))
 				self.maskedCheck.get_child().set_use_markup(True)
 			else:
-				self.maskedCheck.set_label("Masked")
+				self.maskedCheck.set_label(_("Masked"))
 			
 			if pkg.is_locally_masked():
-				self.maskedCheck.set_label("<b>Masked</b>")
+				self.maskedCheck.set_label("<b>%s</b>" % _("Masked"))
 				self.maskedCheck.get_child().set_use_markup(True)
 				self.maskedCheck.set_active(True)
 			else:
 				self.maskedCheck.set_active(pkg.is_masked(use_changed = False))
 			
 			if pkg.is_testing(use_keywords = False) and not pkg.is_testing(use_keywords = True):
-				self.testingCheck.set_label("<i>(Testing)</i>")
+				self.testingCheck.set_label("<i>(%s)</i>" % _("Testing"))
 				self.testingCheck.get_child().set_use_markup(True)
 			else:
-				self.testingCheck.set_label("Testing")
+				self.testingCheck.set_label(_("Testing"))
 			
 			self.testingCheck.set_active(pkg.is_testing(use_keywords = False))
 
 		if self.doEmerge:
 			# set emerge-button-label
 			if not self.actual_package().is_installed():
-				self.emergeBtn.set_label("E_merge")
+				self.emergeBtn.set_label(_("E_merge"))
 				self.unmergeBtn.set_sensitive(False)
 			else:
-				self.emergeBtn.set_label("Re_merge")
+				self.emergeBtn.set_label(_("Re_merge"))
 				self.unmergeBtn.set_sensitive(True)
 		
 		self.table.show_all()
@@ -819,12 +821,12 @@ class PackageTable:
 
 		if not self.actual_package().is_testing(use_keywords = True):
 			self.actual_package().set_testing(False)
-			button.set_label("Testing")
+			button.set_label(_("Testing"))
 			button.set_active(True)
 		else:
 			self.actual_package().set_testing(True)
 			if self.actual_package().is_testing(use_keywords=False):
-				button.set_label("<i>(Testing)</i>")
+				button.set_label("<i>(%s)</i>" % _("Testing"))
 				button.get_child().set_use_markup(True)
 				button.set_active(True)
 
@@ -847,21 +849,21 @@ class PackageTable:
 		if not pkg.is_masked(use_changed = True):
 			pkg.set_masked(True)
 			if pkg.is_locally_masked():
-				button.set_label("<b>Masked</b>")
+				button.set_label("<b>%s</b>" % _("Masked"))
 				button.get_child().set_use_markup(True)
 			else:
-				button.set_label("Masked")
+				button.set_label(_("Masked"))
 
 			button.set_active(True)
 		else:
 			locally = pkg.is_locally_masked()
 			pkg.set_masked(False)
 			if pkg.is_masked(use_changed=False) and not locally:
-				button.set_label("<i>(Masked)</i>")
+				button.set_label("<i>(%s)</i>" % _("Masked"))
 				button.get_child().set_use_markup(True)
 				button.set_active(True)
 			else:
-				button.set_label("Masked")
+				button.set_label(_("Masked"))
 		
 		if self.instantChange:
 			self._update_keywords(True, update = True)
@@ -1062,10 +1064,10 @@ class MainWindow (Window):
 		self.queueList.set_model(store)
 		
 		cell = gtk.CellRendererText()
-		col = gtk.TreeViewColumn("Queue", cell, text = 0)
+		col = gtk.TreeViewColumn(_("Queue"), cell, text = 0)
 		self.queueList.append_column(col)
 		
-		col = gtk.TreeViewColumn("Options", cell, markup = 1)
+		col = gtk.TreeViewColumn(_("Options"), cell, markup = 1)
 		self.queueList.append_column(col)
 
 		self.useTips.add_view(self.queueList)
@@ -1083,7 +1085,7 @@ class MainWindow (Window):
 
 		self.catList.set_model(store)
 		cell = gtk.CellRendererText()
-		col = gtk.TreeViewColumn("Categories", cell, text = 0)
+		col = gtk.TreeViewColumn(_("Categories"), cell, text = 0)
 		self.catList.append_column(col)
 
 	def build_pkg_list (self, name = None):
@@ -1098,7 +1100,7 @@ class MainWindow (Window):
 		# build view
 		self.pkgList.set_model(store)
 		
-		col = gtk.TreeViewColumn("Packages")
+		col = gtk.TreeViewColumn(_("Packages"))
 		col.set_clickable(True)
 		col.connect("clicked", self.cb_pkg_list_header_clicked)
 
@@ -1159,9 +1161,9 @@ class MainWindow (Window):
 			
 			window_title_update(title)
 			if title is None: 
-				title = "Console"
+				title = _("Console")
 			else: 
-				title = ("Console (%s)" % title)
+				title = (_("Console (%(title)s)") % {"title" : title})
 			
 			return False
 
