@@ -6,7 +6,7 @@ cd i18n
 for ITEM in *.po; do
 	LANG=${ITEM/.po/}
 
-	if [ $1 == "-emerge" ]; then
+	if [ "$1" == "-emerge" ]; then
 		mkdir mo -p
 		msgfmt ${ITEM} -o mo/${LANG}.mo
 	else
