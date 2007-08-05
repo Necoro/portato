@@ -10,6 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+from gettext import lgettext as _
 from portato.gui.wrapper import Tree, Console
 import vte
 

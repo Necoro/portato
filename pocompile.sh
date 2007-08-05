@@ -6,6 +6,8 @@ cd i18n
 for ITEM in *.po; do
 	LANG=${ITEM/.po/}
 
+	echo "Creating translation file for ${LANG}."
+
 	if [ "$1" == "-emerge" ]; then
 		mkdir mo -p
 		msgfmt ${ITEM} -o mo/${LANG}.mo
