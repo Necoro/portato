@@ -8,8 +8,8 @@ for ITEM in *.po; do
 	LANG=${ITEM2/_??/}
 
 	if [ $1 == "-emerge" ]; then
-		mkdir po -p
-		msgfmt ${ITEM} -o po/portato.${LANG}
+		mkdir mo -p
+		msgfmt ${ITEM} -o mo/${LANG}.mo
 	else
 		mkdir ${LANG}/LC_MESSAGES -p
 		msgfmt ${ITEM} -o ${LANG}/LC_MESSAGES/portato.mo
