@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-04 21:44-0700\n"
+"POT-Creation-Date: 2007-08-04 22:21-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -468,6 +468,10 @@ msgstr ""
 msgid ""
 "%(blocked)s is blocked by %(blocks)s.\n"
 "Please unmerge the blocking package."
+msgstr ""
+
+#: portato/gui/gtk/dialogs.py:39
+msgid "You are not root."
 msgstr ""
 
 #: portato/gui/gtk/dialogs.py:45

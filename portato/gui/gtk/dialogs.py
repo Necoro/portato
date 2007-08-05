@@ -36,7 +36,7 @@ def blocked_dialog (blocked, blocks):
 	return ret
 
 def not_root_dialog ():
-	errorMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "_(You are not root."))
+	errorMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, _("You are not root."))
 	ret = errorMB.run()
 	errorMB.destroy()
 	return ret

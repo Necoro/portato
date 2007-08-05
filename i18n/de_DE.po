@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2007-08-04 22:09-0800\n"
+"PO-Revision-Date: 2007-08-04 22:21-0800\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -486,6 +486,10 @@ msgid ""
 msgstr ""
 "%(blocks)s blockiert %(blocked)s.\n"
 "Bitte deinstalliere das blockierende Paket."
+
+#: portato/gui/gtk/dialogs.py:39
+msgid "You are not root."
+msgstr "Du bist nicht root."
 
 #: portato/gui/gtk/dialogs.py:45
 #, python-format
