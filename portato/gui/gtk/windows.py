@@ -1165,9 +1165,9 @@ class MainWindow (Window):
 			else: 
 				title = (_("Console (%(title)s)") % {"title" : title})
 			
-			return False
-
 			self.notebook.set_tab_label_text(self.termHB, title)
+
+			return False
 
 		gobject.idle_add(__update, title)
 

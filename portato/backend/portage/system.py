@@ -101,7 +101,7 @@ class PortageSystem (SystemInterface):
 		
 		if name != None:
 			if isinstance(name, str):
-				return lambda x: re.match(".*"+name+".*",x)
+				return lambda x: re.match(".*"+name+".*",x, re.I)
 			else: # assume regular expression
 				return lambda x: name.match(x)
 		else:

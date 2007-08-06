@@ -1,5 +1,7 @@
-0.8.2:
+next:
 - added an uncaught exception dialog
+- i18n
+- minor enhancements
 
 0.8.1:
 - bugfixes
