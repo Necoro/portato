@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/uncaughtException.py
+# File: portato/gui/gtk/exception_handling.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2007 René 'Necoro' Neumann
@@ -8,24 +8,40 @@
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
 #
-# Written by Gustavo Carneiro
-# original code: http://www.daa.com.au/pipermail/pygtk/attachments/20030828/2d304204/gtkexcepthook.py
 #
-# Modified by René 'Necoro' Neumann
+# Written by René 'Necoro' Neumann
 
-import sys
-import gtk, pango
-from StringIO import StringIO
-import traceback
+import gtk, pango, gobject
+import sys, traceback
+
+from threading import Thread
 from gettext import lgettext as _
+from StringIO import StringIO
 
 from portato.helper import error
 
-class UncaughExceptionDialog(gtk.MessageDialog):
+class GtkThread (Thread):
+	def run(self):
+		try:
+			Thread.run(self)
+		except SystemExit:
+			raise # let normal thread handle it
+		except:
+			type, val, tb = sys.exc_info()
+			try:
+				try:
+					sys.excepthook(type, val, tb, thread = self.getName())
+				except TypeError:
+					raise type, val, tb # let normal thread handle it
+			finally:
+				del type, val, tb
 
-	def __init__(self, type, value, tb):
+class UncaughtExceptionDialog(gtk.MessageDialog):
+	"""Original idea by Gustavo Carneiro - original code: http://www.daa.com.au/pipermail/pygtk/attachments/20030828/2d304204/gtkexcepthook.py."""
 
-		super(UncaughExceptionDialog,self).__init__(parent=None, flags=0,  type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_NONE, message_format=_("A programming error has been detected during the execution of this program."))
+	def __init__(self, type, value, tb, thread = None):
+
+		super(UncaughtExceptionDialog,self).__init__(parent=None, flags=0,  type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_NONE, message_format=_("A programming error has been detected during the execution of this program."))
 		self.set_title(_("Bug Detected"))
 		self.format_secondary_text(_("It probably isn't fatal, but should be reported to the developers nonetheless."))
 
@@ -49,7 +65,10 @@ class UncaughExceptionDialog(gtk.MessageDialog):
 		self.vbox.add(self.tbFrame)
 		
 		textbuffer = self.textview.get_buffer()
-		textbuffer.set_text(get_trace(type, value, tb))
+		text = get_trace(type, value, tb)
+		if thread:
+			text = _("Exception in thread \"%(thread)s\":\n%(trace)s") % {"thread": thread, "trace": text}
+		textbuffer.set_text(text)
 		self.textview.set_size_request(gtk.gdk.screen_width()/2, gtk.gdk.screen_height()/3)
 
 		self.details = self.tbFrame
@@ -58,7 +77,7 @@ class UncaughExceptionDialog(gtk.MessageDialog):
 
 	def run (self):
 		while True:
-			resp = super(UncaughExceptionDialog, self).run()
+			resp = super(UncaughtExceptionDialog, self).run()
 			if resp == 1:
 				self.details.show_all()
 				self.set_response_sensitive(1, False)
@@ -75,8 +94,15 @@ def get_trace(type, value, tb):
 	
 def register_ex_handler():
 	
-	def handler(*args):
-		error(_("An uncaught exception has occured:\n%s"), get_trace(*args))
-		UncaughExceptionDialog(*args).run()
+	def handler(type, val, tb, thread = None):
+		def run_dialog():
+			UncaughtExceptionDialog(type, val, tb, thread).run()
+		
+		if thread:
+			error(_("Exception in thread \"%(thread)s\":\n%(trace)s"), {"thread": thread, "trace": get_trace(type, val, tb)})
+		else:
+			error(_("Exception:\n%s"), get_trace(type, val, tb))
+		
+		gobject.idle_add(run_dialog)
 
 	sys.excepthook = handler

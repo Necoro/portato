@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2007-08-05 00:08-0800\n"
+"PO-Revision-Date: 2007-08-07 00:07-0800\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -432,41 +432,16 @@ msgstr "Use Flags"
 msgid "masking keywords"
 msgstr "Masking Keywords"
 
-#: portato/gui/gtk/uncaughtException.py:28
-msgid "A programming error has been detected during the execution of this program."
-msgstr "Ein Fehler ist aufgetreten."
-
-#: portato/gui/gtk/uncaughtException.py:29
-msgid "Bug Detected"
-msgstr "Fehler aufgetreten"
-
-#: portato/gui/gtk/uncaughtException.py:30
-msgid "It probably isn't fatal, but should be reported to the developers nonetheless."
-msgstr "Dies ist möglicherweise nicht kritisch, sollte aber trotzdem an die Entwickler weitergeleitet werden."
-
-#: portato/gui/gtk/uncaughtException.py:32
-msgid "Show Details"
-msgstr "Details"
-
-#: portato/gui/gtk/uncaughtException.py:79
-#, python-format
-msgid ""
-"An uncaught exception has occured:\n"
-"%s"
-msgstr ""
-"An uncaught exception has occured:\n"
-"%s"
-
-#: portato/gui/gtk/wrapper.py:36
+#: portato/gui/gtk/wrapper.py:37
 msgid "oneshot"
 msgstr "oneshot"
 
-#: portato/gui/gtk/wrapper.py:41
+#: portato/gui/gtk/wrapper.py:42
 #, python-format
 msgid "updating from version %s"
 msgstr "Update von Version %s"
 
-#: portato/gui/gtk/wrapper.py:43
+#: portato/gui/gtk/wrapper.py:44
 msgid "updating"
 msgstr "Update"
 
@@ -517,7 +492,42 @@ msgstr "Du kannst keine Abhängigkeiten löschen ;)."
 msgid "Do you really want to clear the whole queue?"
 msgstr "Wirklich die gesamte Queue löschen?"
 
-#: portato/gui/gui_helper.py:239
+#: portato/gui/gtk/exception_handling.py:44
+msgid "A programming error has been detected during the execution of this program."
+msgstr "Ein Fehler ist aufgetreten."
+
+#: portato/gui/gtk/exception_handling.py:45
+msgid "Bug Detected"
+msgstr "Fehler aufgetreten"
+
+#: portato/gui/gtk/exception_handling.py:46
+msgid "It probably isn't fatal, but should be reported to the developers nonetheless."
+msgstr "Dies ist möglicherweise nicht kritisch, sollte aber trotzdem an die Entwickler weitergeleitet werden."
+
+#: portato/gui/gtk/exception_handling.py:48
+msgid "Show Details"
+msgstr "Details"
+
+#: portato/gui/gtk/exception_handling.py:70
+#: portato/gui/gtk/exception_handling.py:102
+#, python-format
+msgid ""
+"Exception in thread \"%(thread)s\":\n"
+"%(trace)s"
+msgstr ""
+"Exception in Thread \"%(thread)s\":\n"
+"%(trace)s"
+
+#: portato/gui/gtk/exception_handling.py:104
+#, python-format
+msgid ""
+"Exception:\n"
+"%s"
+msgstr ""
+"Exception:\n"
+"%s"
+
+#: portato/gui/gui_helper.py:240
 #, python-format
 msgid "Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?"
 msgstr "Catched KeyError => %s scheint keine valide Kategorie zu sein. Hast du mit rsync-excludes gespielt?"

@@ -13,7 +13,8 @@
 # some backend things
 from portato import backend
 from portato.backend import flags, system, set_system
-from portato.helper import *
+from portato.helper import debug, info, send_signal_to_group, set_log_level, unique_array
+from portato.waiting_queue import WaitingQueue
 from portato import plugin
 
 # parser
@@ -24,7 +25,7 @@ from wrapper import Console, Tree
 
 # some stuff needed
 from subprocess import Popen, PIPE, STDOUT
-from threading import Thread
+import threading
 import pty
 import time
 import os
@@ -251,7 +252,7 @@ class Database:
 class EmergeQueue:
 	"""This class manages the emerge queue."""
 	
-	def __init__ (self, tree = None, console = None, db = None, title_update = None):
+	def __init__ (self, tree = None, console = None, db = None, title_update = None, threadClass = threading.Thread):
 		"""Constructor.
 		
 		@param tree: Tree to append all the items to.
@@ -270,6 +271,7 @@ class EmergeQueue:
 		
 		# the emerge process
 		self.process = None
+		self.threadQueue = WaitingQueue(threadClass = threadClass)
 
 		# dictionaries with data about the packages in the queue
 		self.iters = {} # iterator in the tree
@@ -448,38 +450,11 @@ class EmergeQueue:
 		else:
 			if cpv not in self.oneshotmerge:
 				self.oneshotmerge.append(cpv)
+
+	def doEmerge (self, *args, **kwargs):
+		self.threadQueue.put(self.__emerge, *args, **kwargs)
 	
-	def _update_packages(self, packages):
-		"""This updates the packages-list. It simply makes the db to rebuild the specific category.
-		
-		@param packages: The packages which we emerged.
-		@type packages: list of cpvs"""
-		
-		old_title = self.console.get_window_title()
-		while self.process and self.process.poll() is None:
-			if self.title_update : 
-				title = self.console.get_window_title()
-				if title != old_title:
-					self.title_update(title)
-				time.sleep(0.5)
-
-		if self.title_update: self.title_update(None)
-
-		if self.process is None: # someone resetted this
-			return
-
-		@plugin.hook("after_emerge", packages = packages, retcode = self.process.returncode)
-		def update_packages():
-			for p in packages:
-				if p in ["world", "system"]: continue
-				cat = system.split_cpv(p)[0] # get category
-				self.db.reload(cat)
-				debug("Category %s refreshed", cat)
-
-		update_packages()
-		self.process = None
-
-	def _emerge (self, options, packages, it, command = None):
+	def __emerge (self, options, packages, it, command = None):
 		"""Calls emerge and updates the terminal.
 		
 		@param options: options to send to emerge
@@ -490,16 +465,6 @@ class EmergeQueue:
 		@type it: Iterator[]
 		@param command: the command to execute - default is "/usr/bin/python /usr/bin/emerge"
 		@type command: string[]"""
-
-		if self.process is not None:
-			def wait():
-				while self.process is not None:
-					time.sleep(0.5)
-
-				self._emerge(options, packages, it, command)
-
-			Thread(name="Waiting-Thread", target=wait).start()
-			return
 
 		@plugin.hook("emerge", packages = packages, command = command, console = self.console, title_update = self.title_update)
 		def sub_emerge(command):
@@ -513,14 +478,34 @@ class EmergeQueue:
 			# start emerge
 			self.process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False, env = system.get_environment())
 			
-			# start thread waiting for the stop of emerge
-			if packages:
-				Thread(name="Emerge-Thread", target=self._update_packages, args=(packages+self.deps.keys(),)).start()
-			
-			# remove
+			# remove packages from queue
 			for i in it:
 				self.remove_with_children(i)
+			
+			# update title
+			old_title = self.console.get_window_title()
+			while self.process and self.process.poll() is None:
+				if self.title_update : 
+					title = self.console.get_window_title()
+					if title != old_title:
+						self.title_update(title)
+					time.sleep(0.5)
 
+			if self.title_update: self.title_update(None)
+
+			if self.process is None: # someone resetted this
+				return
+
+			@plugin.hook("after_emerge", packages = packages, retcode = self.process.returncode)
+			def update_packages():
+				for cat in unique_array([system.split_cpv(p)[0] for p in packages if p not in ["world", "system"]]):
+					self.db.reload(cat)
+					debug("Category %s refreshed", cat)
+
+			update_packages()
+			self.process = None
+			self.threadQueue.next()
+			
 		sub_emerge(command)
 
 	def emerge (self, force = False, options = None):
@@ -550,7 +535,7 @@ class EmergeQueue:
 			if not force: s += system.get_pretend_option()
 			if options is not None: s += options
 			
-			self._emerge(s, list, its)
+			self.doEmerge(s, list, its, caller = self.emerge)
 		
 		# normal queue
 		if self.mergequeue:
@@ -561,7 +546,7 @@ class EmergeQueue:
 			if not force: s = system.get_pretend_option()
 			if options is not None: s += options
 		
-			self._emerge(s, list, its)
+			self.doEmerge(s, list, its, caller = self.emerge)
 
 	def unmerge (self, force = False, options = None):
 		"""Unmerges everything in the umerge-queue.
@@ -580,7 +565,7 @@ class EmergeQueue:
 		if not force: s += system.get_pretend_option()
 		if options is not None: s += options
 		
-		self._emerge(s,list, [self.unmergeIt])
+		self.doEmerge(s,list, [self.unmergeIt], caller = self.unmerge)
 
 	def update_world(self, force = False, newuse = False, deep = False, options = None):
 		"""Does an update world. newuse and deep are the arguments handed to emerge.
@@ -601,7 +586,7 @@ class EmergeQueue:
 		if not force: opts += system.get_pretend_option()
 		if options is not None: opts += options
 
-		self._emerge(opts, ["world"], [self.emergeIt])
+		self.doEmerge(opts, ["world"], [self.emergeIt], caller = self.update_world)
 
 	def sync (self, command = None):
 		"""Calls "emerge --sync".
@@ -611,32 +596,19 @@ class EmergeQueue:
 
 		if command is None:
 			command = system.get_sync_command()
-		
-		def threaded_sync (cmd):
-			ret = self.process.wait()
-			self.process = None
-			if ret == 0:
-				__sync(cmd, False)
-		
-		def __sync(cmd, startThread = True):
-			try:
-				idx = cmd.index("&&")
-			except ValueError: # no && in there -> normal behavior
-				self._emerge([],[],[], command = cmd)
-			else:
-				self._emerge([],[],[], command = cmd[:idx])
-
-				if startThread:
-					Thread(name = "SyncThread", target = threaded_sync, args = (cmd[idx+1:],)).start()
-				else:
-					threaded_sync(cmd[idx+1:])
-
-		__sync(command)
-
+	
+		try:
+			while True:
+				idx = command.index("&&")
+				self.doEmerge([],[],[], command[:idx], caller = self.sync)
+				command = command[idx+1:]
+		except ValueError: # no && in command
+			self.doEmerge([],[],[], command, caller = self.sync)
 
 	def kill_emerge (self):
 		"""Kills the emerge process."""
 		if self.process is not None:
+			self.threadQueue.clear() # remove all pending emerge threads
 			try:
 				send_signal_to_group(signal.SIGTERM)
 				debug("Process should be killed")

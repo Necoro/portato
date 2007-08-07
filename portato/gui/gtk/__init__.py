@@ -14,7 +14,7 @@ import gtk
 from portato import plugin
 from portato.backend import system
 from windows import MainWindow, SearchWindow, EbuildWindow
-from uncaughtException import register_ex_handler
+from exception_handling import register_ex_handler
 
 def run ():
 	try:

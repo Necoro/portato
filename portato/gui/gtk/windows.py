@@ -30,11 +30,11 @@ from portato.gui.gui_helper import Database, Config, EmergeQueue
 from dialogs import *
 from wrapper import GtkTree, GtkConsole
 from usetips import UseTips
+from exception_handling import GtkThread
 
 # other
 import types, logging
 from subprocess import Popen
-from threading import Thread
 from gettext import lgettext as _
 
 gtk.glade.bindtextdomain (APP, LOCALE_DIR)
@@ -1037,7 +1037,7 @@ class MainWindow (Window):
 
 		# set emerge queue
 		self.queueTree = GtkTree(self.queueList.get_model())
-		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update)
+		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update, threadClass = GtkThread)
 	
 		self.window.maximize()
 
@@ -1281,7 +1281,7 @@ class MainWindow (Window):
 				finally:
 					self.window.window.set_cursor(None)
 				
-			Thread(name="Update-Thread", target=__update).start()
+			GtkThread(name="Update-Thread", target=__update).start()
 		
 		return True
 
@@ -1393,7 +1393,7 @@ class MainWindow (Window):
 			gobject.idle_add(cb_idle_watch, packages)
 			gobject.idle_add(cb_idle)
 		
-		Thread(name="Show Updates Thread", target = __update).start()
+		GtkThread(name="Show Updates Thread", target = __update).start()
 		return True
 
 	def cb_right_click (self, object, event):

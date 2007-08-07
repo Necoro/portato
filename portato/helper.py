@@ -14,7 +14,7 @@
 Some nice functions used in the program.
 """
 
-import types, os, signal, logging
+import os, signal, logging
 
 debug 		= logging.getLogger("portatoLogger").debug
 info 		= logging.getLogger("portatoLogger").info
@@ -66,7 +66,7 @@ def flatten (listOfLists):
 	@returns: flattend list
 	@rtype: list"""
 
-	if type(listOfLists) != types.ListType:
+	if not isinstance(listOfLists, list):
 		return [listOfLists]
 
 	ret = []

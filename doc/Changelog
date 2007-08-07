@@ -1,6 +1,7 @@
 next:
 - added an uncaught exception dialog
 - i18n
+- new threading model for the emerge process
 - minor enhancements
 
 0.8.1:
