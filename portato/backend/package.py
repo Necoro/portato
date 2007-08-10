@@ -13,7 +13,7 @@
 from portato.backend import system
 import flags
 
-class Package:
+class Package (object):
 	"""This is a class abstracting a normal package which can be installed."""
 
 	def __init__ (self, cpv):

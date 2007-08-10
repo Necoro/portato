@@ -16,14 +16,13 @@ from system_interface import SystemInterface
 SYSTEM = "portage" # the name of the current system
 _sys = None # the SystemInterface-instance
 
-class SystemWrapper (object, SystemInterface):
+class SystemWrapper (SystemInterface):
 	"""This is a wrapper to the different system interfaces, allowing the direct import via C{from portato.backend import system}.
 	With this wrapper a change of the system is propagated to all imports."""
 	
 	def __getattribute__ (self, name):
 		"""Just pass all attribute accesses directly to _sys."""
-		global _sys
-		return eval ("_sys.%s" % name)
+		return getattr(_sys, name)
 
 def set_system (new_sys):
 	"""Sets the current system to a new one.

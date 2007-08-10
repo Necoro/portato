@@ -11,14 +11,17 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 # gtk stuff
-import pygtk
 import gtk
-import gtk.glade
 import gobject
+
+# other
+import types, logging
+from subprocess import Popen
+from gettext import lgettext as _
 
 # our backend stuff
 from portato.helper import *
-from portato.constants import CONFIG_LOCATION, VERSION, DATA_DIR, APP_ICON, APP, LOCALE_DIR
+from portato.constants import CONFIG_LOCATION, VERSION, APP_ICON
 from portato.backend import flags, system
 from portato.backend.exceptions import *
 
@@ -27,88 +30,11 @@ from portato import plugin
 
 # more GUI stuff
 from portato.gui.gui_helper import Database, Config, EmergeQueue
+from basic import Window, AbstractDialog, Popup
 from dialogs import *
 from wrapper import GtkTree, GtkConsole
 from usetips import UseTips
 from exception_handling import GtkThread
-
-# other
-import types, logging
-from subprocess import Popen
-from gettext import lgettext as _
-
-gtk.glade.bindtextdomain (APP, LOCALE_DIR)
-gtk.glade.textdomain (APP)
-GLADE_FILE = DATA_DIR+"portato.glade"
-
-class Window:
-	def __init__ (self):
-		self.tree = self.get_tree(self.__class__.__name__)
-		self.tree.signal_autoconnect(self)
-		self.window = self.tree.get_widget(self.__class__.__name__)
-		self.window.set_icon_from_file(APP_ICON)
-
-	@staticmethod
-	def watch_cursor (func):
-		"""This is a decorator for functions being so time consuming, that it is appropriate to show the watch-cursor.
-		@attention: this function relies on the gtk.Window-Object being stored as self.window"""
-		def wrapper (self, *args, **kwargs):
-			ret = None
-			def cb_idle():
-				try:
-					ret = func(self, *args, **kwargs)
-				finally:
-					self.window.window.set_cursor(None)
-				return False
-			
-			watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
-			self.window.window.set_cursor(watch)
-			gobject.idle_add(cb_idle)
-			return ret
-		return wrapper
-
-	def get_tree (self, name):
-		return gtk.glade.XML(GLADE_FILE, name)
-
-class Popup:
-
-	def __init__ (self, name, parent):
-		self.tree = gtk.glade.XML(GLADE_FILE, root = name)
-		self.tree.signal_autoconnect(parent)
-		self._popup = self.tree.get_widget(name)
-
-	def popup (self, *args):
-		self._popup.popup(*args)
-
-
-class AbstractDialog (Window):
-	"""A class all our dialogs get derived from. It sets useful default vars and automatically handles the ESC-Button."""
-
-	def __init__ (self, parent):
-		"""Constructor.
-
-		@param parent: the parent window
-		@type parent: gtk.Window"""
-		
-		Window.__init__(self)
-
-		# set parent
-		self.window.set_transient_for(parent)
-		
-		# catch the ESC-key
-		self.window.connect("key-press-event", self.cb_key_pressed)
-
-	def cb_key_pressed (self, widget, event):
-		"""Closes the window if ESC is pressed."""
-		keyname = gtk.gdk.keyval_name(event.keyval)
-		if keyname == "Escape":
-			self.close()
-			return True
-		else:
-			return False
-
-	def close (self, *args):
-		self.window.destroy()
 
 class AboutWindow (AbstractDialog):
 	"""A window showing the "about"-informations."""
@@ -935,9 +861,12 @@ class MainWindow (Window):
 	QUEUE_PAGE = 1
 	CONSOLE_PAGE = 2
 
-	def __init__ (self):	
+	def __init__ (self, splash = None):	
 		"""Build up window"""
 
+		if splash is None:
+			splash = lambda x: True
+		
 		# the title
 		self.main_title = "Portato (%s)" % VERSION
 
@@ -958,10 +887,12 @@ class MainWindow (Window):
 		self.logWindow = LogWindow(self.window)
 		
 		# package db
+		splash(_("Creating Database"))
 		self.db = Database()
 		self.db.populate()
 
 		# config
+		splash(_("Loading Config"))
 		try:
 			self.cfg = Config(CONFIG_LOCATION)
 		except IOError, e:
@@ -972,6 +903,8 @@ class MainWindow (Window):
 		gtk.link_button_set_uri_hook(lambda btn, x: Popen([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
 
 		# set plugins and plugin-menu
+		splash(_("Loading Plugins"))
+
 		plugin.load_plugins("gtk")
 		menus = plugin.get_plugin_queue().get_plugin_menus()
 		if menus:
@@ -982,6 +915,8 @@ class MainWindow (Window):
 				item = gtk.MenuItem(m.label)
 				item.connect("activate", m.call)
 				pluginMenu.append(item)
+
+		splash(_("Finishing startup"))
 
 		# set vpaned position
 		vpaned = self.tree.get_widget("vpaned")
@@ -1006,7 +941,7 @@ class MainWindow (Window):
 		
 		# notebook
 		self.notebook = self.tree.get_widget("notebook")
-		self.window.show_all()
+		#self.window.show_all()
 		
 		# table
 		self.packageTable = PackageTable(self)
@@ -1040,7 +975,8 @@ class MainWindow (Window):
 		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update, threadClass = GtkThread)
 	
 		self.window.maximize()
-
+		self.window.show_all()
+		
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)
 		self.notebook.set_current_page(self.PKG_PAGE)

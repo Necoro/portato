@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-class SystemInterface:
+class SystemInterface (object):
 
 	def split_cpv (self, cpv):
 		"""Splits a cpv into all its parts.

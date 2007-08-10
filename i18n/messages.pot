@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-07 00:06-0700\n"
+"POT-Creation-Date: 2007-08-09 20:17-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,7 +39,7 @@ msgid "_Emerge"
 msgstr ""
 
 #: portato/gui/templates/portato.glade:89
-#: portato/gui/templates/portato.glade:719 portato/gui/gtk/windows.py:764
+#: portato/gui/templates/portato.glade:719 portato/gui/gtk/windows.py:690
 msgid "E_merge"
 msgstr ""
 
@@ -135,20 +135,20 @@ msgstr ""
 msgid "Installed"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:641 portato/gui/gtk/windows.py:741
-#: portato/gui/gtk/windows.py:744 portato/gui/gtk/windows.py:747
-#: portato/gui/gtk/windows.py:852 portato/gui/gtk/windows.py:855
-#: portato/gui/gtk/windows.py:862 portato/gui/gtk/windows.py:866
+#: portato/gui/templates/portato.glade:641 portato/gui/gtk/windows.py:667
+#: portato/gui/gtk/windows.py:670 portato/gui/gtk/windows.py:673
+#: portato/gui/gtk/windows.py:778 portato/gui/gtk/windows.py:781
+#: portato/gui/gtk/windows.py:788 portato/gui/gtk/windows.py:792
 msgid "Masked"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:655 portato/gui/gtk/windows.py:754
-#: portato/gui/gtk/windows.py:757 portato/gui/gtk/windows.py:824
-#: portato/gui/gtk/windows.py:829
+#: portato/gui/templates/portato.glade:655 portato/gui/gtk/windows.py:680
+#: portato/gui/gtk/windows.py:683 portato/gui/gtk/windows.py:750
+#: portato/gui/gtk/windows.py:755
 msgid "Testing"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:682 portato/gui/gtk/windows.py:201
+#: portato/gui/templates/portato.glade:682 portato/gui/gtk/windows.py:127
 msgid "Package"
 msgstr ""
 
@@ -156,11 +156,11 @@ msgstr ""
 msgid "_Remove"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:777 portato/gui/gtk/windows.py:1067
+#: portato/gui/templates/portato.glade:777 portato/gui/gtk/windows.py:1003
 msgid "Queue"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:805 portato/gui/gtk/windows.py:1164
+#: portato/gui/templates/portato.glade:805 portato/gui/gtk/windows.py:1100
 msgid "Console"
 msgstr ""
 
@@ -350,71 +350,91 @@ msgstr ""
 msgid "Cannot start etc-proposals. Not root!"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:146
+#: portato/gui/gtk/windows.py:72
 msgid "Plugin"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:149
+#: portato/gui/gtk/windows.py:75
 msgid "Authors"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:154 portato/gui/gtk/windows.py:200
-#: portato/gui/gtk/windows.py:615
+#: portato/gui/gtk/windows.py:80 portato/gui/gtk/windows.py:126
+#: portato/gui/gtk/windows.py:541
 msgid "Enabled"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:299
+#: portato/gui/gtk/windows.py:225
 msgid "Results"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:568
+#: portato/gui/gtk/windows.py:494
 msgid "<no description>"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:597
+#: portato/gui/gtk/windows.py:523
 msgid "This is an expanded use flag and cannot be selected"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:616
+#: portato/gui/gtk/windows.py:542
 msgid "Flag"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:617
+#: portato/gui/gtk/windows.py:543
 msgid "Description"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:696
+#: portato/gui/gtk/windows.py:622
 #, python-format
 msgid "Package could not be found: %s"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:767
+#: portato/gui/gtk/windows.py:693
 msgid "Re_merge"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:1070
+#: portato/gui/gtk/windows.py:890
+msgid "Creating Database"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:895
+msgid "Loading Config"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:906
+msgid "Loading Plugins"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:919
+msgid "Finishing startup"
+msgstr ""
+
+#: portato/gui/gtk/windows.py:1006
 msgid "Options"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:1088
+#: portato/gui/gtk/windows.py:1024
 msgid "Categories"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:1103
+#: portato/gui/gtk/windows.py:1039
 msgid "Packages"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:1166
+#: portato/gui/gtk/windows.py:1102
 #, python-format
 msgid "Console (%(title)s)"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:1218
+#: portato/gui/gtk/windows.py:1154
 msgid "use flags"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:1225
+#: portato/gui/gtk/windows.py:1161
 msgid "masking keywords"
+msgstr ""
+
+#: portato/gui/gtk/__init__.py:20
+msgid "Loading Portage"
 msgstr ""
 
 #: portato/gui/gtk/wrapper.py:37
@@ -506,6 +526,11 @@ msgstr ""
 msgid ""
 "Exception:\n"
 "%s"
+msgstr ""
+
+#: portato/gui/gtk/splash.py:34
+#, python-format
+msgid "... is starting up: %s"
 msgstr ""
 
 #: portato/gui/gui_helper.py:240

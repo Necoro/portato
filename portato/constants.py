@@ -32,6 +32,8 @@ These should be set during the installation.
 @type ICON_DIR: string
 @var APP_ICON: the path of the application icon
 @type APP_ICON: string
+@var LOCALE_DIR: the path to the directory where the locale files (*.mo) are stored.
+@type LOCALE_DIR: string
 @var FRONTENDS: the list of frontends which are installed
 @type FRONTENDS: string[]
 @var STD_FRONTEND: the frontend uses as the default, i.e. if no other one is given on the cmdline

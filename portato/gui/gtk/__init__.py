@@ -10,21 +10,29 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-import gtk
-from portato import plugin
-from portato.backend import system
-from windows import MainWindow, SearchWindow, EbuildWindow
+from gettext import lgettext as _
+
 from exception_handling import register_ex_handler
 
 def run ():
+	from splash import SplashScreen
 	try:
-		m = MainWindow()
+		s = SplashScreen(_("Loading Portage"))
 		register_ex_handler()
+		s.show()
+		from windows import MainWindow
+		m = MainWindow(s)
+		s.hide()
 		m.main()
 	except KeyboardInterrupt:
 		pass
 
-def show_ebuild (pkg):
+def show_ebuild (pkg):	
+	import gtk
+	from portato import plugin
+	from portato.backend import system
+	from windows import SearchWindow, EbuildWindow
+
 	plugin.load_plugins("gtk")
 	register_ex_handler()
 
