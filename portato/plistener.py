@@ -52,7 +52,6 @@ class PListener (object):
 				string = con.recv(int(len))
 
 				data = string.split("\0")
-				debug(data)
 
 				if data[0] == "notify":
 					self.do_notify(*data[1:])

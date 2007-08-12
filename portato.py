@@ -108,7 +108,7 @@ def main ():
 				additional.extend(["-f", options.frontend])
 
 			try:
-				if os.getuid() == 0:
+				if os.getuid() != 0:
 					call([SU_COMMAND, "%s --no-listener %s" % (sys.argv[0], " ".join(additional))], env = os.environ)
 				else:
 					call([sys.argv[0], "--no-listener"]+additional, env = os.environ)
