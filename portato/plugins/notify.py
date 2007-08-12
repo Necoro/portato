@@ -12,12 +12,12 @@ def notify (retcode, **kwargs):
 	else:
 		icon = APP_ICON
 		if retcode == 0:
-			text = "Emerge finished!"
+			text = _("Emerge finished!")
 			descr = ""
 			urgency = pynotify.URGENCY_NORMAL
 		else:
-			text = "Emerge failed!"
-			descr = "Error Code: %d" % retcode
+			text = _("Emerge failed!")
+			descr = _("Error Code: %d") % retcode
 			urgency = pynotify.URGENCY_CRITICAL
 
 		listener.send_notify(base = text, descr = descr, icon = icon, urgency = urgency)

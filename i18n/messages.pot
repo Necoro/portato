@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-11 22:12-0700\n"
+"POT-Creation-Date: 2007-08-11 22:50-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -354,6 +354,19 @@ msgstr ""
 msgid "Notify called while process is still running!"
 msgstr ""
 
+#: portato/plugins/notify.py:15
+msgid "Emerge finished!"
+msgstr ""
+
+#: portato/plugins/notify.py:19
+msgid "Emerge failed!"
+msgstr ""
+
+#: portato/plugins/notify.py:20
+#, python-format
+msgid "Error Code: %d"
+msgstr ""
+
 #: portato/gui/gtk/windows.py:73
 msgid "Plugin"
 msgstr ""
@@ -621,7 +634,7 @@ msgid ""
 "For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"
 msgstr ""
 
-#: portato/plistener.py:95
+#: portato/plistener.py:94
 msgid "Listener has not been started."
 msgstr ""
 

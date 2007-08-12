@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2007-08-11 22:13-0800\n"
+"PO-Revision-Date: 2007-08-11 22:53-0800\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -368,6 +368,19 @@ msgstr "Kann etc-proposals nicht starten. Nur root kann das!"
 msgid "Notify called while process is still running!"
 msgstr "\"Notify\" aufgerufen, während Emerge noch lief."
 
+#: portato/plugins/notify.py:15
+msgid "Emerge finished!"
+msgstr "Emerge-Prozess erfolgreich beendet!"
+
+#: portato/plugins/notify.py:19
+msgid "Emerge failed!"
+msgstr "Emerge fehlgeschlagen!"
+
+#: portato/plugins/notify.py:20
+#, python-format
+msgid "Error Code: %d"
+msgstr "Fehler-Code: %d"
+
 #: portato/gui/gtk/windows.py:73
 msgid "Plugin"
 msgstr "Plugin"
@@ -638,7 +651,7 @@ msgstr "Laden des Plugins '%(plugin)s\" fehlgeschlagen. Import von '%(import)s' 
 msgid "For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"
 msgstr "Das Plugin '%(plugin)s' definiert bereits einen \"Override\" fürr den Hook '%(hook)s'!"
 
-#: portato/plistener.py:95
+#: portato/plistener.py:94
 msgid "Listener has not been started."
 msgstr "Listener wurde nicht gestartet."
 
