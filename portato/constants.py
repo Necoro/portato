@@ -38,6 +38,10 @@ These should be set during the installation.
 @type FRONTENDS: string[]
 @var STD_FRONTEND: the frontend uses as the default, i.e. if no other one is given on the cmdline
 @type STD_FRONTEND: string
+@var SU_COMMAND: command to execute to "su"
+@type SU_COMMAND: string
+@var SOCKET: path to socket for communication between listener and GUI
+@type SOCKET: string
 """
 from os.path import join as pjoin
 
@@ -60,3 +64,6 @@ LOCALE_DIR = "i18n/"
 
 FRONTENDS = ["gtk" ,"qt"]
 STD_FRONTEND = "gtk"
+
+SU_COMMAND = "gksu -D 'Portato'"
+SOCKET = "/tmp/portato.socket"

@@ -133,6 +133,9 @@ class Hook:
 		@param connects: the list of <connect>'s
 		@type connects: NodeList"""
 		
+		if not connects: # no connects - assume "before" connect
+			self.connects.append(Connect(self, "before", None))
+		
 		for c in connects:
 			type = c.getAttribute("type")
 			if type == '': 

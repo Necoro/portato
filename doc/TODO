@@ -26,6 +26,8 @@ Main Point: user preferences:
 	- window size / location
 	- colors and font sizes
 
+- rotating systray icon
+
 GTK:
 ----
 - make oneshot better

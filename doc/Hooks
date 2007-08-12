@@ -1,13 +1,6 @@
 List of hooks currently being supported by Portato
 ==================================================
 
-am_i_root
----------
-Called: When checking whether the current user is root (ie. uid == 0).
-Parameters: None
-Return if override: Boolean signaling whether we are root.
-
-
 emerge:
 -------
 Called: When emerge or every other command given by e.g. the synccmd preference is being called.

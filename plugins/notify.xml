@@ -1,12 +1,14 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <plugin xmlns="http://portato.sourceforge.net/plugin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://portato.sourceforge.net/plugin http://portato.sourceforge.net/plugin.xsd">
+
 	<author>René 'Necoro' Neumann</author>
-	<name>No Root</name>
-	<import>portato.plugins.noroot</import>
+	<name>Notify</name>
+	<frontends>gtk</frontends>
+
+	<import>portato.plugins.notify</import>
 
 	<hooks>
-		<hook type = "am_i_root" call = "i_am_root">
-			<connect type="override" />
-		</hook>
+		<hook type = "after_emerge"	call = "notify" />
 	</hooks>
+
 </plugin>

@@ -14,7 +14,7 @@
 Some nice functions used in the program.
 """
 
-import os, signal, logging
+import os, signal, logging, grp
 
 debug 		= logging.getLogger("portatoLogger").debug
 info 		= logging.getLogger("portatoLogger").info
@@ -42,21 +42,6 @@ def send_signal_to_group (sig):
 	
 	pgid = os.getpgrp()
 	os.killpg(pgid, sig)
-
-def am_i_root ():
-	"""Returns True if the current user is root, False otherwise.
-	@rtype: boolean"""
-
-	from plugin import hook
-
-	@hook("am_i_root")
-	def __am_i_root():
-		if os.getuid() == 0:
-			return True
-		else:
-			return False
-	
-	return __am_i_root()
 
 def flatten (listOfLists):
 	"""Flattens the given list of lists.

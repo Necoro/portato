@@ -13,7 +13,7 @@
 							<xs:element name="hook" minOccurs="1" maxOccurs="unbounded">
 								<xs:complexType>
 									<xs:sequence>
-										<xs:element name="connect" minOccurs="1" maxOccurs="unbounded">
+										<xs:element name="connect" minOccurs="0" maxOccurs="unbounded">
 											<xs:complexType>
 												<xs:simpleContent>
 													<xs:extension base="xs:string">

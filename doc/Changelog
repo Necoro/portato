@@ -4,6 +4,8 @@ next:
 - new threading model for the emerge process
 - minor enhancements
 - added splash screen
+- added notifies
+- added listener / launch gksu/kdesu by ourselves
 
 0.8.1:
 - bugfixes

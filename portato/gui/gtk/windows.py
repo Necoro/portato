@@ -20,6 +20,7 @@ from subprocess import Popen
 from gettext import lgettext as _
 
 # our backend stuff
+from portato import listener
 from portato.helper import *
 from portato.constants import CONFIG_LOCATION, VERSION, APP_ICON
 from portato.backend import flags, system
@@ -335,7 +336,7 @@ class PreferenceWindow (AbstractDialog):
 		self.cfg.set("consolefont", font, section = "GTK")
 		self.set_console_font(font)
 		
-		gtk.link_button_set_uri_hook(lambda btn, x: Popen([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
+		gtk.link_button_set_uri_hook(lambda btn, x: listener.send_cmd([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
 
 	def cb_ok_clicked(self, button):
 		"""Saves, writes to config-file and closes the window."""
@@ -717,20 +718,14 @@ class PackageTable:
 
 	def cb_package_emerge_clicked (self, button):
 		"""Callback for pressed emerge-button. Adds the package to the EmergeQueue."""
-		if not am_i_root():
-			not_root_dialog()
-		else:
-			self._update_keywords(True)
-			self.main.notebook.set_current_page(self.main.QUEUE_PAGE)
+		self._update_keywords(True)
+		self.main.notebook.set_current_page(self.main.QUEUE_PAGE)
 		return True
 
 	def cb_package_unmerge_clicked (self, button):
 		"""Callback for pressed unmerge-button clicked. Adds the package to the UnmergeQueue."""
-		if not am_i_root():
-			not_root_dialog()
-		else:
-			self._update_keywords(False)
-			self.main.notebook.set_current_page(self.main.QUEUE_PAGE)
+		self._update_keywords(False)
+		self.main.notebook.set_current_page(self.main.QUEUE_PAGE)
 		return True
 
 	def cb_package_ebuild_clicked(self, button):
@@ -900,7 +895,7 @@ class MainWindow (Window):
 			raise
 
 		self.cfg.modify_external_configs()
-		gtk.link_button_set_uri_hook(lambda btn, x: Popen([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
+		gtk.link_button_set_uri_hook(lambda btn, x: listener.send_cmd([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
 
 		# set plugins and plugin-menu
 		splash(_("Loading Plugins"))
@@ -1177,47 +1172,43 @@ class MainWindow (Window):
 		return True
 
 	def cb_update_clicked (self, action):
-		if not am_i_root():
-			not_root_dialog()
-		else:
+		def __update():
 			
-			def __update():
-				
-				def cb_idle_append (pkg, unmask):
-					self.queue.append(pkg.get_cpv(), unmask = unmask)
-					return False
+			def cb_idle_append (pkg, unmask):
+				self.queue.append(pkg.get_cpv(), unmask = unmask)
+				return False
 
-				def cb_idle_unmask_dialog (e, updating):
-					if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
-						for pkg, old_pkg in updating:
-							self.queue.append(pkg.get_cpv(), unmask = True)
-					return False
+			def cb_idle_unmask_dialog (e, updating):
+				if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
+					for pkg, old_pkg in updating:
+						self.queue.append(pkg.get_cpv(), unmask = True)
+				return False
 
-				def cb_idle_blocked(e):
-					blocked_dialog(e[0], e[1])
-					self.queue.remove_children(self.queue.emergeIt)
-					return False
+			def cb_idle_blocked(e):
+				blocked_dialog(e[0], e[1])
+				self.queue.remove_children(self.queue.emergeIt)
+				return False
 
-				watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
-				self.window.window.set_cursor(watch)
+			watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
+			self.window.window.set_cursor(watch)
+			try:
+				updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
+				debug("updating list: %s --> length: %s", [(x.get_cpv(), y.get_cpv()) for x,y in updating], len(updating))
 				try:
-					updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
-					debug("updating list: %s --> length: %s", [(x.get_cpv(), y.get_cpv()) for x,y in updating], len(updating))
 					try:
-						try:
-							for pkg, old_pkg in updating:
-								gobject.idle_add(cb_idle_append, pkg, False)
-						except PackageNotFoundException, e:
-							gobject.idle_add(cb_idle_unmask_dialog, e, updating)
-					
-					except BlockedException, e:
-						gobject.idle_add(cb_idle_blocked(e))
-					
-					if len(updating): self.doUpdate = True
-				finally:
-					self.window.window.set_cursor(None)
+						for pkg, old_pkg in updating:
+							gobject.idle_add(cb_idle_append, pkg, False)
+					except PackageNotFoundException, e:
+						gobject.idle_add(cb_idle_unmask_dialog, e, updating)
 				
-			GtkThread(name="Update-Thread", target=__update).start()
+				except BlockedException, e:
+					gobject.idle_add(cb_idle_blocked(e))
+				
+				if len(updating): self.doUpdate = True
+			finally:
+				self.window.window.set_cursor(None)
+			
+		GtkThread(name="Update-Thread", target=__update).start()
 		
 		return True
 
@@ -1245,26 +1236,20 @@ class MainWindow (Window):
 		return True
 
 	def cb_sync_clicked (self, action):
-		if not am_i_root():
-			not_root_dialog()
-		else:
-			self.notebook.set_current_page(self.CONSOLE_PAGE)
-			cmd = self.cfg.get("syncCmd")
+		self.notebook.set_current_page(self.CONSOLE_PAGE)
+		cmd = self.cfg.get("syncCmd")
 
-			if cmd != "emerge --sync":
-				cmd = cmd.split()
-				self.queue.sync(cmd)
-			else:
-				self.queue.sync()
+		if cmd != "emerge --sync":
+			cmd = cmd.split()
+			self.queue.sync(cmd)
+		else:
+			self.queue.sync()
 
 	def cb_save_flags_clicked (self, action):
-		if not am_i_root():
-			not_root_dialog()
-		else:
-			flags.write_use_flags()
-			flags.write_testing()
-			flags.write_masked()
-	
+		flags.write_use_flags()
+		flags.write_testing()
+		flags.write_masked()
+
 	@Window.watch_cursor
 	def cb_reload_clicked (self, action):
 		"""Reloads the portage settings and the database."""
