@@ -476,7 +476,7 @@ class EmergeQueue:
 			self.console.set_pty(master)
 			
 			# start emerge
-			self.process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False, env = system.get_environment())
+			self.process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False, env = system.get_environment(), preexec_fn = os.setsid)
 			
 			# remove packages from queue
 			for i in it:
@@ -610,8 +610,12 @@ class EmergeQueue:
 		if self.process is not None:
 			self.threadQueue.clear() # remove all pending emerge threads
 			try:
-				send_signal_to_group(signal.SIGTERM)
-				debug("Process should be killed")
+				pgid = os.getpgid(self.process.pid)
+				os.killpg(pgid, signal.SIGTERM)
+				debug("Process should be terminated")
+				if self.process.poll() is None:
+					os.killpg(pgid, signal.SIGKILL)
+					debug("Process should be killed")
 			except AttributeError:
 				debug("AttributeError occured ==> process not exisiting - ignore")
 			except OSError:
@@ -621,13 +625,12 @@ class EmergeQueue:
 
 	def stop_emerge (self):
 		if self.process is not None:
-			# use SIGTSTP in favor of SIGSTOP, as SIGSTOP cannot be blocked and would stop the GUI too
-			send_signal_to_group(signal.SIGTSTP) 
+			os.killpg(os.getpgid(self.process.pid), signal.SIGSTOP)
 			debug("Process should be stopped")
 
 	def continue_emerge (self):
 		if self.process is not None:
-			send_signal_to_group(signal.SIGCONT)
+			os.killpg(os.getpgid(self.process.pid), signal.SIGCONT)
 			debug("Process should continue")
 
 	def remove_with_children (self, it, removeNewFlags = True):

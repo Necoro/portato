@@ -89,12 +89,6 @@ def main ():
 			print _("Validation succeeded.")
 			return
 	elif options.nolistener:
-		try:
-			# move this process into a new process group
-			# this is to be able to kill emerge et al w/o killing ourselves :)
-			os.setsid()
-		except OSError:
-			pass
 		listener.set_send()
 		run()
 	else: # start listener and start us again in root modus
