@@ -936,7 +936,7 @@ class MainWindow (Window):
 		
 		# notebook
 		self.notebook = self.tree.get_widget("notebook")
-		#self.window.show_all()
+		self.window.show_all()
 		
 		# table
 		self.packageTable = PackageTable(self)
@@ -970,7 +970,6 @@ class MainWindow (Window):
 		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update, threadClass = GtkThread)
 	
 		self.window.maximize()
-		self.window.show_all()
 		
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)
