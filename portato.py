@@ -15,8 +15,7 @@
 from portato import listener
 from portato.constants import VERSION, FRONTENDS, STD_FRONTEND, XSD_LOCATION, LOCALE_DIR, APP, SU_COMMAND
 from optparse import OptionParser
-from subprocess import call
-import sys, os, socket
+import sys, os
 import gettext, locale
 
 def get_frontend_list ():
@@ -88,26 +87,23 @@ def main ():
 		else:
 			print _("Validation succeeded.")
 			return
-	elif options.nolistener:
+	elif options.nolistener or os.getuid() == 0:
 		listener.set_send()
 		run()
 	else: # start listener and start us again in root modus
-		if os.fork() == 0:
-			listener.set_recv()
-		else:
+		pid = os.fork()
+		if pid == 0: # start portato in child
 			additional = []
 			if options.check:
 				additional.append("-c")
 			if options.frontend:
 				additional.extend(["-f", options.frontend])
 
-			try:
-				if os.getuid() != 0:
-					call(SU_COMMAND.split()+["%s --no-listener %s" % (sys.argv[0], " ".join(additional))], env = os.environ)
-				else:
-					call([sys.argv[0], "--no-listener"]+additional, env = os.environ)
-			except KeyboardInterrupt:
-				pass
+			cmd = SU_COMMAND.split()
+			os.execvpe(cmd[0], cmd+["%s --no-listener %s" % (sys.argv[0], " ".join(additional))], env = os.environ)
+	
+		else: # start listener
+			listener.set_recv()
 
 if __name__ == "__main__":
 	main()
