@@ -552,7 +552,7 @@ msgid ""
 "Exception in thread \"%(thread)s\":\n"
 "%(trace)s"
 msgstr ""
-"Exception in Thread \"%(thread)s\":\n"
+"Exception im Thread \"%(thread)s\":\n"
 "%(trace)s"
 
 #: portato/gui/gtk/exception_handling.py:104
