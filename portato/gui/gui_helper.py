@@ -369,17 +369,25 @@ class EmergeQueue:
 					elif cmp < 0:
 						downgrade = True
 
-					if cmp != 0:
-						uVersion = old.get_version()
+					uVersion = old.get_version()
 
-						old_iuse = set(old.get_iuse_flags())
-						new_iuse = set(pkg.get_iuse_flags())
+					old_iuse = set(old.get_iuse_flags())
+					new_iuse = set(pkg.get_iuse_flags())
 
-						for i in old_iuse.difference(new_iuse):
-							changedUse.append("-"+i)
+					for i in old_iuse.difference(new_iuse):
+						changedUse.append("-"+i)
 
-						for i in new_iuse.difference(old_iuse):
-							changedUse.append("+"+i)
+					for i in new_iuse.difference(old_iuse):
+						changedUse.append("+"+i)
+			else:
+				old_iuse = set(pkg.get_iuse_flags(installed = True))
+				new_iuse = set(pkg.get_iuse_flags(installed = False))
+
+				for i in old_iuse.difference(new_iuse):
+					changedUse.append("-"+i)
+
+				for i in new_iuse.difference(old_iuse):
+					changedUse.append("+"+i)
 
 		except backend.PackageNotFoundException, e: # package not found / package is masked -> delete current tree and re-raise the exception
 			if self.tree.iter_has_parent(it):

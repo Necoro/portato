@@ -137,8 +137,13 @@ class PortagePackage (Package):
 		actual = self.get_actual_use_flags()
 		
 		depstring = ""
-		for d in depvar:
-			depstring += self.get_package_settings(d, tree = self._settings.porttree)+" "
+		try:
+			for d in depvar:
+				depstring += self.get_package_settings(d, tree = self._settings.porttree)+" "
+		except KeyError: # not found in porttree - use vartree
+			depstring = ""
+			for d in depvar:
+				depstring += self.get_package_settings(d, tree = self._settings.vartree)+" "
 
 		deps = portage.dep_check(depstring, None, self._settings.settings, myuse = actual, trees = self._trees)
 
