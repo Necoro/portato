@@ -323,11 +323,19 @@ class PortageSystem (SystemInterface):
 		
 		checked = []
 		updating = []
-		raw_checked = []
+		raw_checked = {}
 		def check (p, add_not_installed = True):
 			"""Checks whether a package is updated or not."""
-			if p.get_cp() in checked: return
-			else: checked.append(p.get_cp())
+			
+			if p.get_slot_cp() in checked:
+				return
+			else: 
+				if (not p.is_installed()) and (not add_not_installed):
+					# don't add these packages to checked as we may see them again
+					# - and then we might have add_not_installed being True
+					return
+				else:
+					checked.append(p.get_slot_cp())
 
 			appended = False
 			tempDeep = False
@@ -339,11 +347,9 @@ class PortageSystem (SystemInterface):
 				else:
 					oldList = self.sort_package_list(self.find_installed_packages(p.get_cp()))
 					if not oldList:
-						if add_not_installed:
-							info(_("Found a not installed dependency: %s.") % p.get_cpv())
-							oldList = [p]
-						else:
-							return
+						info(_("Found a not installed dependency: %s.") % p.get_cpv())
+						oldList = [p]
+					
 					old = oldList[-1]
 				
 				updating.append((p, old))
@@ -352,8 +358,8 @@ class PortageSystem (SystemInterface):
 
 			if newuse and p.is_installed() and p.is_in_system(): # there is no use to check newuse for a package which is not existing in portage anymore :)
 
-				new_iuse = set(p.get_all_use_flags(installed = False)) # IUSE in the ebuild
-				old_iuse = set(p.get_all_use_flags(installed = True)) # IUSE in the vardb
+				new_iuse = set(p.get_iuse_flags(installed = False)) # IUSE in the ebuild
+				old_iuse = set(p.get_iuse_flags(installed = True)) # IUSE in the vardb
 				
 				if new_iuse.symmetric_difference(old_iuse): # difference between new_iuse and old_iuse
 					tempDeep = True
@@ -362,10 +368,7 @@ class PortageSystem (SystemInterface):
 						appended = True
 				
 				else:
-					old = set(p.get_installed_use_flags())
-					new = set(p.get_global_settings("USE").split())
-					
-					if new_iuse.intersection(new) != old_iuse.intersection(old):
+					if new_iuse.intersection(p.get_actual_use_flags()).symmetric_difference(p.get_installed_use_flags()):
 						tempDeep = True
 						if not appended:
 							updating.append((p,p))
@@ -376,8 +379,8 @@ class PortageSystem (SystemInterface):
 				
 				for state in states:
 					for i in p.get_matched_dep_packages(state[0]):
-						if i not in raw_checked:
-							raw_checked.append(i)
+						if i not in raw_checked or raw_checked[i] == False:
+							raw_checked.update({i : state[1]})
 							bm = self.get_new_packages([i])
 							if not bm: 
 								warning(_("Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."), {"package" : i, "cpv": p.get_cpv()})

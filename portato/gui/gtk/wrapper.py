@@ -30,18 +30,31 @@ class GtkTree (Tree):
 		self.emergeIt = self.append(None, ["Emerge", ""])
 		self.unmergeIt = self.append(None, ["Unmerge", ""])
 
-	def build_append_value (self, cpv, oneshot = False, update = False, version = None):
+	def build_append_value (self, cpv, oneshot = False, update = False, downgrade = False, version = None, useChange = []):
 		string = ""
 
 		if oneshot:
 			string += "<i>%s</i>" % _("oneshot")
-			if update: string += "; "
 
 		if update:
+			if oneshot: string += "; "
 			if version is not None:
 				string += "<i>%s</i>" % (_("updating from version %s") % version)
 			else:
 				string += "<i>%s</i>" % _("updating")
+
+		elif downgrade:
+			if oneshot: string += "; "
+			if version is not None:
+				string += "<i>%s</i>" % (_("downgrading from version %s") % version)
+			else:
+				string += "<i>%s</i>" % _("downgrading")
+
+		if useChange:
+			if update or downgrade or oneshot: string += "; "
+			string += "<i><b>%s </b></i>" % _("IUSE changes:")
+			useChange.sort()
+			string += "<i>%s</i>" % " ".join(useChange)
 
 		return [cpv, string]
 

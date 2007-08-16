@@ -139,7 +139,7 @@ class Tree:
 		@rtype: Iterator"""
 		raise NotImplementedError
 
-	def build_append_value (self, cpv, oneshot = False, update = False, version = None):
+	def build_append_value (self, cpv, oneshot = False, update = False, downgrade = False, version = None, useChange = []):
 		"""Builds the list, which is going to be passed to append. 
 
 		@param cpv: the cpv
@@ -148,8 +148,12 @@ class Tree:
 		@type oneshot: boolean
 		@param update: True if this is an update
 		@type update: boolean
+		@param downgrade: True if this is a downgrade
+		@type downgrade: boolean
 		@param version: the version we update from
 		@type version: string
+		@param useChange: list of changed useflags; use "-use" for removed and "+use" for added flags
+		@type useChange: string[]
 
 		@returns: the created list
 		@rtype: list"""

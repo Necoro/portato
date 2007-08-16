@@ -354,15 +354,32 @@ class EmergeQueue:
 		
 		# try to find an already installed instance
 		update = False
+		downgrade = False
 		uVersion = None
+		changedUse = []
 		try:
 			pkg = self._get_pkg_from_cpv(cpv, unmask)
 			if not pkg.is_installed():
 				old = system.find_installed_packages(pkg.get_slot_cp())
 				if old: 
 					old = old[0] # assume we have only one there
-					update = True
-					uVersion = old.get_version()
+					cmp = pkg.compare_version(old)
+					if cmp > 0:
+						update = True
+					elif cmp < 0:
+						downgrade = True
+
+					if cmp != 0:
+						uVersion = old.get_version()
+
+						old_iuse = set(old.get_iuse_flags())
+						new_iuse = set(pkg.get_iuse_flags())
+
+						for i in old_iuse.difference(new_iuse):
+							changedUse.append("-"+i)
+
+						for i in new_iuse.difference(old_iuse):
+							changedUse.append("+"+i)
 
 		except backend.PackageNotFoundException, e: # package not found / package is masked -> delete current tree and re-raise the exception
 			if self.tree.iter_has_parent(it):
@@ -372,7 +389,7 @@ class EmergeQueue:
 			raise
 
 		# add iter
-		subIt = self.tree.append(it, self.tree.build_append_value(cpv, oneshot = oneshot, update = update, version = uVersion))
+		subIt = self.tree.append(it, self.tree.build_append_value(cpv, oneshot = oneshot, update = update, downgrade = downgrade, version = uVersion, useChange = changedUse))
 		self.iters.update({cpv: subIt})
 		
 		# get dependencies

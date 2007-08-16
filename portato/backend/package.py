@@ -74,7 +74,7 @@ class Package (object):
 		
 		if self.is_installed():
 			uses = set(self.get_use_flags().split()) # all set at installation time
-			iuses = set(self.get_all_use_flags(installed=True)) # all you can set for the package
+			iuses = set(self.get_iuse_flags(installed=True)) # all you can set for the package
 			
 			return list(uses.intersection(iuses))
 		else:
@@ -89,23 +89,22 @@ class Package (object):
 		return flags.get_new_use_flags(self)
 
 	def get_actual_use_flags (self):
-		"""This returns the result of installed_use_flags + new_use_flags. If the package is not installed, it returns only the new flags.
+		"""This returns all currently set use-flags including the new ones.
 
 		@return: list of flags
 		@rtype: string[]"""
 
-		if self.is_installed():
-			i_flags = self.get_installed_use_flags()
-			for f in self.get_new_use_flags():
-				
+		i_flags = self.get_global_settings("USE").split()
+		for f in self.get_new_use_flags():
+			
+			if f[0] == '-':
 				if flags.invert_use_flag(f) in i_flags:
 					i_flags.remove(flags.invert_use_flag(f))
-				
-				elif f not in i_flags:
-					i_flags.append(f)
-			return i_flags
-		else:
-			return self.get_new_use_flags()
+			
+			elif f not in i_flags:
+				i_flags.append(f)
+		
+		return i_flags
 
 	def set_use_flag (self, flag):
 		"""Set a use-flag.
@@ -119,28 +118,6 @@ class Package (object):
 		"""Remove all the new use-flags."""
 		
 		flags.remove_new_use_flags(self)
-
-	def is_use_flag_enabled (self, flag):
-		"""Looks whether a given useflag is enabled for the package, taking all options
-		(ie. even the new flags) into account.
-
-		@param flag: the flag to check
-		@type flag: string
-		@returns: True or False
-		@rtype: bool"""
-		
-		if self.is_installed() and flag in self.get_actual_use_flags(): # flags set during install
-			return True
-		
-		elif (not self.is_installed()) and flag in self.get_global_settings("USE").split() \
-				and not flags.invert_use_flag(flag) in self.get_new_use_flags(): # flags that would be set
-			return True
-		
-		elif flag in self.get_new_use_flags():
-			return True
-		
-		else:
-			return False
 
 	def use_expanded (self, flag, suggest = None):
 		"""Tests whether a useflag is an expanded one. If it is, this method returns the USE_EXPAND-value.
@@ -156,7 +133,7 @@ class Package (object):
 			if flag.startswith(suggest.lower()):
 				return suggest
 
-		for exp in self.get_global_settings("USE_EXPAND").split(" "):
+		for exp in self.get_global_settings("USE_EXPAND").split():
 			lexp = exp.lower()
 			if flag.startswith(lexp):
 				return exp
@@ -290,7 +267,7 @@ class Package (object):
 		@returns: the reason for masking the package
 		@rtype: string"""
 		
-	def get_all_use_flags (self, installed = False):
+	def get_iuse_flags (self, installed = False):
 		"""Returns a list of _all_ useflags for this package, i.e. all useflags you can set for this package.
 		
 		@param installed: do not take the ones stated in the ebuild, but the ones it has been installed with

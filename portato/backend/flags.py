@@ -382,6 +382,7 @@ def write_use_flags ():
 	# reset
 	useFlags = {}
 	newUseFlags = {}
+	system.reload_settings()
 
 ### MASKING PART ###
 new_masked = {}
@@ -586,6 +587,7 @@ def write_masked ():
 	# reset
 	new_masked = {}
 	new_unmasked = {}
+	system.reload_settings()
 
 ### TESTING PART ###
 newTesting = {}
@@ -704,3 +706,4 @@ def write_testing ():
 		f.close()
 	# reset
 	newTesting = {}
+	system.reload_settings()

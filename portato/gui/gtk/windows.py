@@ -509,11 +509,14 @@ class PackageTable:
 	def fill_use_list(self):
 
 		pkg = self.actual_package()
-		pkg_flags = pkg.get_all_use_flags()
+		pkg_flags = pkg.get_iuse_flags()
 		pkg_flags.sort()
 	
 		actual_exp = None
 		actual_exp_it = None
+
+		euse = pkg.get_actual_use_flags()
+		instuse = pkg.get_installed_use_flags()
 
 		store = self.useList.get_model()
 
@@ -521,29 +524,34 @@ class PackageTable:
 			exp = pkg.use_expanded(use, suggest = actual_exp)
 			if exp is not None:
 				if exp != actual_exp:
-					actual_exp_it = store.append(None, [None, exp, "<i>%s</i>" % _("This is an expanded use flag and cannot be selected")])
+					actual_exp_it = store.append(None, [None, None, exp, "<i>%s</i>" % _("This is an expanded use flag and cannot be selected")])
 					actual_exp = exp
 			else:
 				actual_exp_it = None
 				actual_exp = None
 
-			store.append(actual_exp_it, [pkg.is_use_flag_enabled(use), use, system.get_use_desc(use, self.cp)])
+			enabled = use in euse
+			installed = use in instuse
+			store.append(actual_exp_it, [enabled, installed, use, system.get_use_desc(use, self.cp)])
 		
 	def build_use_list (self):
 		"""Builds the useList."""
-		store = gtk.TreeStore(bool, str, str)
+		store = gtk.TreeStore(bool, bool, str, str)
 		self.useList.set_model(store)
 
 		# build view
 		cell = gtk.CellRendererText()
+		iCell = gtk.CellRendererToggle()
+		iCell.set_property("activatable", False)
 		tCell = gtk.CellRendererToggle()
 		tCell.set_property("activatable", True)
 		tCell.connect("toggled", self.cb_use_flag_toggled, store)
 		self.useList.append_column(gtk.TreeViewColumn(_("Enabled"), tCell, active = 0))
-		self.useList.append_column(gtk.TreeViewColumn(_("Flag"), cell, text = 1))
-		self.useList.append_column(gtk.TreeViewColumn(_("Description"), cell, markup = 2))
+		self.useList.append_column(gtk.TreeViewColumn(_("Installed"), iCell, active = 1))
+		self.useList.append_column(gtk.TreeViewColumn(_("Flag"), cell, text = 2))
+		self.useList.append_column(gtk.TreeViewColumn(_("Description"), cell, markup = 3))
 
-		self.useList.set_search_column(1)
+		self.useList.set_search_column(2)
 		self.useList.set_enable_tree_lines(True)
 
 	def build_vers_list (self):
@@ -793,10 +801,10 @@ class PackageTable:
 
 	def cb_use_flag_toggled (self, cell, path, store):
 		"""Callback for a toggled use-flag button."""
-		flag = store[path][1]
+		flag = store[path][2]
 		pkg = self.actual_package()
 		
-		if flag in pkg.get_global_settings("USE_EXPAND").split(" "): # ignore expanded flags
+		if flag in pkg.get_global_settings("USE_EXPAND").split(): # ignore expanded flags
 			return False
 
 		store[path][0] = not store[path][0]

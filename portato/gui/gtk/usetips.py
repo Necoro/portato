@@ -53,21 +53,35 @@ class UseTips (TreeViewTooltips):
 		disabled = []
 		expanded = set()
 
-		pkg_flags = pkg.get_all_use_flags()
+		pkg_flags = pkg.get_iuse_flags()
 		if not pkg_flags: # no flags - stop here
 			return None
 		
 		pkg_flags.sort()
+		actual = pkg.get_actual_use_flags()
+		
+		if pkg.is_installed():
+			installed = pkg.get_installed_use_flags()
+		else:
+			inst = system.find_installed_packages(pkg.get_slot_cp())
+			if inst:
+				installed = inst[0].get_installed_use_flags()
+			else:
+				installed = []
+
 		for use in pkg_flags:
 			exp = pkg.use_expanded(use)
 			if exp:
 				expanded.add(exp)
 			
 			else:
-				if pkg.is_use_flag_enabled(use):
-					enabled.append(use)
+				useStr = use
+				if installed and ((use in actual) != (use in installed)):
+					useStr += " %"
+				if use in actual:
+					enabled.append(useStr)
 				else:
-					disabled.append(use)
+					disabled.append(useStr)
 		
 		string = ""
 		

@@ -124,7 +124,7 @@ class PortagePackage (Package):
 		else:
 			return reason
 
-	def get_all_use_flags (self, installed = False):
+	def get_iuse_flags (self, installed = False):
 		if installed or not self.is_in_system():
 			tree = self._settings.vartree
 		else:
@@ -134,22 +134,13 @@ class PortagePackage (Package):
 
 	def get_matched_dep_packages (self, depvar):
 		# change the useflags, because we have internally changed some, but not made them visible for portage
-		newUseFlags = self.get_new_use_flags()
-		actual = self.get_global_settings("USE").split()
-		if newUseFlags:
-			for u in newUseFlags:
-				if u[0] == "-" and flags.invert_use_flag(u) in actual:
-					actual.remove(flags.invert_use_flag(u))
-				elif u not in actual:
-					actual.append(u)
+		actual = self.get_actual_use_flags()
 		
 		depstring = ""
 		for d in depvar:
-			depstring += self.get_package_settings(d)+" "
+			depstring += self.get_package_settings(d, tree = self._settings.porttree)+" "
 
-		portage_dep._dep_check_strict = False
 		deps = portage.dep_check(depstring, None, self._settings.settings, myuse = actual, trees = self._trees)
-		portage_dep._dep_check_strict = True
 
 		if not deps: # FIXME: what is the difference to [1, []] ?
 			return [] 
@@ -171,14 +162,7 @@ class PortagePackage (Package):
 		dep_pkgs = [] # the package list
 		
 		# change the useflags, because we have internally changed some, but not made them visible for portage
-		newUseFlags = self.get_new_use_flags()
-		actual = self.get_global_settings("USE").split()
-		if newUseFlags:
-			for u in newUseFlags:
-				if u[0] == "-" and flags.invert_use_flag(u) in actual:
-					actual.remove(flags.invert_use_flag(u))
-				elif u not in actual:
-					actual.append(u)
+		actual = self.get_actual_use_flags()
 
 		depstring = ""
 		for d in depvar:
