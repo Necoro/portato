@@ -102,4 +102,6 @@ class GtkTree (Tree):
 
 class GtkConsole (vte.Terminal, Console):
 	"""The implementation of the abstract Console for GTK."""
-	pass
+	
+	def reset (self):
+		vte.Terminal.reset(self, True, True)

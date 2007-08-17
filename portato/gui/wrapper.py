@@ -175,3 +175,8 @@ class Console:
 
 		@returns: title of the console or None"""
 		raise NotImplementedError
+
+	def reset (self):
+		"""Resets the terminal."""
+
+		raise NotImplementedError

@@ -272,6 +272,7 @@ class EmergeQueue:
 		# the emerge process
 		self.process = None
 		self.threadQueue = WaitingQueue(threadClass = threadClass)
+		self.pty = None
 
 		# dictionaries with data about the packages in the queue
 		self.iters = {} # iterator in the tree
@@ -497,11 +498,14 @@ class EmergeQueue:
 				command = system.get_merge_command()
 
 			# open tty
-			(master, slave) = pty.openpty()
-			self.console.set_pty(master)
+			if not self.pty:
+				self.pty = pty.openpty()
+				self.console.set_pty(self.pty[0])
+			else:
+				self.console.reset()
 			
 			# start emerge
-			self.process = Popen(command+options+packages, stdout = slave, stderr = STDOUT, shell = False, env = system.get_environment(), preexec_fn = os.setsid)
+			self.process = Popen(command+options+packages, stdout = self.pty[1], stderr = STDOUT, shell = False, env = system.get_environment(), preexec_fn = os.setsid)
 			
 			# remove packages from queue
 			for i in it:
@@ -518,18 +522,22 @@ class EmergeQueue:
 
 			if self.title_update: self.title_update(None)
 
+			
 			if self.process is None: # someone resetted this
+				self.threadQueue.next()
 				return
+			else:
+				ret = self.process.returncode
+				self.process = None
+				self.threadQueue.next()
 
-			@plugin.hook("after_emerge", packages = packages, retcode = self.process.returncode)
+			@plugin.hook("after_emerge", packages = packages, retcode = ret)
 			def update_packages():
 				for cat in unique_array([system.split_cpv(p)[0] for p in packages if p not in ["world", "system"]]):
 					self.db.reload(cat)
 					debug("Category %s refreshed", cat)
 
 			update_packages()
-			self.process = None
-			self.threadQueue.next()
 			
 		sub_emerge(command)
 
