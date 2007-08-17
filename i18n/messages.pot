@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-16 01:22-0700\n"
+"POT-Creation-Date: 2007-08-16 22:50-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,13 +38,13 @@ msgid "_Emerge"
 msgstr ""
 
 #: portato/gui/templates/portato.glade:89
-#: portato/gui/templates/portato.glade:571
+#: portato/gui/templates/portato.glade:516
 #: portato/gui/templates/portato.glade:721 portato/gui/gtk/windows.py:699
 msgid "E_merge"
 msgstr ""
 
 #: portato/gui/templates/portato.glade:104
-#: portato/gui/templates/portato.glade:580
+#: portato/gui/templates/portato.glade:525
 #: portato/gui/templates/portato.glade:730
 msgid "_Unmerge"
 msgstr ""
@@ -115,37 +115,37 @@ msgstr ""
 msgid "gtk-find"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:474
-msgid "<b>Installed, but not in portage anymore</b>"
-msgstr ""
-
-#: portato/gui/templates/portato.glade:553
-msgid "<span foreground='red'><b>MISSING KEYWORD</b></span>"
-msgstr ""
-
-#: portato/gui/templates/portato.glade:592
-msgid "Re_vert"
-msgstr ""
-
-#: portato/gui/templates/portato.glade:604
-msgid "E_build"
-msgstr ""
-
-#: portato/gui/templates/portato.glade:630 portato/gui/gtk/windows.py:550
+#: portato/gui/templates/portato.glade:463 portato/gui/gtk/windows.py:550
 msgid "Installed"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:643 portato/gui/gtk/windows.py:676
+#: portato/gui/templates/portato.glade:476 portato/gui/gtk/windows.py:676
 #: portato/gui/gtk/windows.py:679 portato/gui/gtk/windows.py:682
 #: portato/gui/gtk/windows.py:781 portato/gui/gtk/windows.py:784
 #: portato/gui/gtk/windows.py:791 portato/gui/gtk/windows.py:795
 msgid "Masked"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:657 portato/gui/gtk/windows.py:689
+#: portato/gui/templates/portato.glade:490 portato/gui/gtk/windows.py:689
 #: portato/gui/gtk/windows.py:692 portato/gui/gtk/windows.py:753
 #: portato/gui/gtk/windows.py:758
 msgid "Testing"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:537
+msgid "Re_vert"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:549
+msgid "E_build"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:570
+msgid "<span foreground='red'><b>MISSING KEYWORD</b></span>"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:649
+msgid "<b>Installed, but not in portage anymore</b>"
 msgstr ""
 
 #: portato/gui/templates/portato.glade:684 portato/gui/gtk/windows.py:128
@@ -214,31 +214,19 @@ msgstr ""
 msgid "<b>Sync Options</b>"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1166
-msgid "File name to use, if package.use is a directory: "
+#: portato/gui/templates/portato.glade:1156
+msgid "<u><i>Masking Keywords</i></u>"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1177
-msgid "Add only exact version to package.use"
+#: portato/gui/templates/portato.glade:1171
+msgid "<u><i>Testing Keywords</i></u>"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1190
-msgid "Add only exact version to package.keywords"
+#: portato/gui/templates/portato.glade:1186
+msgid "<u><i>Use-Flags</i></u>"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1204
-msgid "File name to use, if package.keywords is a directory: "
-msgstr ""
-
-#: portato/gui/templates/portato.glade:1238
-msgid "File name to use, if package.mask/package.unmask is a directory: "
-msgstr ""
-
-#: portato/gui/templates/portato.glade:1249
-msgid "Add only exact version to package.mask/package.unmask"
-msgstr ""
-
-#: portato/gui/templates/portato.glade:1271
+#: portato/gui/templates/portato.glade:1208
 msgid ""
 "<u>You may use the following placeholders:</u>\n"
 "\n"
@@ -247,16 +235,28 @@ msgid ""
 "<i>$(cat-1)/$(cat-2)</i>: first/second part of the category"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1297
-msgid "<u><i>Use-Flags</i></u>"
+#: portato/gui/templates/portato.glade:1232
+msgid "Add only exact version to package.mask/package.unmask"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1312
-msgid "<u><i>Testing Keywords</i></u>"
+#: portato/gui/templates/portato.glade:1246
+msgid "File name to use, if package.mask/package.unmask is a directory: "
 msgstr ""
 
-#: portato/gui/templates/portato.glade:1327
-msgid "<u><i>Masking Keywords</i></u>"
+#: portato/gui/templates/portato.glade:1280
+msgid "File name to use, if package.keywords is a directory: "
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1291
+msgid "Add only exact version to package.keywords"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1304
+msgid "Add only exact version to package.use"
+msgstr ""
+
+#: portato/gui/templates/portato.glade:1318
+msgid "File name to use, if package.use is a directory: "
 msgstr ""
 
 #: portato/gui/templates/portato.glade:1344
