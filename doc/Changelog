@@ -1,4 +1,4 @@
-next:
+0.8.5:
 - added an uncaught exception dialog
 - i18n
 - new threading model for the emerge process
