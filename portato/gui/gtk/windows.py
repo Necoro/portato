@@ -1181,19 +1181,20 @@ class MainWindow (Window):
 	def cb_update_clicked (self, action):
 		def __update():
 			
-			def cb_idle_append (pkg, unmask):
-				self.queue.append(pkg.get_cpv(), unmask = unmask)
-				return False
+			def cb_idle_append (updating):
+				try:
+					try:
+						for pkg, old_pkg in updating:
+							self.queue.append(pkg.get_cpv(), unmask = unmask)
+					except PackageNotFoundException, e:
+						if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
+							for pkg, old_pkg in updating:
+								self.queue.append(pkg.get_cpv(), unmask = True)
 
-			def cb_idle_unmask_dialog (e, updating):
-				if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
-					for pkg, old_pkg in updating:
-						self.queue.append(pkg.get_cpv(), unmask = True)
-				return False
-
-			def cb_idle_blocked(e):
-				blocked_dialog(e[0], e[1])
-				self.queue.remove_children(self.queue.emergeIt)
+				except BlockedException, e:
+					blocked_dialog(e[0], e[1])
+					self.queue.remove_children(self.queue.emergeIt)
+				
 				return False
 
 			watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
@@ -1201,16 +1202,7 @@ class MainWindow (Window):
 			try:
 				updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
 				debug("updating list: %s --> length: %s", [(x.get_cpv(), y.get_cpv()) for x,y in updating], len(updating))
-				try:
-					try:
-						for pkg, old_pkg in updating:
-							gobject.idle_add(cb_idle_append, pkg, False)
-					except PackageNotFoundException, e:
-						gobject.idle_add(cb_idle_unmask_dialog, e, updating)
-				
-				except BlockedException, e:
-					gobject.idle_add(cb_idle_blocked(e))
-				
+				gobject.idle_add(cb_idle_append, updating)
 				if len(updating): self.doUpdate = True
 			finally:
 				self.window.window.set_cursor(None)
@@ -1304,22 +1296,21 @@ class MainWindow (Window):
 	
 	def cb_show_updates_clicked (self, button):
 		def __update():
-			def cb_idle():
+			
+			def cb_idle_show(packages):
 				UpdateWindow(self.window, packages, self.queue, self.jump_to)
 				return False
-			
-			def cb_idle_watch(packages):
-				try:
-					packages.extend(system.get_updated_packages())
-				finally:
-					self.window.window.set_cursor(None)
 			
 			watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
 			self.window.window.set_cursor(watch)
 			
 			packages = []
-			gobject.idle_add(cb_idle_watch, packages)
-			gobject.idle_add(cb_idle)
+			try:
+				packages.extend(system.get_updated_packages())
+			finally:
+				self.window.window.set_cursor(None)
+
+			gobject.idle_add(cb_idle_show, packages)
 		
 		GtkThread(name="Show Updates Thread", target = __update).start()
 		return True
