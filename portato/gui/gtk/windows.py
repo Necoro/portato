@@ -1185,7 +1185,7 @@ class MainWindow (Window):
 				try:
 					try:
 						for pkg, old_pkg in updating:
-							self.queue.append(pkg.get_cpv(), unmask = unmask)
+							self.queue.append(pkg.get_cpv(), unmask = False)
 					except PackageNotFoundException, e:
 						if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
 							for pkg, old_pkg in updating:
