@@ -6,6 +6,7 @@ Backend:
 
 - add Paludis support
 - add pkgcore support
+- add equo support
 
 - bugs in update world (Necoro, 04/20/07: are there any more bugs?)
 - fix for flag handling, when reverting flags (Necoro, 04/20/07: what did i mean by this?)
@@ -17,6 +18,8 @@ Backend:
 - only remove already merged packages from queue
 - make sure, a package being removed from the queue is not needed as a dependency by another package
 
+- "nach hause telefonieren" :)
+
 GUI:
 ====
 
@@ -27,10 +30,13 @@ Main Point: user preferences:
 	- colors and font sizes
 
 - rotating systray icon
+- interactive emerges
 
 GTK:
 ----
 - make oneshot better
+- show installed files
+- show dependencies
 
 Qt (stopped):
 ---

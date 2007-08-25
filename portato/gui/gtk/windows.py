@@ -151,16 +151,13 @@ class UpdateWindow (AbstractDialog):
 				items.append(model.get_value(iter, 1))
 			iter = model.iter_next(iter)
 		
-		world = [x.get_cp() for x in system.find_all_world_packages()]
 		for item in items:
-			cp = "/".join(system.split_cpv(item)[:2])
-			not_in_world = cp not in world
 			try:
 				try:
-					self.queue.append(item, unmerge = False, oneshot = not_in_world)
+					self.queue.append(item, unmerge = False, oneshot = True)
 				except PackageNotFoundException, e:
 					if unmask_dialog(e[0]) == gtk.RESPONSE_YES :
-						self.queue.append(item, unmerge = False, unmask = True, oneshot = not_in_world)
+						self.queue.append(item, unmerge = False, unmask = True, oneshot = True)
 
 			except BlockedException, e:
 				blocked_dialog(e[0], e[1])
@@ -904,6 +901,7 @@ class MainWindow (Window):
 
 		self.cfg.modify_external_configs()
 		gtk.link_button_set_uri_hook(lambda btn, x: listener.send_cmd([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
+		gtk.about_dialog_set_url_hook(lambda *args: True) # dummy - if not set link is not set as link; if link is clicked the normal uri_hook is called too - thus do not call browser here
 
 		# set plugins and plugin-menu
 		splash(_("Loading Plugins"))
