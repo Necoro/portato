@@ -13,6 +13,7 @@
 """
 Some nice functions used in the program.
 """
+from __future__ import absolute_import
 
 import os, signal, logging, grp
 

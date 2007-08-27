@@ -12,11 +12,14 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from portato import listener
-from portato.constants import VERSION, FRONTENDS, STD_FRONTEND, XSD_LOCATION, LOCALE_DIR, APP, SU_COMMAND
-from optparse import OptionParser
+from __future__ import with_statement, absolute_import
+
 import sys, os
 import gettext, locale
+from optparse import OptionParser
+
+from portato import listener
+from portato.constants import VERSION, FRONTENDS, STD_FRONTEND, XSD_LOCATION, LOCALE_DIR, APP, SU_COMMAND
 
 def get_frontend_list ():
 	return ", ".join(["'%s'" % x for x in FRONTENDS])

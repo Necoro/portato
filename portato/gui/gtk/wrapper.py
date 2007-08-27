@@ -10,8 +10,10 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+from __future__ import absolute_import
+
 from gettext import lgettext as _
-from portato.gui.wrapper import Tree, Console
+from ..wrapper import Tree, Console
 import vte
 
 class GtkTree (Tree):

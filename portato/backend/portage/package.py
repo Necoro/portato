@@ -10,9 +10,13 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from portato.helper import *
-from portato.backend.exceptions import *
-from portato.backend import flags, Package, system
+from __future__ import absolute_import
+
+from ..package import Package
+from .. import flags
+from .. import system
+from ..exceptions import BlockedException, PackageNotFoundException
+from ...helper import debug, unique_array
 
 import portage, portage_dep
 from portage_util import unique_array

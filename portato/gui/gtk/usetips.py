@@ -10,10 +10,12 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from portato.backend import system
-from portato.backend.flags import invert_use_flag
+from __future__ import absolute_import
 
-from TreeViewTooltips import TreeViewTooltips
+from ...backend import system
+from ...backend.flags import invert_use_flag
+
+from .TreeViewTooltips import TreeViewTooltips
 
 class UseTips (TreeViewTooltips):
 	"""This class handles the display of the so called use-tips,

@@ -10,6 +10,8 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+from __future__ import absolute_import
+
 import os
 import portage
 from threading import Lock

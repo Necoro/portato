@@ -10,12 +10,14 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+from __future__ import absolute_import
+
 # gtk stuff
 import gtk
 import gtk.glade
 import gobject
 
-from portato.constants import DATA_DIR, APP_ICON, APP, LOCALE_DIR
+from ...constants import DATA_DIR, APP_ICON, APP, LOCALE_DIR
 
 gtk.glade.bindtextdomain (APP, LOCALE_DIR)
 gtk.glade.textdomain (APP)

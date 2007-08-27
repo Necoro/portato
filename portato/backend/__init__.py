@@ -10,11 +10,20 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from exceptions import *
-from system_interface import SystemInterface
+from __future__ import absolute_import
+
+from .system_interface import SystemInterface
+from .exceptions import BlockedException, PackageNotFoundException, DependencyCalcError, InvalidSystemError
 
 SYSTEM = "portage" # the name of the current system
 _sys = None # the SystemInterface-instance
+
+class _Package (object):
+	"""Wrapping class from which L{portato.backend.Package} inherits. This is used by the flags module to check
+	whether an object is a package. It cannot use the normal Package class as this results in cyclic dependencies."""
+
+	def __init__ (self):
+		raise TypeError, "Calling __init__ on portato.backend._Package objects is not allowed."
 
 class SystemWrapper (SystemInterface):
 	"""This is a wrapper to the different system interfaces, allowing the direct import via C{from portato.backend import system}.
@@ -42,7 +51,7 @@ def load_system ():
 	global _sys
 
 	if SYSTEM == "portage":
-		from portato.backend.portage import PortageSystem
+		from .portage import PortageSystem
 		_sys = PortageSystem ()
 	else:
 		raise InvalidSystemError, SYSTEM
@@ -50,6 +59,9 @@ def load_system ():
 system = SystemWrapper()
 
 # import package before loading the system as some systems may depend on it being in the namespace
-from package import Package
+from .package import Package
+
+def is_package(what):
+	return isinstance(what, Package)
 
 load_system()

@@ -10,6 +10,8 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+from __future__ import absolute_import
+
 import logging
 import sys
 import os
@@ -56,5 +58,5 @@ logging.getLogger("portatoLogger").addHandler(handler)
 logging.getLogger("portatoLogger").setLevel(logging.DEBUG)
 logging.getLogger("portatoLogger").propagate = False
 
-from plistener import PListener
+from .plistener import PListener
 listener = PListener()

@@ -10,10 +10,11 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from portato.backend import system
-import flags
+from __future__ import absolute_import
 
-class Package (object):
+from . import _Package, system, flags
+
+class Package (_Package):
 	"""This is a class abstracting a normal package which can be installed."""
 
 	def __init__ (self, cpv):

@@ -11,6 +11,8 @@
 #
 # Written by René 'Necoro' Neumann
 
+from __future__ import absolute_import
+
 import gtk, pango, gobject
 import sys, traceback
 
@@ -18,7 +20,7 @@ from threading import Thread
 from gettext import lgettext as _
 from StringIO import StringIO
 
-from portato.helper import error
+from ...helper import error
 
 class GtkThread (Thread):
 	def run(self):
@@ -29,10 +31,9 @@ class GtkThread (Thread):
 		except:
 			type, val, tb = sys.exc_info()
 			try:
-				try:
-					sys.excepthook(type, val, tb, thread = self.getName())
-				except TypeError:
-					raise type, val, tb # let normal thread handle it
+				sys.excepthook(type, val, tb, thread = self.getName())
+			except TypeError:
+				raise type, val, tb # let normal thread handle it
 			finally:
 				del type, val, tb
 

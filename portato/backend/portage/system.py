@@ -10,15 +10,17 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+from __future__ import absolute_import
+
 import re, os
 import types
 from gettext import lgettext as _
 import portage
 
-import package
-from settings import PortageSettings
-from portato.helper import *
-from portato.backend.system_interface import SystemInterface
+from .package import PortagePackage
+from .settings import PortageSettings
+from ..system_interface import SystemInterface
+from ...helper import debug, unique_array
 
 class PortageSystem (SystemInterface):
 	"""This class provides access to the portage-system."""
@@ -32,7 +34,7 @@ class PortageSystem (SystemInterface):
 		portage.WORLD_FILE = self.settings.settings["ROOT"]+portage.WORLD_FILE
 
 	def new_package (self, cpv):
-		return package.PortagePackage(cpv)
+		return PortagePackage(cpv)
 
 	def get_config_path (self):
 		return portage.USER_CONFIG_PATH
@@ -115,13 +117,13 @@ class PortageSystem (SystemInterface):
 		@returns: converted list
 		@rtype: PortagePackage[]"""
 		
-		return [package.PortagePackage(x) for x in list_of_packages]
+		return [PortagePackage(x) for x in list_of_packages]
 
 	def get_global_settings (self, key):
 		return self.settings.settings[key]
 
 	def find_best (self, list):
-		return package.PortagePackage(portage.best(list))
+		return PortagePackage(portage.best(list))
 
 	def find_best_match (self, search_key, only_installed = False):
 		t = None
@@ -263,7 +265,7 @@ class PortageSystem (SystemInterface):
 		return portage.catpkgsplit(cpv)
 
 	def sort_package_list(self, pkglist):
-		pkglist.sort(package.PortagePackage.compare_version)
+		pkglist.sort(PortagePackage.compare_version)
 		return pkglist
 
 	def reload_settings (self):

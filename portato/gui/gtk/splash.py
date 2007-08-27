@@ -9,12 +9,15 @@
 # There is NO WARRANTY, to the extent permitted by law.
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
+
+from __future__ import absolute_import
+
 import gtk
 import gobject
 from gettext import lgettext as _
 
-from portato.constants import VERSION, APP_ICON
-from basic import Window
+from ...constants import VERSION, APP_ICON
+from .basic import Window
 
 class SplashScreen (Window):
 	

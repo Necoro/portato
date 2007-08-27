@@ -10,27 +10,25 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-# some backend things
-from portato import backend
-from portato.backend import flags, system, set_system
-from portato.helper import debug, info, send_signal_to_group, set_log_level, unique_array
-from portato.waiting_queue import WaitingQueue
-from portato import plugin
-
-# parser
-from portato.config_parser import ConfigParser
-
-# the wrapper
-from wrapper import Console, Tree
+from __future__ import absolute_import
 
 # some stuff needed
-from subprocess import Popen, PIPE, STDOUT
-import threading
-import pty
-import time
-import os
-import signal
 import logging
+import os, pty
+import signal, threading, time
+from subprocess import Popen, PIPE, STDOUT
+
+# some backend things
+from .. import backend, plugin
+from ..backend import flags, system, set_system
+from ..helper import debug, info, send_signal_to_group, set_log_level, unique_array
+from ..waiting_queue import WaitingQueue
+
+# parser
+from ..config_parser import ConfigParser
+
+# the wrapper
+from .wrapper import Console, Tree
 
 class Config:
 	"""Wrapper around a ConfigParser and for additional local configurations."""

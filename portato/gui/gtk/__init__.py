@@ -10,18 +10,20 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+from __future__ import absolute_import
+
 from gettext import lgettext as _
 
-from portato import listener
-from exception_handling import register_ex_handler
+from ... import listener
+from .exception_handling import register_ex_handler
 
 def run ():
-	from splash import SplashScreen
+	from .splash import SplashScreen
 	try:
 		s = SplashScreen(_("Loading Portage"))
 		register_ex_handler()
 		s.show()
-		from windows import MainWindow
+		from .windows import MainWindow
 		m = MainWindow(s)
 		s.hide()
 		m.main()
@@ -32,9 +34,9 @@ def run ():
 
 def show_ebuild (pkg):	
 	import gtk
-	from portato import plugin
-	from portato.backend import system
-	from windows import SearchWindow, EbuildWindow
+	from ... import plugin
+	from ...backend import system
+	from .windows import SearchWindow, EbuildWindow
 
 	plugin.load_plugins("gtk")
 	register_ex_handler()

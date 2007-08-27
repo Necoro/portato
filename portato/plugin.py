@@ -12,13 +12,15 @@
 
 """A module containing the management of the plugin system."""
 
+from __future__ import absolute_import
+
 import os, os.path
 from xml.dom.minidom import parse
 from lxml import etree
 from gettext import lgettext as _
 
-from constants import PLUGIN_DIR, XSD_LOCATION
-from helper import *
+from .constants import PLUGIN_DIR, XSD_LOCATION
+from .helper import debug, info, error, flatten
 
 class PluginImportException (ImportError):
 	pass
@@ -365,33 +367,32 @@ class PluginQueue:
 			doc = parse(p)
 			
 			try:
-				try:
-					list = doc.getElementsByTagName("plugin")
-					elem = list[0]
+				list = doc.getElementsByTagName("plugin")
+				elem = list[0]
 
-					frontendOK = None
-					frontends = elem.getElementsByTagName("frontends")
-					if frontends:
-						nodes = frontends[0].childNodes
-						for f in nodes[0].nodeValue.strip().split():
-							if f == self.frontend:
-								frontendOK = True # one positive is enough
-								break
-							elif frontendOK is None: # do not make negative if we already have a positive
-								frontendOK = False
+				frontendOK = None
+				frontends = elem.getElementsByTagName("frontends")
+				if frontends:
+					nodes = frontends[0].childNodes
+					for f in nodes[0].nodeValue.strip().split():
+						if f == self.frontend:
+							frontendOK = True # one positive is enough
+							break
+						elif frontendOK is None: # do not make negative if we already have a positive
+							frontendOK = False
 
-					if frontendOK is None or frontendOK == True:
-						plugin = Plugin(p, elem.getElementsByTagName("name")[0], elem.getElementsByTagName("author")[0])
-						plugin.parse_hooks(elem.getElementsByTagName("hooks")[0])
-						plugin.set_import(elem.getElementsByTagName("import"))
-						plugin.parse_menus(elem.getElementsByTagName("menu"))
-						plugin.parse_options(elem.getElementsByTagName("options"))
-					
-						self.list.append(plugin)
-						info(_("Plugin '%s' loaded."), p)
+				if frontendOK is None or frontendOK == True:
+					plugin = Plugin(p, elem.getElementsByTagName("name")[0], elem.getElementsByTagName("author")[0])
+					plugin.parse_hooks(elem.getElementsByTagName("hooks")[0])
+					plugin.set_import(elem.getElementsByTagName("import"))
+					plugin.parse_menus(elem.getElementsByTagName("menu"))
+					plugin.parse_options(elem.getElementsByTagName("options"))
 				
-				except PluginImportException, e:
-					error(_("Loading plugin '%(plugin)s' failed: Could not import %(import)s"), {"plugin": p, "import": e[0]})
+					self.list.append(plugin)
+					info(_("Plugin '%s' loaded."), p)
+			
+			except PluginImportException, e:
+				error(_("Loading plugin '%(plugin)s' failed: Could not import %(import)s"), {"plugin": p, "import": e[0]})
 			finally:
 				doc.unlink()
 

@@ -29,12 +29,12 @@ Currently supported are the values (case insensitive): false, 0, off, falsch, ne
 @var SECTION: Regular expression allowing the recognition of a section header.
 @var EXPRESSION: Regular expression defining a normal option-value pair.
 """
-
-from helper import debug
-from gettext import lgettext as _
+from __future__ import absolute_import
 
 import re
-import types
+from gettext import lgettext as _
+
+from .helper import debug
 
 DELIMITER = ["=", ":"]
 COMMENT = [";","#"]
@@ -285,7 +285,7 @@ class ConfigParser:
 		section = section.upper()
 		key = key.lower()
 		
-		if not isinstance(value, types.BooleanType):
+		if not isinstance(value, bool):
 			raise ValueError, "Passed value must be a boolean."
 
 		val = self.vars[section][key]

@@ -10,6 +10,8 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+from __future__ import absolute_import
+
 import socket, os
 from subprocess import Popen
 from gettext import lgettext as _
@@ -19,8 +21,8 @@ try:
 except ImportError:
 	pynotify = None
 
-from constants import SOCKET, APP
-from helper import debug, warning
+from .constants import SOCKET, APP
+from .helper import debug, warning
 
 class PListener (object):
 	"""This class handles the communication between the "listener" and the GUI.
@@ -77,7 +79,7 @@ class PListener (object):
 		"""Displays a notify.
 		This will do nothing if pynotify is not present and/or root is running the listener."""
 
-		if pynotify and not os.getuid == 0:
+		if pynotify and os.getuid() != 0:
 			if not pynotify.is_initted():
 				pynotify.init(APP)
 

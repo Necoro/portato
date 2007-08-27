@@ -10,5 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from system import PortageSystem
-from package import PortagePackage
+from __future__ import absolute_import
+
+from .system import PortageSystem
+from .package import PortagePackage

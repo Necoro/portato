@@ -10,6 +10,8 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+from __future__ import absolute_import
+
 # gtk stuff
 import gtk
 import gobject
@@ -20,22 +22,21 @@ from subprocess import Popen
 from gettext import lgettext as _
 
 # our backend stuff
-from portato import listener
-from portato.helper import *
-from portato.constants import CONFIG_LOCATION, VERSION, APP_ICON
-from portato.backend import flags, system
-from portato.backend.exceptions import *
-
-# plugins
-from portato import plugin
+from ... import listener, plugin
+from ...helper import debug, warning, error, unique_array
+from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
+from ...backend import flags, system
+from ...backend.exceptions import PackageNotFoundException, BlockedException
 
 # more GUI stuff
-from portato.gui.gui_helper import Database, Config, EmergeQueue
-from basic import Window, AbstractDialog, Popup
-from dialogs import *
-from wrapper import GtkTree, GtkConsole
-from usetips import UseTips
-from exception_handling import GtkThread
+from ..gui_helper import Database, Config, EmergeQueue
+from .basic import Window, AbstractDialog, Popup
+from .wrapper import GtkTree, GtkConsole
+from .usetips import UseTips
+from .exception_handling import GtkThread
+from .dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
+		nothing_found_dialog, queue_not_empty_dialog, remove_deps_dialog,
+		remove_queue_dialog, unmask_dialog)
 
 class AboutWindow (AbstractDialog):
 	"""A window showing the "about"-informations."""
@@ -901,7 +902,7 @@ class MainWindow (Window):
 
 		self.cfg.modify_external_configs()
 		gtk.link_button_set_uri_hook(lambda btn, x: listener.send_cmd([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
-		gtk.about_dialog_set_url_hook(lambda *args: True) # dummy - if not set link is not set as link; if link is clicked the normal uri_hook is called too - thus do not call browser here
+		gtk.about_dialog_set_url_hook(lambda *args: True) # dummy - if not set link is not set as link; if link is clicked the normal uuri_hook is called too - thus do not call browser here
 
 		# set plugins and plugin-menu
 		splash(_("Loading Plugins"))
