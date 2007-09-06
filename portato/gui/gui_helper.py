@@ -392,7 +392,7 @@ class EmergeQueue:
 			if self.tree.iter_has_parent(it):
 				while self.tree.iter_has_parent(it):
 					it = self.tree.parent_iter(it)
-				self.remove_with_children(it)
+				self.remove_with_children(it, removeNewFlags = False)
 			raise
 
 		# add iter
