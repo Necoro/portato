@@ -3,7 +3,7 @@
 from __future__ import absolute_import
 
 import unittest
-import .helper
+from . import helper
 
 class HelperTest (unittest.TestCase):
 
