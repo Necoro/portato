@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 from ..package import Package
 from .. import flags
@@ -40,8 +40,11 @@ class PortagePackage (Package):
 		self._trees = system.settings.trees
 
 		self.forced_flags = set()
-		self.forced_flags.update(self._settings.settings.usemask)
-		self.forced_flags.update(self._settings.settings.useforce)
+		
+		with self._settingslock:
+			self._settings.settings.setcpv(self._cpv)
+			self.forced_flags.update(self._settings.settings.usemask)
+			self.forced_flags.update(self._settings.settings.useforce)
 		
 		try:
 			self._status = portage.getmaskingstatus(self.get_cpv(), settings = self._settings.settings)
@@ -228,10 +231,10 @@ class PortagePackage (Package):
 		return dep_pkgs
 
 	def get_global_settings(self, key):
-		self._settingslock.acquire()
-		self._settings.settings.setcpv(self._cpv)
-		v = self._settings.settings[key]
-		self._settingslock.release()
+		with self._settingslock:
+			self._settings.settings.setcpv(self._cpv)
+			v = self._settings.settings[key]
+		
 		return v
 
 	def get_ebuild_path(self):
