@@ -247,12 +247,12 @@ class PortageSystem (SystemInterface):
 			return t
 
 	def find_all_world_packages (self, name = None):
-		world = filter(self.find_lambda(name), [x.get_cpv() for x in self.find_world_packages()[0]])
+		world = filter(self.find_lambda(name), (x.get_cpv() for x in self.find_world_packages()[0]))
 		world = unique_array(world)
 		return self.geneticize_list(world)
 
 	def find_all_system_packages (self, name = None):
-		sys = filter(self.find_lambda(name), [x.get_cpv() for x in self.find_system_packages()[0]])
+		sys = filter(self.find_lambda(name), (x.get_cpv() for x in self.find_system_packages()[0]))
 		sys = unique_array(sys)
 		return self.geneticize_list(sys)
 

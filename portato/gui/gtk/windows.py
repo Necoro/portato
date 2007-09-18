@@ -82,7 +82,7 @@ class PluginWindow (AbstractDialog):
 		col = gtk.TreeViewColumn(_("Enabled"), bcell, active = 2)
 		view.append_column(col)
 		
-		for p in [("<b>"+p.name+"</b>", p.author, p.is_enabled()) for p in plugins]:
+		for p in (("<b>"+p.name+"</b>", p.author, p.is_enabled()) for p in plugins):
 			self.store.append(p)
 
 		self.window.show_all()
@@ -580,7 +580,7 @@ class PackageTable:
 		
 		store = self.versList.get_model()
 		# append versions
-		for vers, inst in [(x.get_version(), x.is_installed()) for x in self.packages]:
+		for vers, inst in ((x.get_version(), x.is_installed()) for x in self.packages):
 			if inst:
 				icon = self.main.instPixbuf
 			else:

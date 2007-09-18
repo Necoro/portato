@@ -201,9 +201,7 @@ class Database:
 		
 		# cycle through packages
 		for p in packages:
-			list = p.split("/")
-			cat = list[0]
-			pkg = list[1]
+			cat, pkg = p.split("/")
 			if not cat in self._db: self._db[cat] = []
 			self._db[cat].append((pkg, p in installed))
 
