@@ -17,7 +17,7 @@ You do need the sources to make translations. The installed program is not suffi
 Change into a local directory where you want to have the sources installed.
 Then do:
 
-> svn co https://portato.svn.sourceforge.net/svnroot/portato/trunk portato
+> svn co https://svn.origo.ethz.ch/portato/trunk portato
 
 You now should have the actual sources in the "portato" subdirectory.
 
@@ -91,15 +91,17 @@ For example, to run portato using the German translation:
 To submit the translation so we can include it in Portato distributions:
 ========================================================================
 
-The easiest method is to post it to a tracker on portato's sourceforge site,
-http://sourceforge.net/projects/portato.
+The easiest method is to post it to a tracker on portato's site: 
+http://portato.origo.ethz.ch/issues
+
+Or send a mail to portato@necoro.net
 
 
-I found a string in Portatot that I can't translate! What gives?:
+I found a string in Portato that I can't translate! What gives?:
 ================================================================
 
 Post a bug report on the sourceforge site
-(http://sourceforge.net/projects/portato). Include the untranslatable string
+(http://portato.origo.ethz.ch/issues). Include the untranslatable string
 and where in Portato you came across it. It's easy for us to mark the strings
 for translation, but we may have missed some!
 
