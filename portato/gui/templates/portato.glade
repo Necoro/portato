@@ -1748,7 +1748,7 @@
     <property name="copyright" translatable="yes">This software is licensed under the terms of the GPLv2.
 Copyright (C) 2006-2007 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;</property>
     <property name="comments" translatable="yes">A Portage GUI</property>
-    <property name="website">http://portato.sourceforge.net</property>
+    <property name="website">http://portato.necoro.net</property>
     <property name="authors">René 'Necoro' Neumann
 
 uses code from: Daniel J. Popowich
