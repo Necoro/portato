@@ -43,10 +43,15 @@ These should be set during the installation.
 @var SOCKET: path to socket for communication between listener and GUI
 @type SOCKET: string
 """
+import os
 from os.path import join as pjoin
+
+HOME = os.environ["HOME"]
 
 APP = "portato"
 VERSION = "9999"
+
+SETTINGS_DIR = pjoin(HOME, "."+APP)
 
 CONFIG_DIR = "/etc/portato/"
 CONFIG_LOCATION = pjoin(CONFIG_DIR, "portato.cfg")

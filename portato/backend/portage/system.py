@@ -13,20 +13,20 @@
 from __future__ import absolute_import
 
 import re, os
-import types
 from gettext import lgettext as _
 import portage
 
 from .package import PortagePackage
 from .settings import PortageSettings
 from ..system_interface import SystemInterface
-from ...helper import debug, unique_array
+from ...helper import debug, info, unique_array
 
 class PortageSystem (SystemInterface):
 	"""This class provides access to the portage-system."""
 
 	# pre-compile the RE removing the ".svn" and "CVS" entries
 	unwantedPkgsRE = re.compile(r".*(\.svn|CVS)$")
+	withBdepsRE = re.compile(r"--with-bdeps\s*( |=)\s*y")
 
 	def __init__ (self):
 		"""Constructor."""
@@ -91,6 +91,20 @@ class PortageSystem (SystemInterface):
 		else:
 			return True
 
+	def with_bdeps(self):
+		"""Returns whether the "--with-bdeps" option is set to true.
+
+		@returns: the value of --with-bdeps
+		@rtype: boolean
+		"""
+
+		settings = self.get_global_settings("EMERGE_DEFAULT_OPTS").split()
+		for s in settings:
+			if self.withBdepsRE.match(s):
+				return True
+
+		return False
+
 	def find_lambda (self, name):
 		"""Returns the function needed by all the find_all_*-functions. Returns None if no name is given.
 		
@@ -147,7 +161,7 @@ class PortageSystem (SystemInterface):
 				t += self.settings.vartree.dbapi.match(search_key)
 		# catch the "ambigous package" Exception
 		except ValueError, e:
-			if type(e[0]) == types.ListType:
+			if isinstance(e[0], list):
 				t = []
 				for cp in e[0]:
 					if masked:
@@ -168,7 +182,7 @@ class PortageSystem (SystemInterface):
 			t = self.settings.vartree.dbapi.match(search_key)
 		# catch the "ambigous package" Exception
 		except ValueError, e:
-			if type(e[0]) == types.ListType:
+			if isinstance(e[0], list):
 				t = []
 				for cp in e[0]:
 					t += self.settings.vartree.dbapi.match(cp)
@@ -277,7 +291,8 @@ class PortageSystem (SystemInterface):
 		@param packages: the list of packages
 		@type packages: string[]
 		@returns: the list of packages
-		@rtype: backend.Package[]"""
+		@rtype: backend.Package[]
+		"""
 
 		new_packages = []
 		for p in packages:
@@ -323,6 +338,10 @@ class PortageSystem (SystemInterface):
 		# append system packages
 		packages.extend(unique_array([p.get_cp() for p in self.find_all_system_packages()]))
 		
+		states = [(["RDEPEND","PDEPEND"],True), (["DEPEND"], False)]
+		if self.with_bdeps():
+			states[1] = (["DEPEND"], True)
+
 		checked = []
 		updating = []
 		raw_checked = {}
@@ -377,8 +396,6 @@ class PortageSystem (SystemInterface):
 							appended = True
 
 			if deep or tempDeep:
-				states = [(["RDEPEND","PDEPEND"],True), (["DEPEND"], False)]
-				
 				for state in states:
 					for i in p.get_matched_dep_packages(state[0]):
 						if i not in raw_checked or raw_checked[i] == False:
@@ -396,7 +413,7 @@ class PortageSystem (SystemInterface):
 			check(p, True)
 		
 		return updating
-		
+	
 	use_descs = {}
 	local_use_descs = {}
 	def get_use_desc (self, flag, package = None):

@@ -1,3 +1,7 @@
+next:
+- "porting" to python-2.5
+- adding support for the "--with-bdeps=y" option in EMERGE_DEFAULT_OPTS
+
 0.8.5:
 - added an uncaught exception dialog
 - i18n
