@@ -19,7 +19,6 @@ Backend:
 - make sure, a package being removed from the queue is not needed as a dependency by another package
 
 - "nach hause telefonieren" :)
-- downgrades do not work in update world
 
 GUI:
 ====

@@ -113,7 +113,8 @@ class PortageSystem (SystemInterface):
 		@returns: 
 					1. None if no name is given
 					2. a lambda function
-		@rtype: function"""
+		@rtype: function
+		"""
 		
 		if name != None:
 			if isinstance(name, str):
@@ -123,35 +124,52 @@ class PortageSystem (SystemInterface):
 		else:
 			return lambda x: True
 
-	def geneticize_list (self, list_of_packages):
+	def geneticize_list (self, list_of_packages, only_cpv = False):
 		"""Convertes a list of cpv's into L{backend.Package}s.
 		
 		@param list_of_packages: the list of packages
-		@type list_of_packages: list of gentoolkit.Packages
+		@type list_of_packages: string[]
+		@param only_cpv: do nothing - return the passed list
+		@type only_cpv: boolean
 		@returns: converted list
-		@rtype: PortagePackage[]"""
+		@rtype: PortagePackage[]
+		"""
 		
-		return [PortagePackage(x) for x in list_of_packages]
+		if not only_cpv:
+			return [PortagePackage(x) for x in list_of_packages]
+		else:
+			return list_of_packages
 
 	def get_global_settings (self, key):
 		return self.settings.settings[key]
 
-	def find_best (self, list):
-		return PortagePackage(portage.best(list))
+	def find_best (self, list, only_cpv = False):
+		if only_cpv:
+			return portage.best(list)
+		else:
+			return PortagePackage(portage.best(list))
 
-	def find_best_match (self, search_key, only_installed = False):
+	def find_best_match (self, search_key, only_installed = False, only_cpv = False):
 		t = None
 		
 		if not only_installed:
-			t = self.find_packages(search_key)
+			try:
+				t = self.settings.porttree.dbapi.match(search_key)
+			except ValueError, e: # ambigous package
+				if isinstance(e[0], list):
+					t = []
+					for cp in e[0]:
+						t += self.settings.porttree.dbapi.match(cp)
+				else:
+					raise
 		else:
-			t = self.find_installed_packages(search_key)
+			t = self.find_installed_packages(search_key, only_cpv = True)
 
 		if t:
-			return self.find_best([x.get_cpv() for x in t])
+			return self.find_best(t, only_cpv)
 		return None
 
-	def find_packages (self, search_key, masked=False):
+	def find_packages (self, search_key, masked=False, only_cpv = False):
 		try:
 			if masked:
 				t = self.settings.porttree.dbapi.xmatch("match-all", search_key)
@@ -171,13 +189,13 @@ class PortageSystem (SystemInterface):
 						t += self.settings.porttree.dbapi.match(cp)
 						t += self.settings.vartree.dbapi.match(cp)
 			else:
-				raise ValueError(e)
+				raise
 		# Make the list of packages unique
 		t = unique_array(t)
 		t.sort()
-		return self.geneticize_list(t)
+		return self.geneticize_list(t, only_cpv)
 
-	def find_installed_packages (self, search_key, masked = False):
+	def find_installed_packages (self, search_key, masked = False, only_cpv = False):
 		try:
 			t = self.settings.vartree.dbapi.match(search_key)
 		# catch the "ambigous package" Exception
@@ -189,48 +207,50 @@ class PortageSystem (SystemInterface):
 			else:
 				raise ValueError(e)
 
-		return self.geneticize_list(t)
+		return self.geneticize_list(t, only_cpv)
 
-	def __find_resolved_unresolved (self, list, check):
+	def __find_resolved_unresolved (self, list, check, only_cpv = False):
 		"""Checks a given list and divides it into a "resolved" and an "unresolved" part.
 
 		@param list: list of cpv's
 		@type list: string[]
 		@param check: function called to check whether an entry is ok
 		@type check: function(cpv)
+		@param only_cpv: do not return packages but cpv-strings
+		@type only_cpv: boolean
 
 		@returns: the divided list: (resolved, unresolved)
-		@rtype: (Package[], Package[])"""
+		@rtype: (Package[], Package[]) or (string[], string[])"""
 		resolved = []
 		unresolved = []
 		for x in list:
 			cpv = x.strip()
 			if len(cpv) and check(cpv):
-				pkg = self.find_best_match(cpv)
+				pkg = self.find_best_match(cpv, only_cpv = only_cpv)
 				if pkg:
 					resolved.append(pkg)
 				else:
-					unresolved.append(self.find_best_match(cpv, True))
+					unresolved.append(self.find_best_match(cpv, True, only_cpv = only_cpv))
 		return (resolved, unresolved)
 	
-	def find_system_packages (self):
+	def find_system_packages (self, only_cpv = False):
 		pkglist = self.settings.settings.packages
 
-		return self.__find_resolved_unresolved(pkglist, lambda cpv: cpv[0] == "*")
+		return self.__find_resolved_unresolved(pkglist, lambda cpv: cpv[0] == "*", only_cpv)
 
-	def find_world_packages (self):
+	def find_world_packages (self, only_cpv = False):
 		f = open(portage.WORLD_FILE)
 		pkglist = f.readlines()
 		f.close()
 
-		return self.__find_resolved_unresolved(pkglist, lambda cpv: cpv[0] != "#")
+		return self.__find_resolved_unresolved(pkglist, lambda cpv: cpv[0] != "#", only_cpv)
 
-	def find_all_installed_packages (self, name = None, withVersion=True):
+	def find_all_installed_packages (self, name = None, withVersion=True, only_cpv = False):
 		if withVersion:
 			t = self.settings.vartree.dbapi.cpv_all()
 			if name:
 				t = filter(self.find_lambda(name),t)
-			return self.geneticize_list(t)
+			return self.geneticize_list(t, only_cpv)
 		
 		else:
 			t = self.settings.vartree.dbapi.cp_all()
@@ -238,11 +258,11 @@ class PortageSystem (SystemInterface):
 				t = filter(self.find_lambda(name),t)
 			return t
 
-	def find_all_uninstalled_packages (self, name = None):
+	def find_all_uninstalled_packages (self, name = None, only_cpv = False):
 		alist = self.find_all_packages(name)
-		return self.geneticize_list([x for x in alist if not x.is_installed()])	
+		return self.geneticize_list([x.get_cpv() for x in alist if not x.is_installed()], only_cpv)	
 
-	def find_all_packages (self, name = None, withVersion = True):
+	def find_all_packages (self, name = None, withVersion = True, only_cpv = False):
 		t = self.settings.porttree.dbapi.cp_all()
 		t += self.settings.vartree.dbapi.cp_all()
 		if name:
@@ -250,23 +270,23 @@ class PortageSystem (SystemInterface):
 		
 		t = filter(lambda x: not self.unwantedPkgsRE.match(x), unique_array(t))
 		
-		if (withVersion):
+		if withVersion:
 			t2 = []
 			for x in t:
 				t2 += self.settings.porttree.dbapi.cp_list(x)
 				t2 += self.settings.vartree.dbapi.cp_list(x)
 				t2 = unique_array(t2)
-			return self.geneticize_list(t2)
+			return self.geneticize_list(t2, only_cpv)
 		else:
 			return t
 
-	def find_all_world_packages (self, name = None):
-		world = filter(self.find_lambda(name), (x.get_cpv() for x in self.find_world_packages()[0]))
+	def find_all_world_packages (self, name = None, only_cpv = False):
+		world = filter(self.find_lambda(name), self.find_world_packages(only_cpv = True)[0])
 		world = unique_array(world)
-		return self.geneticize_list(world)
+		return self.geneticize_list(world, only_cpv)
 
 	def find_all_system_packages (self, name = None):
-		sys = filter(self.find_lambda(name), (x.get_cpv() for x in self.find_system_packages()[0]))
+		sys = filter(self.find_lambda(name), self.find_system_packages(only_cpv = True)[0])
 		sys = unique_array(sys)
 		return self.geneticize_list(sys)
 

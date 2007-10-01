@@ -18,7 +18,8 @@ class SystemInterface (object):
 		@param cpv: the cpv to split
 		@type cpv: string
 		@returns: the splitted cpv
-		@rtype: string[]"""
+		@rtype: string[]
+		"""
 
 		raise NotImplementedError
 
@@ -30,129 +31,169 @@ class SystemInterface (object):
 		@param criterion: criterion to check against
 		@type criterion: string
 		@returns: match result
-		@rtype: boolean"""
+		@rtype: boolean
+		"""
 
 		raise NotImplementedError
 	
-	def find_best(self, list):
+	def find_best(self, list, only_cpv = False):
 		"""Returns the best package out of a list of packages.
 
 		@param list: the list of packages to select from
 		@type list: string[]
+		@param only_cpv: do not return package but only the cpv
+		@type only_cpv: boolean
+
 		@returns: the best package
-		@rtype: backend.Package"""
+		@rtype: backend.Package or string
+		"""
 		
 		raise NotImplementedError
 
-	def find_best_match (self, search_key, only_installed = False):
+	def find_best_match (self, search_key, only_installed = False, only_cpv = False):
 		"""Finds the best match in the portage tree. It does not find masked packages!
 		
 		@param search_key: the key to find in the portage tree
 		@type search_key: string
 		@param only_installed: if True, only installed packages are searched
 		@type only_installed: boolean
+		@param only_cpv: do not return package but only the cpv
+		@type only_cpv: boolean
 		
 		@returns: the package found or None
-		@rtype: backend.Package"""
+		@rtype: backend.Package or string
+		"""
 
 		raise NotImplementedError
 
-	def find_packages (self, search_key, masked=False):
+	def find_packages (self, search_key, masked = False, only_cpv = False):
 		"""This returns a list of packages which have to fit exactly. Additionally ranges like '<,>,=,~,!' et. al. are possible.
 		
 		@param search_key: the key to look for
 		@type search_key: string
 		@param masked: if True, also look for masked packages
 		@type masked: boolean
+		@param only_cpv: do not return package but only the cpv
+		@type only_cpv: boolean
 		
 		@returns: list of found packages
-		@rtype: backend.Package[]"""
+		@rtype: backend.Package[] or string[]
+		"""
 
 		raise NotImplementedError
 
 
-	def find_installed_packages (self, search_key, masked = False):
+	def find_installed_packages (self, search_key, masked = False, only_cpv = False):
 		"""This returns a list of packages which have to fit exactly. Additionally ranges like '<,>,=,~,!' et. al. are possible.
 		
 		@param search_key: the key to look for
 		@type search_key: string
 		@param masked: if True, also look for masked packages
 		@type masked: boolean
+		@param only_cpv: do not return package but only the cpv
+		@type only_cpv: boolean
 		
 		@returns: list of found packages
-		@rtype: backend.Package[]"""
+		@rtype: backend.Package[] or string[]
+		"""
 
 		raise NotImplementedError
 
-	def find_system_packages (self):
+	def find_system_packages (self, only_cpv = False):
 		"""Looks for all packages saved as "system-packages".
 		
+		@param only_cpv: do not return package but only the cpv
+		@type only_cpv: boolean
+
 		@returns: a tuple of (resolved_packages, unresolved_packages).
-		@rtype: (backend.Package[], backend.Package[])"""
+		@rtype: (backend.Package[], backend.Package[]) or (string[], string[])
+		"""
 
 		raise NotImplementedError
 
-	def find_world_packages (self):
+	def find_world_packages (self, only_cpv = False):
 		"""Looks for all packages saved in the world-file.
 		
+		@param only_cpv: do not return package but only the cpv
+		@type only_cpv: boolean
+
 		@returns: a tuple of (resolved_packages, unresolved_packages).
-		@rtype: (backend.Package[], backend.Package[])"""
+		@rtype: (backend.Package[], backend.Package[]) or (string[], string[])
+		"""
 
 		raise NotImplementedError
 
-	def find_all_installed_packages (self, name = None, withVersion = True):
+	def find_all_installed_packages (self, name = None, withVersion = True, only_cpv = False):
 		"""Finds all installed packages matching a name or all if no name is specified.
 
 		@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
 		@type name: string or None
 		@param withVersion: if True version-specific packages are returned; else only the cat/package-strings a delivered
 		@type withVersion: boolean
+		@param only_cpv: do not return package but only the cpv
+		@type only_cpv: boolean
 
 		@returns: all packages/cp-strings found
-		@rtype: backend.Package[] or cp-string[]"""
+		@rtype: backend.Package[] or string[]
+		"""
 
 		raise NotImplementedError
 
-	def find_all_uninstalled_packages (self, name = None):
+	def find_all_uninstalled_packages (self, name = None, only_cpv = False):
 		"""Finds all uninstalled packages matching a name or all if no name is specified.
 
 		@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
 		@type name: string or None
+		@param only_cpv: do not return package but only the cpv
+		@type only_cpv: boolean
+
 		@returns: all packages found
-		@rtype: backend.Package[]"""
+		@rtype: backend.Package[] or string[]
+		"""
 
 		raise NotImplementedError
 
-	def find_all_packages (self, name = None, withVersion = True):
+	def find_all_packages (self, name = None, withVersion = True, only_cpv = False):
 		"""Finds all packages matching a name or all if no name is specified.
 
 		@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
 		@type name: string or None
 		@param withVersion: if True version-specific packages are returned; else only the cat/package-strings a delivered
 		@type withVersion: boolean
+		@param only_cpv: do not return package but only the cpv
+		@type only_cpv: boolean
 
 		@returns: all packages/cp-strings found
-		@rtype: backend.Package[] or cp-string[]"""
+		@rtype: backend.Package[] or string[]
+		"""
 
 		raise NotImplementedError
 		
-	def find_all_world_packages (self, name = None):
+	def find_all_world_packages (self, name = None, only_cpv = False):
 		"""Finds all world packages matching a name or all if no name is specified.
 
 		@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
 		@type name: string or None
+		@param only_cpv: do not return package but only the cpv
+		@type only_cpv: boolean
+
 		@returns: all packages found
-		@rtype: backend.Package[]"""
+		@rtype: backend.Package[] or string[]
+		"""
 
 		raise NotImplementedError
 
-	def find_all_system_packages (self, name = None):
+	def find_all_system_packages (self, name = None, only_cpv = False):
 		"""Finds all system packages matching a name or all if no name is specified.
 
 		@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
 		@type name: string or None
+		@param only_cpv: do not return package but only the cpv
+		@type only_cpv: boolean
+
 		@returns: all packages found
-		@rtype: backend.Package[]"""
+		@rtype: backend.Package[] or string[]
+		"""
 
 		raise NotImplementedError
 
@@ -162,7 +203,8 @@ class SystemInterface (object):
 		@param name: the name to look for - it is expanded to .*name.* ; if None, all categories are returned
 		@type name: string or None
 		@returns: all categories found
-		@rtype: string[]"""
+		@rtype: string[]
+		"""
 
 		raise NotImplementedError
 
@@ -170,7 +212,8 @@ class SystemInterface (object):
 		"""Sorts a package list in the same manner portage does.
 		
 		@param pkglist: list to sort
-		@type pkglist: Packages[]"""
+		@type pkglist: Packages[]
+		"""
 
 		raise NotImplementedError
 		
@@ -187,7 +230,8 @@ class SystemInterface (object):
 		@param deep: Not only check world packages but also there dependencies.
 		@type deep: boolean
 		@returns: a list of the tuple (new_package, old_package)
-		@rtype: (backend.Package, backend.Package)[]"""
+		@rtype: (backend.Package, backend.Package)[]
+		"""
 
 		raise NotImplementedError
 
@@ -196,7 +240,8 @@ class SystemInterface (object):
 		This differs from update_world as it takes all installed packages into account but ignores changed useflags.
 
 		@returns: the list of new packages
-		@rtype: backend.Package[]"""
+		@rtype: backend.Package[]
+		"""
 
 		raise NotImplementedError
 
@@ -209,7 +254,8 @@ class SystemInterface (object):
 		@param package: name of a package: if given local use descriptions are searched too
 		@type package: cp-string
 		@returns: found description
-		@rtype: string"""
+		@rtype: string
+		"""
 
 		raise NotImplementedError
 
@@ -219,7 +265,8 @@ class SystemInterface (object):
 		@param key: the setting to return
 		@type key: string
 		@returns: the value of this setting
-		@rtype: string"""
+		@rtype: string
+		"""
 
 		raise NotImplementedError
 
@@ -229,7 +276,8 @@ class SystemInterface (object):
 		@param cpv: the cpv to create the package from
 		@type cpv: string
 		@returns: a new Package-object.
-		@rtype: Package"""
+		@rtype: Package
+		"""
 
 		raise NotImplementedError
 
@@ -237,7 +285,8 @@ class SystemInterface (object):
 		"""Returns the actual path to the config files.
 		
 		@returns: the path, e.g. /etc/portage
-		@rtype: string"""
+		@rtype: string
+		"""
 
 		raise NotImplementedError
 
@@ -245,7 +294,8 @@ class SystemInterface (object):
 		"""Returns the path to the world file.
 
 		@returns: the path of the world file
-		@rtype: string"""
+		@rtype: string
+		"""
 
 		raise NotImplementedError
 
@@ -253,7 +303,8 @@ class SystemInterface (object):
 		"""Returns the command(s) to run for syncing. This can be overridden by the user.
 
 		@returns: command to run
-		@rtype: string[]"""
+		@rtype: string[]
+		"""
 
 		raise NotImplementedError
 
@@ -261,7 +312,8 @@ class SystemInterface (object):
 		"""Returns the command(s) to run for the merging.
 
 		@returns: command to run
-		@rtype: string[]"""
+		@rtype: string[]
+		"""
 
 		raise NotImplementedError
 
@@ -269,7 +321,8 @@ class SystemInterface (object):
 		"""Returns the options to append for marking a merge as "oneshot".
 
 		@returns: option(s) to append
-		@rtype: string[]"""
+		@rtype: string[]
+		"""
 
 		raise NotImplementedError
 
@@ -277,7 +330,8 @@ class SystemInterface (object):
 		"""Returns the options to append for marking a merge as "newuse".
 
 		@returns: option(s) to append
-		@rtype: string[]"""
+		@rtype: string[]
+		"""
 
 		raise NotImplementedError
 
@@ -285,7 +339,8 @@ class SystemInterface (object):
 		"""Returns the options to append for marking a merge as "deep".
 
 		@returns: option(s) to append
-		@rtype: string[]"""
+		@rtype: string[]
+		"""
 
 		raise NotImplementedError
 
@@ -293,7 +348,8 @@ class SystemInterface (object):
 		"""Returns the options to append for marking a merge as "update".
 
 		@returns: option(s) to append
-		@rtype: string[]"""
+		@rtype: string[]
+		"""
 
 		raise NotImplementedError
 
@@ -301,7 +357,8 @@ class SystemInterface (object):
 		"""Returns the options to append for marking a merge as "pretend".
 
 		@returns: option(s) to append
-		@rtype: string[]"""
+		@rtype: string[]
+		"""
 
 		raise NotImplementedError
 
@@ -309,7 +366,8 @@ class SystemInterface (object):
 		"""Returns the options to append for marking a merge as "unmerge".
 
 		@returns: option(s) to append
-		@rtype: string[]"""
+		@rtype: string[]
+		"""
 
 		raise NotImplementedError
 
@@ -317,6 +375,7 @@ class SystemInterface (object):
 		"""Returns a dictionary of environment variables to set prior to do an emerge.
 
 		@returns: environment variables
-		@rtype: dict{string : string}"""
+		@rtype: dict{string : string}
+		"""
 
 		raise NotImplementedError
