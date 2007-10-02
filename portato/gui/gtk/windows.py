@@ -15,6 +15,10 @@ from __future__ import absolute_import
 # gtk stuff
 import gtk
 import gobject
+try:
+	import gtksourceview2
+except ImportError:
+	gtksourceview2 = None
 
 # other
 import types, logging
@@ -380,8 +384,19 @@ class EbuildWindow (AbstractDialog):
 
 	def _build_view(self):
 		"""Creates the buffer and the view."""
-		self.buf = gtk.TextBuffer()
-		self.view = gtk.TextView(self.buf)
+
+		if gtksourceview2 is None:
+			self.buf = gtk.TextBuffer()
+			self.view = gtk.TextView(self.buf)
+		else:
+			man = gtksourceview2.LanguageManager()
+			language = man.get_language("ebuild")
+		
+			# set buffer and view
+			self.buf = gtksourceview2.Buffer()
+			self.buf.set_language(language)
+			#self.buf.set_highlight(True)
+			self.view = gtksourceview2.View(self.buf)
 
 	def _show (self):
 		"""Fill the buffer with content and shows the window."""
