@@ -19,7 +19,7 @@ import portage
 from .package import PortagePackage
 from .settings import PortageSettings
 from ..system_interface import SystemInterface
-from ...helper import debug, info, unique_array
+from ...helper import debug, info, warning, unique_array
 
 class PortageSystem (SystemInterface):
 	"""This class provides access to the portage-system."""

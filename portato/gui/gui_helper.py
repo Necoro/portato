@@ -518,7 +518,6 @@ class EmergeQueue:
 
 			if self.title_update: self.title_update(None)
 
-			
 			if self.process is None: # someone resetted this
 				self.threadQueue.next()
 				return

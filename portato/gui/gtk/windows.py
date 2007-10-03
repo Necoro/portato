@@ -391,6 +391,10 @@ class EbuildWindow (AbstractDialog):
 		else:
 			man = gtksourceview2.LanguageManager()
 			language = man.get_language("ebuild")
+
+			if language is None:
+				info(_("No ebuild language file installed. Falling back to shell."))
+				language = man.get_language("sh")
 		
 			# set buffer and view
 			self.buf = gtksourceview2.Buffer()
