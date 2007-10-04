@@ -19,7 +19,6 @@ from ..exceptions import BlockedException, PackageNotFoundException
 from ...helper import debug, unique_array
 
 import portage, portage_dep
-from portage_util import unique_array
 
 import os.path
 from gettext import lgettext as _
@@ -216,15 +215,16 @@ class PortagePackage (Package):
 					raise PackageNotFoundException, dep
 
 				list = system.sort_package_list(list)
+				list.reverse()
 				done = False
-				for i in range(len(list)-1,0,-1):
+				for i in range(len(list)):
 					p = list[i]
 					if not p.is_masked():
 						dep_pkgs.append(create_dep_pkgs_data(dep, p))
 						done = True
 						break
 				if not done:
-					dep_pkgs.append(create_dep_pkgs_data(dep, list[-1]))
+					dep_pkgs.append(create_dep_pkgs_data(dep, list[0]))
 			else:
 				dep_pkgs.append(create_dep_pkgs_data(dep, pkg))
 

@@ -17,6 +17,8 @@ import gtk
 import gtk.glade
 import gobject
 
+from functools import wraps
+
 from ...constants import DATA_DIR, APP_ICON, APP, LOCALE_DIR
 
 gtk.glade.bindtextdomain (APP, LOCALE_DIR)
@@ -34,6 +36,8 @@ class Window (object):
 	def watch_cursor (func):
 		"""This is a decorator for functions being so time consuming, that it is appropriate to show the watch-cursor.
 		@attention: this function relies on the gtk.Window-Object being stored as self.window"""
+		
+		@wraps(func)
 		def wrapper (self, *args, **kwargs):
 			ret = None
 			def cb_idle():
@@ -48,9 +52,6 @@ class Window (object):
 			gobject.idle_add(cb_idle)
 			return ret
 
-		wrapper.__dict__ = func.__dict__
-		wrapper.__name__ = func.__name__
-		wrapper.__doc__ = func.__doc__
 		return wrapper
 
 	def get_tree (self, name):
