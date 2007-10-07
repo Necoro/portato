@@ -72,3 +72,5 @@ STD_FRONTEND = "gtk"
 
 SU_COMMAND = "gksu -D 'Portato'"
 SOCKET = "/tmp/portato.socket"
+
+USE_CATAPULT = False

@@ -206,7 +206,7 @@ class Database:
 			self._db[cat].append((pkg, p in installed))
 
 		for key in self._db: # sort alphabetically
-			self._db[key].sort(cmp=cmp, key=lambda x: str.lower(x[0]))
+			self._db[key].sort(cmp=cmp, key=lambda x: x[0].lower())
 
 	def get_cat (self, cat, byName = True):
 		"""Returns the packages in the category.

@@ -12,10 +12,14 @@
 
 from __future__ import absolute_import
 
+from ..constants import USE_CATAPULT
 from .system_interface import SystemInterface
 from .exceptions import BlockedException, PackageNotFoundException, DependencyCalcError, InvalidSystemError
 
-SYSTEM = "portage" # the name of the current system
+if USE_CATAPULT:
+	SYSTEM = "catapult"
+else:
+	SYSTEM = "portage" # the name of the current system
 _sys = None # the SystemInterface-instance
 
 class _Package (object):
@@ -53,6 +57,9 @@ def load_system ():
 	if SYSTEM == "portage":
 		from .portage import PortageSystem
 		_sys = PortageSystem ()
+	elif SYSTEM == "catapult":
+		from .catapult import CatapultSystem
+		_sys = CatapultSystem()
 	else:
 		raise InvalidSystemError, SYSTEM
 
