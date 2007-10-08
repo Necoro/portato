@@ -103,7 +103,9 @@ def main ():
 				additional.extend(["-f", options.frontend])
 
 			cmd = SU_COMMAND.split()
-			os.execvpe(cmd[0], cmd+["%s --no-listener %s" % (sys.argv[0], " ".join(additional))], env = os.environ)
+			env = os.environ.copy()
+			env.update(DBUS_SESSION_BUS_ADDRESS="")
+			os.execvpe(cmd[0], cmd+["%s --no-listener %s" % (sys.argv[0], " ".join(additional))], env = env)
 	
 		else: # start listener
 			listener.set_recv()

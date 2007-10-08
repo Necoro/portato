@@ -4,9 +4,9 @@ Documentation:
 Backend:
 ========
 
-- add Paludis support
-- add pkgcore support
-- add equo support
+- add Paludis support  \
+- add pkgcore support   |-> not necessairy if catapult is used
+- add equo support     /
 
 - bugs in update world (Necoro, 04/20/07: are there any more bugs?)
 - fix for flag handling, when reverting flags (Necoro, 04/20/07: what did i mean by this?)
