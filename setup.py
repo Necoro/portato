@@ -24,7 +24,7 @@ def ui_file_list ():
 	uis = [x for x in os.listdir("portato/gui/templates/ui/") if x.endswith(".ui")]
 	return [os.path.join("portato/gui/templates/ui",x) for x in uis]
 
-packages = ["portato", "portato.gui", "portato.plugins", "portato.backend", "portato.backend.portage"]
+packages = ["portato", "portato.gui", "portato.plugins", "portato.backend", "portato.backend.portage", "portato.backend.catapult"]
 ext_modules = []
 data_files = [(ICON_DIR, ["icons/portato-icon.png"]), (PLUGIN_DIR, plugin_list("shutdown", "resume_loop")), (XSD_DIR, ["plugin.xsd"])]
 cmdclass = {}
