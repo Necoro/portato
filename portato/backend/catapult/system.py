@@ -51,7 +51,7 @@ class CatapultSystem (SystemInterface):
 		return self.proxy.split_cpv(cpv)
 
 	def cpv_matches (self, cpv, criterion):
-		return self.proxy.cpv_matches(cpv, criterion)
+		return CatapultPackage(cpv).matches(criterion)
 
 	def find_best(self, list, only_cpv = False):
 		if only_cpv:

@@ -51,10 +51,10 @@ class CatapultPackage(Package):
 		return self.proxy.is_installed(self.get_cpv())
 
 	def is_overlay(self):
-		return self.proxy.is_overlay(self.get_cpv())
+		return self.proxy.is_in_overlay(self.get_cpv())
 
 	def get_overlay_path(self):
-		return self.proxy.is_overlay_path(self.get_cpv())
+		return self.proxy.get_overlay_path(self.get_cpv())
 		
 	def is_in_system (self):
 		return self.proxy.is_in_system(self.get_cpv())
