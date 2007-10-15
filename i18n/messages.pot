@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-10-15 11:08+0200\n"
+"POT-Creation-Date: 2007-10-15 20:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -156,11 +156,11 @@ msgstr ""
 msgid "_Remove"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:779 portato/gui/gtk/windows.py:1023
+#: portato/gui/templates/portato.glade:779 portato/gui/gtk/windows.py:1025
 msgid "Queue"
 msgstr ""
 
-#: portato/gui/templates/portato.glade:807 portato/gui/gtk/windows.py:1120
+#: portato/gui/templates/portato.glade:807 portato/gui/gtk/windows.py:1122
 msgid "Console"
 msgstr ""
 
@@ -418,34 +418,38 @@ msgstr ""
 msgid "Cannot start etc-proposals. Not root!"
 msgstr ""
 
-#: portato/gui/gtk/exception_handling.py:45
+#: portato/gui/gtk/exception_handling.py:46
 msgid ""
 "A programming error has been detected during the execution of this program."
 msgstr ""
 
-#: portato/gui/gtk/exception_handling.py:46
+#: portato/gui/gtk/exception_handling.py:47
 msgid "Bug Detected"
 msgstr ""
 
-#: portato/gui/gtk/exception_handling.py:47
+#: portato/gui/gtk/exception_handling.py:48
 msgid ""
 "It probably isn't fatal, but should be reported to the developers "
 "nonetheless."
 msgstr ""
 
-#: portato/gui/gtk/exception_handling.py:49
+#: portato/gui/gtk/exception_handling.py:50
 msgid "Show Details"
 msgstr ""
 
-#: portato/gui/gtk/exception_handling.py:71
-#: portato/gui/gtk/exception_handling.py:103
+#: portato/gui/gtk/exception_handling.py:73
+#: portato/gui/gtk/exception_handling.py:119
 #, python-format
 msgid ""
 "Exception in thread \"%(thread)s\":\n"
 "%(trace)s"
 msgstr ""
 
-#: portato/gui/gtk/exception_handling.py:105
+#: portato/gui/gtk/exception_handling.py:89
+msgid "Save traceback..."
+msgstr ""
+
+#: portato/gui/gtk/exception_handling.py:121
 #, python-format
 msgid ""
 "Exception:\n"
@@ -519,28 +523,28 @@ msgstr ""
 msgid "Finishing startup"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:1026
+#: portato/gui/gtk/windows.py:1028
 msgid "Options"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:1044
+#: portato/gui/gtk/windows.py:1046
 msgid "Categories"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:1059
+#: portato/gui/gtk/windows.py:1061
 msgid "Packages"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:1122
+#: portato/gui/gtk/windows.py:1124
 #, python-format
 msgid "Console (%(title)s)"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:1174
+#: portato/gui/gtk/windows.py:1176
 msgid "use flags"
 msgstr ""
 
-#: portato/gui/gtk/windows.py:1181
+#: portato/gui/gtk/windows.py:1183
 msgid "masking keywords"
 msgstr ""
 

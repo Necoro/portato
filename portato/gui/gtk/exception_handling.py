@@ -11,7 +11,7 @@
 #
 # Written by René 'Necoro' Neumann
 
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 import gtk, pango, gobject
 import sys, traceback
@@ -20,7 +20,8 @@ from threading import Thread
 from gettext import lgettext as _
 from StringIO import StringIO
 
-from ...helper import error
+from ...helper import debug, error
+from .dialogs import file_chooser_dialog, io_ex_dialog
 
 class GtkThread (Thread):
 	def run(self):
@@ -47,6 +48,7 @@ class UncaughtExceptionDialog(gtk.MessageDialog):
 		self.format_secondary_text(_("It probably isn't fatal, but should be reported to the developers nonetheless."))
 
 		self.add_button(_("Show Details"), 1)
+		self.add_button(gtk.STOCK_SAVE_AS, 2)
 		self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
 		# Details
@@ -66,10 +68,10 @@ class UncaughtExceptionDialog(gtk.MessageDialog):
 		self.vbox.add(self.tbFrame)
 		
 		textbuffer = self.textview.get_buffer()
-		text = get_trace(type, value, tb)
+		self.text = get_trace(type, value, tb)
 		if thread:
-			text = _("Exception in thread \"%(thread)s\":\n%(trace)s") % {"thread": thread, "trace": text}
-		textbuffer.set_text(text)
+			self.text = _("Exception in thread \"%(thread)s\":\n%(trace)s") % {"thread": thread, "trace": text}
+		textbuffer.set_text(self.text)
 		self.textview.set_size_request(gtk.gdk.screen_width()/2, gtk.gdk.screen_height()/3)
 
 		self.details = self.tbFrame
@@ -82,6 +84,20 @@ class UncaughtExceptionDialog(gtk.MessageDialog):
 			if resp == 1:
 				self.details.show_all()
 				self.set_response_sensitive(1, False)
+			elif resp == 2:
+				debug("Want to save")
+				file = file_chooser_dialog(_("Save traceback..."), self)
+				if file:
+					debug("Save to %s", file)
+					
+					try:
+						with open(file, "w") as f:
+							f.writelines(self.text)
+					except IOError, e:
+						io_ex_dialog(e)
+
+				else:
+					debug("Nothing to save")
 			else:
 				break
 		self.destroy()

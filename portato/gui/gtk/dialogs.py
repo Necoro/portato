@@ -71,3 +71,16 @@ def remove_queue_dialog ():
 	ret = askMB.run()
 	askMB.destroy()
 	return ret
+
+def file_chooser_dialog (title, parent):
+	fc = gtk.FileChooserDialog(title = title, parent = parent, action = gtk.FILE_CHOOSER_ACTION_SAVE, buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+	fc.set_do_overwrite_confirmation(True)
+	ret = fc.run()
+
+	if ret == gtk.RESPONSE_ACCEPT:
+		ret = fc.get_filename()
+	else:
+		ret = None
+
+	fc.destroy()
+	return ret

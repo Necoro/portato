@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2007-10-15 11:11+0100\n"
+"PO-Revision-Date: 2007-10-15 20:18+0100\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -162,12 +162,12 @@ msgid "_Remove"
 msgstr "_Löschen"
 
 #: portato/gui/templates/portato.glade:779
-#: portato/gui/gtk/windows.py:1023
+#: portato/gui/gtk/windows.py:1025
 msgid "Queue"
 msgstr "Queue"
 
 #: portato/gui/templates/portato.glade:807
-#: portato/gui/gtk/windows.py:1120
+#: portato/gui/gtk/windows.py:1122
 msgid "Console"
 msgstr "Konsole"
 
@@ -430,24 +430,24 @@ msgstr "Kann etc-proposals nicht starten. Kein grafisches Frontend installiert."
 msgid "Cannot start etc-proposals. Not root!"
 msgstr "Kann etc-proposals nicht starten. Nur root kann das!"
 
-#: portato/gui/gtk/exception_handling.py:45
+#: portato/gui/gtk/exception_handling.py:46
 msgid "A programming error has been detected during the execution of this program."
 msgstr "Ein Fehler ist aufgetreten."
 
-#: portato/gui/gtk/exception_handling.py:46
+#: portato/gui/gtk/exception_handling.py:47
 msgid "Bug Detected"
 msgstr "Fehler aufgetreten"
 
-#: portato/gui/gtk/exception_handling.py:47
+#: portato/gui/gtk/exception_handling.py:48
 msgid "It probably isn't fatal, but should be reported to the developers nonetheless."
 msgstr "Dies ist möglicherweise nicht kritisch, sollte aber trotzdem an die Entwickler weitergeleitet werden."
 
-#: portato/gui/gtk/exception_handling.py:49
+#: portato/gui/gtk/exception_handling.py:50
 msgid "Show Details"
 msgstr "Details"
 
-#: portato/gui/gtk/exception_handling.py:71
-#: portato/gui/gtk/exception_handling.py:103
+#: portato/gui/gtk/exception_handling.py:73
+#: portato/gui/gtk/exception_handling.py:119
 #, python-format
 msgid ""
 "Exception in thread \"%(thread)s\":\n"
@@ -456,7 +456,11 @@ msgstr ""
 "Exception im Thread \"%(thread)s\":\n"
 "%(trace)s"
 
-#: portato/gui/gtk/exception_handling.py:105
+#: portato/gui/gtk/exception_handling.py:89
+msgid "Save traceback..."
+msgstr "Speichere Traceback..."
+
+#: portato/gui/gtk/exception_handling.py:121
 #, python-format
 msgid ""
 "Exception:\n"
@@ -533,28 +537,28 @@ msgstr "Lade Plugins"
 msgid "Finishing startup"
 msgstr "Erledige letzte Handgriffe :)"
 
-#: portato/gui/gtk/windows.py:1026
+#: portato/gui/gtk/windows.py:1028
 msgid "Options"
 msgstr "Optionen"
 
-#: portato/gui/gtk/windows.py:1044
+#: portato/gui/gtk/windows.py:1046
 msgid "Categories"
 msgstr "Kategorien"
 
-#: portato/gui/gtk/windows.py:1059
+#: portato/gui/gtk/windows.py:1061
 msgid "Packages"
 msgstr "Pakete"
 
-#: portato/gui/gtk/windows.py:1122
+#: portato/gui/gtk/windows.py:1124
 #, python-format
 msgid "Console (%(title)s)"
 msgstr "Konsole (%(title)s)"
 
-#: portato/gui/gtk/windows.py:1174
+#: portato/gui/gtk/windows.py:1176
 msgid "use flags"
 msgstr "Use Flags"
 
-#: portato/gui/gtk/windows.py:1181
+#: portato/gui/gtk/windows.py:1183
 msgid "masking keywords"
 msgstr "Masking Keywords"
 
