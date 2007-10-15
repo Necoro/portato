@@ -28,7 +28,7 @@ from gettext import lgettext as _
 # our backend stuff
 from ... import listener, plugin
 from ...helper import debug, warning, error, unique_array
-from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
+from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, DATA_DIR
 from ...backend import flags, system
 from ...backend.exceptions import PackageNotFoundException, BlockedException
 
@@ -390,10 +390,11 @@ class EbuildWindow (AbstractDialog):
 			self.view = gtk.TextView(self.buf)
 		else:
 			man = gtksourceview2.LanguageManager()
+			man.set_search_path(man.get_search_path()+[DATA_DIR])
 			language = man.get_language("ebuild")
 
 			if language is None:
-				info(_("No ebuild language file installed. Falling back to shell."))
+				warning(_("No ebuild language file installed. Falling back to shell."))
 				language = man.get_language("sh")
 		
 			# set buffer and view
@@ -713,10 +714,8 @@ class PackageTable:
 		if self.doEmerge:
 			# set emerge-button-label
 			if not self.actual_package().is_installed():
-				self.emergeBtn.set_label(_("E_merge"))
 				self.unmergeBtn.set_sensitive(False)
 			else:
-				self.emergeBtn.set_label(_("Re_merge"))
 				self.unmergeBtn.set_sensitive(True)
 		
 		self.table.show_all()

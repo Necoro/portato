@@ -37,7 +37,6 @@ GTK:
 - make oneshot better
 - show installed files
 - show dependencies
-- new names for the Emerge and Unmerge button in the package table
 - reload package table when emerge is finished
 
 Qt (stopped):

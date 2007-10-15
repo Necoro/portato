@@ -19,11 +19,11 @@ import gobject
 
 from functools import wraps
 
-from ...constants import DATA_DIR, APP_ICON, APP, LOCALE_DIR
+from ...constants import TEMPLATE_DIR, APP_ICON, APP, LOCALE_DIR
 
 gtk.glade.bindtextdomain (APP, LOCALE_DIR)
 gtk.glade.textdomain (APP)
-GLADE_FILE = DATA_DIR+"portato.glade"
+GLADE_FILE = TEMPLATE_DIR+"portato.glade"
 
 class Window (object):
 	def __init__ (self):

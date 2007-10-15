@@ -4,6 +4,8 @@ next:
 - fix update world
 - added support for pygtksourceview-2
 - adding support for the catapult backend
+- adding "Save As" button for the exception dialog
+- some tooltips and new button labels
 
 0.8.5:
 - added an uncaught exception dialog
