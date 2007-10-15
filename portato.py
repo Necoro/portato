@@ -14,7 +14,7 @@
 
 from __future__ import with_statement, absolute_import
 
-import sys, os
+import sys, os, subprocess
 import gettext, locale
 from optparse import OptionParser
 
@@ -47,6 +47,9 @@ def main ():
 	parser.add_option("-e", "--ebuild", action = "store", dest = "ebuild",
 			help = _("opens the ebuild viewer instead of launching Portato"))
 
+	parser.add_option("-p", "--pipe", action = "store", dest = "pipe",
+			help = _("file descriptor to use to communicate with the listener (internal use only)"))
+
 	parser.add_option("-x", "--validate", action = "store", dest = "validate", metavar="PLUGIN",
 			help = _("validates the given plugin xml instead of launching Portato"))
 
@@ -58,7 +61,7 @@ def main ():
 
 	# evaluate parser's results
 	if options.check: # run pychecker
-		os.environ['PYCHECKER'] = "--limit 50"
+		os.environ['PYCHECKER'] = "--limit 100"
 		import pychecker.checker
 	
 	if len(args): # additional arguments overwrite given frontend
@@ -75,9 +78,9 @@ def main ():
 		print _("'%(frontend)s' should be installed, but cannot be imported. This is definitly a bug. (%(error)s)") % {"frontend": options.frontend, "error": e[0]}
 		sys.exit(1)
 
-	if options.ebuild:
+	if options.ebuild: # show ebuild
 		show_ebuild(options.ebuild)
-	elif options.validate:
+	elif options.validate: # validate a plugin
 		from lxml import etree
 		try:
 			etree.XMLSchema(file = XSD_LOCATION).assertValid(etree.parse(options.validate))
@@ -90,25 +93,30 @@ def main ():
 		else:
 			print _("Validation succeeded.")
 			return
-	elif options.nolistener or os.getuid() == 0:
-		listener.set_send()
-		run()
-	else: # start listener and start us again in root modus
-		pid = os.fork()
-		if pid == 0: # start portato in child
-			additional = []
-			if options.check:
-				additional.append("-c")
-			if options.frontend:
-				additional.extend(["-f", options.frontend])
 
-			cmd = SU_COMMAND.split()
-			env = os.environ.copy()
-			env.update(DBUS_SESSION_BUS_ADDRESS="")
-			os.execvpe(cmd[0], cmd+["%s --no-listener %s" % (sys.argv[0], " ".join(additional))], env = env)
-	
-		else: # start listener
-			listener.set_recv()
+	elif options.nolistener or os.getuid() == 0: # start GUI
+		if options.pipe:
+			listener.set_send(int(options.pipe))
+		else:
+			listener.set_send()
+		
+		run()
+		
+	else: # start us again in root modus and launch listener
+		read, write = os.pipe()
+		additional = []
+		if options.check:
+			additional.append("--check")
+		if options.frontend:
+			additional.extend(["--frontend", options.frontend])
+
+		# set DBUS_SESSION_BUS_ADDRESS to "" to make dbus work as root ;)
+		env = os.environ.copy()
+		env.update(DBUS_SESSION_BUS_ADDRESS="")
+		cmd = SU_COMMAND.split()
+		subprocess.Popen(cmd+["%s --no-listener --pipe %d %s" % (sys.argv[0], write, " ".join(additional))], env = env, close_fds = False)
+		
+		listener.set_recv(read)
 
 if __name__ == "__main__":
 	main()

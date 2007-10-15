@@ -21,7 +21,7 @@ try:
 except ImportError:
 	pynotify = None
 
-from .constants import SOCKET, APP
+from .constants import APP
 from .helper import debug, warning
 
 class PListener (object):
@@ -29,29 +29,17 @@ class PListener (object):
 	This listener starts programs as the user while the GUI runs as root.
 	
 	@ivar _recv: listener socket
-	@type _recv: socket.socket
+	@type _recv: int
 	@ivar _send: sender socket
-	@type _send: socket.socket"""
+	@type _send: int"""
 
-	def set_recv (self):
-		self._recv = socket.socket(socket.AF_UNIX)
+	def set_recv (self, pipe):
+		self._recv = pipe
 
-		try:
-			self._recv.bind(SOCKET)
-		except socket.error, e:
-			if int(e[0]) == 98: # already existing - delete
-				os.unlink(SOCKET)
-				self._recv.bind(SOCKET)
-			else:
-				raise
-
-		self._recv.listen(1)
-		con, addr = self._recv.accept()
-		
 		while True:
 			try:
-				len = con.recv(4)
-				string = con.recv(int(len))
+				len = os.read(self._recv, 4)
+				string = os.read(self._recv, int(len))
 
 				data = string.split("\0")
 
@@ -62,10 +50,9 @@ class PListener (object):
 				elif data[0] == "close":
 					break
 			except KeyboardInterrupt:
-				pass
+				break
 
-		con.close()
-		self._recv.close()
+		os.close(self._recv)
 
 	def do_cmd (self, cmdlist):
 		"""Starts a command as the user.
@@ -87,20 +74,15 @@ class PListener (object):
 			n.set_urgency(int(urgency))
 			n.show()
 
-	def set_send (self):
-		self._send = socket.socket(socket.AF_UNIX)
-		try:
-			self._send.connect(SOCKET)
-		except socket.error, e:
-			if e[0] in [111, 2]: # can't connect
-				warning(_("Listener has not been started."))
-				self._send = None
-			else:
-				raise
+	def set_send (self, pipe = None):
+		if pipe is None:
+			warning(_("Listener has not been started."))
+		
+		self._send = pipe
 
 	def __send (self, string):
-		self._send.sendall("%4d" % len(string))
-		self._send.sendall(string)
+		os.write(self._send, "%4d" % len(string))
+		os.write(self._send, string)
 
 	def send_notify (self, base = "", descr = "", icon = "", urgency = None):	
 		if self._send is None:
@@ -124,5 +106,4 @@ class PListener (object):
 	def close (self):
 		if self._send is not None:
 			self.__send("close")
-			self._send.close()
-			os.unlink(SOCKET)
+			os.close(self._send)

@@ -40,8 +40,6 @@ These should be set during the installation.
 @type STD_FRONTEND: string
 @var SU_COMMAND: command to execute to "su"
 @type SU_COMMAND: string
-@var SOCKET: path to socket for communication between listener and GUI
-@type SOCKET: string
 """
 import os
 from os.path import join as pjoin
@@ -56,6 +54,8 @@ SETTINGS_DIR = pjoin(HOME, "."+APP)
 CONFIG_DIR = "/etc/portato/"
 CONFIG_LOCATION = pjoin(CONFIG_DIR, "portato.cfg")
 
+VAR_DIR = "/var/portato/"
+
 DATA_DIR = "portato/gui/templates/"
 PLUGIN_DIR = "plugins/"
 
@@ -67,10 +67,9 @@ APP_ICON = pjoin(ICON_DIR, "portato-icon.png")
 
 LOCALE_DIR = "i18n/"
 
-FRONTENDS = ["gtk" ,"qt"]
+FRONTENDS = ["gtk"]
 STD_FRONTEND = "gtk"
 
 SU_COMMAND = "gksu -D 'Portato'"
-SOCKET = "/tmp/portato.socket"
 
-USE_CATAPULT = False
+USE_CATAPULT = True
