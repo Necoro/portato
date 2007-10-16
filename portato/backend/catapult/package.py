@@ -36,16 +36,16 @@ class CatapultPackage(Package):
 	def use_expanded (self, flag, suggest = None):
 		if not suggest:
 			suggest = ""
-		return self.proxy.use_expanded(self.get_cpv(), flag, suggest)
+		return str(self.proxy.use_expanded(self.get_cpv(), flag, suggest))
 
 	def get_cp (self):
-		return self.proxy.get_cp(self.get_cpv())
+		return str(self.proxy.get_cp(self.get_cpv()))
 
 	def get_slot_cp (self):
-		return self.proxy.get_slot_cp(self.get_cpv())
+		return str(self.proxy.get_slot_cp(self.get_cpv()))
 
 	def get_package_path(self):
-		return self.proxy.get_package_path(self.get_cpv())
+		return str(self.proxy.get_package_path(self.get_cpv()))
 
 	def is_installed(self):
 		return self.proxy.is_installed(self.get_cpv())
@@ -54,7 +54,7 @@ class CatapultPackage(Package):
 		return self.proxy.is_in_overlay(self.get_cpv())
 
 	def get_overlay_path(self):
-		return self.proxy.get_overlay_path(self.get_cpv())
+		return str(self.proxy.get_overlay_path(self.get_cpv()))
 		
 	def is_in_system (self):
 		return self.proxy.is_in_system(self.get_cpv())
@@ -102,25 +102,25 @@ class CatapultPackage(Package):
 			return False
 
 	def get_masking_reason (self):
-		return self.proxy.get_masking_reason(self.get_cpv())
+		return str(self.proxy.get_masking_reason(self.get_cpv()))
 		
 	def get_iuse_flags (self, installed = False):
-		return self.proxy.get_iuse_flags(self.get_cpv(), installed)
+		return [str(x) for x in self.proxy.get_iuse_flags(self.get_cpv(), installed)]
 
 	def get_matched_dep_packages (self, depvar):
-		return self.proxy.get_matched_dep_packages(self.get_cpv(), self.get_new_use_flags())
+		return [str(x) for x in self.proxy.get_matched_dep_packages(self.get_cpv(), self.get_new_use_flags())]
 		
 	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"], with_criterions = False):
-		return self.proxy.get_dep_packages(self.get_cpv(), depvar, self.get_new_use_flags(), with_criterions)
+		return [str(x) for x in self.proxy.get_dep_packages(self.get_cpv(), depvar, self.get_new_use_flags(), with_criterions)]
 
 	def get_global_settings(self, key):
-		return self.proxy.get_global_settings(self.get_cpv(), key)
+		return str(self.proxy.get_global_settings(self.get_cpv(), key))
 
 	def get_ebuild_path(self):
-		return self.proxy.get_ebuild_path(self.get_cpv())
+		return str(self.proxy.get_ebuild_path(self.get_cpv()))
 
 	def get_package_settings(self, var, tree = True):
-		return self.proxy.get_package_settings(self.get_cpv(), var, tree)
+		return str(self.proxy.get_package_settings(self.get_cpv(), var, tree))
 
 	def get_use_flags(self):
 		return " ".join(self.proxy.get_use_flags(self.get_cpv()))

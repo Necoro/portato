@@ -44,18 +44,18 @@ class CatapultSystem (SystemInterface):
 		if not only_cpv:
 			return [CatapultPackage(x) for x in list_of_packages]
 		else:
-			return list_of_packages
+			return [str(x) for x in list_of_packages]
 
 
 	def split_cpv (self, cpv):
-		return self.proxy.split_cpv(cpv)
+		return [str(x) for x in self.proxy.split_cpv(cpv)]
 
 	def cpv_matches (self, cpv, criterion):
 		return CatapultPackage(cpv).matches(criterion)
 
 	def find_best(self, list, only_cpv = False):
 		if only_cpv:
-			return self.proxy.find_best(list)
+			return str(self.proxy.find_best(list))
 		else:
 			return CatapultPackage(self.proxy.find_best(list))
 
@@ -64,7 +64,7 @@ class CatapultSystem (SystemInterface):
 
 		if p and not only_cpv:
 			return CatapultPackage(p)
-		return p
+		return str(p)
 
 	def find_packages (self, search_key, masked = False, only_cpv = False):
 		return self.geneticize_list(self.proxy.find_packages(search_key, masked), only_cpv)
@@ -115,7 +115,7 @@ class CatapultSystem (SystemInterface):
 	def list_categories (self, name = None):
 		if not name:
 			name = ""
-		return self.proxy.list_categories(name)
+		return [str(x) for x in self.proxy.list_categories(name)]
 
 	def sort_package_list(self, pkglist):
 		return self.geneticize_list(self.proxy.sort_package_list([x.get_cpv() for x in pkglist]))
@@ -132,43 +132,43 @@ class CatapultSystem (SystemInterface):
 	def get_use_desc (self, flag, package = None):
 		if not package:
 			package = ""
-		return self.proxy.get_use_desc(flag, package)
+		return str(self.proxy.get_use_desc(flag, package))
 
 	def get_global_settings(self, key):
-		return self.proxy.get_global_settings(key)
+		return str(self.proxy.get_global_settings(key))
 
 	def new_package (self, cpv):
 		return CatapultPackage(cpv)
 
 	def get_config_path (self):
-		return self.proxy.get_config_path()
+		return str(self.proxy.get_config_path())
 
 	def get_world_file_path (self):
-		return self.proxy.get_world_file_path()
+		return str(self.proxy.get_world_file_path())
 	
 	def get_sync_command (self):
-		return self.proxy.get_sync_command()
+		return [str(x) for x in self.proxy.get_sync_command()]
 
 	def get_merge_command (self):
-		return self.proxy.get_merge_command()
+		return [str(x) for x in self.proxy.get_merge_command()]
 
 	def get_oneshot_option (self):
-		return self.proxy.get_oneshot_option()
+		return [str(x) for x in self.proxy.get_oneshot_option()]
 
 	def get_newuse_option (self):
-		return self.proxy.get_newuse_option()
+		return [str(x) for x in self.proxy.get_newuse_option()]
 
 	def get_deep_option (self):
-		return self.proxy.get_deep_option()
+		return [str(x) for x in self.proxy.get_deep_option()]
 
 	def get_update_option (self):
-		return self.proxy.get_update_option()
+		return [str(x) for x in self.proxy.get_update_option()]
 
 	def get_pretend_option (self):
-		return self.proxy.get_pretend_option()
+		return [str(x) for x in self.proxy.get_pretend_option()]
 
 	def get_unmerge_option (self):
-		return self.proxy.get_unmerge_option()
+		return [str(x) for x in self.proxy.get_unmerge_option()]
 
 	def get_environment (self):
 		return self.proxy.get_environment()
