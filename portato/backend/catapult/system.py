@@ -59,8 +59,8 @@ class CatapultSystem (SystemInterface):
 		else:
 			return CatapultPackage(self.proxy.find_best(list))
 
-	def find_best_match (self, search_key, only_installed = False, only_cpv = False):
-		p = self.proxy.find_best_match(search_key, only_installed)
+	def find_best_match (self, search_key, masked = False, only_installed = False, only_cpv = False):
+		p = self.proxy.find_best_match(search_key, masked, only_installed)
 
 		if p and not only_cpv:
 			return CatapultPackage(p)

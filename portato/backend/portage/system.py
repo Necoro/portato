@@ -149,21 +149,27 @@ class PortageSystem (SystemInterface):
 		else:
 			return PortagePackage(portage.best(list))
 
-	def find_best_match (self, search_key, only_installed = False, only_cpv = False):
+	def find_best_match (self, search_key, masked = False, only_installed = False, only_cpv = False):
 		t = None
 		
 		if not only_installed:
 			try:
-				t = self.settings.porttree.dbapi.match(search_key)
+				if masked:
+					t = self.settings.porttree.dbapi.xmatch("match-all", search_key)
+				else:
+					t = self.settings.porttree.dbapi.match(search_key)
 			except ValueError, e: # ambigous package
 				if isinstance(e[0], list):
 					t = []
 					for cp in e[0]:
-						t += self.settings.porttree.dbapi.match(cp)
+						if masked:
+							t += self.settings.porttree.dbapi.xmatch("match-all", cp)
+						else:
+							t += self.settings.porttree.dbapi.match(cp)
 				else:
 					raise
 		else:
-			t = self.find_installed_packages(search_key, only_cpv = True)
+			t = self.find_installed_packages(search_key, masked, only_cpv = True)
 
 		if t:
 			return self.find_best(t, only_cpv)
@@ -320,8 +326,12 @@ class PortageSystem (SystemInterface):
 			
 			best_p = self.find_best_match(p)
 			if best_p is None:
-				warning(_("No best match for %s. It seems not to be in the tree anymore.") % p)
-				continue
+				best_p = self.find_best_match(p, masked = True)
+				if best_p is None:
+					warning(_("No best match for %s. It seems not to be in the tree anymore.") % p)
+					continue
+				else:
+					debug("Best match for %s is masked" % p)
 
 			if len(inst) > 1:
 				myslots = set()

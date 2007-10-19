@@ -50,11 +50,13 @@ class SystemInterface (object):
 		
 		raise NotImplementedError
 
-	def find_best_match (self, search_key, only_installed = False, only_cpv = False):
+	def find_best_match (self, search_key, masked = False, only_installed = False, only_cpv = False):
 		"""Finds the best match in the portage tree. It does not find masked packages!
 		
 		@param search_key: the key to find in the portage tree
 		@type search_key: string
+		@param masked: if True, also look for masked packages
+		@type masked: boolean
 		@param only_installed: if True, only installed packages are searched
 		@type only_installed: boolean
 		@param only_cpv: do not return package but only the cpv
