@@ -20,6 +20,8 @@ Backend:
 
 - "nach hause telefonieren" :)
 
+- move resume_loop and shutdown plugins into main code
+
 GUI:
 ====
 

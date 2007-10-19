@@ -1,4 +1,4 @@
-next:
+0.8.6:
 - "porting" to python-2.5
 - adding support for the "--with-bdeps=y" option in EMERGE_DEFAULT_OPTS
 - fix update world

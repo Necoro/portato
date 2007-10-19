@@ -15,10 +15,7 @@ from __future__ import absolute_import
 # gtk stuff
 import gtk
 import gobject
-try:
-	import gtksourceview2
-except ImportError:
-	gtksourceview2 = None
+import gtksourceview2
 
 # other
 import types, logging
@@ -385,23 +382,19 @@ class EbuildWindow (AbstractDialog):
 	def _build_view(self):
 		"""Creates the buffer and the view."""
 
-		if gtksourceview2 is None:
-			self.buf = gtk.TextBuffer()
-			self.view = gtk.TextView(self.buf)
-		else:
-			man = gtksourceview2.LanguageManager()
-			man.set_search_path(man.get_search_path()+[DATA_DIR])
-			language = man.get_language("ebuild")
+		man = gtksourceview2.LanguageManager()
+		man.set_search_path(man.get_search_path()+[DATA_DIR])
+		language = man.get_language("ebuild")
 
-			if language is None:
-				warning(_("No ebuild language file installed. Falling back to shell."))
-				language = man.get_language("sh")
-		
-			# set buffer and view
-			self.buf = gtksourceview2.Buffer()
-			self.buf.set_language(language)
-			#self.buf.set_highlight(True)
-			self.view = gtksourceview2.View(self.buf)
+		if language is None:
+			warning(_("No ebuild language file installed. Falling back to shell."))
+			language = man.get_language("sh")
+	
+		# set buffer and view
+		self.buf = gtksourceview2.Buffer()
+		self.buf.set_language(language)
+		#self.buf.set_highlight(True)
+		self.view = gtksourceview2.View(self.buf)
 
 	def _show (self):
 		"""Fill the buffer with content and shows the window."""

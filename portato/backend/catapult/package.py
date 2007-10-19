@@ -25,14 +25,10 @@ from gettext import lgettext as _
 
 class CatapultPackage(Package):
 
-	def __init__ (self, cpv):
-		Package.__init__(self, cpv)
-
-		self.bus = dbus.SessionBus()
-		# get the system
-		po = self.bus.get_object("org.gentoo.catapult.portage", "/org/gentoo/catapult/Package")
-		self.proxy = dbus.Interface(po, "org.gentoo.catapult.Package")
-
+	bus = dbus.SessionBus()
+	dbus_object = bus.get_object("org.gentoo.catapult.portage", "/org/gentoo/catapult/Package")
+	proxy = dbus.Interface(dbus_object, "org.gentoo.catapult.Package")
+	
 	def use_expanded (self, flag, suggest = None):
 		if not suggest:
 			suggest = ""
