@@ -56,6 +56,10 @@ These should be set during the installation.
 import os
 from os.path import join as pjoin
 
+# icons
+ICON_DIR = "icons/"
+APP_ICON = pjoin(ICON_DIR, "portato-icon.png")
+
 # general
 APP = "portato"
 VERSION = "9999"
@@ -70,10 +74,6 @@ STD_FRONTEND = "gtk"
 # config
 CONFIG_DIR = "/etc/portato/"
 CONFIG_LOCATION = pjoin(CONFIG_DIR, "portato.cfg")
-
-# icons
-ICON_DIR = "icons/"
-APP_ICON = pjoin(ICON_DIR, "portato-icon.png")
 
 # misc dirs
 DATA_DIR = "./"

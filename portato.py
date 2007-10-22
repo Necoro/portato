@@ -16,7 +16,9 @@ from __future__ import with_statement, absolute_import
 
 import sys, os, subprocess
 import gettext, locale
-from optparse import OptionParser
+from optparse import OptionParser, SUPPRESS_HELP
+
+import shm_wrapper as shm
 
 from portato import listener
 from portato.constants import VERSION, FRONTENDS, STD_FRONTEND, XSD_LOCATION, LOCALE_DIR, APP, SU_COMMAND
@@ -47,8 +49,8 @@ def main ():
 	parser.add_option("-e", "--ebuild", action = "store", dest = "ebuild",
 			help = _("opens the ebuild viewer instead of launching Portato"))
 
-	parser.add_option("-p", "--pipe", action = "store", dest = "pipe",
-			help = _("file descriptor to use to communicate with the listener (internal use only)"))
+	parser.add_option("--shm", action = "store", nargs = 3, type="long", dest = "shm",
+			help = SUPPRESS_HELP)
 
 	parser.add_option("-x", "--validate", action = "store", dest = "validate", metavar="PLUGIN",
 			help = _("validates the given plugin xml instead of launching Portato"))
@@ -95,15 +97,19 @@ def main ():
 			return
 
 	elif options.nolistener or os.getuid() == 0: # start GUI
-		if options.pipe:
-			listener.set_send(int(options.pipe))
+		if options.shm:
+			listener.set_send(*options.shm)
 		else:
 			listener.set_send()
 		
 		run()
 		
 	else: # start us again in root modus and launch listener
-		read, write = os.pipe()
+		
+		mem = shm.create_memory(1024, permissions=0600)
+		sig = shm.create_semaphore(InitialValue = 0, permissions = 0600)
+		rw = shm.create_semaphore(InitialValue = 1, permissions = 0600)
+		
 		additional = []
 		if options.check:
 			additional.append("--check")
@@ -114,9 +120,9 @@ def main ():
 		env = os.environ.copy()
 		env.update(DBUS_SESSION_BUS_ADDRESS="")
 		cmd = SU_COMMAND.split()
-		subprocess.Popen(cmd+["%s --no-listener --pipe %d %s" % (sys.argv[0], write, " ".join(additional))], env = env, close_fds = False)
+		subprocess.Popen(cmd+["%s --no-listener --shm %ld %ld %ld %s" % (sys.argv[0], mem.key, sig.key, rw.key, " ".join(additional))], env = env, close_fds = False)
 		
-		listener.set_recv(read)
+		listener.set_recv(mem, sig, rw)
 
 if __name__ == "__main__":
 	main()

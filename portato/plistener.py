@@ -12,7 +12,8 @@
 
 from __future__ import absolute_import
 
-import socket, os
+import shm_wrapper as shm
+import os
 from subprocess import Popen
 from gettext import lgettext as _
 
@@ -33,13 +34,20 @@ class PListener (object):
 	@ivar _send: sender socket
 	@type _send: int"""
 
-	def set_recv (self, pipe):
-		self._recv = pipe
+	def set_recv (self, mem, sig, rw):
+		self._mem = mem
+		self._sig = sig
+		self._rw = rw
 
 		while True:
 			try:
-				len = os.read(self._recv, 4)
-				string = os.read(self._recv, int(len))
+				try:
+					self._sig.P()
+					self._rw.P()
+					len = self._mem.read(NumberOfBytes = 4)
+					string = self._mem.read(NumberOfBytes = int(len), offset = 4)
+				finally:
+					self._rw.V()
 
 				data = string.split("\0")
 
@@ -52,7 +60,9 @@ class PListener (object):
 			except KeyboardInterrupt:
 				break
 
-		os.close(self._recv)
+		self._mem.remove()
+		self._sig.remove()
+		self._rw.remove()
 
 	def do_cmd (self, cmdlist):
 		"""Starts a command as the user.
@@ -74,18 +84,28 @@ class PListener (object):
 			n.set_urgency(int(urgency))
 			n.show()
 
-	def set_send (self, pipe = None):
-		if pipe is None:
+	def set_send (self, mem = None, sig = None, rw = None):
+		if mem is None or sig is None or rw is None:
 			warning(_("Listener has not been started."))
-		
-		self._send = pipe
+			self._mem = None
+			self._sig = None
+			self._rw = None
+		else:
+			self._mem = shm.SharedMemoryHandle(mem)
+			self._sig = shm.SemaphoreHandle(sig)
+			self._rw = shm.SemaphoreHandle(rw)
 
 	def __send (self, string):
-		os.write(self._send, "%4d" % len(string))
-		os.write(self._send, string)
+		self._rw.P()
+		self._sig.Z()
+		try:
+			self._mem.write("%4d%s" % (len(string), string))
+			self._sig.V()
+		finally:
+			self._rw.V() 
 
 	def send_notify (self, base = "", descr = "", icon = "", urgency = None):	
-		if self._send is None:
+		if self._sig is None:
 			self.do_notify(base, descr, icon, urgency)
 		else:
 			string = "\0".join(["notify", base, descr, icon])
@@ -98,12 +118,11 @@ class PListener (object):
 			self.__send(string)
 
 	def send_cmd (self, cmdlist):
-		if self._send is None:
+		if self._sig is None:
 			self.do_cmd(cmdlist)
 		else:
 			self.__send("\0".join(["cmd"] +cmdlist))
 
 	def close (self):
-		if self._send is not None:
+		if self._sig is not None:
 			self.__send("close")
-			os.close(self._send)
