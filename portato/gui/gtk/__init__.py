@@ -14,7 +14,7 @@ from __future__ import absolute_import
 
 from gettext import lgettext as _
 
-from ... import listener
+from ... import get_listener
 from .exception_handling import register_ex_handler
 
 def run ():
@@ -30,7 +30,7 @@ def run ():
 	except KeyboardInterrupt:
 		pass
 
-	listener.close()
+	get_listener().close()
 
 def show_ebuild (pkg):	
 	import gtk

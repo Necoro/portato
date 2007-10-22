@@ -23,7 +23,7 @@ try:
 except ImportError:
 	from portato.shm import shm_wrapper as shm
 
-from portato import listener
+from portato import get_listener
 from portato.constants import VERSION, FRONTENDS, STD_FRONTEND, XSD_LOCATION, LOCALE_DIR, APP, SU_COMMAND
 
 def get_frontend_list ():
@@ -101,9 +101,9 @@ def main ():
 
 	elif options.nolistener or os.getuid() == 0: # start GUI
 		if options.shm:
-			listener.set_send(*options.shm)
+			get_listener().set_send(*options.shm)
 		else:
-			listener.set_send()
+			get_listener().set_send()
 		
 		run()
 		
@@ -125,7 +125,7 @@ def main ():
 		cmd = SU_COMMAND.split()
 		subprocess.Popen(cmd+["%s --no-listener --shm %ld %ld %ld %s" % (sys.argv[0], mem.key, sig.key, rw.key, " ".join(additional))], env = env, close_fds = False)
 		
-		listener.set_recv(mem, sig, rw)
+		get_listener().set_recv(mem, sig, rw)
 
 if __name__ == "__main__":
 	main()

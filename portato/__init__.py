@@ -58,5 +58,12 @@ logging.getLogger("portatoLogger").addHandler(handler)
 logging.getLogger("portatoLogger").setLevel(logging.DEBUG)
 logging.getLogger("portatoLogger").propagate = False
 
-from .plistener import PListener
-listener = PListener()
+__listener = None
+
+def get_listener():
+	global __listener
+	if __listener is None:
+		from .plistener import PListener
+		__listener = PListener()
+	
+	return __listener

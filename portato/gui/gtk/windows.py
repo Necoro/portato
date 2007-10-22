@@ -23,7 +23,7 @@ from subprocess import Popen
 from gettext import lgettext as _
 
 # our backend stuff
-from ... import listener, plugin
+from ... import get_listener, plugin
 from ...helper import debug, warning, error, unique_array
 from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, DATA_DIR
 from ...backend import flags, system
@@ -335,7 +335,7 @@ class PreferenceWindow (AbstractDialog):
 		self.cfg.set("consolefont", font, section = "GTK")
 		self.set_console_font(font)
 		
-		gtk.link_button_set_uri_hook(lambda btn, x: listener.send_cmd([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
+		gtk.link_button_set_uri_hook(lambda btn, x: get_listener().send_cmd([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
 
 	def cb_ok_clicked(self, button):
 		"""Saves, writes to config-file and closes the window."""
@@ -912,7 +912,7 @@ class MainWindow (Window):
 			raise
 
 		self.cfg.modify_external_configs()
-		gtk.link_button_set_uri_hook(lambda btn, x: listener.send_cmd([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
+		gtk.link_button_set_uri_hook(lambda btn, x: get_listener().send_cmd([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
 		gtk.about_dialog_set_url_hook(lambda *args: True) # dummy - if not set link is not set as link; if link is clicked the normal uuri_hook is called too - thus do not call browser here
 
 		# set plugins and plugin-menu
