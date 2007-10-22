@@ -12,10 +12,14 @@
 
 from __future__ import absolute_import
 
-import shm_wrapper as shm
 import os
 from subprocess import Popen
 from gettext import lgettext as _
+
+try:
+	import shm_wrapper as shm
+except ImportError:
+	from portato.shm import shm_wrapper as shm
 
 try:
 	import pynotify

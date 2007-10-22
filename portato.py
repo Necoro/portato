@@ -18,7 +18,10 @@ import sys, os, subprocess
 import gettext, locale
 from optparse import OptionParser, SUPPRESS_HELP
 
-import shm_wrapper as shm
+try:
+	import shm_wrapper as shm
+except ImportError:
+	from portato.shm import shm_wrapper as shm
 
 from portato import listener
 from portato.constants import VERSION, FRONTENDS, STD_FRONTEND, XSD_LOCATION, LOCALE_DIR, APP, SU_COMMAND
