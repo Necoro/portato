@@ -25,7 +25,7 @@ from gettext import lgettext as _
 # our backend stuff
 from ... import get_listener, plugin
 from ...helper import debug, warning, error, unique_array
-from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, DATA_DIR
+from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
 from ...backend import flags, system
 from ...backend.exceptions import PackageNotFoundException, BlockedException
 
@@ -383,11 +383,10 @@ class EbuildWindow (AbstractDialog):
 		"""Creates the buffer and the view."""
 
 		man = gtksourceview2.LanguageManager()
-		man.set_search_path(man.get_search_path()+[DATA_DIR])
-		language = man.get_language("ebuild")
+		language = man.get_language("gentoo")
 
 		if language is None:
-			warning(_("No ebuild language file installed. Falling back to shell."))
+			warning(_("No gentoo language file installed. Falling back to shell."))
 			language = man.get_language("sh")
 	
 		# set buffer and view
