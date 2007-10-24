@@ -15,7 +15,7 @@ import sys, os, os.path
 from distutils.core import setup, Extension
 from portato.constants import FRONTENDS, VERSION, DATA_DIR, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR
 
-#### copied from shm's setup.py ####
+##### copied from shm's setup.py #####
 MacrosAndDefines = [ ]
 
 # HAVE_UNION_SEMUN needs to be #defined on FreeBSD and OS X and must *not* be #defined
@@ -23,7 +23,7 @@ MacrosAndDefines = [ ]
 # need to make changes for your platform.
 if ("bsd" in sys.platform) or ("darwin" in sys.platform):
     MacrosAndDefines.append( ('HAVE_UNION_SEMUN', None) )
-#### end copy ####
+##### end copy #####
 
 def plugin_list (*args):
 	"""Creates a list of correct plugin pathes out of the arguments."""
