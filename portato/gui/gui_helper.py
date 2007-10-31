@@ -188,12 +188,14 @@ class Database:
 	def __init__ (self):
 		"""Constructor."""
 		self._db = {}
+		self.inst_cats = set()
 
 	def populate (self, category = None):
 		"""Populates the database.
 		
 		@param category: An optional category - so only packages of this category are inserted.
-		@type category: string"""
+		@type category: string
+		"""
 		
 		# get the lists
 		packages = system.find_all_packages(name = category, withVersion = False)
@@ -203,7 +205,11 @@ class Database:
 		for p in packages:
 			cat, pkg = p.split("/")
 			if not cat in self._db: self._db[cat] = []
-			self._db[cat].append((pkg, p in installed))
+			inst = p in installed
+			self._db[cat].append((pkg, inst))
+
+			if inst:
+				self.inst_cats.add(cat)
 
 		for key in self._db: # sort alphabetically
 			self._db[key].sort(cmp=cmp, key=lambda x: x[0].lower())
@@ -216,7 +222,8 @@ class Database:
 		@param byName: selects whether to return the list sorted by name or by installation
 		@type byName: boolean
 		@return: list of tuples: (name, is_installed) or []
-		@rtype: (string, boolean)[]"""
+		@rtype: (string, boolean)[]
+		"""
 
 		try:
 			if byName:
@@ -236,11 +243,21 @@ class Database:
 			info(_("Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?"), cat)
 			return []
 
+	def get_installed_categories (self):
+		"""Returns all categories which have installed packages in them.
+
+		@returns: the list of categories
+		@rtype: string[]
+		"""
+
+		return list(self.inst_cats)
+
 	def reload (self, cat):
 		"""Reloads the given category.
 		
 		@param cat: category
-		@type cat: string"""
+		@type cat: string
+		"""
 
 		del self._db[cat]
 		self.populate(cat+"/")

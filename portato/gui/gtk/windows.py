@@ -890,6 +890,7 @@ class MainWindow (Window):
 		
 		# booleans
 		self.doUpdate = False
+		self.showAll = True # show only installed or all packages?
 
 		# installed pixbuf
 		self.instPixbuf = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
@@ -1024,16 +1025,25 @@ class MainWindow (Window):
 		
 		store = gtk.ListStore(str)
 
-		# build categories
-		for p in system.list_categories():
-			store.append([p])
-		# sort them alphabetically
-		store.set_sort_column_id(0, gtk.SORT_ASCENDING)
-
 		self.catList.set_model(store)
 		cell = gtk.CellRendererText()
 		col = gtk.TreeViewColumn(_("Categories"), cell, text = 0)
 		self.catList.append_column(col)
+
+		self.fill_cat_store(store)
+
+	def fill_cat_store (self, store):
+		
+		if self.showAll:
+			cats = system.list_categories() 
+		else:
+			cats = self.db.get_installed_categories()
+
+		for p in cats:
+			store.append([p])
+		
+		# sort them alphabetically
+		store.set_sort_column_id(0, gtk.SORT_ASCENDING)
 
 	def build_pkg_list (self, name = None):
 		"""Builds the package list.
@@ -1077,6 +1087,8 @@ class MainWindow (Window):
 			for pkg, is_inst in self.db.get_cat(name, self.sortPkgListByName):
 				if is_inst:
 					icon = self.instPixbuf
+				elif not self.showAll:
+					continue # ignore not installed packages
 				else:
 					icon = None
 				store.append([icon, pkg])
@@ -1323,6 +1335,20 @@ class MainWindow (Window):
 		
 		GtkThread(name="Show Updates Thread", target = __update).start()
 		return True
+
+	def cb_show_installed_toggled (self, *args):
+		self.showAll = not self.showAll
+
+		store = self.catList.get_model()
+		store.clear()
+		self.fill_cat_store(store)
+
+		store = self.pkgList.get_model()
+		store.clear()
+		try:
+			self.fill_pkg_store(store, self.selCatName)
+		except AttributeError: # no selCatName -> so no category selected --> ignore
+			debug("AttributeError occured --> should be no harm.")
 
 	def cb_right_click (self, object, event):
 		if event.button == 3:

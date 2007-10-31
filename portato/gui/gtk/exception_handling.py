@@ -70,7 +70,7 @@ class UncaughtExceptionDialog(gtk.MessageDialog):
 		textbuffer = self.textview.get_buffer()
 		self.text = get_trace(type, value, tb)
 		if thread:
-			self.text = _("Exception in thread \"%(thread)s\":\n%(trace)s") % {"thread": thread, "trace": text}
+			self.text = _("Exception in thread \"%(thread)s\":\n%(trace)s") % {"thread": thread, "trace": self.text}
 		textbuffer.set_text(self.text)
 		self.textview.set_size_request(gtk.gdk.screen_width()/2, gtk.gdk.screen_height()/3)
 
