@@ -1,3 +1,6 @@
+next:
+- added view for "installed only"
+
 0.8.6.2:
 - changed the pipe version and use shm instead (fixes issues with kdesu)
 
