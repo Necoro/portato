@@ -22,6 +22,7 @@ from subprocess import Popen, PIPE, STDOUT
 from .. import backend, plugin
 from ..backend import flags, system, set_system
 from ..helper import debug, info, send_signal_to_group, set_log_level, unique_array
+from ..constants import USE_CATAPULT
 from ..waiting_queue import WaitingQueue
 
 # parser
@@ -113,7 +114,8 @@ class Config:
 	def modify_system_config (self):
 		"""Sets the system config.
 		@see: L{backend.set_system()}"""
-		set_system(self.get("system"))
+		if not USE_CATAPULT:
+			set_system(self.get("system"))
 
 	def modify_external_configs (self):
 		"""Convenience function setting all external configs."""

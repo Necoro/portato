@@ -17,7 +17,7 @@ import os.path
 from subprocess import Popen, PIPE # needed for grep
 from gettext import lgettext as _
 
-from . import system, _Package
+from . import system, is_package
 from ..helper import debug, error, unique_array
 
 CONFIG = {
@@ -94,7 +94,7 @@ def grep (pkg, path):
 	@returns: occurences of pkg in the format: "file:line-no:complete_line_found"
 	@rtype: string"""
 
-	if not isinstance(pkg, _Package):
+	if not is_package(pkg):
 		pkg = system.new_package(pkg) # assume it is a cpv or a gentoolkit.Package
 
 	if os.path.exists(path):
@@ -202,7 +202,7 @@ def set_use_flag (pkg, flag):
 
 	global useFlags, newUseFlags
 
-	if not isinstance(pkg, _Package):
+	if not is_package(pkg):
 		pkg = system.new_package(pkg) # assume cpv or gentoolkit.Package
 
 	cpv = pkg.get_cpv()
@@ -266,7 +266,7 @@ def remove_new_use_flags (cpv):
 	@param cpv: the package for which to remove the flags
 	@type cpv: string (cpv) or L{backend.Package}-object"""
 	
-	if isinstance(cpv, _Package):
+	if is_package(cpv):
 		cpv = cpv.get_cpv()
 	
 	try:
@@ -282,7 +282,7 @@ def get_new_use_flags (cpv):
 	@returns: list of flags
 	@rtype: string[]"""
 	
-	if isinstance(cpv, _Package):
+	if is_package(cpv):
 		cpv = cpv.get_cpv()
 
 	list2return = []
@@ -399,7 +399,7 @@ def set_masked (pkg, masked = True):
 	
 	global new_masked, newunmasked
 	
-	if not isinstance(pkg, _Package):
+	if not is_package(pkg):
 		pkg = system.new_package(pkg)
 
 	cpv = pkg.get_cpv()
@@ -458,7 +458,7 @@ def set_masked (pkg, masked = True):
 	debug("new_(un)masked: %s",str(link_neq))
 
 def remove_new_masked (cpv):
-	if isinstance(cpv, _Package):
+	if is_package(cpv):
 		cpv = cpv.get_cpv()
 	
 	try:
@@ -472,7 +472,7 @@ def remove_new_masked (cpv):
 		pass
 
 def new_masking_status (cpv):
-	if isinstance(cpv, _Package):
+	if is_package(cpv):
 		cpv = cpv.get_cpv()
 
 	def get(list):
@@ -500,7 +500,7 @@ def new_masking_status (cpv):
 
 def is_locally_masked (pkg, changes = True):
 
-	if not isinstance(pkg, _Package):
+	if not is_package(pkg):
 		pkg = system.new_package(pkg) # assume it is a cpv or a gentoolkit.Package
 
 	if changes:
@@ -595,7 +595,7 @@ newTesting = {}
 arch = ""
 
 def remove_new_testing (cpv):
-	if isinstance(cpv, _Package):
+	if is_package(cpv):
 		cpv = cpv.get_cpv()
 	
 	try:
@@ -604,7 +604,7 @@ def remove_new_testing (cpv):
 		pass
 
 def new_testing_status (cpv):
-	if isinstance(cpv, _Package):
+	if is_package(cpv):
 		cpv = cpv.get_cpv()
 
 	if cpv in newTesting:
@@ -622,7 +622,7 @@ def set_testing (pkg, enable):
 	@type enable: boolean"""
 
 	global arch, newTesting
-	if not isinstance(pkg, _Package):
+	if not is_package(pkg):
 		pkg = system.new_package(pkg)
 
 	arch = pkg.get_global_settings("ARCH")

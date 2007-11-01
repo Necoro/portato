@@ -34,12 +34,6 @@ class CatapultPackage(Package):
 			suggest = ""
 		return str(self.proxy.use_expanded(self.get_cpv(), flag, suggest))
 
-	def get_cp (self):
-		return str(self.proxy.get_cp(self.get_cpv()))
-
-	def get_slot_cp (self):
-		return str(self.proxy.get_slot_cp(self.get_cpv()))
-
 	def get_package_path(self):
 		return str(self.proxy.get_package_path(self.get_cpv()))
 
@@ -107,7 +101,12 @@ class CatapultPackage(Package):
 		return [str(x) for x in self.proxy.get_matched_dep_packages(self.get_cpv(), self.get_new_use_flags())]
 		
 	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"], with_criterions = False):
-		return [str(x) for x in self.proxy.get_dep_packages(self.get_cpv(), depvar, self.get_new_use_flags(), with_criterions)]
+		pkgs = self.proxy.get_dep_packages(self.get_cpv(), depvar, self.get_new_use_flags())
+
+		if not with_criterions:
+			return [str(x) for x,y in pkgs]
+		else:
+			return [(str(x),str(y)) for x,y in pkgs]
 
 	def get_global_settings(self, key):
 		return str(self.proxy.get_global_settings(self.get_cpv(), key))
@@ -122,7 +121,7 @@ class CatapultPackage(Package):
 		return " ".join(self.proxy.get_use_flags(self.get_cpv()))
 
 	def compare_version(self, other):
-		return self.proxy.compare_version(self.get_cpv(), other)
+		return self.proxy.compare_version(self.get_cpv(), other.get_cpv())
 
 	def matches (self, criterion):
 		return self.proxy.matches(self.get_cpv(), criterion)

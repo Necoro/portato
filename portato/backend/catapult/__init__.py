@@ -12,5 +12,8 @@
 
 from __future__ import absolute_import
 
+from dbus.mainloop.glib import DBusGMainLoop
+DBusGMainLoop(set_as_default=True)
+
 from .system import CatapultSystem
 from .package import CatapultPackage

@@ -14,6 +14,7 @@ from __future__ import absolute_import
 
 import re, os
 from gettext import lgettext as _
+from threading import Event
 import dbus
 
 from .package import CatapultPackage
@@ -124,7 +125,21 @@ class CatapultSystem (SystemInterface):
 		return self.proxy.reload_settings()
 
 	def update_world (self, newuse = False, deep = False):
-		return [(CatapultPackage(x), CatapultPackage(y)) for x,y in self.proxy.update_world(newuse, deep, {})]
+		
+		ret = []
+		e = Event()
+				
+		def wait (list):
+			ret.extend([(CatapultPackage(x), CatapultPackage(y)) for x,y in list])
+			e.set()
+
+		def error (ex):
+			raise ex
+		
+		self.proxy.update_world(newuse, deep, {}, reply_handler = wait, error_handler = error)
+		e.wait()
+		return ret
+	#	return [(CatapultPackage(x), CatapultPackage(y)) for x,y in self.proxy.update_world(newuse, deep, {})]
 
 	def get_updated_packages (self):
 		return self.geneticize_list(self.proxy.get_updated_packages())

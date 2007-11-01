@@ -12,6 +12,7 @@
 
 from __future__ import absolute_import
 
+from ..helper import debug
 from ..constants import USE_CATAPULT
 from .system_interface import SystemInterface
 from .exceptions import BlockedException, PackageNotFoundException, DependencyCalcError, InvalidSystemError
@@ -55,9 +56,13 @@ def load_system ():
 	global _sys
 
 	if SYSTEM == "portage":
+		debug("Setting Portage System")
+		from traceback import print_stack
+		print_stack()
 		from .portage import PortageSystem
 		_sys = PortageSystem ()
 	elif SYSTEM == "catapult":
+		debug("Setting Catapult System")
 		from .catapult import CatapultSystem
 		_sys = CatapultSystem()
 	else:
@@ -65,10 +70,7 @@ def load_system ():
 
 system = SystemWrapper()
 
-# import package before loading the system as some systems may depend on it being in the namespace
-from .package import Package
-
 def is_package(what):
-	return isinstance(what, Package)
+	return isinstance(what, _Package)
 
 load_system()
