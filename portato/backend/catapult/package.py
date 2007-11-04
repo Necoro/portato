@@ -32,7 +32,11 @@ class CatapultPackage(Package):
 	def use_expanded (self, flag, suggest = None):
 		if not suggest:
 			suggest = ""
-		return str(self.proxy.use_expanded(self.get_cpv(), flag, suggest))
+		s = str(self.proxy.use_expanded(self.get_cpv(), flag, suggest))
+		if s:
+			return s
+		else:
+			return None
 
 	def get_package_path(self):
 		return str(self.proxy.get_package_path(self.get_cpv()))
