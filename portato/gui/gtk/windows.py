@@ -33,7 +33,6 @@ from ...backend.exceptions import PackageNotFoundException, BlockedException
 from ..gui_helper import Database, Config, EmergeQueue
 from .basic import Window, AbstractDialog, Popup
 from .wrapper import GtkTree, GtkConsole
-from .usetips import UseTips
 from .exception_handling import GtkThread
 from .dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
 		nothing_found_dialog, queue_not_empty_dialog, remove_deps_dialog,
@@ -256,8 +255,7 @@ class PreferenceWindow (AbstractDialog):
 			"systrayCheck"			: ("systray", "GUI"),
 			"testPerVersionCheck"	: "testingPerVersion",
 			"titleUpdateCheck"		: ("updateTitle", "GUI"),
-			"usePerVersionCheck"	: "usePerVersion",
-			"useTipsCheck"			: ("useTips", "GTK")
+			"usePerVersionCheck"	: "usePerVersion"
 			}
 	
 	# all edits in the window
@@ -607,7 +605,7 @@ class PackageTable:
 			if self.version:
 				best_version = self.version
 			else:
-				best_version = system.find_best_match(self.packages[0].get_cp(), (self.instPackages != [])).get_version()
+				best_version = system.find_best_match(self.packages[0].get_cp(), only_installed = (self.instPackages != [])).get_version()
 			for i in range(len(self.packages)):
 				if self.packages[i].get_version() == best_version:
 					sel.select_path((i,))
@@ -943,7 +941,6 @@ class MainWindow (Window):
 		self.build_pkg_list()
 
 		# queue list
-		self.useTips = UseTips(0, self.cfg)
 		self.queueList = self.tree.get_widget("queueList")
 		self.build_queue_list()
 
@@ -1017,8 +1014,6 @@ class MainWindow (Window):
 		
 		col = gtk.TreeViewColumn(_("Options"), cell, markup = 1)
 		self.queueList.append_column(col)
-
-		self.useTips.add_view(self.queueList)
 
 	def build_cat_list (self):
 		"""Builds the category list."""
@@ -1167,6 +1162,70 @@ class MainWindow (Window):
 				if rev != "r0": vers = vers+"-"+rev
 				self.show_package(cat+"/"+name, queue = self.queue, version = vers, instantChange = True, doEmerge = False)
 		return True
+	
+	def cb_queue_tooltip_queried (self, view, x, y, is_keyboard, tooltip):
+		store = self.queueList.get_model()
+		path = self.queueList.get_path_at_pos(x,y)
+
+		if path is None:
+			return False
+
+		it = store.get_iter(path[0])
+
+		if store.iter_parent(it) is None:
+			return False # do not show tooltips for the root entries
+
+		pkg = system.new_package(store.get_value(it, 0))
+		
+		enabled = []
+		disabled = []
+		expanded = set()
+
+		pkg_flags = pkg.get_iuse_flags()
+		if not pkg_flags: # no flags - stop here
+			return None
+		
+		pkg_flags.sort()
+		actual = pkg.get_actual_use_flags()
+		
+		if pkg.is_installed():
+			installed = pkg.get_installed_use_flags()
+		else:
+			inst = system.find_installed_packages(pkg.get_slot_cp())
+			if inst:
+				installed = inst[0].get_installed_use_flags()
+			else:
+				installed = []
+
+		for use in pkg_flags:
+			exp = pkg.use_expanded(use)
+			if exp:
+				expanded.add(exp)
+			
+			else:
+				useStr = use
+				if installed and ((use in actual) != (use in installed)):
+					useStr += " %"
+				if use in actual:
+					enabled.append(useStr)
+				else:
+					disabled.append(useStr)
+		
+		string = ""
+		
+		if enabled:
+			string = "<b>+%s</b>" % ("\n+".join(enabled),)
+			if len(disabled) > 0:
+				string = string + "\n"
+		
+		if disabled:
+			string = string+"<i>- %s</i>" % ("\n- ".join(disabled),)
+
+		if expanded:
+			string = string+"\n\n"+"\n".join(expanded)
+		
+		tooltip.set_markup(string)
+		return string != ""
 
 	def cb_emerge_clicked (self, action):
 		"""Do emerge."""

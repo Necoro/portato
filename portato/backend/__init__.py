@@ -57,8 +57,6 @@ def load_system ():
 
 	if SYSTEM == "portage":
 		debug("Setting Portage System")
-		from traceback import print_stack
-		print_stack()
 		from .portage import PortageSystem
 		_sys = PortageSystem ()
 	elif SYSTEM == "catapult":
