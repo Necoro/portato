@@ -134,6 +134,7 @@ class CatapultSystem (SystemInterface):
 			e.set()
 
 		def error (ex):
+			e.set()
 			raise ex
 		
 		self.proxy.update_world(newuse, deep, {}, reply_handler = wait, error_handler = error)
