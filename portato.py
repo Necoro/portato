@@ -80,7 +80,7 @@ def main ():
 	try:
 		exec ("from portato.gui.%s import run, show_ebuild" % options.frontend)
 	except ImportError, e:
-		print _("'%(frontend)s' should be installed, but cannot be imported. This is definitly a bug. (%(error)s)") % {"frontend": options.frontend, "error": e[0]}
+		print _("'%(frontend)s' should be installed, but cannot be imported. This is definitely a bug. (%(error)s)") % {"frontend": options.frontend, "error": e[0]}
 		sys.exit(1)
 
 	if options.ebuild: # show ebuild
