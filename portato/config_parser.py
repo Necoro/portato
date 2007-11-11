@@ -29,10 +29,11 @@ Currently supported are the values (case insensitive): false, 0, off, falsch, ne
 @var SECTION: Regular expression allowing the recognition of a section header.
 @var EXPRESSION: Regular expression defining a normal option-value pair.
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 import re
 from gettext import lgettext as _
+from threading import Lock
 
 from .helper import debug
 
@@ -145,6 +146,7 @@ class ConfigParser:
 		@type file: string"""
 
 		self.file = file
+		self.writelock = Lock()
 		self.__initialize()
 
 	def __initialize (self):
@@ -153,6 +155,7 @@ class ConfigParser:
 		self.vars = {"MAIN": {}}
 		self.cache = None # file cache
 		self.pos = {} # stores the positions of the matches
+		self.sections = {"MAIN" : -1} # the line with the section header
 
 	def _invert (self, val):
 		"""Invertes a given boolean.
@@ -168,9 +171,8 @@ class ConfigParser:
 		"""Parses the file."""
 
 		# read into cache
-		file = open(self.file, "r")
-		self.cache = file.readlines()
-		file.close()
+		with open(self.file, "r") as f:
+			self.cache = f.readlines()
 
 		# implicit first section is main
 		section = "MAIN"
@@ -186,6 +188,7 @@ class ConfigParser:
 			match = SECTION.search(line)
 			if match:
 				sec = match.group(1).upper()
+				self.sections[sec] = count
 				if sec != section:
 					self.vars[sec] = {}
 					section = sec
@@ -296,23 +299,76 @@ class ConfigParser:
 		else:
 			raise ValueError, "\"%s\" is not a boolean." % key
 
+	def add_section (self, section, comment = None, with_blankline = True):
+		section = section.upper()
+
+		if section in self.vars:
+			return
+
+		if with_blankline and len(self.cache) > 0:
+			self.cache.append("\n")
+
+		if comment:
+			if isinstance(comment, str) or isinstance(comment, unicode):
+				comment = comment.split("\n")
+			
+			comment.insert(0, "")
+			comment.append("")
+			
+			for c in comment:
+				self.cache.append("# %s\n" % c)
+
+		self.vars[section] = {}
+		self.sections[section] = len(self.cache)
+		self.cache.append("[%s]\n" % section)
+
+	def add (self, key, value, section = "MAIN", comment = None, with_blankline = True):
+		section = section.upper()
+		key = key.lower()
+
+		self.write()
+		
+		# find line# to add
+		if self.vars[section]:
+			mline = max((x.line for x in self.vars[section].itervalues())) + 1
+		else:
+			mline = self.sections[section] + 1
+
+		if with_blankline and mline > 0:
+			self.cache.insert(mline, "\n")
+			mline += 1
+
+		if comment:
+			if isinstance(comment, str) or isinstance(comment, unicode):
+				comment = comment.split("\n")
+			
+			for c in comment:
+				self.cache.insert(mline, "; %s\n" % c)
+				mline += 1
+		
+		self.cache.insert(mline, "%s = %s\n" % (key, value))
+		
+		self.write()
+
 	def write (self):
 		"""Writes file."""
 
-		for sec in self.vars:
-			for key in self.vars[sec]:
-				val = self.vars[sec][key]
-				if val.changed:
-					part1 = self.cache[val.line][:self.pos[val.line][0]] 	# key+DELIMITER
-					part2 = val.value										# value
-					part3 = self.cache[val.line][self.pos[val.line][1]:]	# everything behind the vale (\n in normal cases)
-					self.cache[val.line] = part1 + part2 + part3
-		
-		# write
-		f = open(self.file, "w")
-		f.writelines(self.cache)
-		f.close()
+		if not self.cache:
+			return
 
-		# reload
-		self.__initialize()
-		self.parse()
+		with self.writelock:
+			for sec in self.vars:
+				for val in self.vars[sec].itervalues():
+					if val.changed:
+						part1 = self.cache[val.line][:self.pos[val.line][0]] 	# key+DELIMITER
+						part2 = val.value										# value
+						part3 = self.cache[val.line][self.pos[val.line][1]:]	# everything behind the vale (\n in normal cases)
+						self.cache[val.line] = part1 + part2 + part3
+			
+			# write
+			with open(self.file, "w") as f:
+				f.writelines(self.cache)
+
+			# reload
+			self.__initialize()
+			self.parse()
