@@ -153,7 +153,7 @@ class ConfigParser:
 		"""Private method which initializes our dictionaries."""
 
 		self.vars = {"MAIN": {}}
-		self.cache = None # file cache
+		self.cache = [] # file cache
 		self.pos = {} # stores the positions of the matches
 		self.sections = {"MAIN" : -1} # the line with the section header
 
@@ -325,6 +325,9 @@ class ConfigParser:
 	def add (self, key, value, section = "MAIN", comment = None, with_blankline = True):
 		section = section.upper()
 		key = key.lower()
+
+		if key in self.vars[section]:
+			return self.set(key, value, section)
 
 		self.write()
 		

@@ -19,15 +19,17 @@ import gtksourceview2
 
 # other
 import types, logging
+import os, os.path
 from subprocess import Popen
 from gettext import lgettext as _
 
 # our backend stuff
 from ... import get_listener, plugin
 from ...helper import debug, warning, error, unique_array
-from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
+from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, PREF_DIR
 from ...backend import flags, system
 from ...backend.exceptions import PackageNotFoundException, BlockedException
+from ...config_parser import ConfigParser
 
 # more GUI stuff
 from ..gui_helper import Database, Config, EmergeQueue
@@ -390,7 +392,6 @@ class EbuildWindow (AbstractDialog):
 		# set buffer and view
 		self.buf = gtksourceview2.Buffer()
 		self.buf.set_language(language)
-		#self.buf.set_highlight(True)
 		self.view = gtksourceview2.View(self.buf)
 
 	def _show (self):
@@ -896,11 +897,6 @@ class MainWindow (Window):
 		# get the logging window as soon as possible
 		self.logWindow = LogWindow(self.window)
 		
-		# package db
-		splash(_("Creating Database"))
-		self.db = Database()
-		self.db.populate()
-
 		# config
 		splash(_("Loading Config"))
 		try:
@@ -913,6 +909,31 @@ class MainWindow (Window):
 		gtk.link_button_set_uri_hook(lambda btn, x: get_listener().send_cmd([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
 		gtk.about_dialog_set_url_hook(lambda *args: True) # dummy - if not set link is not set as link; if link is clicked the normal uuri_hook is called too - thus do not call browser here
 
+		# preferences
+		splash(_("Loading Preferences"))
+		try:
+			if not (os.path.exists(PREF_DIR) and os.path.isdir(PREF_DIR)):
+				os.mkdir(PREF_DIR)
+			self.pref_cfg = ConfigParser(os.path.join(PREF_DIR, "pref_gtk.cfg"))
+			try:
+				self.pref_cfg.parse()
+			except IOError, e:
+				if e.errno == 2: pass
+				else: raise
+		except (OSError, IOError), e:
+			io_ex_dialog(e)
+			raise
+
+		try:
+			self.window.resize(int(self.pref_cfg.get("width")), int(self.pref_cfg.get("height")))
+		except KeyError: # preferences empty -> ignore
+			pass
+		
+		# package db
+		splash(_("Creating Database"))
+		self.db = Database()
+		self.db.populate()
+		
 		# set plugins and plugin-menu
 		splash(_("Loading Plugins"))
 
@@ -984,8 +1005,6 @@ class MainWindow (Window):
 		self.queueTree = GtkTree(self.queueList.get_model())
 		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update, threadClass = GtkThread)
 	
-		self.window.maximize()
-		
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)
 		self.notebook.set_current_page(self.PKG_PAGE)
@@ -1477,6 +1496,13 @@ class MainWindow (Window):
 
 	def cb_delete (self, *args):
 		"""Looks whether we really want to quit."""
+
+		# write prefs
+		width, height = self.window.get_size()
+		self.pref_cfg.add("width", str(width), with_blankline = False)
+		self.pref_cfg.add("height", str(height), with_blankline = False)
+		self.pref_cfg.write()
+
 		if not self.queue.is_empty():
 			ret = queue_not_empty_dialog()
 			if ret == gtk.RESPONSE_CANCEL:
