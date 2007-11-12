@@ -31,19 +31,7 @@ from ..config_parser import ConfigParser
 # the wrapper
 from .wrapper import Console, Tree
 
-class Config:
-	"""Wrapper around a ConfigParser and for additional local configurations."""
-	# this const-dict holds all the values which are named differently in the sourcecode and in the cfg-file
-	# note: the keys are lowered before being looked up
-	const = {
-			"minimize" : "hideonminimize",
-			"pkgicons" : "packageIcons",
-			"synccmd" : "synccommand",
-			"systray" : "showsystray",
-			"testingfile" : "keywordfile",
-			"testingperversion" : "keywordperversion",
-			"usetips" : "showusetips"
-			}
+class Config (ConfigParser):
 	
 	def __init__ (self, cfgFile):
 		"""Constructor.
@@ -51,44 +39,13 @@ class Config:
 		@param cfgFile: path to config file
 		@type cfgFile: string"""
 
-		# init ConfigParser
-		self._cfg = ConfigParser(cfgFile)
+		ConfigParser.__init__(self, cfgFile)
 		
 		# read config
-		self._cfg.parse()
+		self.parse()
 
 		# local configs
 		self.local = {}
-
-	def __get_val (self, name):
-		try:
-			return self.const[name.lower()]
-		except KeyError:
-			return name
-
-	def get(self, name, section="MAIN"):
-		"""Gets an option.
-		
-		@param name: name of the option
-		@type name: string
-		@param section: section to look in; default is Main-Section
-		@type section: string
-		@return: the option's value
-		@rtype: string"""
-
-		return self._cfg.get(self.__get_val(name), self.__get_val(section))
-
-	def get_boolean(self, name, section="MAIN"):
-		"""Gets a boolean option.
-			
-		@param name: name of the option
-		@type name: string
-		@param section: section to look in; default is Main-Section
-		@type section: string
-		@return: the option's value
-		@rtype: boolean"""
-
-		return self._cfg.get_boolean(self.__get_val(name), self.__get_val(section))
 
 	def modify_flags_config (self):
 		"""Sets the internal config of the L{flags}-module.
@@ -99,8 +56,8 @@ class Config:
 				"usePerVersion" : self.get_boolean("usePerVersion"),
 				"maskfile" : self.get("maskFile"),
 				"maskPerVersion" : self.get_boolean("maskPerVersion"),
-				"testingfile" : self.get("testingFile"),
-				"testingPerVersion" : self.get_boolean("testingPerVersion")}
+				"testingfile" : self.get("keywordFile"),
+				"testingPerVersion" : self.get_boolean("keywordPerVersion")}
 		flags.set_config(flagCfg)
 
 	def modify_debug_config (self):
@@ -155,33 +112,9 @@ class Config:
 
 		return self.local[cpv][name]
 
-	def set(self, name, val, section = "MAIN"):
-		"""Sets an option.
-		
-		@param name: name of the option
-		@type name: string
-		@param val: value to set the option to
-		@type val: string
-		@param section: section to look in; default is Main-Section
-		@type section: string"""
-
-		self._cfg.set(self.__get_val(name), val, self.__get_val(section))
-
-	def set_boolean (self, name, val, section = "MAIN"):
-		"""Sets a boolean option.
-		
-		@param name: name of the option
-		@type name: string
-		@param val: value to set the option to
-		@type val: boolean
-		@param section: section to look in; default is Main-Section
-		@type section: string"""
-
-		self._cfg.set_boolean(self.__get_val(name), val, self.__get_val(section))
-
 	def write(self):
 		"""Writes to the config file and modify any external configs."""
-		self._cfg.write()
+		ConfigParser.write(self)
 		self.modify_external_configs()
 
 class Database:

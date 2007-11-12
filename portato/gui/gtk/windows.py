@@ -251,9 +251,9 @@ class PreferenceWindow (AbstractDialog):
 			"deepCheck"				: "deep",
 			"newUseCheck"			: "newuse",
 			"maskPerVersionCheck"	: "maskPerVersion",
-			"minimizeCheck"			: ("minimize", "GUI"),
-			"systrayCheck"			: ("systray", "GUI"),
-			"testPerVersionCheck"	: "testingPerVersion",
+			"minimizeCheck"			: ("hideOnMinimize", "GUI"),
+			"systrayCheck"			: ("showSystray", "GUI"),
+			"testPerVersionCheck"	: "keywordPerVersion",
 			"titleUpdateCheck"		: ("updateTitle", "GUI"),
 			"usePerVersionCheck"	: "usePerVersion"
 			}
@@ -262,9 +262,9 @@ class PreferenceWindow (AbstractDialog):
 	# widget name -> option name
 	edits = {
 			"maskFileEdit"		: "maskFile",
-			"testFileEdit"		: "testingFile",
+			"testFileEdit"		: "keywordFile",
 			"useFileEdit"		: "useFile",
-			"syncCommandEdit"	: "syncCmd",
+			"syncCommandEdit"	: "syncCommand",
 			"browserEdit"		: ("browserCmd", "GUI")
 			}
 
@@ -973,7 +973,7 @@ class MainWindow (Window):
 			self.pauseItems[k] = (v, v.connect_after("activate", self.cb_pause_emerge(k)))
 
 		# systray
-		if self.cfg.get_boolean("systray", "GUI"):
+		if self.cfg.get_boolean("showSystray", "GUI"):
 			self.tray = gtk.status_icon_new_from_file(APP_ICON)
 			self.tray.connect("activate", self.cb_systray_activated)
 			self.tray.connect("popup-menu", lambda icon, btn, time: self.trayPopup.popup(None, None, None, btn, time))
@@ -1316,7 +1316,7 @@ class MainWindow (Window):
 
 	def cb_sync_clicked (self, action):
 		self.notebook.set_current_page(self.CONSOLE_PAGE)
-		cmd = self.cfg.get("syncCmd")
+		cmd = self.cfg.get("syncCommand")
 
 		if cmd != "emerge --sync":
 			cmd = cmd.split()
@@ -1487,7 +1487,7 @@ class MainWindow (Window):
 		return False
 
 	def cb_minimized (self, window, event):
-		if self.tray and self.cfg.get_boolean("minimize", "GUI"):
+		if self.tray and self.cfg.get_boolean("hideOnMinimize", "GUI"):
 			if event.changed_mask & gtk.gdk.WINDOW_STATE_ICONIFIED:
 				if event.new_window_state & gtk.gdk.WINDOW_STATE_ICONIFIED:
 					self.window.hide()
