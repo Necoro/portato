@@ -49,9 +49,6 @@ def main ():
 	parser.add_option("-f", "--frontend", action = "store", choices = FRONTENDS, default = STD_FRONTEND, dest = "frontend",
 			help = _("the frontend to use - possible values are: %s [default: %%default]") % get_frontend_list())
 
-	parser.add_option("-e", "--ebuild", action = "store", dest = "ebuild",
-			help = _("opens the ebuild viewer instead of launching Portato"))
-
 	parser.add_option("--shm", action = "store", nargs = 3, type="long", dest = "shm",
 			help = SUPPRESS_HELP)
 
@@ -78,14 +75,12 @@ def main ():
 			options.frontend = arg
 
 	try:
-		exec ("from portato.gui.%s import run, show_ebuild" % options.frontend)
+		exec ("from portato.gui.%s import run" % options.frontend)
 	except ImportError, e:
 		print _("'%(frontend)s' should be installed, but cannot be imported. This is definitely a bug. (%(error)s)") % {"frontend": options.frontend, "error": e[0]}
 		sys.exit(1)
 
-	if options.ebuild: # show ebuild
-		show_ebuild(options.ebuild)
-	elif options.validate: # validate a plugin
+	if options.validate: # validate a plugin
 		from lxml import etree
 		try:
 			etree.XMLSchema(file = XSD_LOCATION).assertValid(etree.parse(options.validate))

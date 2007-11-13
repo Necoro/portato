@@ -10,12 +10,13 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 # gtk stuff
 import gtk
 import gobject
 import gtksourceview2
+import pango
 
 # other
 import types, logging
@@ -351,66 +352,51 @@ class PreferenceWindow (AbstractDialog):
 		"""Just closes - w/o saving."""
 		self.window.destroy()
 
-class EbuildWindow (AbstractDialog):
-	"""The window showing the ebuild."""
+class HighlightView (gtksourceview2.View):
 
-	def __init__ (self, parent, package):
-		"""Constructor.
-
-		@param parent: the parent window
-		@type parent: gtk.Window
-		@param package: the actual package
-		@type package: backend.Package"""
-
-		AbstractDialog.__init__(self,parent)
-		
-		# we want it to get minimized
-		self.window.set_transient_for(None)
-
-		self.window.set_title(package.get_cpv())
-		
-		# set geometry (same as MainWindow)
-		mHeight = 800
-		if gtk.gdk.screen_height() <= 800: mHeight = 600
-		self.window.set_geometry_hints (self.window, min_width = 800, min_height = mHeight, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
-
-		self.package = package
-
-		self._build_view()
-		self._show()
-
-	def _build_view(self):
-		"""Creates the buffer and the view."""
+	def __init__ (self, get_file_fn, languages = []):
+		self.get_fn = get_file_fn
 
 		man = gtksourceview2.LanguageManager()
-		language = man.get_language("gentoo")
-
-		if language is None:
-			warning(_("No gentoo language file installed. Falling back to shell."))
-			language = man.get_language("sh")
-	
-		# set buffer and view
-		self.buf = gtksourceview2.Buffer()
-		self.buf.set_language(language)
-		self.view = gtksourceview2.View(self.buf)
-
-	def _show (self):
-		"""Fill the buffer with content and shows the window."""
-		self.view.set_editable(False)
-		self.view.set_cursor_visible(False)
 		
-		try: # read ebuild
-			f = open(self.package.get_ebuild_path(), "r")
-			lines = f.readlines()
-			f.close()
-		except IOError,e:
-			io_ex_dialog(e)
-			return
+		language = None
+		old_lang = None
+		for lang in languages:
+			if old_lang and not language:
+				warning(_("No %(old)s language file installed. Falling back to %(new)s."), {"old" : old_lang, "new" : lang})
+			language = man.get_language(lang)
+			old_lang = lang
 
-		self.buf.set_text("".join(lines))
+		if not language and old_lang:
+			warning(_("No %(old)s language file installed. Disable highlighting."), {"old" : old_lang})
 
-		self.tree.get_widget("ebuildScroll").add(self.view)
-		self.window.show_all()
+		buf = gtksourceview2.Buffer()
+		buf.set_language(language)
+
+		gtksourceview2.View.__init__(self, buf)
+
+		self.set_editable(False)
+		self.set_cursor_visible(False)
+		self.connect("map", self.cb_mapped)
+
+		self.pkg = None
+		self.updated = False
+
+	def update (self, pkg):
+		self.pkg = pkg
+		self.updated = True
+		
+	def cb_mapped (self, *args):
+		if self.updated and self.pkg:
+			try:
+				with open(self.get_fn(self.pkg)) as f:
+					lines = f.readlines()
+			except IOError, e:
+				lines = _("Error: %s") % e.strerror
+
+			self.get_buffer().set_text("".join(lines))
+
+		return False
 
 class PackageTable:
 	"""A window with data about a specfic package."""
@@ -643,6 +629,10 @@ class PackageTable:
 	def cb_vers_list_changed (self, *args):
 
 		pkg = self.actual_package()
+		self.main.ebuildView.update(pkg)
+		self.main.ebuildView.get_parent().show_all()
+		self.main.changelogView.update(pkg)
+		self.main.changelogView.get_parent().show_all()
 		
 		self.set_desc_label()
 
@@ -653,6 +643,7 @@ class PackageTable:
 
 		# set use list
 		self.useList.get_model().clear()
+		self.useList.columns_autosize()
 		self.fill_use_list()
 		
 		#
@@ -743,11 +734,6 @@ class PackageTable:
 		self.main.notebook.set_current_page(self.main.QUEUE_PAGE)
 		return True
 
-	def cb_package_ebuild_clicked(self, button):
-		hook = plugin.hook("open_ebuild", package = self.actual_package(), parent = self.window)
-		hook(EbuildWindow)(self.window, self.actual_package())
-		return True
-
 	def cb_testing_toggled (self, button):
 		"""Callback for toggled testing-checkbox."""
 		status = button.get_active()
@@ -825,51 +811,50 @@ class PackageTable:
 	
 		return True
 
-class LogWindow (AbstractDialog, logging.Handler):
+class LogView (logging.Handler):
 
-	def __init__ (self, parent):
-		AbstractDialog.__init__(self, parent)
-		logging.Handler.__init__(self, logging.INFO)
+	colors = (
+			(logging.DEBUG, "debug", "blue"),
+			(logging.INFO, "info", "green"),
+			(logging.WARNING, "warning", "yellow"),
+			(-1, "error", "red")
+			)
 
-		self.logView = self.tree.get_widget("logView")
+	def __init__ (self, view):
+		logging.Handler.__init__(self, logging.DEBUG)
+
+		self.view = view
+		self.buf = view.get_buffer()
+
+		# set tags
+		for lvl, name, color in self.colors:
+			self.buf.create_tag("log_%s" % name, foreground = color,weight = pango.WEIGHT_BOLD)
+		
 		logging.getLogger("portatoLogger").addHandler(self)
 
-		self.deleteIsOk = False
-	
-	def format (self, record):
-		
-		if (record.levelno > logging.INFO):
-			return "%s: %s" % (record.levelname, record.getMessage())
-		else:
-			return record.getMessage()
-
 	def emit (self, record):
-		self.logView.get_buffer().insert_at_cursor(self.format(record)+"\n")
+		iter = self.buf.get_end_iter()
+		
+		for lvl, name, color in self.colors:
+			if lvl == -1 or record.levelno <= lvl:
+				tag = "log_%s" % name
+				break
 
-	def show (self):
-		self.window.show()
-	
-	def close (self):
-		self.window.hide()
-
-	def destroy (self):
-		self.deleteIsOk = True
-		self.window.destroy()
-
-	def cb_delete (self, *args):
-		if not self.deleteIsOk:
-			self.close()
-			return True
-		else:
-			return False
+		self.buf.insert_with_tags_by_name(iter, "* ", tag)
+		self.buf.insert_at_cursor(record.getMessage()+"\n")
 
 class MainWindow (Window):
 	"""Application main window."""
 
 	# NOTEBOOK PAGE CONSTANTS
-	PKG_PAGE = 0
-	QUEUE_PAGE = 1
-	CONSOLE_PAGE = 2
+	(
+			PKG_PAGE,
+			EBUILD_PAGE,
+			CHANGELOG_PAGE,
+			QUEUE_PAGE,
+			CONSOLE_PAGE,
+			LOG_PAGE
+	) = range(6)
 
 	def __init__ (self, splash = None):	
 		"""Build up window"""
@@ -895,7 +880,7 @@ class MainWindow (Window):
 		self.instPixbuf = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
 		
 		# get the logging window as soon as possible
-		self.logWindow = LogWindow(self.window)
+		self.logView = LogView(self.tree.get_widget("logView"))
 		
 		# config
 		splash(_("Loading Config"))
@@ -973,6 +958,16 @@ class MainWindow (Window):
 		# notebook
 		self.notebook = self.tree.get_widget("notebook")
 		self.window.show_all()
+		
+		ebuildScroll = self.tree.get_widget("ebuildScroll")
+		self.ebuildView = HighlightView(lambda p: p.get_ebuild_path(), ["gentoo", "sh"])
+		ebuildScroll.add(self.ebuildView)
+		ebuildScroll.hide_all()
+
+		changelogScroll = self.tree.get_widget("changelogScroll")
+		self.changelogView = HighlightView(lambda p: os.path.join(p.get_package_path(), "ChangeLog"), ["changelog"])
+		changelogScroll.add(self.changelogView)
+		changelogScroll.hide_all()
 		
 		# table
 		self.packageTable = PackageTable(self)
@@ -1390,9 +1385,6 @@ class MainWindow (Window):
 		PluginWindow(self.window, queue)
 		return True
 	
-	def cb_show_log_clicked (self, btn):
-		self.logWindow.show()
-	
 	def cb_show_updates_clicked (self, button):
 		def __update():
 			
@@ -1535,7 +1527,6 @@ class MainWindow (Window):
 
 	def cb_destroy (self, widget):
 		"""Calls main_quit()."""
-		self.logWindow.destroy()
 		gtk.main_quit()
 	
 	def main (self):

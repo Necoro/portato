@@ -1,9 +1,7 @@
 #!/usr/bin/python
 
-from __future__ import absolute_import
-
 import unittest
-from . import helper
+import helper
 
 class HelperTest (unittest.TestCase):
 
