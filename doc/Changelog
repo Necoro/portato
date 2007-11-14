@@ -1,5 +1,8 @@
 next:
 - added view for "installed only"
+- removed "--ebuild" mode
+- added log, ebuild and changelog as tabs
+- saved preferences (aka sessions)
 
 0.8.6.2:
 - changed the pipe version and use shm instead (fixes issues with kdesu)
