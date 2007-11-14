@@ -28,7 +28,7 @@ class CatapultSystem (SystemInterface):
 		
 		self.bus = dbus.SessionBus()
 		# get the system
-		so = self.bus.get_object("org.gentoo.catapult.portage", "/org/gentoo/catapult/System")
+		so = self.bus.get_object("org.gentoo.catapult.portage", "/org/gentoo/catapult/System", follow_name_owner_changes = True)
 		self.proxy = dbus.Interface(so, "org.gentoo.catapult.System")
 
 	def geneticize_list (self, list_of_packages, only_cpv = False):
@@ -68,54 +68,67 @@ class CatapultSystem (SystemInterface):
 		return str(p)
 
 	def find_packages (self, search_key, masked = False, only_cpv = False):
-		return self.geneticize_list(self.proxy.find_packages(search_key, masked), only_cpv)
+		return self.geneticize_list(self.proxy.find_packages(search_key, "all", masked, True), only_cpv)
 
 	def find_installed_packages (self, search_key, masked = False, only_cpv = False):
-		return self.geneticize_list(self.proxy.find_installed_packages(search_key, masked), only_cpv)
+		return self.geneticize_list(self.proxy.find_packages(search_key, "installed", masked, True), only_cpv)
 
 	def find_system_packages (self, only_cpv = False):
-			
-		result = self.proxy.find_system_packages()
-		if only_cpv:
-			return result
-		else:
-			return tuple(map(self.geneticize_list, result))
+#		result = self.proxy.find_system_packages()
+#		if only_cpv:
+#			return result
+#		else:
+#			return tuple(map(self.geneticize_list, result))
+		return (self.geneticize_list(self.proxy.find_packages(search_key, "system", False, True), only_cpv), [])
 
 	def find_world_packages (self, only_cpv = False):
-		result = self.proxy.find_world_packages()
-		if only_cpv:
-			return result
-		else:
-			return tuple(map(self.geneticize_list, result))
+#		result = self.proxy.find_world_packages()
+#		if only_cpv:
+#			return result
+#		else:
+#			return tuple(map(self.geneticize_list, result))
+		return (self.geneticize_list(self.proxy.find_packages(search_key, "world", False, True), only_cpv), [])
 
 	def find_all_installed_packages (self, name = None, withVersion = True, only_cpv = False):
 		if not name:
-			name = ""
-		return self.geneticize_list(self.proxy.find_all_installed_packages(name, withVersion), (not withVersion) or only_cpv)
+			name = ".*"
+		else:
+			name = ".*%s.*" % name
+		return self.geneticize_list(self.proxy.find_packages(name, "installed", True, withVersion), (not withVersion) or only_cpv)
 
 	def find_all_uninstalled_packages (self, name = None, only_cpv = False):
 		if not name:
-			name = ""
-		return self.geneticize_list(self.proxy.find_all_uninstalled_packages(name), only_cpv)
+			name = ".*"
+		else:
+			name = ".*%s.*" % name
+		return self.geneticize_list(self.proxy.find_packages(name, "uninstalled", True, withVersion), (not withVersion) or only_cpv)
 
 	def find_all_packages (self, name = None, withVersion = True, only_cpv = False):
 		if not name:
-			name = ""
-		return self.geneticize_list(self.proxy.find_all_packages(name, withVersion), (not withVersion) or only_cpv)
+			name = ".*"
+		else:
+			name = ".*%s.*" % name
+		return self.geneticize_list(self.proxy.find_packages(name, "all", True, withVersion), (not withVersion) or only_cpv)
 
 	def find_all_world_packages (self, name = None, only_cpv = False):
 		if not name:
-			name = ""
-		return self.geneticize_list(self.proxy.find_all_world_packages(name), only_cpv)
+			name = ".*"
+		else:
+			name = ".*%s.*" % name
+		return self.geneticize_list(self.proxy.find_packages(name, "world", True, True), (not withVersion) or only_cpv)
 	
 	def find_all_system_packages (self, name = None, only_cpv = False):
 		if not name:
-			name = ""
-		return self.geneticize_list(self.proxy.find_all_system_packages(name), only_cpv)
+			name = ".*"
+		else:
+			name = ".*%s.*" % name
+		return self.geneticize_list(self.proxy.find_packages(name, "system", True, True), (not withVersion) or only_cpv)
 
 	def list_categories (self, name = None):
 		if not name:
-			name = ""
+			name = ".*"
+		else:
+			name = ".*%s.*" % name
 		return [str(x) for x in self.proxy.list_categories(name)]
 
 	def sort_package_list(self, pkglist):
@@ -137,10 +150,10 @@ class CatapultSystem (SystemInterface):
 			e.set()
 			raise ex
 		
-		self.proxy.update_world(newuse, deep, {}, reply_handler = wait, error_handler = error)
+		self.proxy.update_world(newuse, deep, {}, reply_handler = wait, error_handler = error, timeout = 300)
 		e.wait()
 		return ret
-	#	return [(CatapultPackage(x), CatapultPackage(y)) for x,y in self.proxy.update_world(newuse, deep, {})]
+	#	return [(CatapultPackage(x), CatapultPackage(y)) for x,y in self.proxy.update_world(newuse, deep, {}, timeout = 300)]
 
 	def get_updated_packages (self):
 		return self.geneticize_list(self.proxy.get_updated_packages())
@@ -187,4 +200,6 @@ class CatapultSystem (SystemInterface):
 		return [str(x) for x in self.proxy.get_unmerge_option()]
 
 	def get_environment (self):
-		return self.proxy.get_environment()
+		env = self.proxy.get_environment()
+		env.update(TERM = "xterm") # emulate terminal :)
+		return env

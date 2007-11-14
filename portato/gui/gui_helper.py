@@ -18,6 +18,8 @@ import os, pty
 import signal, threading, time
 from subprocess import Popen, PIPE, STDOUT
 
+from gettext import lgettext as _
+
 # some backend things
 from .. import backend, plugin
 from ..backend import flags, system, set_system

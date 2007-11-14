@@ -26,7 +26,7 @@ from gettext import lgettext as _
 class CatapultPackage(Package):
 
 	bus = dbus.SessionBus()
-	dbus_object = bus.get_object("org.gentoo.catapult.portage", "/org/gentoo/catapult/Package")
+	dbus_object = bus.get_object("org.gentoo.catapult.portage", "/org/gentoo/catapult/Package", follow_name_owner_changes = True)
 	proxy = dbus.Interface(dbus_object, "org.gentoo.catapult.Package")
 	
 	def use_expanded (self, flag, suggest = None):
