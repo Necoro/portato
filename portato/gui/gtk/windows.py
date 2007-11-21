@@ -15,7 +15,6 @@ from __future__ import absolute_import, with_statement
 # gtk stuff
 import gtk
 import gobject
-import pango
 
 # other
 import os.path
@@ -1428,6 +1427,8 @@ class MainWindow (Window):
 
 	def cb_delete (self, *args):
 		"""Looks whether we really want to quit."""
+
+		self.__save_queue = True
 
 		if not self.queue.is_empty():
 			ret = queue_not_empty_dialog()
