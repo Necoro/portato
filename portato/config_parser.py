@@ -366,6 +366,14 @@ class ConfigParser:
 						part1 = self.cache[val.line][:self.pos[val.line][0]] 	# key+DELIMITER
 						part2 = val.value										# value
 						part3 = self.cache[val.line][self.pos[val.line][1]:]	# everything behind the vale (\n in normal cases)
+
+						if not val.old: # empty original value
+							add = ""
+							if part1.endswith("\n"):
+								part1 = part1[:-1]
+								add = "\n"
+							part3 = part3 + add
+
 						self.cache[val.line] = part1 + part2 + part3
 			
 			# write

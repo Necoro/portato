@@ -15,28 +15,27 @@ from __future__ import absolute_import, with_statement
 # gtk stuff
 import gtk
 import gobject
-import gtksourceview2
 import pango
 
 # other
-import types, logging
-import os, os.path
+import os.path
 from subprocess import Popen
 from gettext import lgettext as _
 
 # our backend stuff
 from ... import get_listener, plugin
 from ...helper import debug, warning, error, unique_array
-from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, PREF_DIR
+from ...session import Session
+from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
 from ...backend import flags, system
 from ...backend.exceptions import PackageNotFoundException, BlockedException
-from ...config_parser import ConfigParser
 
 # more GUI stuff
 from ..gui_helper import Database, Config, EmergeQueue
 from .basic import Window, AbstractDialog, Popup
 from .wrapper import GtkTree, GtkConsole
 from .exception_handling import GtkThread
+from .views import LogView, HighlightView
 from .dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
 		nothing_found_dialog, queue_not_empty_dialog, remove_deps_dialog,
 		remove_queue_dialog, unmask_dialog)
@@ -295,7 +294,7 @@ class PreferenceWindow (AbstractDialog):
 
 		# the checkboxes
 		for box, val in self.checkboxes.iteritems():
-			if type(val) == types.TupleType:
+			if isinstance(val, tuple):
 				self.tree.get_widget(box).\
 						set_active(self.cfg.get_boolean(val[0], section = val[1]))
 			else:
@@ -304,7 +303,7 @@ class PreferenceWindow (AbstractDialog):
 
 		# the edits
 		for edit, val in self.edits.iteritems():
-			if type(val) == types.TupleType:
+			if isinstance(val,tuple):
 				self.tree.get_widget(edit).\
 						set_text(self.cfg.get(val[0], section = val[1]))
 			else:
@@ -321,13 +320,13 @@ class PreferenceWindow (AbstractDialog):
 		"""Sets all options in the Config-instance."""
 		
 		for box, val in self.checkboxes.iteritems():
-			if type(val) == types.TupleType:
+			if isinstance(val, tuple):
 				self.cfg.set_boolean(val[0], self.tree.get_widget(box).get_active(), section = val[1])
 			else:
 				self.cfg.set_boolean(val, self.tree.get_widget(box).get_active())
 
 		for edit, val in self.edits.iteritems():
-			if type(val) == types.TupleType:
+			if isinstance(val,tuple):
 				self.cfg.set(val[0], self.tree.get_widget(edit).get_text(), section = val[1])
 			else:
 				self.cfg.set(val,self.tree.get_widget(edit).get_text())
@@ -352,51 +351,6 @@ class PreferenceWindow (AbstractDialog):
 		"""Just closes - w/o saving."""
 		self.window.destroy()
 
-class HighlightView (gtksourceview2.View):
-
-	def __init__ (self, get_file_fn, languages = []):
-		self.get_fn = get_file_fn
-
-		man = gtksourceview2.LanguageManager()
-		
-		language = None
-		old_lang = None
-		for lang in languages:
-			if old_lang and not language:
-				warning(_("No %(old)s language file installed. Falling back to %(new)s."), {"old" : old_lang, "new" : lang})
-			language = man.get_language(lang)
-			old_lang = lang
-
-		if not language and old_lang:
-			warning(_("No %(old)s language file installed. Disable highlighting."), {"old" : old_lang})
-
-		buf = gtksourceview2.Buffer()
-		buf.set_language(language)
-
-		gtksourceview2.View.__init__(self, buf)
-
-		self.set_editable(False)
-		self.set_cursor_visible(False)
-		self.connect("map", self.cb_mapped)
-
-		self.pkg = None
-		self.updated = False
-
-	def update (self, pkg):
-		self.pkg = pkg
-		self.updated = True
-		
-	def cb_mapped (self, *args):
-		if self.updated and self.pkg:
-			try:
-				with open(self.get_fn(self.pkg)) as f:
-					lines = f.readlines()
-			except IOError, e:
-				lines = _("Error: %s") % e.strerror
-
-			self.get_buffer().set_text("".join(lines))
-
-		return False
 
 class PackageTable:
 	"""A window with data about a specfic package."""
@@ -811,38 +765,6 @@ class PackageTable:
 	
 		return True
 
-class LogView (logging.Handler):
-
-	colors = (
-			(logging.DEBUG, "debug", "blue"),
-			(logging.INFO, "info", "green"),
-			(logging.WARNING, "warning", "yellow"),
-			(-1, "error", "red")
-			)
-
-	def __init__ (self, view):
-		logging.Handler.__init__(self, logging.DEBUG)
-
-		self.view = view
-		self.buf = view.get_buffer()
-
-		# set tags
-		for lvl, name, color in self.colors:
-			self.buf.create_tag("log_%s" % name, foreground = color,weight = pango.WEIGHT_BOLD)
-		
-		logging.getLogger("portatoLogger").addHandler(self)
-
-	def emit (self, record):
-		iter = self.buf.get_end_iter()
-		
-		for lvl, name, color in self.colors:
-			if lvl == -1 or record.levelno <= lvl:
-				tag = "log_%s" % name
-				break
-
-		self.buf.insert_with_tags_by_name(iter, "* ", tag)
-		self.buf.insert_at_cursor(record.getMessage()+"\n")
-
 class MainWindow (Window):
 	"""Application main window."""
 
@@ -894,26 +816,6 @@ class MainWindow (Window):
 		gtk.link_button_set_uri_hook(lambda btn, x: get_listener().send_cmd([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
 		gtk.about_dialog_set_url_hook(lambda *args: True) # dummy - if not set link is not set as link; if link is clicked the normal uuri_hook is called too - thus do not call browser here
 
-		# preferences
-		splash(_("Loading Preferences"))
-		try:
-			if not (os.path.exists(PREF_DIR) and os.path.isdir(PREF_DIR)):
-				os.mkdir(PREF_DIR)
-			self.pref_cfg = ConfigParser(os.path.join(PREF_DIR, "pref_gtk.cfg"))
-			try:
-				self.pref_cfg.parse()
-			except IOError, e:
-				if e.errno == 2: pass
-				else: raise
-		except (OSError, IOError), e:
-			io_ex_dialog(e)
-			raise
-
-		try:
-			self.window.resize(int(self.pref_cfg.get("width")), int(self.pref_cfg.get("height")))
-		except KeyError: # preferences empty -> ignore
-			pass
-		
 		# package db
 		splash(_("Creating Database"))
 		self.db = Database()
@@ -933,11 +835,10 @@ class MainWindow (Window):
 				item.connect("activate", m.call)
 				pluginMenu.append(item)
 
-		splash(_("Finishing startup"))
-
+		splash(_("Building frontend"))
 		# set vpaned position
-		vpaned = self.tree.get_widget("vpaned")
-		vpaned.set_position(int(mHeight/2))
+		self.vpaned = self.tree.get_widget("vpaned")
+		self.vpaned.set_position(int(mHeight/2))
 
 		# cat and pkg list
 		self.sortPkgListByName = True
@@ -955,23 +856,6 @@ class MainWindow (Window):
 		self.termHB = self.tree.get_widget("termHB")
 		self.build_terminal()
 		
-		# notebook
-		self.notebook = self.tree.get_widget("notebook")
-		self.window.show_all()
-		
-		ebuildScroll = self.tree.get_widget("ebuildScroll")
-		self.ebuildView = HighlightView(lambda p: p.get_ebuild_path(), ["gentoo", "sh"])
-		ebuildScroll.add(self.ebuildView)
-		ebuildScroll.hide_all()
-
-		changelogScroll = self.tree.get_widget("changelogScroll")
-		self.changelogView = HighlightView(lambda p: os.path.join(p.get_package_path(), "ChangeLog"), ["changelog"])
-		changelogScroll.add(self.changelogView)
-		changelogScroll.hide_all()
-		
-		# table
-		self.packageTable = PackageTable(self)
-		self.packageTable.hide()
 
 		# popups
 		self.queuePopup = Popup("queuePopup", self)
@@ -999,6 +883,31 @@ class MainWindow (Window):
 		# set emerge queue
 		self.queueTree = GtkTree(self.queueList.get_model())
 		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update, threadClass = GtkThread)
+		
+		# session
+		splash(_("Restoring Session"))
+		self.load_session()
+		
+		splash(_("Finishing startup"))
+		
+		# notebook
+		self.notebook = self.tree.get_widget("notebook")
+		self.window.show_all()
+		
+		# the hidden stuff
+		ebuildScroll = self.tree.get_widget("ebuildScroll")
+		self.ebuildView = HighlightView(lambda p: p.get_ebuild_path(), ["gentoo", "sh"])
+		ebuildScroll.add(self.ebuildView)
+		ebuildScroll.hide_all()
+
+		changelogScroll = self.tree.get_widget("changelogScroll")
+		self.changelogView = HighlightView(lambda p: os.path.join(p.get_package_path(), "ChangeLog"), ["changelog"])
+		changelogScroll.add(self.changelogView)
+		changelogScroll.hide_all()
+		
+		# table
+		self.packageTable = PackageTable(self)
+		self.packageTable.hide()
 	
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)
@@ -1103,6 +1012,37 @@ class MainWindow (Window):
 				store.append([icon, pkg])
 		return store
 
+	def load_session(self):
+		try:
+			self.session = Session("gtk_session.cfg")
+		except (OSError, IOError), e:
+			io_ex_dialog(e)
+			raise
+
+		def load_queue (merge, unmerge, oneshot):
+			def _load(q, **kwargs):
+				if q:
+					for i in q.split(","):
+						self.queue.append(i, **kwargs)
+
+			_load(merge)
+			_load(unmerge, unmerge = True)
+			_load(oneshot, oneshot = True)
+			
+		def save_queue ():
+			if self.__save_queue:
+				return (",".join(self.queue.mergequeue), ",".join(self.queue.unmergequeue), ",".join(self.queue.oneshotmerge))
+			else:
+				return ("", "", "")
+
+		map(self.session.add_handler,[
+			([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
+			([("vpanedpos", "window")], lambda p: self.vpaned.set_position(int(p)), self.vpaned.get_position),
+			([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue)
+			])
+
+		self.session.load()
+	
 	def jump_to (self, cp, version = None):
 		"""Is called when we want to jump to a specific package."""
 		self.show_package(cp, self.queue, version = version)
@@ -1489,19 +1429,17 @@ class MainWindow (Window):
 	def cb_delete (self, *args):
 		"""Looks whether we really want to quit."""
 
-		# write prefs
-		width, height = self.window.get_size()
-		self.pref_cfg.add("width", str(width), with_blankline = False)
-		self.pref_cfg.add("height", str(height), with_blankline = False)
-		self.pref_cfg.write()
-
 		if not self.queue.is_empty():
 			ret = queue_not_empty_dialog()
 			if ret == gtk.RESPONSE_CANCEL:
 				return True
 			else:
+				self.__save_queue = (ret == gtk.RESPONSE_YES)
 				self.queue.kill_emerge()
 
+		# write session
+		self.session.save()
+		
 		return False
 
 	def cb_minimized (self, window, event):

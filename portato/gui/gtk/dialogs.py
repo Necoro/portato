@@ -14,7 +14,8 @@ import gtk
 from gettext import lgettext as _
 
 def queue_not_empty_dialog():
-	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, _("There are some packages in the emerge queue and/or an emerge process is running.\nDo you really want to quit?"))
+	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, _("There are some packages in the emerge queue and/or an emerge process is running.\nDo you really want to quit?"))
+	dialog.add_buttons(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_SAVE, gtk.RESPONSE_YES, gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 	ret = dialog.run()
 	dialog.destroy()
 	return ret

@@ -74,7 +74,7 @@ STD_FRONTEND = "gtk"
 # config
 CONFIG_DIR = "/etc/portato/"
 CONFIG_LOCATION = pjoin(CONFIG_DIR, "portato.cfg")
-PREF_DIR = pjoin(os.environ["HOME"], ".portato")
+SESSION_DIR = pjoin(os.environ["HOME"], ".portato")
 
 # misc dirs
 DATA_DIR = "./"
