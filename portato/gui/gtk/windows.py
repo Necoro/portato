@@ -105,7 +105,7 @@ class UpdateWindow (AbstractDialog):
 
 	def __init__ (self, parent, packages, queue, jump_to):
 		AbstractDialog.__init__(self, parent)
-		
+
 		self.queue = queue
 		self.jump = jump_to
 
@@ -131,6 +131,21 @@ class UpdateWindow (AbstractDialog):
 
 		for p in self.packages:
 			store.append([False, p.get_cpv()])
+
+	def cb_set_size (self, *args):
+		"""
+		This callback is called shortly before drawing.
+		It calculates the optimal size of the window.
+		The optimum is defined as: as large as possible w/o scrollbars
+		"""
+
+		bb = self.tree.get_widget("updateBB")
+		vals = (self.view.get_vadjustment().upper+bb.size_request()[1]+10, # max size of list + size of BB + constant
+				self.parent.get_size()[1]) # size of the parent -> maximum size
+		debug("Size values for the list and for the parent: %d / %d", *vals)
+		val = int(min(vals))
+		debug("Minimum value: %d", val)
+		self.window.set_geometry_hints(self.window, min_height = val)
 
 	def cb_select_all_clicked (self, btn):
 		model = self.view.get_model()
@@ -789,9 +804,7 @@ class MainWindow (Window):
 		# main window stuff
 		Window.__init__(self)
 		self.window.set_title(self.main_title)
-		mHeight = 800
-		if gtk.gdk.screen_height() <= 800: mHeight = 600
-		self.window.set_geometry_hints (self.window, min_width = 600, min_height = mHeight, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
+		self.window.set_geometry_hints (self.window, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
 		
 		# booleans
 		self.doUpdate = False
@@ -837,7 +850,7 @@ class MainWindow (Window):
 		splash(_("Building frontend"))
 		# set vpaned position
 		self.vpaned = self.tree.get_widget("vpaned")
-		self.vpaned.set_position(int(mHeight/2))
+		self.vpaned.set_position(int(self.window.get_size()[1]/2))
 
 		# cat and pkg list
 		self.sortPkgListByName = True

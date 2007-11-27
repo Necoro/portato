@@ -70,6 +70,7 @@ class AbstractDialog (Window):
 
 		# set parent
 		self.window.set_transient_for(parent)
+		self.parent = parent
 		
 		# catch the ESC-key
 		self.window.connect("key-press-event", self.cb_key_pressed)
