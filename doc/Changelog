@@ -3,6 +3,7 @@ next:
 - removed "--ebuild" mode
 - added log, ebuild and changelog as tabs
 - saved preferences (aka sessions)
+- added scrollbars to the update window
 
 0.8.6.2:
 - changed the pipe version and use shm instead (fixes issues with kdesu)
