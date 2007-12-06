@@ -4,4 +4,4 @@ Icon=portato-icon
 Exec=portato
 StartupNotify=true
 Type=Application
-Categories=Application;System;PackageManager
+Categories=System;PackageManager;
