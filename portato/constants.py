@@ -65,7 +65,7 @@ APP = "portato"
 VERSION = "9999"
 HOME = os.environ["HOME"]
 SU_COMMAND = "gksu -D 'Portato'"
-USE_CATAPULT = True
+USE_CATAPULT = False
 
 # frontends
 FRONTENDS = ["gtk"]
