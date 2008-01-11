@@ -8,9 +8,10 @@ Backend:
 - add pkgcore support   |-> not necessairy if catapult is used
 - add equo support     /
 
-- bugs in update world (Necoro, 04/20/07: are there any more bugs?)
+- bugs in update world
 - fix for flag handling, when reverting flags (Necoro, 04/20/07: what did i mean by this?)
 	==> rewrite flags handling in an object oriented manner
+	- new USEflag format (with the "+")
 
 - do not alert a block, if a package blocks a version of one package which is updated to a new one not being blocked anymore
 
@@ -25,10 +26,9 @@ Backend:
 GUI:
 ====
 
-- return from console after finishing emerge
+- return from console after finishing emerge (Necoro, 01/10/07: needed anymore with new design?)
 
 Main Point: user preferences:
-	- window size / location
 	- colors and font sizes
 
 - rotating systray icon
