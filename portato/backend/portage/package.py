@@ -130,13 +130,20 @@ class PortagePackage (Package):
 		else:
 			return reason
 
-	def get_iuse_flags (self, installed = False):
+	def get_iuse_flags (self, installed = False, keep = False):
 		if installed or not self.is_in_system():
 			tree = self._settings.vartree
 		else:
 			tree = self._settings.porttree
 		
-		return list(set(self.get_package_settings("IUSE", tree = tree).split()).difference(self.forced_flags))
+		flags = self.get_package_settings("IUSE", tree = tree).split()
+
+		if not keep: # remove "+"/"-"
+			for ctr, f in enumerate(flags):
+				if f.startswith(("+","-")):
+					flags[ctr] = f[1:]
+		
+		return list(set(flags).difference(self.forced_flags))
 
 	def get_matched_dep_packages (self, depvar):
 		# change the useflags, because we have internally changed some, but not made them visible for portage

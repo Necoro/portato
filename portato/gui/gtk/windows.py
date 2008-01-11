@@ -472,8 +472,7 @@ class PackageTable:
 	def fill_use_list(self):
 
 		pkg = self.actual_package()
-		pkg_flags = pkg.get_iuse_flags()
-		pkg_flags.sort()
+		pkg_flags = flags.sort_use_flag_list(pkg.get_iuse_flags(keep = True))
 	
 		actual_exp = None
 		actual_exp_it = None
@@ -484,6 +483,12 @@ class PackageTable:
 		store = self.useList.get_model()
 
 		for use in pkg_flags:
+			if use.startswith(("+","-")):
+				forced = (use[0] == "+")
+				use = use[1:]
+			else:
+				forced = None
+
 			exp = pkg.use_expanded(use, suggest = actual_exp)
 			if exp is not None:
 				if exp != actual_exp:
@@ -493,7 +498,7 @@ class PackageTable:
 				actual_exp_it = None
 				actual_exp = None
 
-			enabled = use in euse
+			enabled = forced or use in euse
 			installed = use in instuse
 			store.append(actual_exp_it, [enabled, installed, use, system.get_use_desc(use, self.cp)])
 		
@@ -1147,11 +1152,10 @@ class MainWindow (Window):
 		disabled = []
 		expanded = set()
 
-		pkg_flags = pkg.get_iuse_flags()
+		pkg_flags = flags.sort_use_flag_list(pkg.get_iuse_flags(keep = True))
 		if not pkg_flags: # no flags - stop here
 			return None
 		
-		pkg_flags.sort()
 		actual = pkg.get_actual_use_flags()
 		
 		if pkg.is_installed():
@@ -1164,15 +1168,21 @@ class MainWindow (Window):
 				installed = []
 
 		for use in pkg_flags:
+			if use.startswith(("+","-")):
+				forced = (use[0] == "+")
+				use = use[1:]
+			else:
+				forced = None
+
 			exp = pkg.use_expanded(use)
 			if exp:
 				expanded.add(exp)
 			
 			else:
 				useStr = use
-				if installed and ((use in actual) != (use in installed)):
+				if installed and ((use in actual) != (use in installed)) and not (forced == (use in installed)):
 					useStr += " %"
-				if use in actual:
+				if use in actual or forced:
 					enabled.append(useStr)
 				else:
 					disabled.append(useStr)

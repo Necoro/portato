@@ -268,11 +268,13 @@ class Package (_Package):
 		@returns: the reason for masking the package
 		@rtype: string"""
 		
-	def get_iuse_flags (self, installed = False):
+	def get_iuse_flags (self, installed = False, keep = False):
 		"""Returns a list of _all_ useflags for this package, i.e. all useflags you can set for this package.
 		
 		@param installed: do not take the ones stated in the ebuild, but the ones it has been installed with
 		@type installed: boolean
+		@param keep: keep the "+" or "-" signs for forced flags
+		@type keep: boolean
 
 		@returns: list of use-flags
 		@rtype: string[]"""

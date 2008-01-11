@@ -192,6 +192,27 @@ def invert_use_flag (flag):
 	else:
 		return "-"+flag
 
+def sort_use_flag_list (flaglist):
+	"""
+	Sorts a list of useflags. If a use flag starts with "+" or "-" this one is ignored for the matter of sorting.
+	This functions sorts the list itself - thus does not create a new one. But for convenience it returns the list too.
+
+	@param flaglist: the list of useflags
+	@type flaglist: string[]
+
+	@returns: the sorted list (Note: it is the same as the one passed in)
+	@rtype: string[]
+	"""
+	
+	def flag_key (flag):
+			if flag.startswith(("+","-")):
+				return flag[1:]
+			else:
+				return flag
+	
+	flaglist.sort(key = flag_key)
+	return flaglist
+
 def set_use_flag (pkg, flag):
 	"""Sets the useflag for a given package.
 	
