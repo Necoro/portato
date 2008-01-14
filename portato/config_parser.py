@@ -43,8 +43,8 @@ COMMENT = [";","#"]
 # precompiled expressions
 TRUE = re.compile("((true)|(1)|(on)|(wahr)|(ja)|(yes))", re.I)
 FALSE = re.compile("((false)|(0)|(off)|(falsch)|(nein)|(no))", re.I)
-SECTION = re.compile("\s*\[(\w+)\]\s*")
-EXPRESSION = re.compile(r"\s*(\w+)\s*[:=]\s*(.*)\s*")
+SECTION = re.compile("\s*\[(?P<name>\w(\w|[-_])*)\]\s*")
+EXPRESSION = re.compile(r"\s*(?P<key>\w(\w|[-_])*)\s*[:=]\s*(?P<value>.*)\s*")
 
 class Value (object):
 	"""Class defining a value of a key.
@@ -187,7 +187,7 @@ class ConfigParser:
 			# look for a section
 			match = SECTION.search(line)
 			if match:
-				sec = match.group(1).upper()
+				sec = match.group("name").upper()
 				self.sections[sec] = count
 				if sec != section:
 					self.vars[sec] = {}
@@ -197,7 +197,7 @@ class ConfigParser:
 			# look for an expression
 			match = EXPRESSION.search(line)
 			if match: 
-				val = match.group(2)
+				val = match.group("value")
 				
 				# find the boolean value
 				bool = None
@@ -207,9 +207,9 @@ class ConfigParser:
 					bool = False
 				
 				# insert
-				key = match.group(1).lower()
+				key = match.group("key").lower()
 				self.vars[section][key] = Value(val, count, bool = bool)
-				self.pos[count] = match.span(2)
+				self.pos[count] = match.span("value")
 			else: # neither comment nor empty nor expression nor section => error
 				error(_("Unrecognized line in configuration: %s"), line)
 
@@ -252,7 +252,7 @@ class ConfigParser:
 		if val.is_bool():
 			return val.boolean
 
-		raise ValueError, "\"%s\" is not a boolean." % key
+		raise ValueError, "\"%s\" is not a boolean. (%s)" % (key, val.value)
 
 	def set (self, key, value = "", section = "MAIN"):
 		"""Sets a new value of a given key in a section.

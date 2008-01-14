@@ -155,6 +155,8 @@ class Hook:
 class Plugin:
 	"""A complete plugin."""
 
+	(STAT_DISABLED, STAT_TEMP_ENABLED, STAT_ENABLED, STAT_TEMP_DISABLED) = range(4)
+
 	def __init__ (self, file, name, author):
 		"""Constructor.
 
@@ -172,6 +174,8 @@ class Plugin:
 		self.hooks = []
 		self.menus = []
 		self.options = Options()
+
+		self.status = self.STAT_ENABLED
 
 	def parse_hooks (self, hooks):
 		"""Gets an <hooks>-elements and parses it.
@@ -199,6 +203,8 @@ class Plugin:
 		if options:
 			for o in options:
 				self.options.parse(o.getElementsByTagName("option"))
+
+		self.status = self.STAT_DISABLED if self.options.get("disabled") else self.STAT_ENABLED
 	
 	def set_import (self, imports):
 		"""This gets a list of imports and parses them - setting the import needed to call the plugin.
@@ -234,7 +240,7 @@ class Plugin:
 		return self.options.set(name, value)
 
 	def is_enabled (self):
-		return not self.get_option("disabled")
+		return (self.status in (self.STAT_ENABLED, self.STAT_TEMP_ENABLED))
 
 class PluginQueue:
 	"""Class managing and loading the plugins."""

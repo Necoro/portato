@@ -77,9 +77,9 @@ class Session (object):
 		for options, lfn, sfn in self._handlers:
 			vals = sfn()
 			
-			# map into tuple if necessairy
+			# map into list if necessairy
 			if not hasattr(vals, "__iter__"):
-				vals = (vals,)
+				vals = [vals]
 			debug("Saving %s with values %s", options, vals)
 
 			for value, (option, section) in zip(vals, options):

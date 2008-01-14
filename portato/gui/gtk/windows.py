@@ -23,7 +23,7 @@ from gettext import lgettext as _
 
 # our backend stuff
 from ... import get_listener, plugin
-from ...helper import debug, warning, error, unique_array
+from ...helper import debug, warning, error, unique_array, N_
 from ...session import Session
 from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
 from ...backend import flags, system
@@ -56,6 +56,11 @@ class AboutWindow (AbstractDialog):
 
 class PluginWindow (AbstractDialog):
 	
+	statsStore = gtk.ListStore(str)
+	
+	for s in (_("Disabled"), _("Temporarily enabled"), _("Enabled"), _("Temporarily disabled")):
+		statsStore.append([s])
+
 	def __init__ (self, parent, plugins):
 		"""Constructor.
 
@@ -67,7 +72,7 @@ class PluginWindow (AbstractDialog):
 		self.changedPlugins = {}
 
 		view = self.tree.get_widget("pluginList")
-		self.store = gtk.ListStore(str,str,bool)
+		self.store = gtk.ListStore(str,str,str)
 		
 		view.set_model(self.store)
 		
@@ -78,25 +83,40 @@ class PluginWindow (AbstractDialog):
 		col = gtk.TreeViewColumn(_("Authors"), cell, text = 1)
 		view.append_column(col)
 
-		bcell = gtk.CellRendererToggle()
-		bcell.connect("toggled", self.cb_plugin_toggled)
-		col = gtk.TreeViewColumn(_("Enabled"), bcell, active = 2)
+		ccell = gtk.CellRendererCombo()
+		ccell.set_property("model", self.statsStore)
+		ccell.set_property("text-column", 0)
+		ccell.set_property("has-entry", False)
+		ccell.set_property("editable", True)
+		ccell.connect("edited", self.cb_status_changed)
+		col = gtk.TreeViewColumn(_("Status"), ccell, markup = 2)
 		view.append_column(col)
 		
-		for p in (("<b>"+p.name+"</b>", p.author, p.is_enabled()) for p in plugins):
+		for p in (("<b>"+p.name+"</b>", p.author, _(self.statsStore[p.status][0])) for p in plugins):
 			self.store.append(p)
 
 		self.window.show_all()
 
-	def cb_plugin_toggled (self, cell, path):
+	def cb_status_changed (self, cell, path, new_text):
 		path = int(path)
-		self.store[path][2] = not self.store[path][2]
+		
+		self.store[path][2] = "<b>%s</b>" % new_text
 
-		self.changedPlugins.update({self.plugins[path] : self.store[path][2]})
+		# convert string to constant
+		const = None
+		for num, val in enumerate(self.statsStore):
+			if val[0] == new_text:
+				const = num
+				break
+
+		assert (const is not None)
+
+		self.changedPlugins.update({self.plugins[path] : const})
+		debug("new changed plugins: %s => %d", self.plugins[path].name, const)
 
 	def cb_ok_clicked (self, btn):
 		for plugin, val in self.changedPlugins.iteritems():
-			plugin.set_option("disabled", not val)
+			plugin.status = val
 
 		self.close()
 		return True
@@ -1052,6 +1072,31 @@ class MainWindow (Window):
 			([("vpanedpos", "window")], lambda p: self.vpaned.set_position(int(p)), self.vpaned.get_position),
 			([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue)
 			])
+
+		def save_plugin (p):
+			def _save ():
+				stat_on = p.status >= p.STAT_ENABLED
+				hard_on = not p.get_option("disabled")
+
+				if stat_on != hard_on:
+					return int(stat_on)
+				else:
+					return ""
+			return _save
+
+		def load_plugin (p):
+			def _load(val):
+				if val:
+					p.status = int(val)*2
+
+			return _load
+
+		queue = plugin.get_plugin_queue().get_plugins()
+		if queue is None:
+			queue = []
+
+		for p in queue:
+			self.session.add_handler(([(p.name.replace(" ","_"), "plugins")], load_plugin(p), save_plugin(p)))
 
 		self.session.load()
 	
