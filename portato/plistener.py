@@ -17,11 +17,6 @@ from subprocess import Popen
 from gettext import lgettext as _
 
 try:
-	import shm_wrapper as shm
-except ImportError:
-	from portato.shm import shm_wrapper as shm
-
-try:
 	import pynotify
 except ImportError:
 	pynotify = None
@@ -95,6 +90,11 @@ class PListener (object):
 			self._sig = None
 			self._rw = None
 		else:
+			try:
+				import shm_wrapper as shm
+			except ImportError:
+				from portato.shm import shm_wrapper as shm
+
 			self._mem = shm.SharedMemoryHandle(mem)
 			self._sig = shm.SemaphoreHandle(sig)
 			self._rw = shm.SemaphoreHandle(rw)

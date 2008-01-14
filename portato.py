@@ -18,11 +18,6 @@ import sys, os, subprocess
 import gettext, locale
 from optparse import OptionParser, SUPPRESS_HELP
 
-try:
-	import shm_wrapper as shm
-except ImportError:
-	from portato.shm import shm_wrapper as shm
-
 from portato import get_listener
 from portato.constants import VERSION, FRONTENDS, STD_FRONTEND, XSD_LOCATION, LOCALE_DIR, APP, SU_COMMAND
 
@@ -104,6 +99,11 @@ def main ():
 		
 	else: # start us again in root modus and launch listener
 		
+		try:
+			import shm_wrapper as shm
+		except ImportError:
+			from portato.shm import shm_wrapper as shm
+
 		mem = shm.create_memory(1024, permissions=0600)
 		sig = shm.create_semaphore(InitialValue = 0, permissions = 0600)
 		rw = shm.create_semaphore(InitialValue = 1, permissions = 0600)
