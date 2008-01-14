@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * « shmmodule.c © 1997, 1998 by INRIA. All rights reserved.
+ * shmmodule.c Copyright 1997, 1998 by INRIA. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
@@ -22,25 +22,29 @@
  * LOSS OF USE, DATA, OR PROFITS OR BUSINESS INTERRUPTION, HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT,
  * INCLUDING NEGLIGENCE OR OTHERWISE, ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. »
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ***************************************************************************/
 
-/* Python Shared Memory module by Vladimir Marangozov */
+/* Python Shared Memory module 
+   Written by Vladimir Marangozov  
+   Adopted by Philip Semanchuk 
 
-/*
   This module provides an interface to System V shared memory IPC.
 
   Version history:
-  - 1.0   - Released by Mr. Marangozov in the 1990s.
-  - 1.1   - Released by me. Fixes a few bugs (including some memory leaks) and adds the ability
-            to read the blocking flag on semaphores.
-  - 1.1.1 - Updated setup.py to handle compile options for Linux users.
+  - 1.0 (sometime in the 1990s) - Released by Mr. Marangozov
+  - 1.1 (Feb 2007) - Released by me, Philip Semanchuk. Fixes a few bugs (including some 
+        memory leaks) and adds the ability to read the blocking flag on semaphores.
+  - 1.1.1 (Mar 2007)- Updated setup.py to handle compile options for Linux users.
+  - 1.1.2 (Nov 2007) - Fixed a sprintf() format in repr to handle size_t.
+  - 1.1.3 (Nov 2007) - Changed #define of key to _key instead of __key for OS X Leopard.
+        Thanks to Bill Hart.
+  - 1.1.4 (Jan 2008) - Changed the reference to key in the ipc_perm structure to the 
+        explicit #define IPC_PERM_KEY_NAME. 
 
-  See http://NikitaTheSpider.com/python/shm/ for more thorough documentation, updates, contact
-  info, setup.py, a more Pythonic wrapper, etc.
-
-  Philip Semanchuk, Feb. 2007
+  See http://NikitaTheSpider.com/python/shm/ for more thorough documentation, a more Pythonic 
+  wrapper, updates, contact info, setup.py, etc.
 
 
   Module interface:
@@ -122,18 +126,23 @@
 #include "structmember.h"
 
 /* v1.1 - added */
-//#ifdef __FreeBSD__
-//#include <machine/param.h>  /* for system definition of PAGE_SIZE */
-//#endif
+#ifdef __FreeBSD__
+#include <machine/param.h>  /* for system definition of PAGE_SIZE */
+#endif
 
 #include <sys/types.h>
 #include <sys/ipc.h>		/* for system's IPC_xxx definitions */
 #include <sys/shm.h>		/* for shmget, shmat, shmdt, shmctl */
 #include <sys/sem.h>		/* for semget, semctl, semop */
 
-#if defined(__GLIBC__)
-#define key __key
-#endif /* __GLIBC__ */
+/* v1.1.4 - The name of this member varies and is sniffed out by setup.py. */
+#if defined(ZERO_UNDERSCORE_KEY)
+#define IPC_PERM_KEY_NAME   key
+#elif defined(ONE_UNDERSCORE_KEY)
+#define IPC_PERM_KEY_NAME  _key
+#elif defined(TWO_UNDERSCORE_KEY)
+#define IPC_PERM_KEY_NAME __key
+#endif
 
 /*
 -- Exception type for errors detected by this module.
@@ -221,7 +230,7 @@ check_memory_identity(PyShmObj *o)
     int new_shmid;
     int old_shmid = o->shmid;
     int old_size = o->ds.shm_segsz;
-    key_t old_key = o->ds.shm_perm.key;
+    key_t old_key = o->ds.shm_perm.IPC_PERM_KEY_NAME;
 
     /*
     -- 1. Try to get the segment identified by the old key (if not IPC_PRIVATE)
@@ -239,7 +248,7 @@ check_memory_identity(PyShmObj *o)
         new_shmid = old_shmid;
     if ((shmctl(new_shmid, IPC_STAT, &(o->ds)) != -1) &&
         (old_size == o->ds.shm_segsz) &&
-	    (old_key == o->ds.shm_perm.key))
+	    (old_key == o->ds.shm_perm.IPC_PERM_KEY_NAME))
         return 1;
     return 0;
 }
@@ -485,7 +494,7 @@ static struct memberlist memory_memberlist[] = {
     {"cgid",	T_INT,	OFF2(cgid),		RO},	/* 0  (gid_t)  */
     {"cpid",	T_INT,	OFF1(shm_cpid),		RO},	/* 1  (pid_t)  */
     {"cuid",	T_INT,	OFF2(cuid),		RO},	/* 2  (uid_t)  */
-    {"key",	T_INT,	OFF2(key),		RO},	/* 3  (key_t)  */
+    {"key", T_INT,	OFF2(IPC_PERM_KEY_NAME),		RO},	/* 3  (key_t)  */
     {"lpid",	T_INT,	OFF1(shm_lpid),		RO},	/* 4  (pid_t)  */
     {"shmid",	T_INT,	OFF(shmid),		RO},	/* 5  (int)    */
     {"size",	T_INT,	OFF1(shm_segsz),	RO},	/* 6  (int)    */
@@ -559,8 +568,9 @@ PyShmMemory_repr(PyShmObj *self, char *name)
         sprintf(buf2, "None");
     else
         /* v 1.1 - changed format from %lx to %p. */
+        /* v 1.1.2 - changed %u to %zu. */
         sprintf(buf2, "0x%p", self->addr);
-    sprintf(buf, "<%s shared memory object, id=%d, size=%u, addr=%s>",
+    sprintf(buf, "<%s shared memory object, id=%d, size=%zu, addr=%s>",
 	    (self->addr == NULL) ? "detached" : (self->mode & SHM_RDONLY) ?
 	    "attached RO" : "attached R/W",
 	    self->shmid,
@@ -601,7 +611,7 @@ check_semaphore_identity(PyShmSemObj *o)
     int new_semid;
     int old_semid = o->semid;
     unsigned short old_nsems = o->ds.sem_nsems;
-    key_t old_key = o->ds.sem_perm.key;
+    key_t old_key = o->ds.sem_perm.IPC_PERM_KEY_NAME;
     semctl_arg arg;
 
     if (old_key != IPC_PRIVATE) {
@@ -614,7 +624,7 @@ check_semaphore_identity(PyShmSemObj *o)
     arg.buf = &(o->ds);
     if ((semctl(new_semid, 0, IPC_STAT, arg) != -1) &&
         (old_nsems == o->ds.sem_nsems) &&
-        (old_key == o->ds.sem_perm.key))
+        (old_key == o->ds.sem_perm.IPC_PERM_KEY_NAME))
         return 1;
     return 0;
 }
@@ -875,7 +885,7 @@ static PyMethodDef semaphore_methods[] = {
 static struct memberlist semaphore_memberlist[] = {
     {"cgid",	T_INT,	OFF2(cgid),		RO},	/* 0  (gid_t)  */
     {"cuid",	T_INT,	OFF2(cuid),		RO},	/* 1  (uid_t)  */
-    {"key",	    T_INT,	OFF2(key),		RO},	/* 2  (key_t)  */
+    {"key",	    T_INT,	OFF2(IPC_PERM_KEY_NAME),		RO},	/* 2  (key_t)  */
     {"semid",	T_INT,	OFF(semid),		RO},	/* 3  (int)    */
     {"gid",	    T_INT,	OFF2(gid),		RO},	/* 4  (gid_t)  */
     {"uid",	    T_INT,	OFF2(uid),		RO},	/* 5  (uid_t)  */
