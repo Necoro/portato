@@ -368,14 +368,14 @@ class PortageSystem (SystemInterface):
 		# append system packages
 		packages.extend(unique_array([p.get_cp() for p in self.find_all_system_packages()]))
 		
-		states = [(["RDEPEND","PDEPEND"],True), (["DEPEND"], False)]
+		states = [(["RDEPEND","PDEPEND"],True)]#, (["DEPEND"], False)]
 		if self.with_bdeps():
 			states[1] = (["DEPEND"], True)
 
 		checked = []
 		updating = []
 		raw_checked = {}
-		def check (p, add_not_installed = True):
+		def check (p, add_not_installed = True, prev_appended = False):
 			"""Checks whether a package is updated or not."""
 			
 			if p.get_slot_cp() in checked:
@@ -426,7 +426,11 @@ class PortageSystem (SystemInterface):
 							appended = True
 
 			if deep or tempDeep:
-				for state in states:
+				if (appended or prev_appended) and len(states) < 2:
+					real_states = states + [("DEPEND", False)]
+				else:
+					real_states = states
+				for state in real_states:
 					for i in p.get_matched_dep_packages(state[0]):
 						if i not in raw_checked or raw_checked[i] == False:
 							raw_checked.update({i : state[1]})
@@ -436,7 +440,7 @@ class PortageSystem (SystemInterface):
 							else:
 								for pkg in bm: 
 									if not pkg: continue
-									check(pkg, state[1])
+									check(pkg, state[1], appended)
 
 		for p in self.get_new_packages(packages):
 			if not p: continue # if a masked package is installed we have "None" here

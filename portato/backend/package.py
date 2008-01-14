@@ -95,7 +95,7 @@ class Package (_Package):
 		@return: list of flags
 		@rtype: string[]"""
 
-		i_flags = self.get_global_settings("USE").split()
+		i_flags = self.get_global_settings("USE", installed = False).split()
 		for f in self.get_new_use_flags():
 			
 			if f[0] == '-':
@@ -311,11 +311,13 @@ class Package (_Package):
 
 		raise NotImplementedError
 
-	def get_global_settings(self, key):
+	def get_global_settings(self, key, installed = True):
 		"""Returns the value of a global setting, i.e. ARCH, USE, ROOT, DISTDIR etc.
 		
 		@param key: the setting to return
 		@type key: string
+		@param installed: get the installed settings or the ebuild settings
+		@type installed: boolean
 		@returns: the value of this setting
 		@rtype: string"""
 

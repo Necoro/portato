@@ -35,13 +35,14 @@ class PortagePackage (Package):
 		Package.__init__(self, cpv)
 		self._settings = system.settings
 		self._settingslock = system.settings.settingslock
+		self._settings_installed = None
 
 		self._trees = system.settings.trees
 
 		self.forced_flags = set()
 		
 		with self._settingslock:
-			self._settings.settings.setcpv(self._cpv)
+			self._init_settings(True)
 			self.forced_flags.update(self._settings.settings.usemask)
 			self.forced_flags.update(self._settings.settings.useforce)
 		
@@ -52,6 +53,21 @@ class PortagePackage (Package):
 		
 		if self._status and len(self._status) == 1 and self._status[0] == "corrupted":
 			self._status = None
+
+	def _init_settings (self, installed):
+		inst = installed and self.is_installed()
+
+		if self._settings_installed is not None and self._settings_installed != inst:
+			self._settings.settings.reset()
+
+		self._settings_installed = inst
+
+		if inst:
+			dbapi = self._settings.vartree.dbapi
+		else:
+			dbapi = self._settings.porttree.dbapi
+
+		self._settings.settings.setcpv(self.get_cpv(), mydb = dbapi)
 	
 	def is_installed(self):
 		return self._settings.vartree.dbapi.cpv_exists(self._cpv)
@@ -237,9 +253,9 @@ class PortagePackage (Package):
 
 		return dep_pkgs
 
-	def get_global_settings(self, key):
+	def get_global_settings(self, key, installed = True):
 		with self._settingslock:
-			self._settings.settings.setcpv(self._cpv)
+			self._init_settings(installed)
 			v = self._settings.settings[key]
 		
 		return v
