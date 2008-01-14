@@ -129,7 +129,10 @@ def ui_file_list ():
 
 packages = ["portato", "portato.gui", "portato.plugins", "portato.backend", "portato.backend.portage", "portato.backend.catapult", "portato.shm"]
 ext_modules = [Extension("portato.shm.shm", ["shm/shmmodule.c"], define_macros = MacrosAndDefines, extra_compile_args=["-fPIC"])]
-data_files = [(ICON_DIR, ["icons/portato-icon.png"]), (PLUGIN_DIR, plugin_list("shutdown", "resume_loop")), (DATA_DIR, ["plugin.xsd"])]
+data_files = [
+		(ICON_DIR, ["icons/portato-icon.png"]), 
+		#(PLUGIN_DIR, plugin_list("shutdown", "resume_loop")), 
+		(DATA_DIR, ["plugin.xsd"])]
 cmdclass = {}
 package_dir = {"portato.shm" : "shm"}
 
