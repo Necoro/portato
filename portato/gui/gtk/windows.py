@@ -984,10 +984,7 @@ class MainWindow (Window):
 
 	def fill_cat_store (self, store):
 		
-		if self.showAll:
-			cats = system.list_categories() 
-		else:
-			cats = self.db.get_installed_categories()
+		cats = self.db.get_categories(installed = not self.showAll)
 
 		for p in cats:
 			store.append([p])
@@ -1001,7 +998,7 @@ class MainWindow (Window):
 		@param name: name of the selected catetegory
 		@type name: string"""
 		
-		store = gtk.ListStore(gtk.gdk.Pixbuf, str)
+		store = gtk.ListStore(gtk.gdk.Pixbuf, str, str)
 		self.fill_pkg_store(store,name)
 		
 		# build view
@@ -1034,14 +1031,14 @@ class MainWindow (Window):
 		@rtype: gtk.ListStore"""
 
 		if name:
-			for pkg, is_inst in self.db.get_cat(name, self.sortPkgListByName):
+			for cat, pkg, is_inst in self.db.get_cat(name, self.sortPkgListByName):
 				if is_inst:
 					icon = self.instPixbuf
 				elif not self.showAll:
 					continue # ignore not installed packages
 				else:
 					icon = None
-				store.append([icon, pkg])
+				store.append([icon, pkg, cat])
 		return store
 
 	def load_session(self):
@@ -1153,7 +1150,8 @@ class MainWindow (Window):
 		store, it = sel.get_selected()
 		if it:
 			package = store.get_value(it, 1)
-			self.show_package(self.selCatName+"/"+package, self.queue)
+			cat = store.get_value(it, 2)
+			self.show_package(cat+"/"+package, self.queue)
 		return True
 
 	def cb_pkg_list_header_clicked(self, col):
@@ -1344,9 +1342,7 @@ class MainWindow (Window):
 	def cb_reload_clicked (self, action):
 		"""Reloads the portage settings and the database."""
 		system.reload_settings()
-		del self.db
-		self.db = Database()
-		self.db.populate()
+		self.db.reload()
 
 	@Window.watch_cursor
 	def cb_search_clicked (self, entry):

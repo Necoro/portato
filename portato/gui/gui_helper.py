@@ -122,10 +122,18 @@ class Config (ConfigParser):
 class Database:
 	"""An internal database which holds a simple dictionary cat -> [package_list]."""
 
+	ALL = _("ALL")
+
 	def __init__ (self):
 		"""Constructor."""
-		self._db = {}
-		self.inst_cats = set()
+		self.__initialize()
+
+	def __initialize (self):
+		self._db = {self.ALL:[]}
+		self.inst_cats = set([self.ALL])
+
+	def __sort_key (self, x):
+		return x[1].lower()
 
 	def populate (self, category = None):
 		"""Populates the database.
@@ -143,61 +151,79 @@ class Database:
 			cat, pkg = p.split("/")
 			if not cat in self._db: self._db[cat] = []
 			inst = p in installed
-			self._db[cat].append((pkg, inst))
+			t = (cat, pkg, inst)
+			self._db[cat].append(t)
+			self._db[self.ALL].append(t)
 
 			if inst:
 				self.inst_cats.add(cat)
 
 		for key in self._db: # sort alphabetically
-			self._db[key].sort(cmp=cmp, key=lambda x: x[0].lower())
+			self._db[key].sort(key = self.__sort_key)
 
-	def get_cat (self, cat, byName = True):
+	def get_cat (self, cat = None, byName = True):
 		"""Returns the packages in the category.
 		
-		@param cat: category to return the packages from
+		@param cat: category to return the packages from; if None it defaults to "ALL"
 		@type cat: string
 		@param byName: selects whether to return the list sorted by name or by installation
 		@type byName: boolean
-		@return: list of tuples: (name, is_installed) or []
-		@rtype: (string, boolean)[]
+		@return: an iterator over a list of tuples: (category, name, is_installed) or []
+		@rtype: (string, string, boolean)<iterator>
 		"""
+		
+		if not cat:
+			cat = self.ALL
 
 		try:
 			if byName:
-				return self._db[cat]
+				for pkg in self._db[cat]:
+					yield pkg
 			else:
-				inst = []
 				ninst = []
-				for p, i in self._db[cat]:
-					if i:
-						inst.append((p,i))
+				for pkg in self._db[cat]:
+					if pkg[2]:
+						yield pkg
 					else:
-						ninst.append((p,i))
+						ninst.append(pkg)
 
-				return inst+ninst
+				for pkg in ninst:
+					yield pkg
 
 		except KeyError: # cat is in category list - but not in portage
 			info(_("Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?"), cat)
-			return []
 
-	def get_installed_categories (self):
-		"""Returns all categories which have installed packages in them.
-
+	def get_categories (self, installed = False):
+		"""Returns all categories.
+		
+		@param installed: Only return these with at least one installed package.
+		@type installed: boolean
 		@returns: the list of categories
-		@rtype: string[]
+		@rtype: string<iterator>
 		"""
 
-		return list(self.inst_cats)
+		if installed:
+			c = self.inst_cats
+		else:
+			c = self._db.iterkeys()
 
-	def reload (self, cat):
+		for cat in c:
+			yield cat
+
+	def reload (self, cat = None):
 		"""Reloads the given category.
 		
 		@param cat: category
 		@type cat: string
 		"""
 
-		del self._db[cat]
-		self.populate(cat+"/")
+		if cat:
+			del self._db[cat]
+			self.inst_cats.remove(cat)
+			self.populate(cat+"/")
+		else:
+			self.__initialize()
+			self.populate()
 
 class EmergeQueue:
 	"""This class manages the emerge queue."""
