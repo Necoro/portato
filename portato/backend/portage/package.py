@@ -263,6 +263,13 @@ class PortagePackage (Package):
 	def get_ebuild_path(self):
 		return self._settings.porttree.dbapi.findname(self._cpv)
 
+	def get_files (self):
+		if self.is_installed():
+			path = os.path.join(self.get_global_settings("ROOT"), portage.VDB_PATH, self.get_cpv(), "CONTENTS")
+			with open(path) as f:
+				for line in f:
+					yield line.split()[1].strip()
+
 	def get_package_settings(self, var, tree = None):
 		if not tree:
 			mytree = self._settings.vartree

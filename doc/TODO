@@ -35,7 +35,6 @@ Main Point: user preferences:
 GTK:
 ----
 - make oneshot better
-- show installed files
 - show dependencies
 - reload package table when emerge is finished
 

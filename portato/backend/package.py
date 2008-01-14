@@ -330,6 +330,15 @@ class Package (_Package):
 
 		raise NotImplementedError
 
+	def get_files (self):
+		"""
+		Returns an iterator over the installed files of a package.
+		If the package is not installed, the iterator should be "empty".
+
+		@returns: the installed files
+		@rtype: string<iterator>
+		"""
+
 	def get_package_settings(self, var, tree = None):
 		"""Returns a package specific setting, such as DESCRIPTION, SRC_URI, IUSE ...
 		

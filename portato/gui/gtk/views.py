@@ -17,6 +17,8 @@ import gtksourceview2
 import gtk
 import logging
 
+from gettext import lgettext as _
+
 class LazyView (object):
 	def __init__ (self):
 		self.connect("map", self.cb_mapped)
@@ -24,13 +26,17 @@ class LazyView (object):
 		self.pkg = None
 		self.updated = False
 
-	def update (self, pkg):
+	def update (self, pkg, force = False):
 		self.pkg = pkg
 		self.updated = True
+		
+		if force:
+			self.cb_mapped()
 
 	def cb_mapped (self, *args):
 		if self.updated and self.pkg:
-			self.set_text("".join(self._get_content(self.pkg)))
+			self.set_text("".join(self._get_content()))
+			self.updated = False
 
 		return False
 
@@ -48,11 +54,14 @@ class ListView (gtk.TextView, LazyView):
 		gtk.TextView.__init__(self)
 		LazyView.__init__(self)
 
+		self.set_editable(False)
+		self.set_cursor_visible(False)
+
 	def set_text (self, text):
 		self.get_buffer().set_text(text)
 
 	def _get_content (self):
-		return self.content_fn()
+		return self.content_fn(self.pkg)
 
 class InstalledOnlyView (ListView):
 	def _get_content (self):
@@ -62,7 +71,7 @@ class InstalledOnlyView (ListView):
 			else:
 				return ListView._get_content(self)
 		else:
-			return ""
+			return "Huh?"
 
 class HighlightView (gtksourceview2.View, LazyView):
 
@@ -94,9 +103,9 @@ class HighlightView (gtksourceview2.View, LazyView):
 	def set_text (self, text):
 		self.get_buffer().set_text(text)
 	
-	def _get_content (self, pkg):
+	def _get_content (self):
 		try:
-			with open(self.get_fn(pkg)) as f:
+			with open(self.get_fn(self.pkg)) as f:
 				return f.readlines()
 		except IOError, e:
 			return _("Error: %s") % e.strerror

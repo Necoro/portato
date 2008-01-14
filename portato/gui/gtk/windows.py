@@ -34,7 +34,7 @@ from ..gui_helper import Database, Config, EmergeQueue
 from .basic import Window, AbstractDialog, Popup
 from .wrapper import GtkTree, GtkConsole
 from .exception_handling import GtkThread
-from .views import LogView, HighlightView
+from .views import LogView, HighlightView, InstalledOnlyView
 from .dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
 		nothing_found_dialog, queue_not_empty_dialog, remove_deps_dialog,
 		remove_queue_dialog, unmask_dialog)
@@ -400,35 +400,47 @@ class PackageTable:
 		self.window = main.window
 		self.tree.signal_autoconnect(self)
 		
-		# the table
-		self.table = self.tree.get_widget("PackageTable")
+		# all the package data is in this one VB
+		self.vb = self.tree.get_widget("packageVB")
+
+		# the notebook
+		self.notebook = self.tree.get_widget("packageNotebook")
 		
-		# the version list
-		self.versList = self.tree.get_widget("versionList")
-		self.build_vers_list()
+		# the version combo
+		self.versionCombo = self.tree.get_widget("versionCombo")
+		self.build_version_combo()
 
 		# chechboxes
 		self.installedCheck = self.tree.get_widget("installedCheck")
 		self.maskedCheck = self.tree.get_widget("maskedCheck")
 		self.testingCheck = self.tree.get_widget("testingCheck")
+		self.maskedLabel = self.tree.get_widget("maskedLabel")
 
 		# labels
+		generalEB = self.tree.get_widget("generalEB")
+		generalEB.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#FFFFFF"))
+		
+		self.nameLabel = self.tree.get_widget("nameLabel")
 		self.descLabel = self.tree.get_widget("descLabel")
+		self.overlayLabel = self.tree.get_widget("overlayLabel")
+		self.overlayLL = self.tree.get_widget("overlayLabelLabel")
+		self.linkBox = self.tree.get_widget("linkBox")
 		self.notInSysLabel = self.tree.get_widget("notInSysLabel")
 		self.missingLabel = self.tree.get_widget("missingLabel")
 		
-		# link
-		self.pkgLinkBox = self.tree.get_widget("pkgLinkBox")
-
 		# buttons
 		self.emergeBtn = self.tree.get_widget("pkgEmergeBtn")
 		self.unmergeBtn = self.tree.get_widget("pkgUnmergeBtn")
-		self.cancelBtn = self.tree.get_widget("pkgCancelBtn")
-		self.ebuildBtn = self.tree.get_widget("pkgEbuildBtn")
+		self.revertBtn = self.tree.get_widget("pkgRevertBtn")
 		
 		# useList
 		self.useList = self.tree.get_widget("useList")
 		self.build_use_list()
+
+		# views
+		self.ebuildView = self.tree.get_widget("ebuildScroll").get_child()
+		self.changelogView = self.tree.get_widget("changelogScroll").get_child()
+		self.filesView = self.tree.get_widget("filesScroll").get_child()
 
 	def update (self, cp, queue = None, version = None, doEmerge = True, instantChange = False):
 		"""Updates the table to show the contents for the package.
@@ -458,36 +470,66 @@ class PackageTable:
 			self.instPackages = system.sort_package_list(system.find_installed_packages(cp, masked = True))
 
 		# version-combo-box
-		self.versList.get_model().clear()
-		self.fill_vers_list()
+		self.versionCombo.handler_block(self.versionCombo.changeHandler) # block change handler, because it would be called several times
+		self.versionCombo.get_model().clear()
+		self.fill_version_combo()
+		self.versionCombo.handler_unblock(self.versionCombo.changeHandler) # unblock handler again
 
 		if not self.queue or not self.doEmerge: 
 			self.emergeBtn.set_sensitive(False)
 			self.unmergeBtn.set_sensitive(False)
 		
 		# current status
-		self.cb_vers_list_changed()
-		self.table.show_all()
+		self.cb_version_combo_changed()
+		self.vb.show_all()
 
 	def hide (self):
-		self.table.hide_all()
+		self.vb.hide_all()
 
-	def set_desc_label (self):
-		desc = self.actual_package().get_package_settings("DESCRIPTION").replace("&","&amp;")
-		if not desc: 
-			desc = _("<no description>")
-			use_markup = False
-		else:
-			desc = "<b>"+desc+"</b>"
-			use_markup = True
-		name = "<i><u>"+self.actual_package().get_cp()+"</u></i>"
-		if self.actual_package().is_overlay():
-			name = "%s\n<i>(Overlay: %s)</i>" % (name, self.actual_package().get_overlay_path())
-
-		desc = "%s\n\n%s" % (name, desc)
-
-		self.descLabel.set_use_markup(use_markup)
+	def set_labels (self):
+		pkg = self.actual_package()
+		
+		# name
+		self.nameLabel.set_markup("<b>%s</b>" % pkg.get_cp())
+		
+		# description
+		desc = pkg.get_package_settings("DESCRIPTION") or _("<no description>")
 		self.descLabel.set_label(desc)
+
+		# overlay
+		if self.actual_package().is_overlay():
+			self.overlayLabel.set_label(pkg.get_overlay_path())
+			self.overlayLabel.show()
+			self.overlayLL.show()
+		else:
+			self.overlayLabel.hide()
+			self.overlayLL.hide()
+
+		# link
+		for c in self.linkBox.get_children():
+			self.linkBox.remove(c)
+		
+		text = pkg.get_package_settings("HOMEPAGE")
+		texts = text.split(" ")
+		ftexts = []
+
+		for t in texts:
+			if not t.startswith(("http:", "ftp:")):
+				if count == 0:
+					error(_("The first homepage part does not start with 'http' or 'ftp'."))
+					ftexts.append(t)
+					continue
+				else:
+					info(_("Blank inside homepage."))
+					ftexts[-1] += t
+			else:
+				ftexts.append(t)
+
+		for t in ftexts:
+			link = gtk.LinkButton(t)
+			link.set_alignment(0.0, 0.5)
+			link.set_border_width(0)
+			self.linkBox.add(link)
 
 	def fill_use_list(self):
 
@@ -537,7 +579,7 @@ class PackageTable:
 		self.useList.set_search_column(2)
 		self.useList.set_enable_tree_lines(True)
 
-	def build_vers_list (self):
+	def build_version_combo (self):
 		"""Builds the package list.
 
 		@param name: name of the selected catetegory
@@ -546,24 +588,26 @@ class PackageTable:
 		store = gtk.ListStore(gtk.gdk.Pixbuf, str)
 
 		# build view
-		self.versList.set_model(store)
-		col = gtk.TreeViewColumn(("Versions"))
+		self.versionCombo.set_model(store)
+		col = gtk.TreeViewColumn("Versions")
 
 		# adding the pixbuf
 		cell = gtk.CellRendererPixbuf()
-		col.pack_start(cell, False)
-		col.add_attribute(cell, "pixbuf", 0)
+		self.versionCombo.pack_start(cell, False)
+		self.versionCombo.add_attribute(cell, "pixbuf", 0)
 
 		# adding the package name
 		cell = gtk.CellRendererText()
-		col.pack_start(cell, True)
-		col.add_attribute(cell, "text", 1)
+		self.versionCombo.pack_start(cell, True)
+		self.versionCombo.add_attribute(cell, "text", 1)
 
-		self.versList.append_column(col)
+		# connect
+		self.versionCombo.changeHandler = self.versionCombo.connect("changed", self.cb_version_combo_changed)
+
+	def fill_version_combo (self):
 		
-	def fill_vers_list (self):
+		store = self.versionCombo.get_model()
 		
-		store = self.versList.get_model()
 		# append versions
 		for vers, inst in ((x.get_version(), x.is_installed()) for x in self.packages):
 			if inst:
@@ -572,8 +616,6 @@ class PackageTable:
 				icon = None
 			store.append([icon, vers])
 		
-		sel = self.versList.get_selection()
-
 		# activate the first one
 		try:
 			best_version = ""
@@ -583,10 +625,10 @@ class PackageTable:
 				best_version = system.find_best_match(self.packages[0].get_cp(), only_installed = (self.instPackages != [])).get_version()
 			for i in range(len(self.packages)):
 				if self.packages[i].get_version() == best_version:
-					sel.select_path((i,))
+					self.versionCombo.set_active(i)
 					break
 		except AttributeError: # no package found
-			sel.select_path((0,))
+			self.versionCombo.set_active(0)
 
 	def actual_package (self):
 		"""Returns the actual selected package.
@@ -594,8 +636,7 @@ class PackageTable:
 		@returns: the actual selected package
 		@rtype: backend.Package"""
 		
-		model, iter = self.versList.get_selection().get_selected()
-		return self.packages[model.get_path(iter)[0]]
+		return self.packages[self.versionCombo.get_active()]
 
 	def _update_keywords (self, emerge, update = False):
 		if emerge:
@@ -614,20 +655,16 @@ class PackageTable:
 				error(_("Package could not be found: %s"), e[0])
 				#masked_dialog(e[0])
 
-	def cb_vers_list_changed (self, *args):
+	def cb_version_combo_changed (self, *args):
 
 		pkg = self.actual_package()
-		self.main.ebuildView.update(pkg)
-		self.main.ebuildView.get_parent().show_all()
-		self.main.changelogView.update(pkg)
-		self.main.changelogView.get_parent().show_all()
-		
-		self.set_desc_label()
 
-		for c in self.pkgLinkBox.get_children():
-			self.pkgLinkBox.remove(c)
+		# set the views
+		for v in (self.ebuildView, self.changelogView, self.filesView):
+			v.update(pkg, force = self.notebook.get_nth_page(self.notebook.get_current_page()) == v.get_parent())
 
-		self.pkgLinkBox.add(gtk.LinkButton(pkg.get_package_settings("HOMEPAGE")))
+		# set the labels
+		self.set_labels()
 
 		# set use list
 		self.useList.get_model().clear()
@@ -644,9 +681,10 @@ class PackageTable:
 			else: # missing keyword
 				self.missingLabel.show()
 				self.notInSysLabel.hide()
-			
+#			
 			self.installedCheck.hide()
 			self.maskedCheck.hide()
+			self.maskedLabel.hide()
 			self.testingCheck.hide()
 			self.emergeBtn.set_sensitive(False)
 		else: # normal package
@@ -654,12 +692,13 @@ class PackageTable:
 			self.notInSysLabel.hide()
 			self.installedCheck.show()
 			self.maskedCheck.show()
+			self.maskedLabel.show()
 			self.testingCheck.show()
 			if self.doEmerge:
 				self.emergeBtn.set_sensitive(True)
 			self.installedCheck.set_active(pkg.is_installed())
 			
-			gtk.Tooltips().set_tip(self.maskedCheck, pkg.get_masking_reason()) # this returns None if it is not masked =)
+			reason = pkg.get_masking_reason() or " "
 			if pkg.is_masked(use_changed = False) and not pkg.is_masked(use_changed = True):
 				self.maskedCheck.set_label("<i>(%s)</i>" % _("Masked"))
 				self.maskedCheck.get_child().set_use_markup(True)
@@ -670,8 +709,12 @@ class PackageTable:
 				self.maskedCheck.set_label("<b>%s</b>" % _("Masked"))
 				self.maskedCheck.get_child().set_use_markup(True)
 				self.maskedCheck.set_active(True)
+				reason = _("Masked by user")
 			else:
 				self.maskedCheck.set_active(pkg.is_masked(use_changed = False))
+			
+			if reason:
+				self.maskedLabel.set_label(reason)
 			
 			if pkg.is_testing(use_keywords = False) and not pkg.is_testing(use_keywords = True):
 				self.testingCheck.set_label("<i>(%s)</i>" % _("Testing"))
@@ -688,7 +731,7 @@ class PackageTable:
 			else:
 				self.unmergeBtn.set_sensitive(True)
 		
-		self.table.show_all()
+		self.vb.show_all()
 
 		return True
 
@@ -726,19 +769,25 @@ class PackageTable:
 		"""Callback for toggled testing-checkbox."""
 		status = button.get_active()
 
+		# end of recursion :)
 		if self.actual_package().is_testing(use_keywords = False) == status:
 			return False
 
+		# if the package is not testing - don't allow to set it as such
+		if not self.actual_package().is_testing(use_keywords = False):
+			button.set_active(False)
+			return True
+
+		# re-set to testing status
 		if not self.actual_package().is_testing(use_keywords = True):
 			self.actual_package().set_testing(False)
 			button.set_label(_("Testing"))
 			button.set_active(True)
-		else:
+		else: # disable testing
 			self.actual_package().set_testing(True)
-			if self.actual_package().is_testing(use_keywords=False):
-				button.set_label("<i>(%s)</i>" % _("Testing"))
-				button.get_child().set_use_markup(True)
-				button.set_active(True)
+			button.set_label("<i>(%s)</i>" % _("Testing"))
+			button.get_child().set_use_markup(True)
+			button.set_active(True)
 
 		if self.instantChange:
 			self._update_keywords(True, update = True)
@@ -761,6 +810,7 @@ class PackageTable:
 			if pkg.is_locally_masked():
 				button.set_label("<b>%s</b>" % _("Masked"))
 				button.get_child().set_use_markup(True)
+				self.maskedLabel.set_label(_("Masked by user"))
 			else:
 				button.set_label(_("Masked"))
 
@@ -774,6 +824,7 @@ class PackageTable:
 				button.set_active(True)
 			else:
 				button.set_label(_("Masked"))
+				self.maskedLabel.set_label("")
 		
 		if self.instantChange:
 			self._update_keywords(True, update = True)
@@ -804,13 +855,10 @@ class MainWindow (Window):
 
 	# NOTEBOOK PAGE CONSTANTS
 	(
-			PKG_PAGE,
-			EBUILD_PAGE,
-			CHANGELOG_PAGE,
 			QUEUE_PAGE,
 			CONSOLE_PAGE,
 			LOG_PAGE
-	) = range(6)
+	) = range(3)
 
 	def __init__ (self, splash = None):	
 		"""Build up window"""
@@ -871,6 +919,8 @@ class MainWindow (Window):
 		# set vpaned position
 		self.vpaned = self.tree.get_widget("vpaned")
 		self.vpaned.set_position(int(self.window.get_size()[1]/2))
+		self.hpaned = self.tree.get_widget("hpaned")
+		self.hpaned.set_position(int(self.window.get_size()[0]/2))
 
 		# cat and pkg list
 		self.sortPkgListByName = True
@@ -923,19 +973,25 @@ class MainWindow (Window):
 		splash(_("Finishing startup"))
 		
 		# notebook
-		self.notebook = self.tree.get_widget("notebook")
+		self.notebook = self.tree.get_widget("systemNotebook")
 		self.window.show_all()
 		
 		# the hidden stuff
 		ebuildScroll = self.tree.get_widget("ebuildScroll")
-		self.ebuildView = HighlightView(lambda p: p.get_ebuild_path(), ["gentoo", "sh"])
-		ebuildScroll.add(self.ebuildView)
+		ebuildScroll.add(HighlightView(lambda p: p.get_ebuild_path(), ["gentoo", "sh"]))
 		ebuildScroll.hide_all()
 
 		changelogScroll = self.tree.get_widget("changelogScroll")
-		self.changelogView = HighlightView(lambda p: os.path.join(p.get_package_path(), "ChangeLog"), ["changelog"])
-		changelogScroll.add(self.changelogView)
+		changelogScroll.add(HighlightView(lambda p: os.path.join(p.get_package_path(), "ChangeLog"), ["changelog"]))
 		changelogScroll.hide_all()
+
+		def show_files (p):
+			for f in p.get_files():
+				yield " %s\n" % f
+
+		filesScroll = self.tree.get_widget("filesScroll")
+		filesScroll.add(InstalledOnlyView(show_files))
+		filesScroll.hide_all()
 		
 		# table
 		self.packageTable = PackageTable(self)
@@ -943,7 +999,6 @@ class MainWindow (Window):
 	
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)
-		self.notebook.set_current_page(self.PKG_PAGE)
 
 	def build_terminal (self):
 		"""Builds the terminal."""
@@ -1067,6 +1122,7 @@ class MainWindow (Window):
 		map(self.session.add_handler,[
 			([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
 			([("vpanedpos", "window")], lambda p: self.vpaned.set_position(int(p)), self.vpaned.get_position),
+			([("hpanedpos", "window")], lambda p: self.hpaned.set_position(int(p)), self.hpaned.get_position),
 			([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue)
 			])
 
@@ -1149,9 +1205,8 @@ class MainWindow (Window):
 		sel = view.get_selection()
 		store, it = sel.get_selected()
 		if it:
-			package = store.get_value(it, 1)
-			cat = store.get_value(it, 2)
-			self.show_package(cat+"/"+package, self.queue)
+			cp = "%s/%s" % (store.get_value(it, 2), store.get_value(it, 1))
+			self.show_package(cp, self.queue)
 		return True
 
 	def cb_pkg_list_header_clicked(self, col):

@@ -28,6 +28,9 @@ class Session (object):
 	want to define boolean values, use 0 and 1. This is future proof.
 	"""
 
+	# the current session format version
+	VERSION = 1
+
 	def __init__ (self, file):
 		"""
 		Initialize a session with a certain file inside L{SESSION_DIR.}
@@ -46,6 +49,9 @@ class Session (object):
 		except IOError, e:
 			if e.errno == 2: pass
 			else: raise
+
+		# add version check
+		self.add_handler(([("version", "session")], self.check_version, lambda: self.VERSION))
 
 	def add_handler (self, (options, load_fn, save_fn)):
 		"""
@@ -87,3 +93,6 @@ class Session (object):
 				self._cfg.add(option, str(value), section = section, with_blankline = False)
 		
 		self._cfg.write()
+
+	def check_version (self, vers):
+		pass # do nothing atm
