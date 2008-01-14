@@ -14,9 +14,57 @@ from __future__ import absolute_import, with_statement
 
 import pango
 import gtksourceview2
+import gtk
 import logging
 
-class HighlightView (gtksourceview2.View):
+class LazyView (object):
+	def __init__ (self):
+		self.connect("map", self.cb_mapped)
+
+		self.pkg = None
+		self.updated = False
+
+	def update (self, pkg):
+		self.pkg = pkg
+		self.updated = True
+
+	def cb_mapped (self, *args):
+		if self.updated and self.pkg:
+			self.set_text("".join(self._get_content(self.pkg)))
+
+		return False
+
+	def set_text (self, text):
+		raise NotImplementedError
+
+	def _get_content (self):
+		raise NotImplementedError
+
+class ListView (gtk.TextView, LazyView):
+
+	def __init__ (self, content_fn):
+		self.content_fn = content_fn
+
+		gtk.TextView.__init__(self)
+		LazyView.__init__(self)
+
+	def set_text (self, text):
+		self.get_buffer().set_text(text)
+
+	def _get_content (self):
+		return self.content_fn()
+
+class InstalledOnlyView (ListView):
+	def _get_content (self):
+		if self.pkg:
+			if not self.pkg.is_installed():
+				return _("Package is not installed")
+			else:
+				return ListView._get_content(self)
+		else:
+			return ""
+
+class HighlightView (gtksourceview2.View, LazyView):
 
 	def __init__ (self, get_file_fn, languages = []):
 		self.get_fn = get_file_fn
@@ -38,30 +86,21 @@ class HighlightView (gtksourceview2.View):
 		buf.set_language(language)
 
 		gtksourceview2.View.__init__(self, buf)
+		LazyView.__init__(self)
 
 		self.set_editable(False)
 		self.set_cursor_visible(False)
-		self.connect("map", self.cb_mapped)
 
-		self.pkg = None
-		self.updated = False
-
-	def update (self, pkg):
-		self.pkg = pkg
-		self.updated = True
-		
-	def cb_mapped (self, *args):
-		if self.updated and self.pkg:
-			try:
-				with open(self.get_fn(self.pkg)) as f:
-					lines = f.readlines()
-			except IOError, e:
-				lines = _("Error: %s") % e.strerror
-
-			self.get_buffer().set_text("".join(lines))
-
-		return False
-
+	def set_text (self, text):
+		self.get_buffer().set_text(text)
+	
+	def _get_content (self, pkg):
+		try:
+			with open(self.get_fn(pkg)) as f:
+				return f.readlines()
+		except IOError, e:
+			return _("Error: %s") % e.strerror
+	
 class LogView (logging.Handler):
 
 	colors = (
