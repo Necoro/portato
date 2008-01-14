@@ -23,7 +23,7 @@ from gettext import lgettext as _
 
 # our backend stuff
 from ... import get_listener, plugin
-from ...helper import debug, warning, error, unique_array, N_
+from ...helper import debug, warning, error, info, unique_array, N_
 from ...session import Session
 from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
 from ...backend import flags, system
@@ -513,7 +513,7 @@ class PackageTable:
 		texts = text.split(" ")
 		ftexts = []
 
-		for t in texts:
+		for count, t in enumerate(texts):
 			if not t.startswith(("http:", "ftp:")):
 				if count == 0:
 					error(_("The first homepage part does not start with 'http' or 'ftp'."))
@@ -521,7 +521,7 @@ class PackageTable:
 					continue
 				else:
 					info(_("Blank inside homepage."))
-					ftexts[-1] += t
+					ftexts[-1] += " %s" % t
 			else:
 				ftexts.append(t)
 
@@ -731,7 +731,13 @@ class PackageTable:
 			else:
 				self.unmergeBtn.set_sensitive(True)
 		
-		self.vb.show_all()
+		# XXX: workaround: currently the useflags are selected as the first tab
+		# but on first start we want the general page
+		if not self.vb.get_property("visible"): 
+			self.vb.show_all()
+			self.notebook.set_current_page(0)
+		else:
+			self.vb.show_all()
 
 		return True
 

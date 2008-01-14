@@ -37,6 +37,7 @@ GTK:
 - make oneshot better
 - show dependencies
 - reload package table when emerge is finished
+- dependency tree out of the installed packages
 
 Qt (stopped):
 ---
