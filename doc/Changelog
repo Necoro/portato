@@ -7,7 +7,7 @@ next:
 - handle new "use defaults" correctly
 - allowed the permanent change of a plugin status
 - added "ALL" category
-- new design
+- new design and handling
 
 0.8.6.2:
 - changed the pipe version and use shm instead (fixes issues with kdesu)
