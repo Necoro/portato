@@ -268,6 +268,10 @@ class EmergeQueue:
 		self.db = db
 		self.title_update = title_update
 		self.threadClass = threadClass
+		
+		if self.console:
+			self.pty = pty.openpty()
+			self.console.set_pty(self.pty[0])
 
 	def _get_pkg_from_cpv (self, cpv, unmask = False):
 		"""Gets a L{backend.Package}-object from a cpv.
@@ -486,12 +490,8 @@ class EmergeQueue:
 				command = system.get_merge_command()
 
 			# open tty
-			if self.console is not None:
-				if not self.pty:
-					self.pty = pty.openpty()
-					self.console.set_pty(self.pty[0])
-				else:
-					self.console.reset()
+			if self.console:
+				self.console.reset()
 			
 			def pre ():
 				os.setsid() # new session
