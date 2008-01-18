@@ -145,6 +145,15 @@ class Tree:
 		@rtype boolean"""
 		raise NotImplementedError
 
+	def first_iter (self, it):
+		"""Returns the iterator at the top.
+
+		@param it: the iterator
+		@type it: Iterator
+		@returns: the top iterator
+		@rtype: Iterator"""
+		raise NotImplementedError
+
 	def get_emerge_it (self):
 		"""Returns an iterator signaling the top of the emerge section.
 
@@ -166,11 +175,22 @@ class Tree:
 		@rtype: Iterator"""
 		raise NotImplementedError
 
-	def set_in_progress (self, it):
+	def set_in_progress (self, it, to = True):
 		"""Marks the queue where the given iterator belongs as being in progress.
 
 		@param it: one iterator of the queue to mark to
-		@type it: Iterator"""
+		@type it: Iterator
+		@param to: whether to enable or disable
+		@type to: boolean"""
+		raise NotImplementedError
+
+	def get_in_progress (self, it):
+		"""Returns whether the queue where the given iterator belongs to, is marked as "being in progress".
+
+		@param it: the iterator
+		@type it: Iterator
+		@returns: whether the queue is marked "in progress"
+		@rtype: boolean"""
 		raise NotImplementedError
 
 	def build_append_value (self, cpv, oneshot = False, update = False, downgrade = False, version = None, useChange = []):

@@ -60,31 +60,42 @@ class GtkTree (Tree):
 			useChange.sort()
 			string += "<i>%s</i>" % " ".join(useChange)
 
-		return [cpv, string]
+		return [cpv, string, False]
 
-	def set_in_progress (self, it):
-		iter = self.tree.get_iter_from_string(self.tree.get_string_from_iter(it).split(":")[0])
-		self.tree.set_value(iter, 1, "<b>%s</b>" % _("(In Progress)"))
+	def set_in_progress (self, it, to = True):
+		iter = self.first_iter(it)
+		if to:
+			self.tree.set_value(iter, 1, "<b>%s</b>" % _("(In Progress)"))
+		else:
+			self.tree.set_value(iter, 1, "")
+		
+		self.tree.set_value(iter, 2, to)
+
+	def is_in_progress (self, it):
+		return self.tree.get_value(it, 2)
 
 	def get_emerge_it (self):
 		if self.emergeIt is None:
-			self.emergeIt = self.append(None, ["<b>%s</b>" % _("Install"), ""])
+			self.emergeIt = self.append(None, ["<b>%s</b>" % _("Install"), "", False])
 		return self.emergeIt
 
 	def get_unmerge_it (self):
 		if self.unmergeIt is None:
-			self.unmergeIt = self.append(None, ["<b>%s</b>" % _("Uninstall"), ""])
+			self.unmergeIt = self.append(None, ["<b>%s</b>" % _("Uninstall"), "", False])
 
 		return self.unmergeIt
 
 	def get_update_it (self):
 		if self.updateIt is None:
-			self.updateIt = self.append(None, ["<b>%s</b>" % _("Update"), ""])
+			self.updateIt = self.append(None, ["<b>%s</b>" % _("Update"), "", False])
 
 		return self.updateIt
 
+	def first_iter (self, it):
+		return self.tree.get_iter_from_string(self.tree.get_string_from_iter(it).split(":")[0])
+
 	def is_in (self, it, in_it):
-		return in_it and self.tree.get_string_from_iter(it).split(":")[0] == self.tree.get_string_from_iter(in_it)
+		return in_it and self.iter_equal(self.first_iter(it), in_it)
 
 	def is_in_emerge (self, it):
 		return self.is_in(it, self.emergeIt)

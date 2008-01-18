@@ -26,6 +26,7 @@ from ..backend import flags, system, set_system
 from ..helper import debug, info, send_signal_to_group, set_log_level, unique_array
 from ..constants import USE_CATAPULT
 from ..waiting_queue import WaitingQueue
+from .updater import Updater
 
 # parser
 from ..config_parser import ConfigParser
@@ -266,6 +267,7 @@ class EmergeQueue:
 		
 		self.db = db
 		self.title_update = title_update
+		self.threadClass = threadClass
 
 	def _get_pkg_from_cpv (self, cpv, unmask = False):
 		"""Gets a L{backend.Package}-object from a cpv.
@@ -455,12 +457,16 @@ class EmergeQueue:
 				self.oneshotmerge.append(cpv)
 
 	def doEmerge (self, options, packages, it, *args, **kwargs):
+		top = None
 		if self.tree and it:
-			self.tree.set_in_progress(it[0])
+			for v in it.itervalues():
+				self.tree.set_in_progress(v)
+				top = self.tree.first_iter(v)
+				break
 
-		self.threadQueue.put(self.__emerge, options, packages, it, *args, **kwargs)
+		self.threadQueue.put(self.__emerge, options, packages, it, top, *args, **kwargs)
 	
-	def __emerge (self, options, packages, it, command = None):
+	def __emerge (self, options, packages, it, top, command = None):
 		"""Calls emerge and updates the terminal.
 		
 		@param options: options to send to emerge
@@ -468,7 +474,9 @@ class EmergeQueue:
 		@param packages: packages to emerge
 		@type packages: string[]
 		@param it: Iterators which point to these entries whose children will be removed after completion.
-		@type it: Iterator[]
+		@type it: dict(string -> Iterator)
+		@param top: The top iterator
+		@type top: Iterator
 		@param command: the command to execute - default is "/usr/bin/python /usr/bin/emerge"
 		@type command: string[]"""
 
@@ -498,9 +506,10 @@ class EmergeQueue:
 			self.process = Popen(command+options+packages, shell = False, env = system.get_environment(), preexec_fn = pre)
 
 			# remove packages from queue
-			if self.tree:
-				for i in it:
-					self.remove_with_children(i)
+			if self.tree and it:
+				self.up = Updater(self, it, self.threadClass)
+			else:
+				self.up = None
 			
 			# update title
 			if self.console:
@@ -511,6 +520,13 @@ class EmergeQueue:
 						if title != old_title:
 							self.title_update(title)
 						time.sleep(0.5)
+
+			if self.up: 
+				self.up.stop()
+				if it:
+					self.tree.set_in_progress(top, False)
+				else:
+					self.remove(top)
 
 			if self.title_update: self.title_update(None)
 
@@ -544,17 +560,18 @@ class EmergeQueue:
 		def prepare(queue):
 			"""Prepares the list of iterators and the list of packages."""
 			list = []
-			its = []
+			its = {}
 			for k in queue:
 				list += ["="+k]
-				if self.tree: its.append(self.iters["install"][k])
+				if self.tree: 
+					its.update({k : self.iters["install"][k]})
 
 			return list, its
 
 		if self.tree:
-			ownit = [self.tree.get_emerge_it()]
+			ownit = self.iters["install"]
 		else:
-			ownit = []
+			ownit = {}
 
 		# oneshot-queue
 		if self.oneshotmerge:
@@ -600,9 +617,9 @@ class EmergeQueue:
 		if options is not None: s += options
 		
 		if self.tree:
-			it = [self.tree.get_unmerge_it()]
+			it = self.iters["uninstall"]
 		else:
-			it = []
+			it = {}
 
 		self.doEmerge(s,list, it, caller = self.unmerge)
 
@@ -626,9 +643,9 @@ class EmergeQueue:
 		if options is not None: opts += options
 
 		if self.tree:
-			it = [self.tree.get_update_it()]
+			it = self.iters["update"]
 		else:
-			it = []
+			it = {}
 
 		self.doEmerge(opts, ["world"], it, caller = self.update_world)
 

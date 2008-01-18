@@ -1061,7 +1061,7 @@ class MainWindow (Window):
 	def build_queue_list (self):
 		"""Builds the queue list."""
 
-		store = gtk.TreeStore(str,str)
+		store = gtk.TreeStore(str,str,bool)
 		
 		self.queueList.set_model(store)
 		
