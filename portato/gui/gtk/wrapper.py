@@ -3,7 +3,7 @@
 # File: portato/gui/gtk/wrapper.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006 René 'Necoro' Neumann
+# Copyright (C) 2006-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -12,9 +12,10 @@
 
 from __future__ import absolute_import
 
+import vte
 from gettext import lgettext as _
 from ..wrapper import Tree, Console
-import vte
+from ...helper import debug
 
 class GtkTree (Tree):
 	"""The implementation of the abstract tree."""

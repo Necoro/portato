@@ -3,7 +3,7 @@
 # File: portato/gui/gui_helper.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006-2007 René 'Necoro' Neumann
+# Copyright (C) 2006-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -14,7 +14,7 @@ from __future__ import absolute_import
 
 # some stuff needed
 import logging
-import os, pty
+import sys, os, pty
 import signal, threading, time
 from subprocess import Popen, PIPE, STDOUT
 
@@ -219,7 +219,10 @@ class Database:
 
 		if cat:
 			del self._db[cat]
-			self.inst_cats.remove(cat)
+			try:
+				self.inst_cats.remove(cat)
+			except KeyError: # not in inst_cats - can be ignored
+				pass
 			self.populate(cat+"/")
 		else:
 			self.__initialize()
@@ -251,8 +254,8 @@ class EmergeQueue:
 		self.pty = None
 
 		# dictionaries with data about the packages in the queue
-		self.iters = {} # iterator in the tree
-		self.deps = {} # all the deps of the package
+		self.iters = {"install" : {}, "uninstall" : {}, "update" : {}} # iterator in the tree
+		self.deps = {"install" : {}, "update" : {}} # all the deps of the package
 		
 		# member vars
 		self.tree = tree
@@ -304,7 +307,7 @@ class EmergeQueue:
 		
 		return pkg
 	
-	def update_tree (self, it, cpv, unmask = False, oneshot = False):
+	def update_tree (self, it, cpv, unmask = False, oneshot = False, type = "install"):
 		"""This updates the tree recursivly, or? Isn't it? Bjorn!
 
 		@param it: iterator where to append
@@ -315,11 +318,13 @@ class EmergeQueue:
 		@type unmask: boolean
 		@param oneshot: True if we want to emerge is oneshot
 		@type oneshot: boolean
+		@param type: the type of the updating
+		@type type: string
 		
 		@raises backend.BlockedException: When occured during dependency-calculation.
 		@raises backend.PackageNotFoundException: If no package could be found - normally it is existing but masked."""
 		
-		if cpv in self.deps:
+		if cpv in self.deps[type]:
 			return # in list already and therefore it's already in the tree too	
 		
 		# try to find an already installed instance
@@ -368,11 +373,11 @@ class EmergeQueue:
 
 		# add iter
 		subIt = self.tree.append(it, self.tree.build_append_value(cpv, oneshot = oneshot, update = update, downgrade = downgrade, version = uVersion, useChange = changedUse))
-		self.iters.update({cpv: subIt})
+		self.iters[type].update({cpv: subIt})
 		
 		# get dependencies
 		deps = pkg.get_dep_packages() # this might raise a BlockedException
-		self.deps.update({cpv : deps})
+		self.deps[type].update({cpv : deps})
 		
 		# recursive call
 		for d in deps:
@@ -408,14 +413,14 @@ class EmergeQueue:
 			deps = pkg.get_dep_packages()
 			
 			if update:
-				if not forceUpdate and cpv in self.deps and deps == self.deps[cpv]:
+				if not forceUpdate and cpv in self.deps[type] and deps == self.deps[type][cpv]:
 					return # nothing changed - return
 				else:
 					hasBeenInQueue = (cpv in self.mergequeue or cpv in self.oneshotmerge)
-					parentIt = self.tree.parent_iter(self.iters[cpv])
+					parentIt = self.tree.parent_iter(self.iters[type][cpv])
 
 					# delete it out of the tree - but NOT the changed flags
-					self.remove_with_children(self.iters[cpv], removeNewFlags = False)
+					self.remove_with_children(self.iters[type][cpv], removeNewFlags = False)
 					
 					if hasBeenInQueue: # package has been in queue before
 						self._queue_append(cpv, oneshot)
@@ -425,14 +430,14 @@ class EmergeQueue:
 				if type == "install":
 					self._queue_append(cpv, oneshot)
 					if self.tree:
-						self.update_tree(self.tree.get_emerge_it(), cpv, unmask, oneshot = oneshot)
+						self.update_tree(self.tree.get_emerge_it(), cpv, unmask, type = type, oneshot = oneshot)
 				elif type == "update" and self.tree:
-					self.update_tree(self.tree.get_update_it(), cpv, unmask, oneshot = oneshot)
+					self.update_tree(self.tree.get_update_it(), cpv, unmask, type = type, oneshot = oneshot)
 			
 		else: # unmerge
 			self.unmergequeue.append(cpv)
 			if self.tree: # update tree
-				self.tree.append(self.tree.get_unmerge_it(), self.tree.build_append_value(cpv))
+				self.iters["uninstall"].update({cpv: self.tree.append(self.tree.get_unmerge_it(), self.tree.build_append_value(cpv))})
 
 	def _queue_append (self, cpv, oneshot = False):
 		"""Convenience function appending a cpv either to self.mergequeue or to self.oneshotmerge.
@@ -473,27 +478,39 @@ class EmergeQueue:
 				command = system.get_merge_command()
 
 			# open tty
-			if not self.pty:
-				self.pty = pty.openpty()
-				self.console.set_pty(self.pty[0])
-			else:
-				self.console.reset()
+			if self.console is not None:
+				if not self.pty:
+					self.pty = pty.openpty()
+					self.console.set_pty(self.pty[0])
+				else:
+					self.console.reset()
 			
+			def pre ():
+				os.setsid() # new session
+				if self.console:
+					import fcntl, termios
+					fcntl.ioctl(self.pty[1], termios.TIOCSCTTY, 0) # set pty-slave as session tty
+					os.dup2(self.pty[1], 0)
+					os.dup2(self.pty[1], 1)
+					os.dup2(self.pty[1], 2)
+
 			# start emerge
-			self.process = Popen(command+options+packages, stdout = self.pty[1], stderr = STDOUT, shell = False, env = system.get_environment(), preexec_fn = os.setsid)
-			
+			self.process = Popen(command+options+packages, shell = False, env = system.get_environment(), preexec_fn = pre)
+
 			# remove packages from queue
-			for i in it:
-				self.remove_with_children(i)
+			if self.tree:
+				for i in it:
+					self.remove_with_children(i)
 			
 			# update title
-			old_title = self.console.get_window_title()
-			while self.process and self.process.poll() is None:
-				if self.title_update : 
-					title = self.console.get_window_title()
-					if title != old_title:
-						self.title_update(title)
-					time.sleep(0.5)
+			if self.console:
+				old_title = self.console.get_window_title()
+				while self.process and self.process.poll() is None:
+					if self.title_update : 
+						title = self.console.get_window_title()
+						if title != old_title:
+							self.title_update(title)
+						time.sleep(0.5)
 
 			if self.title_update: self.title_update(None)
 
@@ -507,9 +524,10 @@ class EmergeQueue:
 
 			@plugin.hook("after_emerge", packages = packages, retcode = ret)
 			def update_packages():
-				for cat in unique_array([system.split_cpv(p)[0] for p in packages if p not in ["world", "system"]]):
-					self.db.reload(cat)
-					debug("Category %s refreshed", cat)
+				if self.db:
+					for cat in unique_array([system.split_cpv(p)[0] for p in packages if p not in ["world", "system"]]):
+						self.db.reload(cat)
+						debug("Category %s refreshed", cat)
 
 			update_packages()
 			
@@ -529,7 +547,7 @@ class EmergeQueue:
 			its = []
 			for k in queue:
 				list += ["="+k]
-				if self.tree: its.append(self.iters[k])
+				if self.tree: its.append(self.iters["install"][k])
 
 			return list, its
 
@@ -698,9 +716,9 @@ class EmergeQueue:
 		if self.tree.iter_has_parent(it):
 			cpv = self.tree.get_value(it, self.tree.get_cpv_column())
 			if self.tree.is_in_emerge(it): # Emerge
-				del self.iters[cpv]
+				del self.iters["install"][cpv]
 				try:
-					del self.deps[cpv]
+					del self.deps["install"][cpv]
 				except KeyError: # this seems to be removed due to a BlockedException - so no deps here atm ;)
 					debug("Catched KeyError => %s seems not to be in self.deps. Should be no harm in normal cases.", cpv)
 				try:
@@ -717,7 +735,20 @@ class EmergeQueue:
 					flags.remove_new_testing(cpv)
 			
 			elif self.tree.is_in_unmerge(it): # in Unmerge
+				del self.iters["uninstall"][cpv]
 				self.unmergequeue.remove(cpv)
+			
+			elif self.tree.is_in_update(it):
+				del self.iters["update"][cpv]
+				try:
+					del self.deps["update"][cpv]
+				except KeyError: # this seems to be removed due to a BlockedException - so no deps here atm ;)
+					debug("Catched KeyError => %s seems not to be in self.deps. Should be no harm in normal cases.", cpv)
+
+				if removeNewFlags: # remove the changed flags
+					flags.remove_new_use_flags(cpv)
+					flags.remove_new_masked(cpv)
+					flags.remove_new_testing(cpv)
 			
 		self.tree.remove(it)
 

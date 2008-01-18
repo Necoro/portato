@@ -70,6 +70,7 @@ class PortageSystem (SystemInterface):
 		default_opts = self.get_global_settings("EMERGE_DEFAULT_OPTS")
 		opts = dict(os.environ)
 		opts.update(TERM = "xterm") # emulate terminal :)
+		opts.update(PAGER = "less") # force less
 
 		if default_opts:
 			opt_list = default_opts.split()

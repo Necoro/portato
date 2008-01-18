@@ -198,9 +198,9 @@ class Console:
 	Each frontend _MUST_ define its own subclass and implement ALL of the methods, otherwise a NotImplementedError will be thrown."""
 	
 	def set_pty (self, pty):
-		"""This sets the pseudo-terminal where to print the incoming output to.
+		"""This sets the pty master.
 
-		@param pty: the terminal to print to
+		@param pty: the pty master
 		@type pty: file-descriptor"""
 		raise NotImplementedError
 

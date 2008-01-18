@@ -3,7 +3,7 @@
 # File: portato/gui/gtk/windows.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006-2007 René 'Necoro' Neumann
+# Copyright (C) 2006-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -458,6 +458,7 @@ class PackageTable:
 		self.nameLabel = self.tree.get_widget("nameLabel")
 		self.descLabel = self.tree.get_widget("descLabel")
 		self.overlayLabel = self.tree.get_widget("overlayLabel")
+		self.licenseLabel = self.tree.get_widget("licenseLabel")
 		self.overlayLL = self.tree.get_widget("overlayLabelLabel")
 		self.linkBox = self.tree.get_widget("linkBox")
 		self.notInSysLabel = self.tree.get_widget("notInSysLabel")
@@ -532,13 +533,16 @@ class PackageTable:
 		self.descLabel.set_label(desc)
 
 		# overlay
-		if self.actual_package().is_overlay():
+		if pkg.is_overlay():
 			self.overlayLabel.set_label(pkg.get_overlay_path())
 			self.overlayLabel.show()
 			self.overlayLL.show()
 		else:
 			self.overlayLabel.hide()
 			self.overlayLL.hide()
+
+		# license
+		self.licenseLabel.set_label(pkg.get_package_settings("LICENSE"))
 
 		# link
 		for c in self.linkBox.get_children():
@@ -1016,6 +1020,7 @@ class MainWindow (Window):
 		# notebooks
 		self.sysNotebook = self.tree.get_widget("systemNotebook")
 		self.pkgNotebook = self.tree.get_widget("packageNotebook")
+		self.set_notebook_tabpos(map(PreferenceWindow.tabpos.get, map(int, (self.cfg.get("packageTabPos", "GTK"), self.cfg.get("systemTabPos", "GTK")))))
 		self.window.show_all()
 		
 		# the hidden stuff

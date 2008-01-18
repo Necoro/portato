@@ -31,7 +31,6 @@ Main Point: user preferences:
 	- colors and font sizes
 
 - rotating systray icon
-- interactive emerges
 
 GTK:
 ----
@@ -40,7 +39,6 @@ GTK:
 - reload package table when emerge is finished
 - dependency tree out of the installed packages
 - better display for search results
-
 
 Qt (stopped):
 ---
