@@ -102,7 +102,7 @@ def main ():
 		try:
 			import shm_wrapper as shm
 		except ImportError:
-			from portato.shm import shm_wrapper as shm
+			from portato._shm import shm_wrapper as shm
 
 		mem = shm.create_memory(1024, permissions=0600)
 		sig = shm.create_semaphore(InitialValue = 0, permissions = 0600)

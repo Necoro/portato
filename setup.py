@@ -127,14 +127,14 @@ def ui_file_list ():
 	uis = [x for x in os.listdir("portato/gui/templates/ui/") if x.endswith(".ui")]
 	return [os.path.join("portato/gui/templates/ui",x) for x in uis]
 
-packages = ["portato", "portato.gui", "portato.plugins", "portato.backend", "portato.backend.portage", "portato.backend.catapult", "portato.shm"]
-ext_modules = [Extension("portato.shm.shm", ["shm/shmmodule.c"], define_macros = MacrosAndDefines, extra_compile_args=["-fPIC"])]
+packages = ["portato", "portato.gui", "portato.plugins", "portato.backend", "portato.backend.portage", "portato.backend.catapult", "portato._shm"]
+ext_modules = [Extension("portato._shm.shm", ["_shm/shmmodule.c"], define_macros = MacrosAndDefines, extra_compile_args=["-fPIC"])]
 data_files = [
 		(ICON_DIR, ["icons/portato-icon.png"]), 
 		#(PLUGIN_DIR, plugin_list("shutdown", "resume_loop")), 
 		(DATA_DIR, ["plugin.xsd"])]
 cmdclass = {}
-package_dir = {"portato.shm" : "shm"}
+package_dir = {"portato._shm" : "_shm"}
 
 if "gtk" in FRONTENDS:
 	packages.append("portato.gui.gtk")

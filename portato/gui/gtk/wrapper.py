@@ -29,8 +29,9 @@ class GtkTree (Tree):
 
 		self.tree = tree
 		self.cpv_col = col
-		self.emergeIt = self.append(None, ["Emerge", ""])
-		self.unmergeIt = self.append(None, ["Unmerge", ""])
+		self.emergeIt = None
+		self.unmergeIt = None
+		self.updateIt = None
 
 	def build_append_value (self, cpv, oneshot = False, update = False, downgrade = False, version = None, useChange = []):
 		string = ""
@@ -60,17 +61,38 @@ class GtkTree (Tree):
 
 		return [cpv, string]
 
+	def set_in_progress (self, it):
+		iter = self.tree.get_iter_from_string(self.tree.get_string_from_iter(it).split(":")[0])
+		self.tree.set_value(iter, 1, "<b>%s</b>" % _("(In Progress)"))
+
 	def get_emerge_it (self):
+		if self.emergeIt is None:
+			self.emergeIt = self.append(None, ["<b>%s</b>" % _("Install"), ""])
 		return self.emergeIt
 
 	def get_unmerge_it (self):
+		if self.unmergeIt is None:
+			self.unmergeIt = self.append(None, ["<b>%s</b>" % _("Uninstall"), ""])
+
 		return self.unmergeIt
 
+	def get_update_it (self):
+		if self.updateIt is None:
+			self.updateIt = self.append(None, ["<b>%s</b>" % _("Update"), ""])
+
+		return self.updateIt
+
+	def is_in (self, it, in_it):
+		return in_it and self.tree.get_string_from_iter(it).split(":")[0] == self.tree.get_string_from_iter(in_it)
+
 	def is_in_emerge (self, it):
-		return self.tree.get_string_from_iter(it).split(":")[0] == self.tree.get_string_from_iter(self.emergeIt)
+		return self.is_in(it, self.emergeIt)
 
 	def is_in_unmerge (self, it):
-		return self.tree.get_string_from_iter(it).split(":")[0] == self.tree.get_string_from_iter(self.unmergeIt)
+		return self.is_in(it, self.unmergeIt)
+
+	def is_in_update (self, it):
+		return self.is_in(it, self.updateIt)
 	
 	def iter_has_parent (self, it):
 		return (self.tree.iter_parent(it) != None)
@@ -90,10 +112,18 @@ class GtkTree (Tree):
 	def get_value (self, it, column):
 		return self.tree.get_value(it, column)
 
+	def iter_equal (self, it, other_it):
+		return self.tree.get_string_from_iter(it) == self.tree.get_string_from_iter(other_it)
+
 	def append (self, parent = None, values = None):
 		return self.tree.append(parent, values)
 
 	def remove (self, it):
+		
+		if self.emergeIt and self.iter_equal(it, self.emergeIt) : self.emergeIt = None
+		elif self.unmergeIt and self.iter_equal(it, self.unmergeIt) : self.unmergeIt = None
+		elif self.updateIt and self.iter_equal(it, self.updateIt) : self.updateIt = None
+		
 		self.tree.remove(it)
 
 	def get_original (self):

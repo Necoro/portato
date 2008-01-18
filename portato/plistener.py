@@ -93,7 +93,7 @@ class PListener (object):
 			try:
 				import shm_wrapper as shm
 			except ImportError:
-				from portato.shm import shm_wrapper as shm
+				from portato._shm import shm_wrapper as shm
 
 			self._mem = shm.SharedMemoryHandle(mem)
 			self._sig = shm.SemaphoreHandle(sig)

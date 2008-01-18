@@ -264,13 +264,6 @@ class EmergeQueue:
 		self.db = db
 		self.title_update = title_update
 
-		# our iterators pointing at the toplevels; they are set to None if we do not have a tree
-		if self.tree: 
-			self.emergeIt = self.tree.get_emerge_it()
-			self.unmergeIt = self.tree.get_unmerge_it()
-		else:
-			self.emergeIt = self.unmergeIt = None
-
 	def _get_pkg_from_cpv (self, cpv, unmask = False):
 		"""Gets a L{backend.Package}-object from a cpv.
 
@@ -390,14 +383,14 @@ class EmergeQueue:
 				self.remove_with_children(subIt)
 				raise
 		
-	def append (self, cpv, unmerge = False, update = False, forceUpdate = False, unmask = False, oneshot = False):
+	def append (self, cpv, type = "install", update = False, forceUpdate = False, unmask = False, oneshot = False):
 		"""Appends a cpv either to the merge queue or to the unmerge-queue.
 		Also updates the tree-view.
 		
 		@param cpv: Package to add
 		@type cpv: string (cat/pkg-ver)
-		@param unmerge: Set to True if you want to unmerge this package - else False.
-		@type unmerge: boolean		
+		@param type: The type of this append process. Possible values are "install", "uninstall", "update".
+		@type unmerge: string		
 		@param update: Set to True if a package is going to be updated (e.g. if the use-flags changed).
 		@type update: boolean
 		@param forceUpdate: Set to True if the update should be forced.
@@ -409,7 +402,7 @@ class EmergeQueue:
 		
 		@raises portato.backend.PackageNotFoundException: if trying to add a package which does not exist"""
 		
-		if not unmerge: # emerge
+		if type in ("install", "update"): # emerge
 			# insert dependencies
 			pkg = self._get_pkg_from_cpv(cpv, unmask)
 			deps = pkg.get_dep_packages()
@@ -429,14 +422,17 @@ class EmergeQueue:
 					
 					self.update_tree(parentIt, cpv, unmask, oneshot = oneshot)
 			else: # not update
-				self._queue_append(cpv, oneshot)
-				if self.emergeIt: 
-					self.update_tree(self.emergeIt, cpv, unmask, oneshot = oneshot)
+				if type == "install":
+					self._queue_append(cpv, oneshot)
+					if self.tree:
+						self.update_tree(self.tree.get_emerge_it(), cpv, unmask, oneshot = oneshot)
+				elif type == "update" and self.tree:
+					self.update_tree(self.tree.get_update_it(), cpv, unmask, oneshot = oneshot)
 			
 		else: # unmerge
 			self.unmergequeue.append(cpv)
-			if self.unmergeIt: # update tree
-				self.tree.append(self.unmergeIt, self.tree.build_append_value(cpv))
+			if self.tree: # update tree
+				self.tree.append(self.tree.get_unmerge_it(), self.tree.build_append_value(cpv))
 
 	def _queue_append (self, cpv, oneshot = False):
 		"""Convenience function appending a cpv either to self.mergequeue or to self.oneshotmerge.
@@ -453,8 +449,11 @@ class EmergeQueue:
 			if cpv not in self.oneshotmerge:
 				self.oneshotmerge.append(cpv)
 
-	def doEmerge (self, *args, **kwargs):
-		self.threadQueue.put(self.__emerge, *args, **kwargs)
+	def doEmerge (self, options, packages, it, *args, **kwargs):
+		if self.tree and it:
+			self.tree.set_in_progress(it[0])
+
+		self.threadQueue.put(self.__emerge, options, packages, it, *args, **kwargs)
 	
 	def __emerge (self, options, packages, it, command = None):
 		"""Calls emerge and updates the terminal.
@@ -530,14 +529,21 @@ class EmergeQueue:
 			its = []
 			for k in queue:
 				list += ["="+k]
-				its.append(self.iters[k])
+				if self.tree: its.append(self.iters[k])
 
 			return list, its
+
+		if self.tree:
+			ownit = [self.tree.get_emerge_it()]
+		else:
+			ownit = []
 
 		# oneshot-queue
 		if self.oneshotmerge:
 			# prepare package-list for oneshot
 			list, its = prepare(self.oneshotmerge)
+			if not self.mergequeue :# the other one does not exist - remove completely
+				its = ownit
 			
 			s = system.get_oneshot_option()
 			if not force: s += system.get_pretend_option()
@@ -549,6 +555,8 @@ class EmergeQueue:
 		if self.mergequeue:
 			# prepare package-list
 			list, its = prepare(self.mergequeue)
+			if not self.oneshotmerge: # the other one does not exist - remove completely
+				its = ownit
 
 			s = []
 			if not force: s = system.get_pretend_option()
@@ -573,7 +581,12 @@ class EmergeQueue:
 		if not force: s += system.get_pretend_option()
 		if options is not None: s += options
 		
-		self.doEmerge(s,list, [self.unmergeIt], caller = self.unmerge)
+		if self.tree:
+			it = [self.tree.get_unmerge_it()]
+		else:
+			it = []
+
+		self.doEmerge(s,list, it, caller = self.unmerge)
 
 	def update_world(self, force = False, newuse = False, deep = False, options = None):
 		"""Does an update world. newuse and deep are the arguments handed to emerge.
@@ -594,7 +607,12 @@ class EmergeQueue:
 		if not force: opts += system.get_pretend_option()
 		if options is not None: opts += options
 
-		self.doEmerge(opts, ["world"], [self.emergeIt], caller = self.update_world)
+		if self.tree:
+			it = [self.tree.get_update_it()]
+		else:
+			it = []
+
+		self.doEmerge(opts, ["world"], it, caller = self.update_world)
 
 	def sync (self, command = None):
 		"""Calls "emerge --sync".
@@ -677,7 +695,7 @@ class EmergeQueue:
 		@param removeNewFlags: True if new flags should be removed; False otherwise. Default: True.
 		@type removeNewFlags: boolean"""
 		
-		if self.tree.iter_has_parent(it): # NEVER remove our top stuff
+		if self.tree.iter_has_parent(it):
 			cpv = self.tree.get_value(it, self.tree.get_cpv_column())
 			if self.tree.is_in_emerge(it): # Emerge
 				del self.iters[cpv]
@@ -698,10 +716,10 @@ class EmergeQueue:
 					flags.remove_new_masked(cpv)
 					flags.remove_new_testing(cpv)
 			
-			else: # in Unmerge
+			elif self.tree.is_in_unmerge(it): # in Unmerge
 				self.unmergequeue.remove(cpv)
 			
-			self.tree.remove(it)
+		self.tree.remove(it)
 
 	def is_empty (self):
 		"""Checks whether the current queue is empty and not working. Therefore it looks, whether the queues are empty,

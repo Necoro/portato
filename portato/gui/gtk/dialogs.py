@@ -68,6 +68,12 @@ def remove_deps_dialog ():
 	infoMB.destroy()
 	return ret
 
+def remove_updates_dialog():
+	askMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("This is the updates queue. You cannot remove single elements.\nDo you want to clear the whole queue instead?"))
+	ret = askMB.run()
+	askMB.destroy()
+	return ret
+
 def remove_queue_dialog ():
 	askMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("Do you really want to clear the whole queue?"))
 	ret = askMB.run()

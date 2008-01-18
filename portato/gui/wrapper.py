@@ -125,6 +125,26 @@ class Tree:
 		@rtype: boolean"""
 		raise NotImplementedError
 
+	def is_in_emerge (self, it):
+		"""Checks whether an iterator is part of the "Update" section.
+
+		@param it: the iterator to check
+		@type it: Iterator
+		@returns: True if the iter is part; False otherwise
+		@rtype: boolean"""
+		raise NotImplementedError
+
+	def iter_equal (self, it, other_it):
+		"""Checks whether to iterators are equal.
+
+		@param it: the one iterator to compare
+		@type it: Iterator
+		@param other_it: the other iterator to compare
+		@type other_it: Iterator
+		@returns: True if both iterators are equal; False otherwise
+		@rtype boolean"""
+		raise NotImplementedError
+
 	def get_emerge_it (self):
 		"""Returns an iterator signaling the top of the emerge section.
 
@@ -137,6 +157,20 @@ class Tree:
 
 		@returns: unmerge-iterator
 		@rtype: Iterator"""
+		raise NotImplementedError
+
+	def get_update_it (self):
+		"""Returns an iterator signaling the top of the update section.
+
+		@returns: unmerge-iterator
+		@rtype: Iterator"""
+		raise NotImplementedError
+
+	def set_in_progress (self, it):
+		"""Marks the queue where the given iterator belongs as being in progress.
+
+		@param it: one iterator of the queue to mark to
+		@type it: Iterator"""
 		raise NotImplementedError
 
 	def build_append_value (self, cpv, oneshot = False, update = False, downgrade = False, version = None, useChange = []):

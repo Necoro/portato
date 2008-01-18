@@ -37,7 +37,7 @@ from .exception_handling import GtkThread
 from .views import LogView, HighlightView, InstalledOnlyView
 from .dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
 		nothing_found_dialog, queue_not_empty_dialog, remove_deps_dialog,
-		remove_queue_dialog, unmask_dialog)
+		remove_queue_dialog, remove_updates_dialog, unmask_dialog)
 
 class AboutWindow (AbstractDialog):
 	"""A window showing the "about"-informations."""
@@ -304,23 +304,37 @@ class PreferenceWindow (AbstractDialog):
 			"browserEdit"		: ("browserCmd", "GUI")
 			}
 
-	def __init__ (self, parent, cfg, set_console_font):
+	# the mappings for the tabpos combos
+	tabpos = {
+			1 : gtk.POS_TOP,
+			2 : gtk.POS_BOTTOM,
+			3 : gtk.POS_LEFT,
+			4 : gtk.POS_RIGHT
+			}
+
+	def __init__ (self, parent, cfg, console_fn, linkbtn_fn, tabpos_fn):
 		"""Constructor.
 
 		@param parent: parent window
 		@type parent: gtk.Window
 		@param cfg: configuration object
 		@type cfg: gui_helper.Config
-		@param set_console_font: function to call to set the console font
-		@type set_console_font: function(string)"""
+		@param console_fn: function to call to set the console font
+		@type console_fn: function(string)
+		@param linkbtn_fn: function to call to set the linkbutton behavior
+		@type linkbtn_fn: function(string)
+		@param tabpos_fn: function to call to set the tabposition of the notebooks
+		@type tabpos_fn: function(gtk.ComboBox,int)"""
 		
 		AbstractDialog.__init__(self, parent)
 
 		# our config
 		self.cfg = cfg
 
-		# the console font setter
-		self.set_console_font = set_console_font
+		# the setter functions
+		self.console_fn = console_fn
+		self.linkbtn_fn = linkbtn_fn
+		self.tabpos_fn = tabpos_fn
 		
 		# set the bg-color of the hint
 		hintEB = self.tree.get_widget("hintEB")
@@ -348,6 +362,19 @@ class PreferenceWindow (AbstractDialog):
 		self.consoleFontBtn = self.tree.get_widget("consoleFontBtn")
 		self.consoleFontBtn.set_font_name(self.cfg.get("consolefont", section = "GTK"))
 
+		# the comboboxes
+		self.systemTabCombo = self.tree.get_widget("systemTabCombo")
+		self.pkgTabCombo = self.tree.get_widget("packageTabCombo")
+
+		for c in (self.systemTabCombo, self.pkgTabCombo):
+			m = c.get_model()
+			m.clear()
+			for i in (_("Top"), _("Bottom"), _("Left"), _("Right")):
+				m.append((i,))
+
+		self.systemTabCombo.set_active(int(self.cfg.get("systemTabPos", section = "GTK"))-1)
+		self.pkgTabCombo.set_active(int(self.cfg.get("packageTabPos", section = "GTK"))-1)
+
 		self.window.show_all()
 
 	def _save(self):
@@ -367,9 +394,17 @@ class PreferenceWindow (AbstractDialog):
 
 		font = self.consoleFontBtn.get_font_name()
 		self.cfg.set("consolefont", font, section = "GTK")
-		self.set_console_font(font)
+		self.console_fn(font)
+
+		pkgPos = self.pkgTabCombo.get_active()+1
+		sysPos = self.systemTabCombo.get_active()+1
+
+		self.cfg.set("packageTabPos", str(pkgPos), section = "GTK")
+		self.cfg.set("systemTabPos", str(sysPos), section = "GTK")
+
+		self.tabpos_fn(map(self.tabpos.get, (pkgPos, sysPos)))
 		
-		gtk.link_button_set_uri_hook(lambda btn, x: get_listener().send_cmd([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
+		self.linkbtn_fn(self.cfg.get("browserCmd", section="GUI"))
 
 	def cb_ok_clicked(self, button):
 		"""Saves, writes to config-file and closes the window."""
@@ -642,15 +677,15 @@ class PackageTable:
 		if emerge:
 			try:
 				try:
-					self.queue.append(self.actual_package().get_cpv(), unmerge = False, update = update)
+					self.queue.append(self.actual_package().get_cpv(), type = "install", update = update)
 				except PackageNotFoundException, e:
 					if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
-						self.queue.append(self.actual_package().get_cpv(), unmerge = False, unmask = True, update = update)
+						self.queue.append(self.actual_package().get_cpv(), type = "install", unmask = True, update = update)
 			except BlockedException, e:
 				blocked_dialog(e[0], e[1])
 		else:
 			try:
-				self.queue.append(self.actual_package().get_cpv(), unmerge = True)
+				self.queue.append(self.actual_package().get_cpv(), type = "uninstall")
 			except PackageNotFoundException, e:
 				error(_("Package could not be found: %s"), e[0])
 				#masked_dialog(e[0])
@@ -752,9 +787,9 @@ class PackageTable:
 		self.actual_package().remove_new_use_flags()
 		self.actual_package().remove_new_masked()
 		self.actual_package().remove_new_testing()
-		self.versList.get_model().clear()
-		self.fill_vers_list()
-		self.cb_vers_list_changed()
+		self.versionCombo.get_model().clear()
+		self.fill_version_combo()
+		self.cb_version_combo_changed()
 		if self.instantChange:
 			self._update_keywords(True, update = True)
 		return True
@@ -762,13 +797,13 @@ class PackageTable:
 	def cb_package_emerge_clicked (self, button):
 		"""Callback for pressed emerge-button. Adds the package to the EmergeQueue."""
 		self._update_keywords(True)
-		self.main.notebook.set_current_page(self.main.QUEUE_PAGE)
+		self.main.sysNotebook.set_current_page(self.main.QUEUE_PAGE)
 		return True
 
 	def cb_package_unmerge_clicked (self, button):
 		"""Callback for pressed unmerge-button clicked. Adds the package to the UnmergeQueue."""
 		self._update_keywords(False)
-		self.main.notebook.set_current_page(self.main.QUEUE_PAGE)
+		self.main.sysNotebook.set_current_page(self.main.QUEUE_PAGE)
 		return True
 
 	def cb_testing_toggled (self, button):
@@ -978,8 +1013,9 @@ class MainWindow (Window):
 		
 		splash(_("Finishing startup"))
 		
-		# notebook
-		self.notebook = self.tree.get_widget("systemNotebook")
+		# notebooks
+		self.sysNotebook = self.tree.get_widget("systemNotebook")
+		self.pkgNotebook = self.tree.get_widget("packageNotebook")
 		self.window.show_all()
 		
 		# the hidden stuff
@@ -1025,7 +1061,7 @@ class MainWindow (Window):
 		self.queueList.set_model(store)
 		
 		cell = gtk.CellRendererText()
-		col = gtk.TreeViewColumn(_("Queue"), cell, text = 0)
+		col = gtk.TreeViewColumn(_("Queue"), cell, markup = 0)
 		self.queueList.append_column(col)
 		
 		col = gtk.TreeViewColumn(_("Options"), cell, markup = 1)
@@ -1163,6 +1199,13 @@ class MainWindow (Window):
 		"""Is called when we want to jump to a specific package."""
 		self.show_package(cp, self.queue, version = version)
 
+	def set_uri_hook (self, browser):
+		gtk.link_button_set_uri_hook(lambda btn, x: get_listener().send_cmd([browser, btn.get_uri()]))
+
+	def set_notebook_tabpos (self, tabposlist):
+		self.pkgNotebook.set_tab_pos(tabposlist[0])
+		self.sysNotebook.set_tab_pos(tabposlist[1])
+
 	def title_update (self, title):
 		
 		def window_title_update (title):
@@ -1189,7 +1232,7 @@ class MainWindow (Window):
 			else: 
 				title = (_("Console (%(title)s)") % {"title" : title})
 			
-			self.notebook.set_tab_label_text(self.termHB, title)
+			self.sysNotebook.set_tab_label_text(self.termHB, title)
 
 			return False
 
@@ -1297,10 +1340,8 @@ class MainWindow (Window):
 		tooltip.set_markup(string)
 		return string != ""
 
-	def cb_emerge_clicked (self, action):
-		"""Do emerge."""
-		
-		self.notebook.set_current_page(self.CONSOLE_PAGE)
+	def cb_execute_clicked (self, action):
+		"""Execute the current queue."""
 		
 		if len(flags.newUseFlags) > 0:
 			changed_flags_dialog(_("use flags"))
@@ -1314,20 +1355,27 @@ class MainWindow (Window):
 			flags.write_masked()
 			flags.write_testing()
 			system.reload_settings()
+
+		model, iter = self.queueList.get_selection().get_selected()
+
+		if iter is None:
+			if model.iter_n_children(None) == 1: # only one queue there - take this as being selected
+				iter = model.get_iter_root()
+			else:
+				return False
+
+		self.sysNotebook.set_current_page(self.CONSOLE_PAGE)
 		
-		if not self.doUpdate:
-			self.queue.emerge(force=True)
+		# test which type of queue we have here
+		if self.queueTree.is_in_emerge(iter):
+			self.queue.emerge(force = True)
+		elif self.queueTree.is_in_unmerge(iter):
+			self.queue.unmerge(force = True)
 		else:
 			self.queue.update_world(force=True, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
-			self.doUpdate = False
-		
-	def cb_unmerge_clicked (self, button):
-		"""Do unmerge."""
 
-		self.notebook.set_current_page(self.CONSOLE_PAGE)
-		self.queue.unmerge(force=True)
 		return True
-
+		
 	def cb_update_clicked (self, action):
 		def __update():
 			
@@ -1335,15 +1383,15 @@ class MainWindow (Window):
 				try:
 					try:
 						for pkg, old_pkg in updating:
-							self.queue.append(pkg.get_cpv(), unmask = False)
+							self.queue.append(pkg.get_cpv(), type = "update", unmask = False)
 					except PackageNotFoundException, e:
 						if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
 							for pkg, old_pkg in updating:
-								self.queue.append(pkg.get_cpv(), unmask = True)
+								self.queue.append(pkg.get_cpv(), type = "update", unmask = True)
 
 				except BlockedException, e:
 					blocked_dialog(e[0], e[1])
-					self.queue.remove_children(self.queue.emergeIt)
+					self.queue.remove_children(self.queueTree.get_update_it())
 				
 				return False
 
@@ -1353,7 +1401,6 @@ class MainWindow (Window):
 				updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
 				debug("updating list: %s --> length: %s", [(x.get_cpv(), y.get_cpv()) for x,y in updating], len(updating))
 				gobject.idle_add(cb_idle_append, updating)
-				if len(updating): self.doUpdate = True
 			finally:
 				self.window.window.set_cursor(None)
 			
@@ -1363,29 +1410,35 @@ class MainWindow (Window):
 
 	def cb_remove_clicked (self, button):
 		"""Removes a selected item in the (un)emerge-queue if possible."""
-		selected = self.queueList.get_selection()
+		model, iter = self.queueList.get_selection().get_selected()
 
-		if selected:
-			model, iter = selected.get_selected()
+		if iter:
+			parent = model.iter_parent(iter)
 			
-			if iter == None: return False
-
-			if not model.iter_parent(iter): # top-level
+			if self.queueTree.is_in_update(iter) and parent:
+				if remove_updates_dialog() == gtk.RESPONSE_YES:
+					self.queue.remove_with_children(self.queueTree.get_update_it())
+			
+			elif not parent: # top-level
 				if model.iter_n_children(iter) > 0: # and has children which can be removed :)
 					if remove_queue_dialog() == gtk.RESPONSE_YES :
-						self.queue.remove_children(iter)
-						self.doUpdate = False
+						self.queue.remove_with_children(iter)
+				else:
+					self.queue.remove(iter)
 			
-			elif model.iter_parent(model.iter_parent(iter)): # this is in the 3rd level => dependency
+			elif model.iter_parent(parent): # this is in the 3rd level => dependency
 				remove_deps_dialog()
 			else:
 				self.queue.remove_with_children(iter)
-				self.doUpdate = False
+
+				if model.iter_n_children(parent) == 0: # no more children left - remove queue too
+					self.queue.remove(parent)
 		
-		return True
+			return True
+		return False
 
 	def cb_sync_clicked (self, action):
-		self.notebook.set_current_page(self.CONSOLE_PAGE)
+		self.sysNotebook.set_current_page(self.CONSOLE_PAGE)
 		cmd = self.cfg.get("syncCommand")
 
 		if cmd != "emerge --sync":
@@ -1424,7 +1477,7 @@ class MainWindow (Window):
 					SearchWindow(self.window, packages, self.jump_to)
 
 	def cb_preferences_clicked (self, button):
-		PreferenceWindow(self.window, self.cfg, self.console.set_font_from_string)
+		PreferenceWindow(self.window, self.cfg, self.console.set_font_from_string, self.set_uri_hook, self.set_notebook_tabpos)
 		return True
 
 	def cb_about_clicked (self, button):

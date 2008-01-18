@@ -16,6 +16,7 @@ Backend:
 - save/restore queue on exit/start
 - only remove already merged packages from queue
 - make sure, a package being removed from the queue is not needed as a dependency by another package
+- binary package support
 
 - "nach hause telefonieren" :)
 
@@ -38,6 +39,8 @@ GTK:
 - show dependencies
 - reload package table when emerge is finished
 - dependency tree out of the installed packages
+- better display for search results
+
 
 Qt (stopped):
 ---
