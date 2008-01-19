@@ -452,8 +452,8 @@ class PackageTable:
 		self.maskedLabel = self.tree.get_widget("maskedLabel")
 
 		# labels
-		generalEB = self.tree.get_widget("generalEB")
-		generalEB.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#FFFFFF"))
+		generalVB = self.tree.get_widget("generalVB")
+		generalVB.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#FFFFFF"))
 		
 		self.nameLabel = self.tree.get_widget("nameLabel")
 		self.descLabel = self.tree.get_widget("descLabel")
@@ -983,6 +983,27 @@ class MainWindow (Window):
 		self.termHB = self.tree.get_widget("termHB")
 		self.build_terminal()
 		
+		# notebooks
+		self.sysNotebook = self.tree.get_widget("systemNotebook")
+		self.pkgNotebook = self.tree.get_widget("packageNotebook")
+		self.set_notebook_tabpos(map(PreferenceWindow.tabpos.get, map(int, (self.cfg.get("packageTabPos", "GTK"), self.cfg.get("systemTabPos", "GTK")))))
+		
+		# the different scrolls
+		ebuildScroll = self.tree.get_widget("ebuildScroll")
+		ebuildScroll.add(HighlightView(lambda p: p.get_ebuild_path(), ["gentoo", "sh"]))
+
+		changelogScroll = self.tree.get_widget("changelogScroll")
+		changelogScroll.add(HighlightView(lambda p: os.path.join(p.get_package_path(), "ChangeLog"), ["changelog"]))
+
+		def show_files (p):
+			for f in p.get_files():
+				yield " %s\n" % f
+
+		filesScroll = self.tree.get_widget("filesScroll")
+		filesScroll.add(InstalledOnlyView(show_files))
+		
+		# table
+		self.packageTable = PackageTable(self)
 
 		# popups
 		self.queuePopup = Popup("queuePopup", self)
@@ -1011,38 +1032,16 @@ class MainWindow (Window):
 		self.queueTree = GtkTree(self.queueList.get_model())
 		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update, threadClass = GtkThread)
 		
+		self.catList.get_selection().select_path(1)
+		self.pkgList.get_selection().select_path(0)
+		
 		# session
 		splash(_("Restoring Session"))
 		self.load_session()
 		
 		splash(_("Finishing startup"))
 		
-		# notebooks
-		self.sysNotebook = self.tree.get_widget("systemNotebook")
-		self.pkgNotebook = self.tree.get_widget("packageNotebook")
-		self.set_notebook_tabpos(map(PreferenceWindow.tabpos.get, map(int, (self.cfg.get("packageTabPos", "GTK"), self.cfg.get("systemTabPos", "GTK")))))
 		self.window.show_all()
-		
-		# the hidden stuff
-		ebuildScroll = self.tree.get_widget("ebuildScroll")
-		ebuildScroll.add(HighlightView(lambda p: p.get_ebuild_path(), ["gentoo", "sh"]))
-		ebuildScroll.hide_all()
-
-		changelogScroll = self.tree.get_widget("changelogScroll")
-		changelogScroll.add(HighlightView(lambda p: os.path.join(p.get_package_path(), "ChangeLog"), ["changelog"]))
-		changelogScroll.hide_all()
-
-		def show_files (p):
-			for f in p.get_files():
-				yield " %s\n" % f
-
-		filesScroll = self.tree.get_widget("filesScroll")
-		filesScroll.add(InstalledOnlyView(show_files))
-		filesScroll.hide_all()
-		
-		# table
-		self.packageTable = PackageTable(self)
-		self.packageTable.hide()
 	
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)
@@ -1083,6 +1082,7 @@ class MainWindow (Window):
 		self.catList.append_column(col)
 
 		self.fill_cat_store(store)
+		self.catList.get_selection().connect("changed", self.cb_cat_list_selection)
 
 	def fill_cat_store (self, store):
 		
@@ -1121,6 +1121,8 @@ class MainWindow (Window):
 		col.add_attribute(cell, "text", 1)
 		
 		self.pkgList.append_column(col)
+
+		self.pkgList.get_selection().connect("changed", self.cb_pkg_list_selection)
 
 	def fill_pkg_store (self, store, name = None):
 		"""Fills a given ListStore with the packages in a category.
@@ -1166,10 +1168,32 @@ class MainWindow (Window):
 			else:
 				return ("", "", "")
 
+		def load_paned (*pos):
+			pos = map(int, pos)
+			[x.set_position(p) for x,p in zip((self.vpaned, self.hpaned), pos)]
+
+		def save_paned ():
+			return [x.get_position() for x in (self.vpaned, self.hpaned)]
+
+		def save_selection ():
+			def _save(list):
+				return list.get_model().get_string_from_iter(list.get_selection().get_selected()[1])
+
+			return map(_save, (self.catList, self.pkgList))
+
+		def load_selection (*positions):
+			
+			def _load(list, pos):
+				pos = int(pos)
+				list.get_selection().select_path(pos)
+				list.scroll_to_cell(pos)
+
+			map(_load, (self.catList, self.pkgList), positions)
+
 		map(self.session.add_handler,[
 			([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
-			([("vpanedpos", "window")], lambda p: self.vpaned.set_position(int(p)), self.vpaned.get_position),
-			([("hpanedpos", "window")], lambda p: self.hpaned.set_position(int(p)), self.hpaned.get_position),
+			([("vpanedpos", "window"), ("hpanedpos", "window")], load_paned, save_paned),
+			([("catsel", "window"), ("pkgsel", "window")], load_selection, save_selection),
 			([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue)
 			])
 
@@ -1243,21 +1267,19 @@ class MainWindow (Window):
 
 		gobject.idle_add(__update, title)
 
-	def cb_cat_list_selection (self, view):
+	def cb_cat_list_selection (self, selection):
 		"""Callback for a category-list selection. Updates the package list with the packages in the category."""
 		# get the selected category
-		sel = view.get_selection()
-		store, it = sel.get_selected()
+		store, it = selection.get_selected()
 		if it:
 			self.selCatName = store.get_value(it, 0)
 			self.pkgList.get_model().clear()
 			self.fill_pkg_store(self.pkgList.get_model(), self.selCatName)
 		return True
 
-	def cb_pkg_list_selection (self, view):
+	def cb_pkg_list_selection (self, selection):
 		"""Callback for a package-list selection. Updates the package info."""
-		sel = view.get_selection()
-		store, it = sel.get_selected()
+		store, it = selection.get_selected()
 		if it:
 			cp = "%s/%s" % (store.get_value(it, 2), store.get_value(it, 1))
 			self.show_package(cp, self.queue)
