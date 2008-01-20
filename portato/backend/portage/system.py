@@ -142,6 +142,7 @@ class PortageSystem (SystemInterface):
 			return list_of_packages
 
 	def get_global_settings (self, key):
+		self.settings.settings.reset()
 		return self.settings.settings[key]
 
 	def find_best (self, list, only_cpv = False):

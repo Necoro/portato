@@ -12,6 +12,7 @@
 
 from __future__ import absolute_import
 
+from ..helper import debug
 from . import _Package, system, flags
 
 class Package (_Package):
@@ -96,15 +97,22 @@ class Package (_Package):
 		@rtype: string[]"""
 
 		i_flags = self.get_global_settings("USE", installed = False).split()
+		m_flags = system.get_global_settings("USE").split()
 		for f in self.get_new_use_flags():
+			removed = False
+
+			if f[0] == "~":
+				f = f[1:]
+				removed = True
 			
 			if f[0] == '-':
-				if flags.invert_use_flag(f) in i_flags:
+				if flags.invert_use_flag(f) in i_flags and not (removed and flags.invert_use_flag(f) in m_flags):
 					i_flags.remove(flags.invert_use_flag(f))
-			
+				
 			elif f not in i_flags:
-				i_flags.append(f)
-		
+				if not (removed and flags.invert_use_flag(f) in m_flags):
+					i_flags.append(f)
+
 		return i_flags
 
 	def set_use_flag (self, flag):
@@ -130,7 +138,7 @@ class Package (_Package):
 		@returns: USE_EXPAND-value on success
 		@rtype: string or None"""
 
-		if not suggest is None:
+		if suggest is not None:
 			if flag.startswith(suggest.lower()):
 				return suggest
 

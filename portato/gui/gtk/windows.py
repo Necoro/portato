@@ -478,7 +478,7 @@ class PackageTable:
 		self.changelogView = self.tree.get_widget("changelogScroll").get_child()
 		self.filesView = self.tree.get_widget("filesScroll").get_child()
 
-	def update (self, cp, queue = None, version = None, doEmerge = True, instantChange = False):
+	def update (self, cp, queue = None, version = None, doEmerge = True, instantChange = False, type = None):
 		"""Updates the table to show the contents for the package.
 		
 		@param cp: the selected package
@@ -490,13 +490,16 @@ class PackageTable:
 		@param doEmerge: if False, the emerge buttons are disabled
 		@type doEmerge: boolean
 		@param instantChange: if True the changed keywords are updated instantly
-		@type instantChange: boolean"""
+		@type instantChange: boolean
+		@param type: the type of the queue this package is in; if None there is no queue :)
+		@type type: string"""
 		
 		self.cp = cp # category/package
 		self.version = version # version - if not None this is used
 		self.queue = queue
 		self.doEmerge = doEmerge
 		self.instantChange = instantChange
+		self.type = type
 
 		# packages and installed packages
 		if not self.doEmerge:
@@ -679,12 +682,13 @@ class PackageTable:
 
 	def _update_keywords (self, emerge, update = False):
 		if emerge:
+			type = "install" if not self.type else self.type
 			try:
 				try:
-					self.queue.append(self.actual_package().get_cpv(), type = "install", update = update)
+					self.queue.append(self.actual_package().get_cpv(), type = type, update = update)
 				except PackageNotFoundException, e:
 					if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
-						self.queue.append(self.actual_package().get_cpv(), type = "install", unmask = True, update = update)
+						self.queue.append(self.actual_package().get_cpv(), type = type, unmask = True, update = update)
 			except BlockedException, e:
 				blocked_dialog(e[0], e[1])
 		else:
@@ -881,7 +885,7 @@ class PackageTable:
 		flag = store[path][2]
 		pkg = self.actual_package()
 		
-		if flag in pkg.get_global_settings("USE_EXPAND").split(): # ignore expanded flags
+		if pkg.use_expanded(flag): # ignore expanded flags
 			return False
 
 		store[path][0] = not store[path][0]
@@ -996,8 +1000,11 @@ class MainWindow (Window):
 		changelogScroll.add(HighlightView(lambda p: os.path.join(p.get_package_path(), "ChangeLog"), ["changelog"]))
 
 		def show_files (p):
-			for f in p.get_files():
-				yield " %s\n" % f
+			try:
+				for f in p.get_files():
+					yield " %s\n" % f
+			except IOError, e:
+				yield _("Error: %s") % e.strerror
 
 		filesScroll = self.tree.get_widget("filesScroll")
 		filesScroll.add(InstalledOnlyView(show_files))
@@ -1150,7 +1157,7 @@ class MainWindow (Window):
 			self.session = Session("gtk_session.cfg")
 		except (OSError, IOError), e:
 			io_ex_dialog(e)
-			raise
+			return
 
 		def load_queue (merge, unmerge, oneshot):
 			def _load(q, **kwargs):
@@ -1291,7 +1298,7 @@ class MainWindow (Window):
 		self.fill_pkg_store(self.pkgList.get_model(), self.selCatName)
 		return True
 
-	def cb_row_activated (self, view, path, *args):
+	def cb_queue_row_activated (self, view, path, *args):
 		"""Callback for an activated row in the emergeQueue. Opens a package window."""
 		store = self.queueTree
 		if len(path) > 1:
@@ -1300,7 +1307,15 @@ class MainWindow (Window):
 				package = store.get_value(iterator, store.get_cpv_column())
 				cat, name, vers, rev = system.split_cpv(package)
 				if rev != "r0": vers = vers+"-"+rev
-				self.show_package(cat+"/"+name, queue = self.queue, version = vers, instantChange = True, doEmerge = False)
+
+				if store.is_in_emerge(iterator):
+					type = "install"
+				elif store.is_in_unmerge(iterator):
+					type = "uninstall"
+				elif store.is_in_update(iterator):
+					type = "update"
+
+				self.show_package(cat+"/"+name, queue = self.queue, version = vers, instantChange = True, doEmerge = False, type = type)
 		return True
 	
 	def cb_queue_tooltip_queried (self, view, x, y, is_keyboard, tooltip):
@@ -1372,16 +1387,25 @@ class MainWindow (Window):
 		
 		if len(flags.newUseFlags) > 0:
 			changed_flags_dialog(_("use flags"))
-			flags.write_use_flags()
+			try:
+				flags.write_use_flags()
+			except IOError, e:
+				io_ex_dialog(e)
+				return True
 		
 		if len(flags.new_masked)>0 or len(flags.new_unmasked)>0 or len(flags.newTesting)>0:
 			debug("new masked: %s",flags.new_masked)
 			debug("new unmasked: %s", flags.new_unmasked)
 			debug("new testing: %s", flags.newTesting)
 			changed_flags_dialog(_("masking keywords"))
-			flags.write_masked()
-			flags.write_testing()
-			system.reload_settings()
+			try:
+				flags.write_masked()
+				flags.write_testing()
+			except IOError, e:
+				io_ex_dialog(e)
+				return True
+			else:
+				system.reload_settings()
 
 		model, iter = self.queueList.get_selection().get_selected()
 
@@ -1475,9 +1499,12 @@ class MainWindow (Window):
 			self.queue.sync()
 
 	def cb_save_flags_clicked (self, action):
-		flags.write_use_flags()
-		flags.write_testing()
-		flags.write_masked()
+		try:
+			flags.write_use_flags()
+			flags.write_testing()
+			flags.write_masked()
+		except IOError, e:
+			io_ex_dialog(e)
 
 	@Window.watch_cursor
 	def cb_reload_clicked (self, action):

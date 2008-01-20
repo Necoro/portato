@@ -388,7 +388,7 @@ class EmergeQueue:
 		# recursive call
 		for d in deps:
 			try:
-				self.update_tree(subIt, d, unmask)
+				self.update_tree(subIt, d, unmask, type = type)
 			except backend.BlockedException, e: # BlockedException occured -> delete current tree and re-raise exception
 				debug("Something blocked: %s", e[0])
 				self.remove_with_children(subIt)
@@ -431,7 +431,7 @@ class EmergeQueue:
 					if hasBeenInQueue: # package has been in queue before
 						self._queue_append(cpv, oneshot)
 					
-					self.update_tree(parentIt, cpv, unmask, oneshot = oneshot)
+					self.update_tree(parentIt, cpv, unmask, oneshot = oneshot, type = type)
 			else: # not update
 				if type == "install":
 					self._queue_append(cpv, oneshot)

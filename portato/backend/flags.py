@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 import os
 import os.path
@@ -250,12 +250,18 @@ def set_use_flag (pkg, flag):
 				if added: del newUseFlags[-1] # we currently added it as an extra option - delete it
 				added = True
 				jumpOut = False
-				for t in [(file, line, invFlag, False),(file, line, flag, True)]:
+				for t in ((file, line, invFlag, False),(file, line, flag, True)):
 					if t in newUseFlags[cpv]:
 						newUseFlags[cpv].remove(t)
 						jumpOut = True
-						break
-				if not jumpOut:	newUseFlags[cpv].append((file, line, invFlag, True))
+						# break # don't break as both cases can be valid (see below)
+				if not jumpOut:	
+					newUseFlags[cpv].append((file, line, invFlag, True))
+					
+					# we removed the inverted from package.use - but it is still enabled somewhere else
+					# so set it explicitly here
+					if invFlag in pkg.get_actual_use_flags():
+						newUseFlags[cpv].append((file, line, flag, False))
 				break
 			
 			# we want to duplicate the flag --> ignore
@@ -306,17 +312,17 @@ def get_new_use_flags (cpv):
 	if is_package(cpv):
 		cpv = cpv.get_cpv()
 
-	list2return = []
+	list2return = set()
 	try:
 		for file, line, flag, remove in newUseFlags[cpv]:
 			if remove:
-				list2return.append(invert_use_flag(flag))
+				list2return.add("~"+invert_use_flag(flag))
 			else:
-				list2return.append(flag)
+				list2return.add(flag)
 	except KeyError:
 		pass
 
-	return list2return
+	return list(list2return)
 
 def write_use_flags ():
 	"""This writes our changed useflags into the file."""
@@ -342,9 +348,11 @@ def write_use_flags ():
 	file_cache = {} # cache for having to read the file only once: name->[lines]
 	for cpv in newUseFlags:
 		flagsToAdd = [] # this is used for collecting the flags to be inserted in a _new_ line
+
+		newUseFlags[cpv].sort(key = lambda x: x[3]) # now the flags are sorted in a manner, that removal comes after appending
+
 		for file, line, flag, delete in newUseFlags[cpv]:
 			line = int(line) # it is saved as a string so far!
-			
 			# add new line
 			if line == -1:
 				flagsToAdd.append(flag)
@@ -352,31 +360,30 @@ def write_use_flags ():
 			else:
 				if not file in file_cache:
 					# read file
-					f = open(file, "r")
-					lines = []
-					i = 1
-					while i < line: # stop at the given line
-						lines.append(f.readline())
-						i += 1
-					l = f.readline().split(" ")
-					
-					# delete or insert
-					if delete:
-						remove(flag,l)
-					else:
-						insert(flag,l)
-					lines.append(" ".join(l))
-					
-					# read the rest
-					lines.extend(f.readlines())
-					
-					file_cache[file] = lines
-					f.close()
+					with open(file, "r") as f:
+						lines = []
+						i = 1
+						while i < line: # stop at the given line
+							lines.append(f.readline())
+							i += 1
+						l = f.readline().split(" ")
+						
+						# delete or insert
+						if delete:
+							remove(flag,l)
+						else:
+							insert(flag,l)
+						lines.append(" ".join(l))
+						
+						# read the rest
+						lines.extend(f.readlines())
+						
+						file_cache[file] = lines
 
 				else: # in cache
 					l = file_cache[file][line-1].split(" ")
 					if delete:
-						remove(flag,l)
+						remove(flag, l)
 					else:
 						insert(flag,l)
 					file_cache[file][line-1] = " ".join(l)

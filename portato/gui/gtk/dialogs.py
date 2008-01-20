@@ -11,6 +11,7 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 import gtk
+from ...helper import error
 from gettext import lgettext as _
 
 def queue_not_empty_dialog():
@@ -26,6 +27,7 @@ def io_ex_dialog (io_ex):
 	if io_ex.filename:
 		string = string+": "+io_ex.filename
 	
+	error(string)
 	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, string)
 	ret = dialog.run()
 	dialog.destroy()

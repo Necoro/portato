@@ -1040,7 +1040,7 @@
                                 <property name="enable_search">False</property>
                                 <signal name="button_press_event" handler="cb_right_click"/>
                                 <signal name="query_tooltip" handler="cb_queue_tooltip_queried"/>
-                                <signal name="row_activated" handler="cb_row_activated"/>
+                                <signal name="row_activated" handler="cb_queue_row_activated"/>
                               </widget>
                             </child>
                           </widget>
