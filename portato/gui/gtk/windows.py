@@ -1267,7 +1267,7 @@ class MainWindow (Window):
 			if title is None: 
 				title = _("Console")
 			else: 
-				title = (_("Console (%(title)s)") % {"title" : title})
+				title = ("%s (%s)") % (_("Console"), title)
 			
 			self.sysNotebook.set_tab_label_text(self.termHB, title)
 
