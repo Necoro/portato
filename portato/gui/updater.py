@@ -66,11 +66,10 @@ q
 			p1 = subprocess.Popen(["qlop", "--current", "--nocolor", "--quiet"], stdout = subprocess.PIPE)
 			this = subprocess.Popen(["sed", self.SED_EXP], stdout = subprocess.PIPE, stdin = p1.stdout).communicate()[0]
 			
-			if this:
-				this = this.strip()
-				if this != curr: # changed package
-					curr = this
-					self.remove(self.find(curr)) # remove it
+			if this: this = this.strip()
+			if this != curr: # changed package
+				curr and self.remove(self.find(curr)) # remove the previous
+				curr = this
 			
 			time.sleep(2.0)
 				

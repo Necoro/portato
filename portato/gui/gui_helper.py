@@ -519,6 +519,7 @@ class EmergeQueue:
 						title = self.console.get_window_title()
 						if title != old_title:
 							self.title_update(title)
+							old_title = title
 						time.sleep(0.5)
 
 			if self.up: 
