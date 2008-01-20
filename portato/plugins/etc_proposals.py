@@ -16,15 +16,17 @@ import os
 from subprocess import Popen
 from gettext import lgettext as _
 
-PROG="/usr/sbin/etc-proposals"
+PROG=["/usr/sbin/etc-proposals"]
+
+def launch (options = []):
+	if os.getuid() == 0:
+		Popen(PROG+options)
+	else:
+		error(_("Cannot start etc-proposals. Not root!"))
 
 def etc_prop (*args, **kwargs):
 	"""Entry point for this plugin."""
-
-	Popen([PROG, "--fastexit"])
+	launch(["--fastexit"])
 
 def etc_prop_menu (*args, **kwargs):
-	if os.getuid() == 0:
-		Popen(PROG)
-	else:
-		error(_("Cannot start etc-proposals. Not root!"))
+	launch()
