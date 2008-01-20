@@ -942,7 +942,7 @@ class MainWindow (Window):
 			raise
 
 		self.cfg.modify_external_configs()
-		gtk.link_button_set_uri_hook(lambda btn, x: get_listener().send_cmd([self.cfg.get("browserCmd", section = "GUI"), btn.get_uri()]))
+		self.set_uri_hook(self.cfg.get("browserCmd", section = "GUI"))
 		gtk.about_dialog_set_url_hook(lambda *args: True) # dummy - if not set link is not set as link; if link is clicked the normal uuri_hook is called too - thus do not call browser here
 
 		# package db
@@ -1236,7 +1236,8 @@ class MainWindow (Window):
 		self.show_package(cp, self.queue, version = version)
 
 	def set_uri_hook (self, browser):
-		gtk.link_button_set_uri_hook(lambda btn, x: get_listener().send_cmd([browser, btn.get_uri()]))
+		browser = browser.split()
+		gtk.link_button_set_uri_hook(lambda btn, x: get_listener().send_cmd(browser+[btn.get_uri()]))
 
 	def set_notebook_tabpos (self, tabposlist):
 		self.pkgNotebook.set_tab_pos(tabposlist[0])
