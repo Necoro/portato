@@ -965,11 +965,11 @@ class MainWindow (Window):
 				pluginMenu.append(item)
 
 		splash(_("Building frontend"))
-		# set vpaned position
+		# set paned position
 		self.vpaned = self.tree.get_widget("vpaned")
 		self.vpaned.set_position(int(self.window.get_size()[1]/2))
 		self.hpaned = self.tree.get_widget("hpaned")
-		self.hpaned.set_position(int(self.window.get_size()[0]/2))
+		self.hpaned.set_position(int(self.window.get_size()[0]/1.5))
 
 		# cat and pkg list
 		self.sortPkgListByName = True
