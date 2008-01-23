@@ -777,4 +777,4 @@ class EmergeQueue:
 		@returns: True if everything is empty and the process is not running.
 		@rtype: bool"""
 
-		return not (self.mergequeue or self.unmergequeue or self.oneshotmerge or self.process)
+		return not (self.process or any(map(len, self.iters.itervalues())))

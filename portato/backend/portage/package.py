@@ -55,7 +55,7 @@ class PortagePackage (Package):
 			self._status = None
 
 	def _init_settings (self, installed):
-		inst = installed and self.is_installed()
+		inst = (installed and self.is_installed()) or (self.is_installed() and not self.is_in_system())
 
 		if self._settings_installed is not None and self._settings_installed != inst:
 			self._settings.settings.reset()

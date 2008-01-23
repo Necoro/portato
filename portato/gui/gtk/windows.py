@@ -1651,7 +1651,7 @@ class MainWindow (Window):
 	def cb_delete (self, *args):
 		"""Looks whether we really want to quit."""
 
-		self.__save_queue = True
+		self.__save_queue = False
 
 		if not self.queue.is_empty():
 			ret = queue_not_empty_dialog()
