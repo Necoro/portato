@@ -1,18 +1,32 @@
 #!/bin/sh
 # Helper script to compile all .po files in the i18n directroy into .mo files.
 
-# Copied from porthole :)
 cd i18n
-for ITEM in *.po; do
-	LANG=${ITEM/.po/}
 
-	echo "Creating translation file for ${LANG}."
+eme=""
+if [ "$1" == "-emerge" ]; then
+	eme="y"
+	shift
+fi
 
-	if [ "$1" == "-emerge" ]; then
-		mkdir mo -p
-		msgfmt ${ITEM} -o mo/${LANG}.mo
-	else
-		mkdir ${LANG}/LC_MESSAGES -p
-		msgfmt ${ITEM} -o ${LANG}/LC_MESSAGES/portato.mo
+if [ $# -gt 0 ]; then
+	langs="$@"
+else
+	langs="$(ls *.po | sed 's/\.po//g')"
+fi
+
+for LANG in $langs; do
+	ITEM=${LANG}.po
+
+	if [ -f $ITEM ]; then
+		echo "Creating translation file for ${LANG}."
+
+		if [ "$eme"x == "yx" ]; then
+			mkdir mo -p
+			msgfmt ${ITEM} -o mo/${LANG}.mo
+		else
+			mkdir ${LANG}/LC_MESSAGES -p
+			msgfmt ${ITEM} -o ${LANG}/LC_MESSAGES/portato.mo
+		fi
 	fi
 done
