@@ -8,13 +8,11 @@ Backend:
 - add pkgcore support   |-> not necessairy if catapult is used
 - add equo support     /
 
-- fix for flag handling, when reverting flags (Necoro, 04/20/07: what did i mean by this?)
-	==> rewrite flags handling in an object oriented manner
+- rewrite flags handling in an object oriented manner
 
 - do not alert a block, if a package blocks a version of one package which is updated to a new one not being blocked anymore
 
 - save/restore queue on exit/start
-- only remove already merged packages from queue
 - make sure, a package being removed from the queue is not needed as a dependency by another package
 - binary package support
 
@@ -24,8 +22,6 @@ Backend:
 
 GUI:
 ====
-
-- return from console after finishing emerge (Necoro, 01/10/07: needed anymore with new design?)
 
 Main Point: user preferences:
 	- colors and font sizes

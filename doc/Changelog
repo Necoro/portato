@@ -1,4 +1,4 @@
-next:
+0.9.0:
 - added view for "installed only"
 - removed "--ebuild" mode
 - added log, ebuild, files, and changelog as tabs
@@ -9,6 +9,8 @@ next:
 - added "ALL" category
 - new design and handling
 - allowed interactive emerges
+- only remove already emerged packages from queue
+- improved "update world"
 
 0.8.6.2:
 - changed the pipe version and use shm instead (fixes issues with kdesu)
