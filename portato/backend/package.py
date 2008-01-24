@@ -68,20 +68,6 @@ class Package (_Package):
 
 		return flags.is_locally_masked(self)
 
-	def get_installed_use_flags (self):
-		"""Returns a list of the useflags enabled at installation time. If package is not installed, it returns an empty list.
-		
-		@returns: list of useflags enabled at installation time or an empty list
-		@rtype: string[]"""
-		
-		if self.is_installed():
-			uses = set(self.get_use_flags().split()) # all set at installation time
-			iuses = set(self.get_iuse_flags(installed=True)) # all you can set for the package
-			
-			return list(uses.intersection(iuses))
-		else:
-			return []
-	
 	def get_new_use_flags (self):
 		"""Returns a list of the new useflags, i.e. these flags which are not written to the portage-system yet.
 
@@ -276,13 +262,13 @@ class Package (_Package):
 		@returns: the reason for masking the package
 		@rtype: string"""
 		
-	def get_iuse_flags (self, installed = False, keep = False):
+	def get_iuse_flags (self, installed = False, removeForced = True):
 		"""Returns a list of _all_ useflags for this package, i.e. all useflags you can set for this package.
 		
 		@param installed: do not take the ones stated in the ebuild, but the ones it has been installed with
 		@type installed: boolean
-		@param keep: keep the "+" or "-" signs for forced flags
-		@type keep: boolean
+		@param removeForced: remove forced flags (i.e. usemask / useforce) from the iuse flags as they cannot be set from the user
+		@type removeForced: boolean
 
 		@returns: list of use-flags
 		@rtype: string[]"""
@@ -360,11 +346,11 @@ class Package (_Package):
 
 		raise NotImplementedError
 
-	def get_use_flags(self):
+	def get_installed_use_flags(self):
 		"""Returns _all_ (not only the package-specific) useflags which were set at the installation time of the package.
 		
-		@returns: string holding all useflags
-		@rtype: string"""
+		@returns: list of use flags
+		@rtype: string[]"""
 		
 		raise NotImplementedError
 

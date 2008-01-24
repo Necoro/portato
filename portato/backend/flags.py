@@ -213,6 +213,23 @@ def sort_use_flag_list (flaglist):
 	flaglist.sort(key = flag_key)
 	return flaglist
 
+def filter_defaults (flaglist):
+	"""
+	Removes "+" and "-" from IUSE defaults.
+
+	@param flaglist: the list of useflags
+	@type flaglist: string<iterator>
+
+	@returns: the "cleaned" list
+	@rtype: string<iterator>
+	"""
+
+	for flag in flaglist:
+		if flag.startswith(("+","-")):
+			yield flag[1:]
+		else:
+			yield flag
+
 def set_use_flag (pkg, flag):
 	"""Sets the useflag for a given package.
 	

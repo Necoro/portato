@@ -1342,16 +1342,18 @@ class MainWindow (Window):
 		if not pkg_flags: # no flags - stop here
 			return None
 		
-		actual = pkg.get_actual_use_flags()
+		actual = set(pkg.get_actual_use_flags())
 		
 		if pkg.is_installed():
-			installed = pkg.get_installed_use_flags()
+			installed = set(pkg.get_iuse_flags()).intersection(pkg.get_installed_use_flags())
 		else:
 			inst = system.find_installed_packages(pkg.get_slot_cp())
 			if inst:
-				installed = inst[0].get_installed_use_flags()
+				installed = set(inst[0].get_iuse_flags()).intersection(inst[0].get_installed_use_flags())
 			else:
-				installed = []
+				installed = set()
+
+		diff = actual.symmetric_difference(installed)
 
 		for use in pkg_flags:
 			exp = pkg.use_expanded(use)
@@ -1360,7 +1362,7 @@ class MainWindow (Window):
 			
 			else:
 				useStr = use
-				if installed and ((use in actual) != (use in installed)):
+				if installed and use in diff:
 					useStr += " %"
 				if use in actual:
 					enabled.append(useStr)

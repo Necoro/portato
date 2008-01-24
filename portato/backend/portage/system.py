@@ -370,9 +370,9 @@ class PortageSystem (SystemInterface):
 		# append system packages
 		packages.extend(unique_array([p.get_cp() for p in self.find_all_system_packages()]))
 		
-		states = [(["RDEPEND","PDEPEND"],True)]#, (["DEPEND"], False)]
+		states = [(["RDEPEND"], True)]
 		if self.with_bdeps():
-			states[1] = (["DEPEND"], True)
+			states.append((["DEPEND"], True))
 
 		checked = []
 		updating = []
@@ -413,15 +413,19 @@ class PortageSystem (SystemInterface):
 
 				new_iuse = set(p.get_iuse_flags(installed = False)) # IUSE in the ebuild
 				old_iuse = set(p.get_iuse_flags(installed = True)) # IUSE in the vardb
+
+				# add forced flags, as they might trigger a rebuild
+				new_iuse_f = set(p.get_iuse_flags(installed = False, removeForced = False))
+				old_iuse_f = set(p.get_iuse_flags(installed = True, removeForced = False))
 				
-				if new_iuse.symmetric_difference(old_iuse): # difference between new_iuse and old_iuse
+				if new_iuse.symmetric_difference(old_iuse): # difference between IUSE (w/o forced)
 					tempDeep = True
 					if not appended:
 						updating.append((p,p))
 						appended = True
 				
-				else:
-					if new_iuse.intersection(p.get_actual_use_flags()).symmetric_difference(p.get_installed_use_flags()):
+				else: # check for difference between the _set_ useflags (w/ forced)
+					if new_iuse_f.intersection(p.get_actual_use_flags()).symmetric_difference(old_iuse_f.intersection(p.get_installed_use_flags())):
 						tempDeep = True
 						if not appended:
 							updating.append((p,p))
@@ -429,7 +433,7 @@ class PortageSystem (SystemInterface):
 
 			if deep or tempDeep:
 				if (appended or prev_appended) and len(states) < 2:
-					real_states = states + [("DEPEND", False)]
+					real_states = states + [("PDEPEND", True), ("DEPEND", False)]
 				else:
 					real_states = states
 				for state in real_states:
@@ -442,7 +446,7 @@ class PortageSystem (SystemInterface):
 							else:
 								for pkg in bm: 
 									if not pkg: continue
-									check(pkg, state[1], appended)
+									check(pkg, state[1], appended) # XXX: should be 'or'ed with prev_appended?
 
 		for p in self.get_new_packages(packages):
 			if not p: continue # if a masked package is installed we have "None" here
