@@ -15,7 +15,7 @@ from __future__ import absolute_import
 from ..backend import system
 
 import threading, subprocess, time
-from ..helper import debug
+from ..helper import debug, error
 
 class Updater (object):
 	"""
@@ -85,7 +85,7 @@ q
 		This is done here.
 		"""
 
-		pkgs = [l.get_cpv() for l in system.find_packages("=%s" % pv)]
+		pkgs = system.find_packages("=%s" % pv, only_cpv = True)
 
 		if len(pkgs) > 1: # ambigous - try to find the one which is also in the iterators
 			for p in pkgs:
@@ -93,6 +93,7 @@ q
 					return p
 		elif not pkgs: # nothing found =|
 			error(_("Trying to remove package '%s' from queue which does not exist in system."), pv)
+			return None
 		else: # only one choice =)
 			return pkgs[0]
 	
@@ -100,6 +101,11 @@ q
 		"""
 		Remove a package from the queue.
 		"""
+		
+		if cpv is None:
+			debug("Nothing to remove.")
+			return
+
 		try:
 			self.queue.remove(self.iterators[cpv])
 		except KeyError:

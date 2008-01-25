@@ -132,12 +132,11 @@ class LogView (logging.Handler):
 		logging.getLogger("portatoLogger").addHandler(self)
 
 	def emit (self, record):
-		iter = self.buf.get_end_iter()
 		
 		for lvl, name, color in self.colors:
 			if lvl == -1 or record.levelno <= lvl:
 				tag = "log_%s" % name
 				break
 
-		self.buf.insert_with_tags_by_name(iter, "* ", tag)
-		self.buf.insert_at_cursor(record.getMessage()+"\n")
+		self.buf.insert_with_tags_by_name(self.buf.get_end_iter(), "* ", tag)
+		self.buf.insert(self.buf.get_end_iter(), record.getMessage()+"\n")
