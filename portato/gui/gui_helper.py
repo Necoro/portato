@@ -506,7 +506,7 @@ class EmergeQueue:
 			self.process = Popen(command+options+packages, shell = False, env = system.get_environment(), preexec_fn = pre)
 
 			# remove packages from queue
-			if self.tree and it:
+			if self.tree and it and not self.tree.is_in_unmerge(top):
 				self.up = Updater(self, it, self.threadClass)
 			else:
 				self.up = None
@@ -528,6 +528,8 @@ class EmergeQueue:
 					self.tree.set_in_progress(top, False)
 				else:
 					self.remove(top)
+			elif self.tree and it:
+				self.remove_with_children(top)
 
 			if self.title_update: self.title_update(None)
 

@@ -18,6 +18,7 @@ import gtk
 import logging
 
 from gettext import lgettext as _
+from ...helper import warning
 
 class LazyView (object):
 	def __init__ (self):
