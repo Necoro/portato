@@ -84,10 +84,14 @@ class HighlightView (gtksourceview2.View, LazyView):
 		language = None
 		old_lang = None
 		for lang in languages:
-			if old_lang and not language:
+			if old_lang:
 				warning(_("No %(old)s language file installed. Falling back to %(new)s."), {"old" : old_lang, "new" : lang})
+			
 			language = man.get_language(lang)
-			old_lang = lang
+			if language:
+				break
+			else:
+				old_lang = lang
 
 		if not language and old_lang:
 			warning(_("No %(old)s language file installed. Disable highlighting."), {"old" : old_lang})
