@@ -38,9 +38,6 @@ def main ():
 
 	parser = OptionParser(version = vers, prog = "Portato", description = desc, usage = usage)
 	
-	parser.add_option("--check", action = "store_true", dest = "check", default = False,
-			help = _("runs pychecker (should only be used by developers)"))
-	
 	parser.add_option("-f", "--frontend", action = "store", choices = FRONTENDS, default = STD_FRONTEND, dest = "frontend",
 			help = _("the frontend to use - possible values are: %s [default: %%default]") % get_frontend_list())
 
@@ -56,11 +53,6 @@ def main ():
 	# run parser
 	(options, args) = parser.parse_args()
 
-	# evaluate parser's results
-	if options.check: # run pychecker
-		os.environ['PYCHECKER'] = "--limit 100"
-		import pychecker.checker
-	
 	if len(args): # additional arguments overwrite given frontend
 		arg = args[0]
 		if arg not in FRONTENDS:
