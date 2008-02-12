@@ -1616,14 +1616,9 @@ class MainWindow (Window):
 		store, it = sel.get_selected()
 		if it:
 			package = store.get_value(it, 0)
-			if not self.cfg.get_local(package, "oneshot"):
-				set = True
-			else:
-				set = False
+			set = (package not in self.queue.oneshotmerge)
 			
-			self.cfg.set_local(package, "oneshot", set)
 			self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
-
 
 	def cb_pause_emerge (self, curr):
 		def pause (cb):

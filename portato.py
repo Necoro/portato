@@ -101,8 +101,6 @@ def main ():
 		rw = shm.create_semaphore(InitialValue = 1, permissions = 0600)
 		
 		additional = []
-		if options.check:
-			additional.append("--check")
 		if options.frontend:
 			additional.extend(["--frontend", options.frontend])
 
