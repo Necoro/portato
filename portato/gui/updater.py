@@ -14,6 +14,7 @@ from __future__ import absolute_import
 
 from ..backend import system
 
+from gettext import lgettext as _
 import threading, subprocess, time
 from ..helper import debug, error
 
@@ -107,6 +108,6 @@ q
 			return
 
 		try:
-			self.queue.remove(self.iterators[cpv])
+			self.queue.remove_with_children(self.iterators[cpv])
 		except KeyError:
 			debug("'%s' should be removed, but is not in queue.", cpv)

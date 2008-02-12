@@ -27,6 +27,7 @@ Main Point: user preferences:
 	- colors and font sizes
 
 - rotating systray icon
+- if a package has been merged, but there are still dependencies to be merged - move the dependencies up the tree (Updater)
 
 GTK:
 ----

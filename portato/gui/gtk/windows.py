@@ -1184,7 +1184,11 @@ class MainWindow (Window):
 
 		def save_selection ():
 			def _save(list):
-				return list.get_model().get_string_from_iter(list.get_selection().get_selected()[1])
+				iter = list.get_selection().get_selected()
+				if iter:
+					return list.get_model().get_string_from_iter(iter[1])
+				else:
+					return "0"
 
 			return map(_save, (self.catList, self.pkgList))
 
