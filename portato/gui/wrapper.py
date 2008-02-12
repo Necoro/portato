@@ -125,7 +125,7 @@ class Tree:
 		@rtype: boolean"""
 		raise NotImplementedError
 
-	def is_in_emerge (self, it):
+	def is_in_update (self, it):
 		"""Checks whether an iterator is part of the "Update" section.
 
 		@param it: the iterator to check

@@ -35,7 +35,7 @@ import re
 from gettext import lgettext as _
 from threading import Lock
 
-from .helper import debug
+from .helper import debug, error
 
 DELIMITER = ["=", ":"]
 COMMENT = [";","#"]

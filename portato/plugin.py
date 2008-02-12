@@ -20,7 +20,7 @@ from lxml import etree
 from gettext import lgettext as _
 
 from .constants import PLUGIN_DIR, XSD_LOCATION
-from .helper import debug, info, error, flatten
+from .helper import debug, info, warning, error, flatten
 
 class PluginImportException (ImportError):
 	pass
@@ -463,7 +463,7 @@ class PluginQueue:
 					# type = "override"
 					elif connect.is_override_type():
 						if self.hooks[hook.hook][1]:
-							warn(_("For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"), {"hook": hook.hook, "plugin": self.hooks[hook.hook][1][0]})
+							warning(_("For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"), {"hook": hook.hook, "plugin": self.hooks[hook.hook][1][0]})
 						
 						self.hooks[hook.hook][1][:1] = [connect]
 						continue
@@ -494,7 +494,7 @@ class PluginQueue:
 				resolve(hook, list, idx, add)
 
 			for l in list:
-				warn("Command for hook '%(hook)s' in plugin '%(plugin)s' could not be added due to missing dependant: '%(dep)s'!", {"hook": hook, "plugin": l.hook.plugin.name, "dep": l.depend_plugin})
+				warning("Command for hook '%(hook)s' in plugin '%(plugin)s' could not be added due to missing dependant: '%(dep)s'!", {"hook": hook, "plugin": l.hook.plugin.name, "dep": l.depend_plugin})
 
 		for hook in before:
 			resolve(hook, before[hook], 0, 0)
