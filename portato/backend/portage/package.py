@@ -15,8 +15,8 @@ from __future__ import absolute_import, with_statement
 from ..package import Package
 from .. import flags
 from .. import system
-from ..exceptions import BlockedException, PackageNotFoundException
-from ...helper import debug, unique_array
+from ..exceptions import BlockedException, PackageNotFoundException, DependencyCalcError
+from ...helper import debug, error, unique_array
 
 import portage, portage_dep
 
