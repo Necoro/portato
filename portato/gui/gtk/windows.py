@@ -191,10 +191,10 @@ class UpdateWindow (AbstractDialog):
 		for item in items:
 			try:
 				try:
-					self.queue.append(item, unmerge = False, oneshot = True)
+					self.queue.append(item, type = "install", oneshot = True)
 				except PackageNotFoundException, e:
 					if unmask_dialog(e[0]) == gtk.RESPONSE_YES :
-						self.queue.append(item, unmerge = False, unmask = True, oneshot = True)
+						self.queue.append(item, type = "install", unmask = True, oneshot = True)
 
 			except BlockedException, e:
 				blocked_dialog(e[0], e[1])
