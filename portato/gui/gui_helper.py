@@ -13,6 +13,7 @@
 from __future__ import absolute_import
 
 # some stuff needed
+import re
 import logging
 import sys, os, pty
 import signal, threading, time
@@ -194,7 +195,7 @@ class Database (object):
 						yield pkg
 
 			if self.restrict:
-				return (pkg for pkg in get_pkgs() if pkg[1].find(self.restrict) != -1)
+				return (pkg for pkg in get_pkgs() if self.restrict.search(pkg[1]))#if pkg[1].find(self.restrict) != -1)
 			else:
 				return get_pkgs()
 
@@ -217,12 +218,13 @@ class Database (object):
 				cats = self._db.iterkeys()
 
 		else:
-			cats = set((pkg[0] for pkg in self.get_cat(self.ALL)))
-
 			if installed:
-				cats = cats.intersection(self.inst_cats)
+				cats = set((pkg[0] for pkg in self.get_cat(self.ALL) if pkg[2]))
+			else:
+				cats = set((pkg[0] for pkg in self.get_cat(self.ALL)))
 
-			cats.add(self.ALL)
+			if len(cats)>1:
+				cats.add(self.ALL)
 
 		return (cat for cat in cats)
 
@@ -251,8 +253,12 @@ class Database (object):
 		if not restrict:
 			self._restrict = None
 		else:
-			#self._restrict = re.compile(".*%s.*" % restrict)
-			self._restrict = restrict
+			try:
+				regex = re.compile(restrict, re.I)
+			except re.error, e:
+				info(_("Error while compiling search expression: '%s'."), str(e))
+			else: # only set self._restrict if no error occurred
+				self._restrict = regex
 
 	restrict = property(get_restrict, set_restrict)
 
