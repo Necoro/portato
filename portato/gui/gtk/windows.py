@@ -978,6 +978,9 @@ class MainWindow (Window):
 		self.build_cat_list()
 		self.build_pkg_list()
 
+		# search entry
+		self.searchEntry = self.tree.get_widget("searchEntry")
+
 		# queue list
 		self.queueList = self.tree.get_widget("queueList")
 		self.build_queue_list()
@@ -1184,9 +1187,9 @@ class MainWindow (Window):
 
 		def save_selection ():
 			def _save(list):
-				iter = list.get_selection().get_selected()
+				iter = list.get_selection().get_selected()[1]
 				if iter:
-					return list.get_model().get_string_from_iter(iter[1])
+					return list.get_model().get_string_from_iter(iter)
 				else:
 					return "0"
 
@@ -1237,6 +1240,19 @@ class MainWindow (Window):
 	
 	def jump_to (self, cp, version = None):
 		"""Is called when we want to jump to a specific package."""
+
+		cat, pkg = cp.split("/")
+
+		for list, idx, what, expr in ((self.catList, 0, "categories", cat), (self.pkgList, 1, "packages", pkg)):
+			pathes = [row.path for row in list.get_model() if row[idx] == expr]
+
+			if len(pathes) == 1:
+				list.get_selection().select_path(pathes[0])
+				list.scroll_to_cell(pathes[0])
+			else:
+				debug("Unexpected number of %s returned after search: %d", what, len(pathes))
+				break
+
 		self.show_package(cp, self.queue, version = version)
 
 	def set_uri_hook (self, browser):
@@ -1537,6 +1553,31 @@ class MainWindow (Window):
 				else:
 					SearchWindow(self.window, packages, self.jump_to)
 
+		return True
+
+	def cb_search_changed (self, *args):
+		txt = self.searchEntry.get_text()
+
+		if txt or self.db.restrict:
+			self.db.restrict = txt
+
+		store = self.catList.get_model()
+		store.clear()
+		self.fill_cat_store(store)
+
+		store = self.pkgList.get_model()
+		store.clear()
+		try:
+			self.fill_pkg_store(store, self.selCatName)
+		except AttributeError: # no selCatName -> so no category selected --> ignore
+			debug("No category selected --> should be no harm.")
+
+		return True
+
+	def cb_delete_search_clicked (self, *args):
+		self.searchEntry.set_text("")
+		return True
+
 	def cb_preferences_clicked (self, button):
 		PreferenceWindow(self.window, self.cfg, self.console.set_font_from_string, self.set_uri_hook, self.set_notebook_tabpos)
 		return True
@@ -1586,7 +1627,7 @@ class MainWindow (Window):
 		try:
 			self.fill_pkg_store(store, self.selCatName)
 		except AttributeError: # no selCatName -> so no category selected --> ignore
-			debug("AttributeError occured --> should be no harm.")
+			debug("No category selected --> should be no harm.")
 
 	def cb_right_click (self, object, event):
 		if event.button == 3:

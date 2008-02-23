@@ -120,7 +120,7 @@ class Config (ConfigParser):
 		ConfigParser.write(self)
 		self.modify_external_configs()
 
-class Database:
+class Database (object):
 	"""An internal database which holds a simple dictionary cat -> [package_list]."""
 
 	ALL = _("ALL")
@@ -132,6 +132,7 @@ class Database:
 	def __initialize (self):
 		self._db = {self.ALL:[]}
 		self.inst_cats = set([self.ALL])
+		self._restrict = None
 
 	def __sort_key (self, x):
 		return x[1].lower()
@@ -177,19 +178,25 @@ class Database:
 			cat = self.ALL
 
 		try:
-			if byName:
-				for pkg in self._db[cat]:
-					yield pkg
-			else:
-				ninst = []
-				for pkg in self._db[cat]:
-					if pkg[2]:
+			def get_pkgs():
+				if byName:
+					for pkg in self._db[cat]:
 						yield pkg
-					else:
-						ninst.append(pkg)
+				else:
+					ninst = []
+					for pkg in self._db[cat]:
+						if pkg[2]:
+							yield pkg
+						else:
+							ninst.append(pkg)
 
-				for pkg in ninst:
-					yield pkg
+					for pkg in ninst:
+						yield pkg
+
+			if self.restrict:
+				return (pkg for pkg in get_pkgs() if pkg[1].find(self.restrict) != -1)
+			else:
+				return get_pkgs()
 
 		except KeyError: # cat is in category list - but not in portage
 			info(_("Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?"), cat)
@@ -203,13 +210,21 @@ class Database:
 		@rtype: string<iterator>
 		"""
 
-		if installed:
-			c = self.inst_cats
-		else:
-			c = self._db.iterkeys()
+		if not self.restrict:
+			if installed:
+				cats = self.inst_cats
+			else:
+				cats = self._db.iterkeys()
 
-		for cat in c:
-			yield cat
+		else:
+			cats = set((pkg[0] for pkg in self.get_cat(self.ALL)))
+
+			if installed:
+				cats = cats.intersection(self.inst_cats)
+
+			cats.add(self.ALL)
+
+		return (cat for cat in cats)
 
 	def reload (self, cat = None):
 		"""Reloads the given category.
@@ -228,6 +243,18 @@ class Database:
 		else:
 			self.__initialize()
 			self.populate()
+
+	def get_restrict (self):
+		return self._restrict
+
+	def set_restrict (self, restrict):
+		if not restrict:
+			self._restrict = None
+		else:
+			#self._restrict = re.compile(".*%s.*" % restrict)
+			self._restrict = restrict
+
+	restrict = property(get_restrict, set_restrict)
 
 class EmergeQueue:
 	"""This class manages the emerge queue."""
