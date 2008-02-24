@@ -288,6 +288,7 @@ class PreferenceWindow (AbstractDialog):
 			"newUseCheck"			: "newuse",
 			"maskPerVersionCheck"	: "maskPerVersion",
 			"minimizeCheck"			: ("hideOnMinimize", "GUI"),
+			"searchOnTypeCheck"		: ("searchOnType", "GUI"),
 			"systrayCheck"			: ("showSystray", "GUI"),
 			"testPerVersionCheck"	: "keywordPerVersion",
 			"titleUpdateCheck"		: ("updateTitle", "GUI"),
@@ -1556,23 +1557,24 @@ class MainWindow (Window):
 		return True
 
 	def cb_search_changed (self, *args):
-		txt = self.searchEntry.get_text()
+		if self.cfg.get_boolean("searchOnType", section="GUI"):
+			txt = self.searchEntry.get_text()
 
-		if txt or self.db.restrict:
-			self.db.restrict = txt
+			if txt or self.db.restrict:
+				self.db.restrict = txt
 
-		store = self.catList.get_model()
-		store.clear()
-		self.fill_cat_store(store)
+			store = self.catList.get_model()
+			store.clear()
+			self.fill_cat_store(store)
 
-		store = self.pkgList.get_model()
-		store.clear()
-		try:
-			self.fill_pkg_store(store, self.selCatName)
-		except AttributeError: # no selCatName -> so no category selected --> ignore
-			debug("No category selected --> should be no harm.")
+			store = self.pkgList.get_model()
+			store.clear()
+			try:
+				self.fill_pkg_store(store, self.selCatName)
+			except AttributeError: # no selCatName -> so no category selected --> ignore
+				debug("No category selected --> should be no harm.")
 
-		return True
+			return True
 
 	def cb_delete_search_clicked (self, *args):
 		self.searchEntry.set_text("")
