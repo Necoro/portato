@@ -35,7 +35,6 @@ GTK:
 - show dependencies
 - reload package table when emerge is finished
 - dependency tree out of the installed packages
-- better display for search results
 
 Qt (stopped):
 ---
