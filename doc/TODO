@@ -1,6 +1,11 @@
 Documentation:
 ==============
 
+Unittest:
+========
+
+- ALL!
+
 Backend:
 ========
 
@@ -8,7 +13,7 @@ Backend:
 - add pkgcore support   |-> not necessairy if catapult is used
 - add equo support     /
 
-- rewrite flags handling in an object oriented manner
+- rewrite flags handling 
 
 - do not alert a block, if a package blocks a version of one package which is updated to a new one not being blocked anymore
 
