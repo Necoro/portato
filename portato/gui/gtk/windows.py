@@ -19,6 +19,7 @@ import gobject
 # other
 import os.path
 from subprocess import Popen
+import itertools
 from gettext import lgettext as _
 
 # our backend stuff
@@ -459,11 +460,13 @@ class PackageTable:
 		self.nameLabel = self.tree.get_widget("nameLabel")
 		self.descLabel = self.tree.get_widget("descLabel")
 		self.overlayLabel = self.tree.get_widget("overlayLabel")
-		self.licenseLabel = self.tree.get_widget("licenseLabel")
 		self.overlayLL = self.tree.get_widget("overlayLabelLabel")
+		self.licenseLabel = self.tree.get_widget("licenseLabel")
 		self.linkBox = self.tree.get_widget("linkBox")
 		self.notInSysLabel = self.tree.get_widget("notInSysLabel")
 		self.missingLabel = self.tree.get_widget("missingLabel")
+		self.useFlagsLabel = self.tree.get_widget("useFlagsLabel")
+		self.useFlagsLL = self.tree.get_widget("useFlagsLabelLabel")
 		
 		# buttons
 		self.emergeBtn = self.tree.get_widget("pkgEmergeBtn")
@@ -573,6 +576,17 @@ class PackageTable:
 			link.set_alignment(0.0, 0.5)
 			link.set_border_width(0)
 			self.linkBox.add(link)
+
+		# useflags
+		flags = ", ".join(itertools.ifilterfalse(pkg.use_expanded, pkg.get_iuse_flags()))
+
+		if flags:
+			self.useFlagsLL.show()
+			self.useFlagsLabel.show()
+			self.useFlagsLabel.set_label(flags)
+		else:
+			self.useFlagsLL.hide()
+			self.useFlagsLabel.hide()
 
 	def fill_use_list(self):
 
