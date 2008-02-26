@@ -11,6 +11,8 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+#test
+
 import sys, os, os.path
 from distutils.core import setup, Extension
 from portato.constants import FRONTENDS, VERSION, DATA_DIR, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR
