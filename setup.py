@@ -122,11 +122,6 @@ def plugin_list (*args):
 	"""Creates a list of correct plugin pathes out of the arguments."""
 	return [("plugins/%s.xml" % x) for x in args]
 
-def ui_file_list ():
-	"""Returns the list of *.ui-files."""
-	uis = [x for x in os.listdir("portato/gui/templates/ui/") if x.endswith(".ui")]
-	return [os.path.join("portato/gui/templates/ui",x) for x in uis]
-
 packages = ["portato", "portato.gui", "portato.plugins", "portato.backend", "portato.backend.portage", "portato.backend.catapult", "portato._shm"]
 ext_modules = [Extension("portato._shm.shm", ["_shm/shmmodule.c"], define_macros = MacrosAndDefines, extra_compile_args=["-fPIC"])]
 data_files = [
@@ -138,11 +133,7 @@ package_dir = {"portato._shm" : "_shm"}
 
 if "gtk" in FRONTENDS:
 	packages.append("portato.gui.gtk")
-	data_files.append((DATA_DIR, ["portato/gui/templates/portato.glade"]))
-
-if "qt" in FRONTENDS:
-	packages.append("portato.gui.qt")
-	data_files.append((os.path.join(DATA_DIR,"ui"), ui_file_list()))
+	data_files.append((DATA_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if x.endswith(".glade")]))
 
 # do the distutils setup
 setup(name="Portato",

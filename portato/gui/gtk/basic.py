@@ -18,6 +18,7 @@ import gtk.glade
 import gobject
 
 from functools import wraps
+import os.path
 
 from ...constants import TEMPLATE_DIR, APP_ICON, APP, LOCALE_DIR
 
@@ -27,9 +28,19 @@ GLADE_FILE = TEMPLATE_DIR+"portato.glade"
 
 class Window (object):
 	def __init__ (self):
-		self.tree = self.get_tree(self.__class__.__name__)
+
+		if not hasattr(self, "__tree__"):
+			self.__tree__ = self.__class__.__name__
+
+		if not hasattr(self, "__window__"):
+			self.__window__ = self.__class__.__name__
+
+		if not hasattr(self, "__file__"):
+			self.__file__ = self.__class__.__name__
+
+		self.tree = self.get_tree(self.__tree__)
 		self.tree.signal_autoconnect(self)
-		self.window = self.tree.get_widget(self.__class__.__name__)
+		self.window = self.tree.get_widget(self.__window__)
 		self.window.set_icon_from_file(APP_ICON)
 
 	@staticmethod
@@ -55,7 +66,7 @@ class Window (object):
 		return wrapper
 
 	def get_tree (self, name):
-		return gtk.glade.XML(GLADE_FILE, name)
+		return gtk.glade.XML(os.path.join(TEMPLATE_DIR, self.__file__+".glade"), name)
 
 class AbstractDialog (Window):
 	"""A class all our dialogs get derived from. It sets useful default vars and automatically handles the ESC-Button."""
@@ -89,8 +100,8 @@ class AbstractDialog (Window):
 
 class Popup (object):
 
-	def __init__ (self, name, parent):
-		self.tree = gtk.glade.XML(GLADE_FILE, root = name)
+	def __init__ (self, name, parent, file = "popups"):
+		self.tree = gtk.glade.XML(os.path.join(TEMPLATE_DIR, file+".glade"), root = name)
 		self.tree.signal_autoconnect(parent)
 		self._popup = self.tree.get_widget(name)
 

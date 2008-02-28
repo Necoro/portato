@@ -1038,8 +1038,8 @@ class MainWindow (Window):
 		self.packageTable = PackageTable(self)
 
 		# popups
-		self.queuePopup = Popup("queuePopup", self)
-		self.consolePopup = Popup("consolePopup", self)
+		self.queuePopup = Popup("queuePopup", self, self.__file__)
+		self.consolePopup = Popup("consolePopup", self, self.__file__)
 		self.trayPopup = Popup("systrayPopup", self)
 
 		# pause menu items

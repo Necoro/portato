@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
+<!--Generated with glade3 3.4.1 on Fri Feb 29 00:01:56 2008 -->
+<glade-interface>
+  <widget class="GtkMenu" id="systrayPopup">
+    <property name="visible">True</property>
+    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+    <child>
+      <widget class="GtkCheckMenuItem" id="pauseItemTray">
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="label" translatable="yes">Emerge _Paused</property>
+        <property name="use_underline">True</property>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkImageMenuItem" id="killItemTray">
+        <property name="visible">True</property>
+        <property name="label" translatable="yes">_Kill Emerge</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="cb_kill_emerge"/>
+        <child internal-child="image">
+          <widget class="GtkImage" id="menu-item-image16">
+            <property name="visible">True</property>
+            <property name="xalign">0</property>
+            <property name="yalign">0</property>
+            <property name="stock">gtk-stop</property>
+            <property name="icon_size">1</property>
+          </widget>
+        </child>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkImageMenuItem" id="closeItemTray">
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="label" translatable="yes">gtk-quit</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="cb_close"/>
+      </widget>
+    </child>
+  </widget>
+</glade-interface>
