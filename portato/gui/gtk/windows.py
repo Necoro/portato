@@ -915,7 +915,9 @@ class PackageTable:
 		return True
 
 class MainWindow (Window):
-	"""Application main window."""
+	"""
+	Application main window.
+	"""
 
 	# NOTEBOOK PAGE CONSTANTS
 	(
@@ -925,7 +927,12 @@ class MainWindow (Window):
 	) = range(3)
 
 	def __init__ (self, splash = None):	
-		"""Build up window"""
+		"""
+		Build up window.
+
+		@param splash: the splash screen =)
+		@type splash: SplashScreen
+		"""
 
 		if splash is None:
 			splash = lambda x: True
@@ -1042,7 +1049,7 @@ class MainWindow (Window):
 		self.pauseItems["popup"] = self.consolePopup.tree.get_widget("pauseItemPopup")
 		self.pauseItems["menu"] = self.tree.get_widget("pauseItemMenu")
 
-		for k,v in self.pauseItems.items():
+		for k,v in self.pauseItems.iteritems():
 			self.pauseItems[k] = (v, v.connect_after("activate", self.cb_pause_emerge(k)))
 
 		# systray
@@ -1072,18 +1079,24 @@ class MainWindow (Window):
 		self.packageTable.update(*args, **kwargs)
 
 	def build_terminal (self):
-		"""Builds the terminal."""
+		"""
+		Builds the terminal.
+		"""
 		
 		self.console.set_scrollback_lines(1024)
 		self.console.set_scroll_on_output(True)
 		self.console.set_font_from_string(self.cfg.get("consolefont", "GTK"))
 		self.console.connect("button-press-event", self.cb_right_click)
-		termScroll = gtk.VScrollbar(self.console.get_adjustment())
 		self.termHB.pack_start(self.console, True, True)
+		
+		# add scrollbar
+		termScroll = gtk.VScrollbar(self.console.get_adjustment())
 		self.termHB.pack_start(termScroll, False)
 
 	def build_queue_list (self):
-		"""Builds the queue list."""
+		"""
+		Builds the queue list.
+		"""
 
 		store = gtk.TreeStore(str,str,bool)
 		
@@ -1097,7 +1110,9 @@ class MainWindow (Window):
 		self.queueList.append_column(col)
 
 	def build_cat_list (self):
-		"""Builds the category list."""
+		"""
+		Builds the category list.
+		"""
 		
 		store = gtk.ListStore(str)
 
@@ -1110,7 +1125,13 @@ class MainWindow (Window):
 		self.catList.get_selection().connect("changed", self.cb_cat_list_selection)
 
 	def fill_cat_store (self, store):
-		
+		"""
+		Fills the category store with data.
+
+		@param store: the store to fill
+		@type store: gtk.ListStore
+		"""
+
 		cats = self.db.get_categories(installed = not self.showAll)
 
 		for p in cats:
@@ -1120,10 +1141,12 @@ class MainWindow (Window):
 		store.set_sort_column_id(0, gtk.SORT_ASCENDING)
 
 	def build_pkg_list (self, name = None):
-		"""Builds the package list.
+		"""
+		Builds the package list.
 		
 		@param name: name of the selected catetegory
-		@type name: string"""
+		@type name: string
+		"""
 		
 		store = gtk.ListStore(gtk.gdk.Pixbuf, str, str)
 		self.fill_pkg_store(store,name)
@@ -1150,14 +1173,14 @@ class MainWindow (Window):
 		self.pkgList.get_selection().connect("changed", self.cb_pkg_list_selection)
 
 	def fill_pkg_store (self, store, name = None):
-		"""Fills a given ListStore with the packages in a category.
+		"""
+		Fills a given ListStore with the packages in a category.
 		
 		@param store: the store to fill
 		@type store: gtk.ListStore
 		@param name: the name of the category
 		@type name: string
-		@returns: the filled store
-		@rtype: gtk.ListStore"""
+		"""
 
 		if name:
 			for cat, pkg, is_inst in self.db.get_cat(name, self.sortPkgListByName):
@@ -1168,15 +1191,38 @@ class MainWindow (Window):
 				else:
 					icon = None
 				store.append([icon, pkg, cat])
-		return store
+
+	def refresh_stores (self):
+		"""
+		Refreshes the category and package stores.
+		"""
+		store = self.catList.get_model()
+		store.clear()
+		self.fill_cat_store(store)
+
+		store = self.pkgList.get_model()
+		store.clear()
+		try:
+			self.fill_pkg_store(store, self.selCatName)
+		except AttributeError: # no selCatName -> so no category selected --> ignore
+			debug("No category selected --> should be no harm.")
 
 	def load_session(self):
+		"""
+		Loads the session data.
+		"""
 		try:
 			self.session = Session("gtk_session.cfg")
 		except (OSError, IOError), e:
 			io_ex_dialog(e)
 			return
 
+		#
+		# the callbacks for the different session variables
+		#
+
+
+		# QUEUE
 		def load_queue (merge, unmerge, oneshot):
 			def _load(q, **kwargs):
 				if q:
@@ -1193,6 +1239,7 @@ class MainWindow (Window):
 			else:
 				return ("", "", "")
 
+		# PANED
 		def load_paned (*pos):
 			pos = map(int, pos)
 			[x.set_position(p) for x,p in zip((self.vpaned, self.hpaned), pos)]
@@ -1200,6 +1247,15 @@ class MainWindow (Window):
 		def save_paned ():
 			return [x.get_position() for x in (self.vpaned, self.hpaned)]
 
+		# SELECTION
+		def load_selection (*positions):
+			def _load(list, pos):
+				pos = int(pos)
+				list.get_selection().select_path(pos)
+				list.scroll_to_cell(pos)
+
+			map(_load, (self.catList, self.pkgList), positions)
+		
 		def save_selection ():
 			def _save(list):
 				iter = list.get_selection().get_selected()[1]
@@ -1210,22 +1266,14 @@ class MainWindow (Window):
 
 			return map(_save, (self.catList, self.pkgList))
 
-		def load_selection (*positions):
-			
-			def _load(list, pos):
-				pos = int(pos)
-				list.get_selection().select_path(pos)
-				list.scroll_to_cell(pos)
+		# PLUGIN
+		def load_plugin (p):
+			def _load(val):
+				if val:
+					p.status = int(val)*2
 
-			map(_load, (self.catList, self.pkgList), positions)
-
-		map(self.session.add_handler,[
-			([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
-			([("vpanedpos", "window"), ("hpanedpos", "window")], load_paned, save_paned),
-			([("catsel", "window"), ("pkgsel", "window")], load_selection, save_selection),
-			([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue)
-			])
-
+			return _load
+		
 		def save_plugin (p):
 			def _save ():
 				stat_on = p.status >= p.STAT_ENABLED
@@ -1237,24 +1285,32 @@ class MainWindow (Window):
 					return ""
 			return _save
 
-		def load_plugin (p):
-			def _load(val):
-				if val:
-					p.status = int(val)*2
+		# set the simple ones :)
+		map(self.session.add_handler,[
+			([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
+			([("vpanedpos", "window"), ("hpanedpos", "window")], load_paned, save_paned),
+			([("catsel", "window"), ("pkgsel", "window")], load_selection, save_selection),
+			([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue)
+			])
 
-			return _load
+		# set the plugins
+		queue = plugin.get_plugin_queue()
+		if queue:
+			for p in queue.get_plugins():
+				self.session.add_handler(([(p.name.replace(" ","_"), "plugins")], load_plugin(p), save_plugin(p)))
 
-		queue = plugin.get_plugin_queue().get_plugins()
-		if queue is None:
-			queue = []
-
-		for p in queue:
-			self.session.add_handler(([(p.name.replace(" ","_"), "plugins")], load_plugin(p), save_plugin(p)))
-
+		# now we have the handlers -> load
 		self.session.load()
 	
 	def jump_to (self, cp, version = None):
-		"""Is called when we want to jump to a specific package."""
+		"""
+		Is called when we want to jump to a specific package.
+
+		@param cp: the CP to jump to
+		@type cp: string
+		@param version: if not None jump to a specific version
+		@type version: string
+		"""
 
 		cat, pkg = cp.split("/")
 
@@ -1271,16 +1327,39 @@ class MainWindow (Window):
 		self.show_package(cp, self.queue, version = version)
 
 	def set_uri_hook (self, browser):
+		"""
+		Sets the browser command which is called when a URL is going to be opened.
+
+		@param browser: the browser command
+		@type browser: string
+		"""
+
 		browser = browser.split()
 		gtk.link_button_set_uri_hook(lambda btn, x: get_listener().send_cmd(browser+[btn.get_uri()]))
 
 	def set_notebook_tabpos (self, tabposlist):
+		"""
+		Sets the positions of the tabs of the notebooks.
+
+		@param tabposlist: the list of positions: first comes the one for package tabs; sndly for sys tabs
+		@type tabposlist: int[]
+		"""
 		self.pkgNotebook.set_tab_pos(tabposlist[0])
 		self.sysNotebook.set_tab_pos(tabposlist[1])
 
 	def title_update (self, title):
+		"""
+		Updates the titles of the window and the systray.
+		Mainly used with emerge term titles.
+
+		@param title: the title
+		@type title: string
+		"""
 		
 		def window_title_update (title):
+			"""
+			Updates the title of the main window.
+			"""
 			if title is None or not self.cfg.get_boolean("updateTitle", "GUI"):
 				self.window.set_title(self.main_title)
 			else:
@@ -1308,10 +1387,14 @@ class MainWindow (Window):
 
 			return False
 
+		# as this might get called from other threads use gobject.idle_add
 		gobject.idle_add(__update, title)
 
 	def cb_cat_list_selection (self, selection):
-		"""Callback for a category-list selection. Updates the package list with the packages in the category."""
+		"""
+		Callback for a category-list selection. 
+		Updates the package list with the packages in the category.
+		"""
 		# get the selected category
 		store, it = selection.get_selected()
 		if it:
@@ -1321,7 +1404,10 @@ class MainWindow (Window):
 		return True
 
 	def cb_pkg_list_selection (self, selection):
-		"""Callback for a package-list selection. Updates the package info."""
+		"""
+		Callback for a package-list selection.
+		Updates the package info.
+		"""
 		store, it = selection.get_selected()
 		if it:
 			cp = "%s/%s" % (store.get_value(it, 2), store.get_value(it, 1))
@@ -1571,6 +1657,10 @@ class MainWindow (Window):
 		return True
 
 	def cb_search_changed (self, *args):
+		"""
+		Called when the user enters something in the search field.
+		Updates the packages according to the search expression.
+		"""
 		if self.cfg.get_boolean("searchOnType", section="GUI"):
 			txt = self.searchEntry.get_text()
 
@@ -1590,30 +1680,45 @@ class MainWindow (Window):
 
 			return True
 
-	def cb_delete_search_clicked (self, *args):
-		self.searchEntry.set_text("")
-		return True
-
-	def cb_preferences_clicked (self, button):
+	def cb_preferences_clicked (self, *args):
+		"""
+		User wants to open preferences.
+		"""
 		PreferenceWindow(self.window, self.cfg, self.console.set_font_from_string, self.set_uri_hook, self.set_notebook_tabpos)
 		return True
 
-	def cb_about_clicked (self, button):
+	def cb_about_clicked (self, *args):
+		"""
+		User wants to open about dialog.
+		"""
 		AboutWindow(self.window)
 		return True
 
-	def cb_plugins_clicked (self, btn):
-		queue = plugin.get_plugin_queue().get_plugins()
+	def cb_plugins_clicked (self, *args):
+		"""
+		User wants to open plugin dialog.
+		"""
+		queue = plugin.get_plugin_queue()
 		if queue is None:
-			queue = []
+			plugins = []
+		else:
+			plugins = queue.get_plugins()
 		
-		PluginWindow(self.window, queue)
+		PluginWindow(self.window, plugins)
 		return True
 	
-	def cb_show_updates_clicked (self, button):
-		def __update():
-			
+	def cb_show_updates_clicked (self, *args):
+		"""
+		Show the list of updateble packages.
+		"""
+
+		def __update():			
 			def cb_idle_show(packages):
+				"""
+				Callback opening the menu when the calculation is finished.
+
+				@returns: False to signal that it is finished
+				"""
 				UpdateWindow(self.window, packages, self.queue, self.jump_to)
 				return False
 			
@@ -1632,21 +1737,26 @@ class MainWindow (Window):
 		return True
 
 	def cb_show_installed_toggled (self, *args):
+		"""
+		Toggle the "show only installed" option.
+		"""
 		self.showAll = not self.showAll
-
-		store = self.catList.get_model()
-		store.clear()
-		self.fill_cat_store(store)
-
-		store = self.pkgList.get_model()
-		store.clear()
-		try:
-			self.fill_pkg_store(store, self.selCatName)
-		except AttributeError: # no selCatName -> so no category selected --> ignore
-			debug("No category selected --> should be no harm.")
+		self.refresh_stores()
 
 	def cb_right_click (self, object, event):
-		if event.button == 3:
+		"""
+		Called when the user right clicks somewhere.
+		Used to display a menu.
+		
+		This method should handle ALL such menus.
+
+		@param object: the object/widget where the click is done
+		@type object: gtk.Widget
+		@param event: the event triggered
+		@type event: gtk.gdk.Event
+		"""
+
+		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3: # 3 == right click
 			x = int(event.x)
 			y = int(event.y)
 			time = event.time
@@ -1655,7 +1765,7 @@ class MainWindow (Window):
 				pthinfo = object.get_path_at_pos(x, y)
 				if pthinfo is not None:
 					path, col, cellx, celly = pthinfo
-					it = self.queueTree.get_original().get_iter(path)
+					it = self.queueList.get_iter(path)
 					if self.queueTree.is_in_emerge(it) and self.queueTree.iter_has_parent(it):
 						object.grab_focus()
 						object.set_cursor(path, col, 0)
@@ -1668,7 +1778,10 @@ class MainWindow (Window):
 		else:
 			return False
 
-	def cb_oneshot_clicked (self, action):
+	def cb_oneshot_clicked (self, *args):
+		"""
+		Mark a package as oneshot.
+		"""
 		sel = self.queueList.get_selection()
 		store, it = sel.get_selected()
 		if it:
@@ -1678,36 +1791,69 @@ class MainWindow (Window):
 			self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
 
 	def cb_pause_emerge (self, curr):
+		"""
+		This method returns a callback for a "pause emerge" toggle button.
+		It is needed as there are different toggle buttons of this type and if one is clicked,
+		the others should be marked too.
+
+		@param curr: The button to return the callback for.
+		@type curr: gtk.ToggleButton
+		"""
 		def pause (cb):
+			"""
+			The actual callback.
+
+			Mark all other buttons too.
+
+			@param cb: The button which got toggled.
+			@type cb: gtk.ToggleButton
+			"""
+
+			# pause or continue
 			self.emergePaused = cb.get_active()
 			if not self.emergePaused:
 				self.queue.continue_emerge()
 			else:
 				self.queue.stop_emerge()
 
+			# block the handlers of the other buttons
+			# so that calling "set_active" does not call this callback recursivly
 			for v in self.pauseItems.itervalues():
 				v[0].handler_block(v[1])
 
+			# mark the others
 			for k, v in self.pauseItems.iteritems():
 				if k != curr:
 					v[0].set_active(self.emergePaused)
 
+			# unblock
 			for v in self.pauseItems.itervalues():
 				v[0].handler_unblock(v[1])
 			
 			return False
 		return pause
 
-	def cb_kill_clicked (self, action):		
+	def cb_kill_clicked (self, *args):
+		"""
+		Kill emerge.
+		"""
 		self.queue.kill_emerge()
-		if self.emergePaused:
-			self.pauseItems["menu"][0].set_active(False)
+		if self.emergePaused: # unmark the "pause emerge" buttons
+			self.pauseItems["menu"][0].set_active(False) # calling one button is enough (see: cb_pause_emerge)
 
-	def cb_copy_clicked (self, action):
+	def cb_copy_clicked (self, *args):
+		"""
+		Copy marked text in the terminal to clipboard.
+		"""
 		self.console.copy_clipboard()
 
 	def cb_delete (self, *args):
-		"""Looks whether we really want to quit."""
+		"""
+		Called when the user wants to quit the application.
+
+		Asks the user for confirmation if there is something in the queue.
+		Also saves session data.
+		"""
 
 		self.__save_queue = False
 
@@ -1715,7 +1861,7 @@ class MainWindow (Window):
 			ret = queue_not_empty_dialog()
 			if ret == gtk.RESPONSE_CANCEL:
 				return True
-			else:
+			else: # there is sth in queue AND the user still wants to close -> kill emerge
 				self.__save_queue = (ret == gtk.RESPONSE_YES)
 				self.queue.kill_emerge()
 
@@ -1725,6 +1871,11 @@ class MainWindow (Window):
 		return False
 
 	def cb_minimized (self, window, event):
+		"""
+		User wants to minimize the window. 
+		If it is possible to minimize to tray, it is done.
+		"""
+
 		if self.tray and self.cfg.get_boolean("hideOnMinimize", "GUI"):
 			if event.changed_mask & gtk.gdk.WINDOW_STATE_ICONIFIED:
 				if event.new_window_state & gtk.gdk.WINDOW_STATE_ICONIFIED:
@@ -1733,7 +1884,10 @@ class MainWindow (Window):
 		
 		return False
 
-	def cb_systray_activated (self, tray):
+	def cb_systray_activated (self, *args):
+		"""
+		Systray was activated. Show or hide the window.
+		"""
 		if self.window.iconify_initially:
 			self.window.deiconify()
 			self.window.show()
@@ -1742,15 +1896,23 @@ class MainWindow (Window):
 			self.window.iconify()
 
 	def cb_close (self, *args):
+		"""
+		"Close" menu entry called.
+		Emulate normal quitting.
+		"""
 		if not self.cb_delete(): # do the checks
 			self.window.destroy()
 
-	def cb_destroy (self, widget):
-		"""Calls main_quit()."""
+	def cb_destroy (self, *args):
+		"""
+		Calls main_quit().
+		"""
 		gtk.main_quit()
 	
 	def main (self):
-		"""Main."""
+		"""
+		Main.
+		"""
 		gobject.threads_init() 
 		# now subthreads can run normally, but are not allowed to touch the GUI. If threads should change sth there - use gobject.idle_add().
 		# for more informations on threading and gtk: http://www.async.com.br/faq/pygtk/index.py?req=show&file=faq20.006.htp
