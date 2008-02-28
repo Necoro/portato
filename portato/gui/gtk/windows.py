@@ -1667,17 +1667,7 @@ class MainWindow (Window):
 			if txt or self.db.restrict:
 				self.db.restrict = txt
 
-			store = self.catList.get_model()
-			store.clear()
-			self.fill_cat_store(store)
-
-			store = self.pkgList.get_model()
-			store.clear()
-			try:
-				self.fill_pkg_store(store, self.selCatName)
-			except AttributeError: # no selCatName -> so no category selected --> ignore
-				debug("No category selected --> should be no harm.")
-
+			self.refresh_stores()
 			return True
 
 	def cb_preferences_clicked (self, *args):
