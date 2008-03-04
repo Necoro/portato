@@ -948,6 +948,7 @@ class MainWindow (Window):
 		# booleans
 		self.doUpdate = False
 		self.showAll = True # show only installed or all packages?
+		self.__searchChanged = False
 
 		# installed pixbuf
 		self.instPixbuf = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
@@ -1675,16 +1676,26 @@ class MainWindow (Window):
 		Called when the user enters something in the search field.
 		Updates the packages according to the search expression.
 		"""
-		if self.cfg.get_boolean("searchOnType", section="GUI"):
-			txt = self.searchEntry.get_text()
+		if not self.__searchChanged and self.cfg.get_boolean("searchOnType", section="GUI"):
+			self.__searchChanged = True
+			
+			def __update():
+				self.__searchChanged = False
+				txt = self.searchEntry.get_text()
 
-			if txt or self.db.restrict:
-				self.db.restrict = txt
+				if txt or self.db.restrict:
+					self.db.restrict = txt
 
-			self.refresh_stores()
-			self.catList.get_selection().select_path("0") # XXX make this smarter
+				self.refresh_stores()
+				self.catList.get_selection().select_path("0") # XXX make this smarter
 
-			return True
+				return False # not again ;)
+
+			gobject.timeout_add(100, __update)
+
+	def cb_delete_search_clicked (self, *args):
+		self.searchEntry.set_text("")
+		return True
 
 	def cb_preferences_clicked (self, *args):
 		"""
