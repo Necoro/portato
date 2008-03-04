@@ -1248,23 +1248,36 @@ class MainWindow (Window):
 			return [x.get_position() for x in (self.vpaned, self.hpaned)]
 
 		# SELECTION
-		def load_selection (*positions):
-			def _load(list, pos):
-				pos = int(pos)
+		def load_selection (list, col):
+			def _load (name):
+				pos = "0" # default
+				
+				if name:
+					for cname, path in ((x[col], x.path) for x in list.get_model()):
+						if cname == name:
+							pos = path
+				
 				list.get_selection().select_path(pos)
 				list.scroll_to_cell(pos)
+			
+			return _load
 
-			map(_load, (self.catList, self.pkgList), positions)
-		
-		def save_selection ():
-			def _save(list):
-				iter = list.get_selection().get_selected()[1]
-				if iter:
-					return list.get_model().get_string_from_iter(iter)
-				else:
-					return "0"
+		def save_pkg_selection ():
+			store, iter = self.pkgList.get_selection().get_selected()
+			if iter:
+				return store.get_value(iter, 1)
+			else:
+				return ""
 
-			return map(_save, (self.catList, self.pkgList))
+		def save_cat_selection ():
+			# try to find the correct category using the pkgList selection
+			# so we do not select ALL =)
+			# if no package has been selected - return selCatName
+			store, iter = self.pkgList.get_selection().get_selected()
+			if iter:
+				return store.get_value(iter, 2)
+			else:
+				return self.selCatName
 
 		# PLUGIN
 		def load_plugin (p):
@@ -1289,7 +1302,8 @@ class MainWindow (Window):
 		map(self.session.add_handler,[
 			([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
 			([("vpanedpos", "window"), ("hpanedpos", "window")], load_paned, save_paned),
-			([("catsel", "window"), ("pkgsel", "window")], load_selection, save_selection),
+			([("catsel", "window")], load_selection(self.catList, 0), save_cat_selection),
+			([("pkgsel", "window")], load_selection(self.pkgList, 1), save_pkg_selection),
 			([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue)
 			])
 
