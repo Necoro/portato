@@ -17,6 +17,7 @@ from .. import flags
 from .. import system
 from ..exceptions import BlockedException, PackageNotFoundException, DependencyCalcError
 from ...helper import debug, error, unique_array
+from ...dependency import DependencyTree
 
 import portage, portage_dep
 
@@ -305,33 +306,30 @@ class PortagePackage (Package):
 	def get_dependencies (self):
 		deps = " ".join(map(self.get_package_settings, ("RDEPEND", "PDEPEND", "DEPEND")))
 		deps = portage_dep.paren_reduce(deps)
-		depdir = {"global": set()}
+		
+		tree = DependencyTree()
 
-		def add (dir, deps):
+		def add (tree, deps):
 			iter = (x for x in deps)
 			for dep in iter:
 				if dep.endswith("?"):
-					dep = dep[:-1]
-					if dep not in dir:
-						dir[dep] = {"global": set()}
+					ntree = tree.add_flag(dep[:-1])
 					n = iter.next()
-					if isinstance(n, list):
-						add(dir[dep], n)
-					else:
-						dir[dep]["global"].add(n)
-				elif dep == "||":
-					if not dep in dir:
-						dir[dep] = set()
-
+					if not hasattr(n, "__iter__"):
+						n = (n,)
+					add(ntree, n)
+				
+				elif dep == "||":	
 					n = iter.next() # skip
-					if not isinstance(n, list):
+					if not hasattr(n, "__iter__"):
 						n = tuple(n,)
 					else:
 						n = tuple(n)
 
-					dir[dep].add(n)
+					tree.add_or(n)
+				
 				else:
-					dir["global"].add(dep)
+					tree.add(dep)
 
-		add(depdir, deps)
-		return depdir
+		add(tree, deps)
+		return tree
