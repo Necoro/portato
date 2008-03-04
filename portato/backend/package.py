@@ -333,6 +333,17 @@ class Package (_Package):
 		@rtype: string<iterator>
 		"""
 
+		raise NotImplementedError
+
+	def get_dependencies (self):
+		"""
+		Returns the tree of dependencies that this package needs.
+
+		@rtype: L{DependencyTree}
+		"""
+
+		raise NotImplementedError
+
 	def get_package_settings(self, var, tree = None):
 		"""Returns a package specific setting, such as DESCRIPTION, SRC_URI, IUSE ...
 		
