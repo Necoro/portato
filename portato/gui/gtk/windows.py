@@ -1782,7 +1782,7 @@ class MainWindow (Window):
 				pthinfo = object.get_path_at_pos(x, y)
 				if pthinfo is not None:
 					path, col, cellx, celly = pthinfo
-					it = self.queueList.get_iter(path)
+					it = self.queueList.get_model().get_iter(path)
 					if self.queueTree.is_in_emerge(it) and self.queueTree.iter_has_parent(it):
 						object.grab_focus()
 						object.set_cursor(path, col, 0)
