@@ -10,26 +10,38 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-"""A simple parser for configuration files in ini-style.
+"""
+A simple parser for configuration files in ini-style.
 
 The main difference to other simple ini-parsers is, that it does not
 write the whole structure into the file, but only the changed values.
 Thus it keeps comments and structuring of the file.
 
-@var DELIMITER: list of delimiters allowed
-@type DELIMITER: string[]
+:Variables:
 
-@var COMMENT: comment marks allowed
-@type COMMENT: string[]
+	DELIMITER : string[]
+		list of delimiters allowed
 
-@var TRUE: Regular expression for all TRUE values allowed.
-Currently supported are the values (case insensitive): true, 1, on, wahr, ja, yes.
-@var FALSE: Regular expression for all FALSE values allowed.
-Currently supported are the values (case insensitive): false, 0, off, falsch, nein, no,
-@var SECTION: Regular expression allowing the recognition of a section header.
-@var EXPRESSION: Regular expression defining a normal option-value pair.
+	COMMENT : string []
+		comment marks allowed
+
+	TRUE
+		Regular expression for all TRUE values allowed.
+		Currently supported are the values (case insensitive): true, 1, on, wahr, ja, yes.
+
+	FALSE
+		Regular expression for all FALSE values allowed.
+		Currently supported are the values (case insensitive): false, 0, off, falsch, nein, no.
+
+	SECTION
+		Regular expression allowing the recognition of a section header.
+
+	EXPRESSION
+		Regular expression defining a normal option-value pair.
 """
+
 from __future__ import absolute_import, with_statement
+__docformat__ = "restructuredtext"
 
 import re
 from gettext import lgettext as _
@@ -47,28 +59,43 @@ SECTION = re.compile("\s*\[(?P<name>\w(\w|[-_])*)\]\s*")
 EXPRESSION = re.compile(r"\s*(?P<key>\w(\w|[-_])*)\s*[:=]\s*(?P<value>.*)\s*")
 
 class Value (object):
-	"""Class defining a value of a key.
+	"""
+	Class defining a value of a key.
 	
-	@ivar value: The specific value. This is a property.
-	@type value: arbitrary
-	@ivar line: The line in the config file.
-	@type line: int
-	@ivar boolean: The boolean meaning of this value. Set this to C{None} if this is not a boolean.
-	@type boolean: boolean
-	@ivar changed: Set to True if the value has been changed.
-	@type changed: boolean
-	@ivar old: The old value.
-	@type old: arbitrary"""
+	:IVariables:
+
+		value
+			The specific value.
+
+		old
+			The old value
+
+		line : int
+			The line in the config file.
+		
+		boolean : boolean
+			The boolean meaning of this value. Set this to ``None`` if this is not a boolean.
+	
+		changed : boolean
+			Set to True if the value has been changed.
+	"""
+	
 
 	def __init__ (self, value, line, bool = None):
-		"""Constructor.
+		"""
+		Constructor.
 
-		@param value: the value
-		@type value: string
-		@param line: the line in the config file
-		@type line: int
-		@param bool: The boolean meaning of the value. Set this to C{None} if this is not a boolean.
-		@type bool: boolean"""
+		:Parameters:
+
+			value : string
+				the value
+
+			line : int
+				the line in the config file
+
+			bool : boolean
+				The boolean meaning of the value. Set this to ``None`` if this is not a boolean.
+		"""
 
 		self.__value = value
 		self.line = line
@@ -78,10 +105,12 @@ class Value (object):
 		self.old = value # keep the original one ... so if we change it back to this one, we do not have to write
 
 	def set (self, value):
-		"""Sets the value to a new one.
+		"""
+		Sets the value to a new one.
 		
-		@param value: new value
-		@type value: string"""
+		:param value: new value
+		:type value: string
+		"""
 
 		self.__value = value
 		
@@ -91,18 +120,20 @@ class Value (object):
 			self.changed = False
 
 	def get (self):
-		"""Returns the actual value.
+		"""
+		Returns the actual value.
 		
-		@returns: the actual value
-		@rtype: string"""
+		:rtype: string
+		"""
 
 		return self.__value
 	
 	def is_bool (self):
-		"""Returns whether the actual value has a boolean meaning.
+		"""
+		Returns whether the actual value has a boolean meaning.
 		
-		@returns: True if the actual value can be interpreted as a boolean
-		@rtype: boolean"""
+		:rtype: boolean
+		"""
 
 		return (self.boolean != None)
 
@@ -115,19 +146,25 @@ class Value (object):
 	value = property(get,set)
 	
 class ConfigParser:
-	"""The parser class.
+	"""
+	The parser class.
 
-	@cvar true_false: A mapping from the truth values to their opposits.
-	@type true_false: string -> string
+	:CVariables:
+
+		true_false : string -> string
+			A mapping from the truth values to their opposits.
 	
-	@ivar file: the file to scan
-	@type file: string
-	@ivar cache: caches the content of the file
-	@type cache: string[]
-	@ivar vars: the found options grouped by section
-	@type vars: string -> (string -> L{Value})
-	@ivar pos: the positions of the values grouped by lineno
-	@type pos: int -> (int, int)"""
+	:IVariables:
+
+		file : string
+			the file to scan
+		cache : string[]
+			caches the content of the file
+		vars : string -> (string -> `Value`)
+			the found options grouped by section
+		pos : int -> (int, int)
+			the positions of the values grouped by lineno
+	"""
 
 	# generates the complementary true-false-pairs
 	true_false = {
@@ -140,10 +177,12 @@ class ConfigParser:
 	true_false.update(zip(true_false.values(), true_false.keys()))
 
 	def __init__ (self, file):
-		"""Constructor.
+		"""
+		Constructor.
 
-		@param file: the configuration file to open
-		@type file: string"""
+		:param file: the configuration file to open
+		:type file: string
+		"""
 
 		self.file = file
 		self.writelock = Lock()
@@ -158,12 +197,16 @@ class ConfigParser:
 		self.sections = {"MAIN" : -1} # the line with the section header
 
 	def _invert (self, val):
-		"""Invertes a given boolean.
+		"""
+		Invertes a given boolean.
 
-		@param val: value to invert
-		@type val: string
-		@returns: inverted value
-		@rtype: string"""
+		:param val: value to invert
+		:type val: string
+		:returns: inverted value
+		:rtype: string
+
+		:see: `true_false`
+		"""
 
 		return self.true_false[val.lower()]
 
@@ -214,35 +257,43 @@ class ConfigParser:
 				error(_("Unrecognized line in configuration: %s"), line)
 
 	def get (self, key, section = "MAIN"):
-		"""Returns the value of a given key in a section.
+		"""
+		Returns the value of a given key in a section.
 
-		@param key: the key
-		@type key: string
-		@param section: the section
-		@type section: string
+		:Parameters:
+
+			key : string
+				the key
+			section : string
+				the section
 		
-		@returns: value
-		@rtype: string
+		:returns: value
+		:rtype: string
 		
-		@raises KeyError: if section or key could not be found"""
+		:raises KeyError: if section or key could not be found
+		"""
 
 		section = section.upper()
 		key = key.lower()
 		return self.vars[section][key].value
 
 	def get_boolean (self, key, section = "MAIN"):
-		"""Returns the boolean value of a given key in a section.
+		"""
+		Returns the boolean value of a given key in a section.
 
-		@param key: the key
-		@type key: string
-		@param section: the section
-		@type section: string
+		:Parameters:
+
+			key : string
+				the key
+			section : string
+				the section
 		
-		@returns: value
-		@rtype: boolean
+		:returns: value
+		:rtype: boolean
 		
-		@raises KeyError: if section or key could not be found
-		@raises ValueError: if key does not have a boolean value"""
+		:raises KeyError: if section or key could not be found
+		:raises ValueError: if key does not have a boolean value
+		"""
 		
 		section = section.upper()
 		key = key.lower()
@@ -255,16 +306,20 @@ class ConfigParser:
 		raise ValueError, "\"%s\" is not a boolean. (%s)" % (key, val.value)
 
 	def set (self, key, value = "", section = "MAIN"):
-		"""Sets a new value of a given key in a section.
+		"""
+		Sets a new value of a given key in a section.
 
-		@param key: the key
-		@type key: string
-		@param value: the new value
-		@type value: string
-		@param section: the section
-		@type section: string
+		:Parameters:
+
+			key : string
+				the key
+			value : string
+				the new value
+			section : string
+				the section
 		
-		@raises KeyError: if section or key could not be found"""
+		:raises KeyError: if section or key could not be found
+		"""
 		
 		section = section.upper()
 		key = key.lower()
@@ -272,18 +327,21 @@ class ConfigParser:
 		self.vars[section][key].value = value
 
 	def set_boolean (self, key, value, section = "MAIN"):
-		"""Sets a new boolean value of a given key in a section.
+		"""
+		Sets a new boolean value of a given key in a section.
 		Therefore it invertes the string representation of the boolean (in lowercase).
 
-		@param key: the key
-		@type key: string
-		@param value: the new value
-		@type value: boolean
-		@param section: the section
-		@type section: string
-		
-		@raises KeyError: if section or key could not be found
-		@raises ValueError: if the old/new value is not a boolean"""
+		:Parameters:
+
+			key : string
+				the key
+			value : boolean
+				the new value
+			section : string
+				the section
+
+		:raises KeyError: if section or key could not be found
+		:raises ValueError: if the old/new value is not a boolean"""
 		
 		section = section.upper()
 		key = key.lower()

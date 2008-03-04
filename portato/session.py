@@ -33,7 +33,7 @@ class Session (object):
 
 	def __init__ (self, file):
 		"""
-		Initialize a session with a certain file inside L{SESSION_DIR.}
+		Initialize a session with a certain file inside L{SESSION_DIR}.
 
 		@param file: the file in L{SESSION_DIR}, where the options will be saved.
 		"""

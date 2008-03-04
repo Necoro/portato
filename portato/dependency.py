@@ -10,14 +10,15 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
-
-from .helper import debug
-
 """
 Provides classes for the presentation of dependencies.
 """
+
+from __future__ import absolute_import, with_statement
 __docformat__ = "restructuredtext"
+
+
+from .helper import debug
 
 class Dependency (object):
 
@@ -93,7 +94,7 @@ class DependencyTree (object):
 		deps : set(`Dependency`)
 			The list of dependencies which are not dependent on a useflag.
 
-		flags : dict(string -> `DependencyTree`)
+		flags : string -> `DependencyTree`
 			Holds the additional dependency trees per useflag.
 	"""
 

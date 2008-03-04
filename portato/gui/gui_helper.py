@@ -434,7 +434,7 @@ class EmergeQueue:
 		@param cpv: Package to add
 		@type cpv: string (cat/pkg-ver)
 		@param type: The type of this append process. Possible values are "install", "uninstall", "update".
-		@type unmerge: string		
+		@type type: string		
 		@param update: Set to True if a package is going to be updated (e.g. if the use-flags changed).
 		@type update: boolean
 		@param forceUpdate: Set to True if the update should be forced.
@@ -665,7 +665,7 @@ class EmergeQueue:
 		@param force: If False, '-pv' is send to emerge. Default: False.
 		@type force: boolean
 		@param newuse: If True, append newuse options
-		@type force: boolean
+		@type newuse: boolean
 		@param deep: If True, append deep options
 		@type deep: boolean
 		@param options: Additional options to send to the emerge command

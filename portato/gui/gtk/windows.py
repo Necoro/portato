@@ -637,11 +637,6 @@ class PackageTable:
 		self.useList.set_enable_tree_lines(True)
 
 	def build_version_combo (self):
-		"""Builds the package list.
-
-		@param name: name of the selected catetegory
-		@type name: string"""
-
 		store = gtk.ListStore(gtk.gdk.Pixbuf, str)
 
 		# build view
