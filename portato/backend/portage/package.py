@@ -301,3 +301,37 @@ class PortagePackage (Package):
 
 	def matches (self, criterion):
 		return system.cpv_matches(self.get_cpv(), criterion)
+
+	def get_dependencies (self):
+		deps = " ".join(map(self.get_package_settings, ("RDEPEND", "PDEPEND", "DEPEND")))
+		deps = portage_dep.paren_reduce(deps)
+		depdir = {"global": set()}
+
+		def add (dir, deps):
+			iter = (x for x in deps)
+			for dep in iter:
+				if dep.endswith("?"):
+					dep = dep[:-1]
+					if dep not in dir:
+						dir[dep] = {"global": set()}
+					n = iter.next()
+					if isinstance(n, list):
+						add(dir[dep], n)
+					else:
+						dir[dep]["global"].add(n)
+				elif dep == "||":
+					if not dep in dir:
+						dir[dep] = set()
+
+					n = iter.next() # skip
+					if not isinstance(n, list):
+						n = tuple(n,)
+					else:
+						n = tuple(n)
+
+					dir[dep].add(n)
+				else:
+					dir["global"].add(dep)
+
+		add(depdir, deps)
+		return depdir
