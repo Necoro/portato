@@ -1682,6 +1682,8 @@ class MainWindow (Window):
 				self.db.restrict = txt
 
 			self.refresh_stores()
+			self.catList.get_selection().select_path("0") # XXX make this smarter
+
 			return True
 
 	def cb_preferences_clicked (self, *args):
