@@ -133,7 +133,7 @@ package_dir = {"portato._shm" : "_shm"}
 
 if "gtk" in FRONTENDS:
 	packages.append("portato.gui.gtk")
-	data_files.append((DATA_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if x.endswith(".glade")]))
+	data_files.append((TEMPLATE_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if x.endswith(".glade")]))
 
 # do the distutils setup
 setup(name="Portato",

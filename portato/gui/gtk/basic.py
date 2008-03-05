@@ -24,7 +24,6 @@ from ...constants import TEMPLATE_DIR, APP_ICON, APP, LOCALE_DIR
 
 gtk.glade.bindtextdomain (APP, LOCALE_DIR)
 gtk.glade.textdomain (APP)
-GLADE_FILE = TEMPLATE_DIR+"portato.glade"
 
 class Window (object):
 	def __init__ (self):
