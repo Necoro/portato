@@ -19,6 +19,7 @@ __docformat__ = "restructuredtext"
 
 
 from .helper import debug
+from .backend import system
 
 class Dependency (object):
 
@@ -29,6 +30,9 @@ class Dependency (object):
 
 		dep : string
 			The dependency string. It is immutable.
+
+		satisfied : boolean
+			Is this dependency satisfied?
 	"""
 
 	def __init__ (self, dep):
@@ -38,7 +42,15 @@ class Dependency (object):
 		:param dep: dependency string
 		:type dep: string
 		"""
-		self.__dep = dep
+		self._dep = dep
+
+	def is_satisfied (self):
+		"""
+		Checks if this dependency is satisfied.
+
+		:rtype: boolean
+		"""
+		return system.find_best_match(self.dep, only_cpv = True, only_installed = True) is not None
 
 	def __cmp__ (self, b):
 		return cmp(self.dep, b.dep)
@@ -51,13 +63,13 @@ class Dependency (object):
 
 	__repr__ = __str__
 
-	def __get_dep (self):
-		return self.__dep
+	def _get_dep (self):
+		return self._dep
 
-	dep = property(__get_dep)
+	dep = property(_get_dep)
+	satisfied = property(is_satisfied)
 
 class OrDependency (Dependency):
-
 	"""
 	Dependency representing an "or".
 	
@@ -77,7 +89,7 @@ class OrDependency (Dependency):
 		:type deps: iter<string>
 		"""
 
-		self.__dep = tuple(Dependency(dep) for dep in deps)
+		self._dep = tuple(Dependency(dep) for dep in deps)
 	
 	def __str__ (self):
 		return "<|| %s>" % str(self.dep)

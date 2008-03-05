@@ -29,6 +29,7 @@ from ...session import Session
 from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
 from ...backend import flags, system
 from ...backend.exceptions import PackageNotFoundException, BlockedException
+from ... import dependency
 
 # more GUI stuff
 from ..gui_helper import Database, Config, EmergeQueue
@@ -422,7 +423,6 @@ class PreferenceWindow (AbstractDialog):
 		"""Just closes - w/o saving."""
 		self.window.destroy()
 
-
 class PackageTable:
 	"""A window with data about a specfic package."""
 
@@ -477,10 +477,21 @@ class PackageTable:
 		self.useList = self.tree.get_widget("useList")
 		self.build_use_list()
 
+		# depList
+		self.depList = self.tree.get_widget("dependencyList")
+		self.build_dep_list()
+
 		# views
 		self.ebuildView = self.tree.get_widget("ebuildScroll").get_child()
 		self.changelogView = self.tree.get_widget("changelogScroll").get_child()
 		self.filesView = self.tree.get_widget("filesScroll").get_child()
+
+		# icons
+		self.icons = {}
+		self.icons["use"] = self.window.render_icon(gtk.STOCK_REMOVE, gtk.ICON_SIZE_MENU)
+		self.icons["installed"] = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
+		self.icons["or"] = self.window.render_icon(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_MENU)
+		self.icons["block"] = self.window.render_icon(gtk.STOCK_NO, gtk.ICON_SIZE_MENU)
 
 	def update (self, cp, queue = None, version = None, doEmerge = True, instantChange = False, type = None):
 		"""Updates the table to show the contents for the package.
@@ -588,6 +599,55 @@ class PackageTable:
 			self.useFlagsLL.hide()
 			self.useFlagsLabel.hide()
 
+	def fill_dep_list(self):
+
+		deptree = self.actual_package().get_dependencies()
+		store = self.depList.get_model()
+
+		def add (tree, it):
+
+			def get_icon (dep):
+				if dep.satisfied:
+					return self.icons["installed"]
+				elif dep.dep[0] == "!":
+					return self.icons["block"]
+				else:
+					return None
+
+			# useflags
+			for use, usetree in tree.flags.iteritems():
+				if use[0] == "!":
+					usestring = _("If '%s' is disabled") % use[1:]
+				else:
+					usestring = _("If '%s' is enabled") % use
+				useit = store.append(it, [self.icons["use"], usestring])
+				add(usetree, useit)
+			
+			# ORs
+			ordeps = (dep for dep in tree.deps if isinstance(dep, dependency.OrDependency))
+
+			for ordep in ordeps:
+				orit = store.append(it, [self.icons["or"], _("One of the following")])
+
+				for dep in ordep.dep:
+					store.append(orit, [get_icon(dep), dep.dep])
+			
+			# normal
+			def sort_key (x):
+				split = system.split_cpv(x.dep)
+
+				if split is None: # split_cpv returns None if this is only a CP; we assume there are only valid deps
+					return x.dep
+				else:
+					return "/".join(split[0:2])
+			
+			ndeps = [dep for dep in tree.deps if not isinstance(dep, dependency.OrDependency)]
+			ndeps.sort(key = sort_key)
+			for dep in ndeps:
+				store.append(it, [get_icon(dep), dep.dep])
+
+		add (deptree, None)
+
 	def fill_use_list(self):
 
 		pkg = self.actual_package()
@@ -616,6 +676,23 @@ class PackageTable:
 			installed = use in instuse
 			store.append(actual_exp_it, [enabled, installed, use, system.get_use_desc(use, self.cp)])
 		
+	def build_dep_list (self):
+		store = gtk.TreeStore(gtk.gdk.Pixbuf, str)
+
+		self.depList.set_model(store)
+
+		col = gtk.TreeViewColumn()
+
+		cell = gtk.CellRendererPixbuf()
+		col.pack_start(cell, False)
+		col.add_attribute(cell, "pixbuf", 0)
+
+		cell = gtk.CellRendererText()
+		col.pack_start(cell, True)
+		col.add_attribute(cell, "text", 1)
+
+		self.depList.append_column(col)
+	
 	def build_use_list (self):
 		"""Builds the useList."""
 		store = gtk.TreeStore(bool, bool, str, str)
@@ -723,6 +800,11 @@ class PackageTable:
 		self.useList.get_model().clear()
 		self.useList.columns_autosize()
 		self.fill_use_list()
+
+		# set dep list
+		self.depList.get_model().clear()
+		self.useList.columns_autosize()
+		self.fill_dep_list()
 		
 		#
 		# rebuild the buttons and checkboxes in all the different manners which are possible
@@ -784,14 +866,6 @@ class PackageTable:
 			else:
 				self.unmergeBtn.set_sensitive(True)
 		
-		# XXX: workaround: currently the useflags are selected as the first tab
-		# but on first start we want the general page
-		if not self.vb.get_property("visible"): 
-			self.vb.show_all()
-			self.notebook.set_current_page(0)
-		else:
-			self.vb.show_all()
-
 		return True
 
 	def cb_button_pressed (self, b, event):
