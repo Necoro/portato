@@ -58,6 +58,18 @@ FALSE = re.compile("((false)|(0)|(off)|(falsch)|(nein)|(no))", re.I)
 SECTION = re.compile("\s*\[(?P<name>\w(\w|[-_])*)\]\s*")
 EXPRESSION = re.compile(r"\s*(?P<key>\w(\w|[-_])*)\s*[:=]\s*(?P<value>.*)\s*")
 
+class KeyNotFoundException (KeyError):
+	"""
+	Exception signaling, that a specific key could not be found in the configuration.
+	"""
+	pass
+
+class SectionNotFoundException (KeyError):
+	"""
+	Exception signaling, that a section could not be found in the configuration.
+	"""
+	pass
+
 class Value (object):
 	"""
 	Class defining a value of a key.
@@ -211,7 +223,9 @@ class ConfigParser:
 		return self.true_false[val.lower()]
 
 	def parse (self):
-		"""Parses the file."""
+		"""
+		Parses the file.
+		"""
 
 		# read into cache
 		with open(self.file, "r") as f:
@@ -256,6 +270,36 @@ class ConfigParser:
 			else: # neither comment nor empty nor expression nor section => error
 				error(_("Unrecognized line in configuration: %s"), line)
 
+	def _access (self, key, section):
+		"""
+		Private method for accessing the saved variables.
+
+		:Parameters:
+
+			key : string
+				the key
+			section : string
+				the section
+
+		:returns: the value wanted
+		:rtype: `Value`
+
+		:Exceptions:
+			
+			KeyNotFoundException : Raised if the specified key could not be found.
+			SectionNotFoundException : Raised if the specified section could not be found.
+		"""
+		
+		try:
+			section = self.vars[section]
+		except KeyError:
+			raise SectionNotFoundException("Section '%s' not found in file '%s'." % (section, self.file))
+		
+		try:
+			return section[key]
+		except KeyError:
+			raise KeyNotFoundException("Key '%s' not found in section '%s' in file '%s'." % (key, section, self.file))
+
 	def get (self, key, section = "MAIN"):
 		"""
 		Returns the value of a given key in a section.
@@ -270,12 +314,15 @@ class ConfigParser:
 		:returns: value
 		:rtype: string
 		
-		:raises KeyError: if section or key could not be found
+		:Exceptions:
+			
+			KeyNotFoundException : Raised if the specified key could not be found.
+			SectionNotFoundException : Raised if the specified section could not be found.
 		"""
 
 		section = section.upper()
 		key = key.lower()
-		return self.vars[section][key].value
+		return self._access(key, section).value
 
 	def get_boolean (self, key, section = "MAIN"):
 		"""
@@ -290,15 +337,18 @@ class ConfigParser:
 		
 		:returns: value
 		:rtype: boolean
-		
-		:raises KeyError: if section or key could not be found
-		:raises ValueError: if key does not have a boolean value
+
+		:Exceptions:
+			
+			KeyNotFoundException : Raised if the specified key could not be found.
+			SectionNotFoundException : Raised if the specified section could not be found.
+			ValueError : Raised if the key accessed is not a boolean.
 		"""
 		
 		section = section.upper()
 		key = key.lower()
 
-		val = self.vars[section][key]
+		val = self._access(key, section)
 
 		if val.is_bool():
 			return val.boolean
@@ -318,13 +368,16 @@ class ConfigParser:
 			section : string
 				the section
 		
-		:raises KeyError: if section or key could not be found
+		:Exceptions:
+			
+			KeyNotFoundException : Raised if the specified key could not be found.
+			SectionNotFoundException : Raised if the specified section could not be found.
 		"""
 		
 		section = section.upper()
 		key = key.lower()
 
-		self.vars[section][key].value = value
+		self._access(key, section).value = value
 
 	def set_boolean (self, key, value, section = "MAIN"):
 		"""
@@ -340,8 +393,12 @@ class ConfigParser:
 			section : string
 				the section
 
-		:raises KeyError: if section or key could not be found
-		:raises ValueError: if the old/new value is not a boolean"""
+		:Exceptions:
+			
+			KeyNotFoundException : Raised if the specified key could not be found.
+			SectionNotFoundException : Raised if the specified section could not be found.
+			ValueError : if the old/new value is not a boolean
+		"""
 		
 		section = section.upper()
 		key = key.lower()
@@ -349,7 +406,7 @@ class ConfigParser:
 		if not isinstance(value, bool):
 			raise ValueError, "Passed value must be a boolean."
 
-		val = self.vars[section][key]
+		val = self._access(key, section)
 		if val.is_bool():
 			if value is not val.boolean:
 				val.boolean = value
@@ -358,6 +415,17 @@ class ConfigParser:
 			raise ValueError, "\"%s\" is not a boolean." % key
 
 	def add_section (self, section, comment = None, with_blankline = True):
+		"""
+		Adds a section to a the current configuration. If this section already exists, it does nothing.
+
+		:Parameters:
+			
+			comment : string
+				An additional comment to place above this section. '\\n' in the comment is interpreted correctly.
+
+			with_blankline : boolean
+				Add an additional blank line above the section.
+		"""
 		section = section.upper()
 
 		if section in self.vars:
@@ -367,9 +435,10 @@ class ConfigParser:
 			self.cache.append("\n")
 
 		if comment:
-			if isinstance(comment, str) or isinstance(comment, unicode):
+			if isinstance(comment, basestring):
 				comment = comment.split("\n")
 			
+			# add newlines to comment at the beginning and the end
 			comment.insert(0, "")
 			comment.append("")
 			
@@ -381,18 +450,38 @@ class ConfigParser:
 		self.cache.append("[%s]\n" % section)
 
 	def add (self, key, value, section = "MAIN", comment = None, with_blankline = True):
+		"""
+		Adds a key to the specified section. If the key already exists, it acts the same as `set`.
+
+		:Parameters:
+
+			key : string
+				The key to add.
+			section : string
+				The section where to add the key to.
+			comment : string
+				An additional comment for the key. '\\n' is correctly handled.
+			with_blankline : boolean
+				Add an additional blank line in front of the value.
+
+		:raises SectionNotFoundException: if the section specified was not found
+		"""
+
 		section = section.upper()
 		key = key.lower()
 
-		if key in self.vars[section]:
-			return self.set(key, value, section)
+		try:
+			if key in self.vars[section]:
+				return self.set(key, value, section)
+		except KeyError:
+			raise SectionNotFoundException("Section '%s' not found in file '%s'." % (section, self.file))
 
 		self.write()
 		
 		# find line# to add
 		if self.vars[section]:
 			mline = max((x.line for x in self.vars[section].itervalues())) + 1
-		else:
+		else: # no value inside the section at the moment
 			mline = self.sections[section] + 1
 
 		if with_blankline and mline > 0:
@@ -400,7 +489,7 @@ class ConfigParser:
 			mline += 1
 
 		if comment:
-			if isinstance(comment, str) or isinstance(comment, unicode):
+			if isinstance(comment, basestring):
 				comment = comment.split("\n")
 			
 			for c in comment:
@@ -412,7 +501,9 @@ class ConfigParser:
 		self.write()
 
 	def write (self):
-		"""Writes file."""
+		"""
+		Writes the configuration file.
+		"""
 
 		if not self.cache:
 			return
@@ -423,14 +514,11 @@ class ConfigParser:
 					if val.changed:
 						part1 = self.cache[val.line][:self.pos[val.line][0]] 	# key+DELIMITER
 						part2 = val.value										# value
-						part3 = self.cache[val.line][self.pos[val.line][1]:]	# everything behind the vale (\n in normal cases)
+						part3 = self.cache[val.line][self.pos[val.line][1]:]	# everything behind the value (\n in normal cases)
 
-						if not val.old: # empty original value
-							add = ""
-							if part1.endswith("\n"):
-								part1 = part1[:-1]
-								add = "\n"
-							part3 = part3 + add
+						if not val.old and part1.endswith("\n"): # empty original value
+							part1 = part1[:-1] # strip \n
+							part3 = part3 + "\n"
 
 						self.cache[val.line] = part1 + part2 + part3
 			
