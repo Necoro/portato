@@ -108,7 +108,7 @@ def main ():
 		env = os.environ.copy()
 		env.update(DBUS_SESSION_BUS_ADDRESS="")
 		cmd = SU_COMMAND.split()
-		subprocess.Popen(cmd+["%s --no-listener --shm %ld %ld %ld %s" % (sys.argv[0], mem.key, sig.key, rw.key, " ".join(additional))], env = env)
+		subprocess.Popen(cmd+["%s --no-fork --shm %ld %ld %ld %s" % (sys.argv[0], mem.key, sig.key, rw.key, " ".join(additional))], env = env)
 		
 		get_listener().set_recv(mem, sig, rw)
 
