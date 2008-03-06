@@ -47,8 +47,8 @@ def main ():
 	parser.add_option("-x", "--validate", action = "store", dest = "validate", metavar="PLUGIN",
 			help = _("validates the given plugin xml instead of launching Portato"))
 
-	parser.add_option("-L", "--no-listener", action = "store_true", dest = "nolistener", default = False, 
-			help = _("do not start listener"))
+	parser.add_option("-F", "--no-fork", "-L", action = "store_true", dest = "nofork", default = False, 
+			help = _("do not fork off as root") + (" (%s)" % _("-L is deprecated")))
 
 	# run parser
 	(options, args) = parser.parse_args()
@@ -81,7 +81,7 @@ def main ():
 			print _("Validation succeeded.")
 			return
 
-	elif options.nolistener or os.getuid() == 0: # start GUI
+	elif options.nofork or os.getuid() == 0: # start GUI
 		if options.shm:
 			get_listener().set_send(*options.shm)
 		else:
