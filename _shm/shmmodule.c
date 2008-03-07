@@ -33,15 +33,20 @@
   This module provides an interface to System V shared memory IPC.
 
   Version history:
-  - 1.0 (sometime in the 1990s) - Released by Mr. Marangozov
-  - 1.1 (Feb 2007) - Released by me, Philip Semanchuk. Fixes a few bugs (including some 
-        memory leaks) and adds the ability to read the blocking flag on semaphores.
+  - 1.0   (sometime in the 1990s) - Released by Mr. Marangozov
+  - 1.1   (Feb 2007) - Released by me, Philip Semanchuk. Fixes a few bugs (including some 
+          memory leaks) and adds the ability to read the blocking flag on semaphores.
   - 1.1.1 (Mar 2007)- Updated setup.py to handle compile options for Linux users.
   - 1.1.2 (Nov 2007) - Fixed a sprintf() format in repr to handle size_t.
   - 1.1.3 (Nov 2007) - Changed #define of key to _key instead of __key for OS X Leopard.
-        Thanks to Bill Hart.
+          Thanks to Bill Hart.
   - 1.1.4 (Jan 2008) - Changed the reference to key in the ipc_perm structure to the 
-        explicit #define IPC_PERM_KEY_NAME. 
+          explicit #define IPC_PERM_KEY_NAME. 
+  - 1.2   (Jan 2008) - Surrounded semop() calls with Py_BEGIN/END_ALLOW_THREADS for 
+		  thread-friendly code. Patch provided by James Teh (thanks!).
+		  Fixed some int/long/ulong sloppiness pointed out by kAbY that could cause
+		  crashes on 64-bit platforms.
+	
 
   See http://NikitaTheSpider.com/python/shm/ for more thorough documentation, a more Pythonic 
   wrapper, updates, contact info, setup.py, etc.
@@ -270,7 +275,7 @@ check_memory_identity(PyShmObj *o)
 static PyObject *
 PyShmMemory_attach(PyShmObj *self, PyObject *args)
 {
-    unsigned long address = 0;
+    long address = 0;
     int mode = 0;
     void *addr, *old_addr;
 
@@ -328,7 +333,8 @@ PyShmMemory_detach(PyShmObj *self, PyObject *args)
 static PyObject *
 PyShmMemory_read(PyShmObj *self, PyObject *args)
 {
-    unsigned long n, offset = 0;
+    long n;
+    long offset = 0;
     char buf[128];
     char *addr;
 
@@ -428,7 +434,8 @@ static PyObject *
 PyShmMemory_write(PyShmObj *self, PyObject *args)
 {
     char *data;
-    unsigned long n, offset = 0;
+    int n;
+    long offset = 0;
     char buf[128];
     char *addr;
 
@@ -655,7 +662,9 @@ PyShmSemaphore_P(PyShmSemObj *self, PyObject *args)
     if (!PyArg_NoArgs(args))
         return NULL;
     refresh_semaphore_status(self);
+    Py_BEGIN_ALLOW_THREADS
     res = semop(self->semid, op, (size_t)1);
+    Py_END_ALLOW_THREADS
     if (res == -1)
         return PyShm_Err();
     Py_INCREF(Py_None);
@@ -679,7 +688,9 @@ PyShmSemaphore_V(PyShmSemObj *self, PyObject *args)
     if (!PyArg_NoArgs(args))
         return NULL;
     refresh_semaphore_status(self);
+    Py_BEGIN_ALLOW_THREADS
     res = semop(self->semid, op, (size_t)1);
+    Py_END_ALLOW_THREADS
     if (res == -1)
         return PyShm_Err();
     Py_INCREF(Py_None);
@@ -703,7 +714,9 @@ PyShmSemaphore_Z(PyShmSemObj *self, PyObject *args)
     if (!PyArg_NoArgs(args))
         return NULL;
     refresh_semaphore_status(self);
+    Py_BEGIN_ALLOW_THREADS
     res = semop(self->semid, op, (size_t)1);
+    Py_END_ALLOW_THREADS
     if (res == -1)
         return PyShm_Err();
     Py_INCREF(Py_None);
