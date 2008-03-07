@@ -589,7 +589,9 @@ class PackageTable:
 			self.linkBox.add(link)
 
 		# useflags
-		flags = ", ".join(itertools.ifilterfalse(pkg.use_expanded, pkg.get_iuse_flags()))
+		flaglist = list(itertools.ifilterfalse(pkg.use_expanded, pkg.get_iuse_flags()))
+		flaglist.sort()
+		flags = ", ".join(flaglist)
 
 		if flags:
 			self.useFlagsLL.show()
@@ -866,6 +868,7 @@ class PackageTable:
 			else:
 				self.unmergeBtn.set_sensitive(True)
 		
+		self.vb.show_all()
 		return True
 
 	def cb_button_pressed (self, b, event):
