@@ -41,6 +41,26 @@ from .dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
 		nothing_found_dialog, queue_not_empty_dialog, remove_deps_dialog,
 		remove_queue_dialog, remove_updates_dialog, unmask_dialog)
 
+# the current version for saved sessions
+# change this, whenever the change is incompatible with previous versions
+SESSION_VERSION = 1
+
+class SessionException (Exception):
+
+	error = _("Version mismatch.")
+	def __init__ (self, got, expected):
+		self.got = got
+		self.expected = expected
+
+	def __str__ (self):
+		return "%s %s" % (self.error, (_("Got '%d' - expected '%d'.") % (self.got, self.expected)))
+
+class OldSessionException (SessionException):
+	error = _("Current session format is too old.")
+
+class NewSessionException (SessionException):
+	error = _("Current session format is newer than this version supports.")
+
 class AboutWindow (AbstractDialog):
 	"""A window showing the "about"-informations."""
 
@@ -1142,7 +1162,13 @@ class MainWindow (Window):
 		
 		# session
 		splash(_("Restoring Session"))
-		self.load_session()
+		try:
+			try:
+				self.load_session()
+			except OldSessionException, e:
+				self.load_session(e)
+		except SessionException, e:
+			warning(str(e))
 		
 		splash(_("Finishing startup"))
 		
@@ -1280,7 +1306,7 @@ class MainWindow (Window):
 		except AttributeError: # no selCatName -> so no category selected --> ignore
 			debug("No category selected --> should be no harm.")
 
-	def load_session(self):
+	def load_session(self, sessionEx = None):
 		"""
 		Loads the session data.
 		"""
@@ -1290,10 +1316,20 @@ class MainWindow (Window):
 			io_ex_dialog(e)
 			return
 
+		oldVersion = SESSION_VERSION
+		allowedVersions = (0,)
+
+		if sessionEx and isinstance(sessionEx, SessionException):
+			if sessionEx.got in allowedVersions:
+				info(_("Translating session from version %d to %d.") % (sessionEx.got, sessionEx.expected))
+				oldVersion = sessionEx.got
+			else:
+				warning(_("Cannot translate session from version %d to %d.") % (session.got, session.expected))
+				raise session_ex
+
 		#
 		# the callbacks for the different session variables
 		#
-
 
 		# QUEUE
 		def load_queue (merge, unmerge, oneshot):
@@ -1371,13 +1407,26 @@ class MainWindow (Window):
 					return ""
 			return _save
 
+		# SESSION VERSION
+		def load_session_version (version):
+			if oldVersion != SESSION_VERSION: # we are trying to convert
+				return
+			
+			version = int(version)
+
+			if version < SESSION_VERSION:
+				raise OldSessionException(version, SESSION_VERSION)
+			elif version > SESSION_VERSION:
+				raise NewSessionException(version, SESSION_VERSION)
+
 		# set the simple ones :)
 		map(self.session.add_handler,[
+			([("gtksessionversion", "session")], load_session_version, lambda: SESSION_VERSION),
 			([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
 			([("vpanedpos", "window"), ("hpanedpos", "window")], load_paned, save_paned),
 			([("catsel", "window")], load_selection(self.catList, 0), save_cat_selection),
-			([("pkgsel", "window")], load_selection(self.pkgList, 1), save_pkg_selection),
-			([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue)
+			([("pkgsel", "window")], load_selection(self.pkgList, 1), save_pkg_selection)
+			#([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue),
 			])
 
 		# set the plugins
