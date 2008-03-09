@@ -16,7 +16,7 @@ import os, os.path
 
 from .config_parser import ConfigParser
 from .constants import SESSION_DIR
-from .helper import debug
+from .helper import _,debug, info
 
 class Session (object):
 	"""
@@ -44,6 +44,7 @@ class Session (object):
 		if not (os.path.exists(SESSION_DIR) and os.path.isdir(SESSION_DIR)):
 			os.mkdir(SESSION_DIR)
 		self._cfg = ConfigParser(os.path.join(SESSION_DIR, file))
+		info(_("Loading session from '%s'.") % self._cfg.file)
 		try:
 			self._cfg.parse()
 		except IOError, e:

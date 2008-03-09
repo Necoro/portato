@@ -1,6 +1,7 @@
 next:
 - added interactive search
 - added uselist to the "Generals" Tab
+- added dependency tab
 
 0.9.0.2:
 - bugfixes

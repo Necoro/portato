@@ -16,6 +16,7 @@ Some nice functions used in the program.
 from __future__ import absolute_import
 
 import os, signal, logging, grp
+from gettext import lgettext as _
 
 debug 		= logging.getLogger("portatoLogger").debug
 info 		= logging.getLogger("portatoLogger").info
