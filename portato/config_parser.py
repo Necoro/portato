@@ -291,12 +291,12 @@ class ConfigParser:
 		"""
 		
 		try:
-			section = self.vars[section]
+			sectiondict = self.vars[section]
 		except KeyError:
 			raise SectionNotFoundException("Section '%s' not found in file '%s'." % (section, self.file))
 		
 		try:
-			return section[key]
+			return sectiondict[key]
 		except KeyError:
 			raise KeyNotFoundException("Key '%s' not found in section '%s' in file '%s'." % (key, section, self.file))
 
