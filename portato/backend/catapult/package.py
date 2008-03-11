@@ -29,6 +29,8 @@ class CatapultPackage(Package):
 	bus = dbus.SessionBus()
 	dbus_object = bus.get_object(catapult.get_dbus_address(catapult.DEFAULT), catapult.CATAPULT_PACKAGE_BUS, follow_name_owner_changes = True)
 	proxy = dbus.Interface(dbus_object, catapult.CATAPULT_PACKAGE_IFACE)
+
+	_expand = {}
 	
 	def _new_flags (self):
 		flags = self.get_new_use_flags()
@@ -44,13 +46,20 @@ class CatapultPackage(Package):
 		return nflags
 	
 	def use_expanded (self, flag, suggest = None):
-		if not suggest:
-			suggest = ""
-		s = str(self.proxy.use_expanded(self.get_cpv(), flag, suggest))
-		if s:
+		
+		exp = self._expand.get(flag, False)
+
+		if exp is False:
+			if not suggest:
+				suggest = ""
+			s = str(self.proxy.use_expanded(self.get_cpv(), flag, suggest))
+			if not s:
+				s = None
+
+			self._expand[flag] = s
 			return s
 		else:
-			return None
+			return exp
 
 	def get_package_path(self):
 		return str(self.proxy.get_package_path(self.get_cpv()))
