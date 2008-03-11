@@ -3,7 +3,7 @@
 # File: portato/backend/catapult/system.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006-2007 René 'Necoro' Neumann
+# Copyright (C) 2007-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -49,7 +49,11 @@ class CatapultSystem (SystemInterface):
 
 
 	def split_cpv (self, cpv):
-		return [str(x) for x in self.proxy.split_cpv(cpv)]
+		split = self.proxy.split_cpv(cpv)
+		if all(split):
+			return map(str, split)
+		else:
+			return None
 
 	def cpv_matches (self, cpv, criterion):
 		return CatapultPackage(cpv).matches(criterion)
@@ -63,9 +67,12 @@ class CatapultSystem (SystemInterface):
 	def find_best_match (self, search_key, masked = False, only_installed = False, only_cpv = False):
 		p = self.proxy.find_best_match(search_key, masked, only_installed)
 
-		if p and not only_cpv:
-			return CatapultPackage(p)
-		return str(p)
+		if p :
+			if not only_cpv:
+				return CatapultPackage(p)
+			else:
+				return str(p)
+		return None
 
 	def find_packages (self, search_key, masked = False, only_cpv = False):
 		return self.geneticize_list(self.proxy.find_packages(search_key, "all", masked, True), only_cpv)
@@ -156,7 +163,20 @@ class CatapultSystem (SystemInterface):
 	#	return [(CatapultPackage(x), CatapultPackage(y)) for x,y in self.proxy.update_world(newuse, deep, {}, timeout = 300)]
 
 	def get_updated_packages (self):
-		return self.geneticize_list(self.proxy.get_updated_packages())
+		ret = []
+		e = Event()
+				
+		def wait (list):
+			ret.extend([CatapultPackage(x) for x in list])
+			e.set()
+
+		def error (ex):
+			e.set()
+			raise ex
+		
+		self.proxy.get_updated_packages(reply_handler = wait, error_handler = error, timeout = 300)
+		e.wait()
+		return ret
 
 	def get_use_desc (self, flag, package = None):
 		if not package:

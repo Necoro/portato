@@ -3,7 +3,7 @@
 # File: portato/backend/portage/package.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006-2007 René 'Necoro' Neumann
+# Copyright (C) 2006-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -34,6 +34,11 @@ class PortagePackage (Package):
 		@type cpv: string (cat/pkg-ver)"""
 
 		Package.__init__(self, cpv)
+		self._scpv = system.split_cpv(self._cpv)
+
+		if not self._scpv:
+			raise ValueError("invalid cpv: %s" % cpv)
+		
 		self._settings = system.settings
 		self._settingslock = system.settings.settingslock
 		self._settings_installed = None
@@ -69,6 +74,18 @@ class PortagePackage (Package):
 			dbapi = self._settings.porttree.dbapi
 
 		self._settings.settings.setcpv(self.get_cpv(), mydb = dbapi)
+
+	def get_name(self):
+		return self._scpv[1]
+
+	def get_version(self):
+		v = self._scpv[2]
+		if self._scpv[3] != "r0":
+			v += "-" + self._scpv[3]
+		return v
+
+	def get_category(self):
+		return self._scpv[0]
 	
 	def is_installed(self):
 		return self._settings.vartree.dbapi.cpv_exists(self._cpv)

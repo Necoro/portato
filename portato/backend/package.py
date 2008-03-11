@@ -3,7 +3,7 @@
 # File: portato/backend/package.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006-2007 René 'Necoro' Neumann
+# Copyright (C) 2006-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -25,10 +25,6 @@ class Package (_Package):
 		@type cpv: string (cat/pkg-ver)"""
 
 		self._cpv = cpv
-		self._scpv = system.split_cpv(self._cpv)
-
-		if not self._scpv:
-			raise ValueError("invalid cpv: %s" % cpv)
 	
 	#
 	# implemented
@@ -159,33 +155,6 @@ class Package (_Package):
 
 		return ("%s:%s" % (self.get_cp(), self.get_package_settings("SLOT")))
 
-	def get_name(self):
-		"""Returns base name of package, no category nor version.
-		
-		@returns: base-name
-		@rtype: string"""
-		
-		return self._scpv[1]
-
-	def get_version(self):
-		"""Returns version of package, with (optional) revision number.
-		
-		@returns: version-rev
-		@rtype: string"""
-		
-		v = self._scpv[2]
-		if self._scpv[3] != "r0":
-			v += "-" + self._scpv[3]
-		return v
-
-	def get_category(self):
-		"""Returns category of package.
-		
-		@returns: category
-		@rtype: string"""
-		
-		return self._scpv[0]
-
 	def get_package_path(self):
 		"""Returns the path to where the ChangeLog, Manifest, .ebuild files reside.
 		
@@ -201,7 +170,31 @@ class Package (_Package):
 	#
 	# Not implemented
 	#
-	
+
+	def get_name(self):
+		"""Returns base name of package, no category nor version.
+		
+		@returns: base-name
+		@rtype: string"""
+		
+		raise NotImplementedError
+
+	def get_version(self):
+		"""Returns version of package, with (optional) revision number.
+		
+		@returns: version-rev
+		@rtype: string"""
+		
+		raise NotImplementedError
+
+	def get_category(self):
+		"""Returns category of package.
+		
+		@returns: category
+		@rtype: string"""
+		
+		raise NotImplementedError
+
 	def is_installed(self):
 		"""Returns true if this package is installed (merged).
 		@rtype: boolean"""

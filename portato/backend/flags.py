@@ -160,9 +160,8 @@ def generate_path (cpv, exp):
 	@returns: rendered path
 	@rtype string"""
 
-	cat, pkg, ver, rev = system.split_cpv(cpv)
-	
 	if exp.find("$(") != -1:
+		cat, pkg, ver, rev = system.split_cpv(cpv)
 		exp = exp.replace("$(cat)",cat).\
 				replace("$(pkg)",pkg).\
 				replace("$(cat-1)",cat.split("-")[0]).\
