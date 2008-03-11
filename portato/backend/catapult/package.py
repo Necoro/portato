@@ -19,6 +19,7 @@ from ..exceptions import BlockedException, PackageNotFoundException
 from ...helper import debug, unique_array
 
 import dbus
+import catapult
 
 import os.path
 from gettext import lgettext as _
@@ -26,8 +27,8 @@ from gettext import lgettext as _
 class CatapultPackage(Package):
 
 	bus = dbus.SessionBus()
-	dbus_object = bus.get_object("org.gentoo.catapult.portage", "/org/gentoo/catapult/Package", follow_name_owner_changes = True)
-	proxy = dbus.Interface(dbus_object, "org.gentoo.catapult.Package")
+	dbus_object = bus.get_object(catapult.get_dbus_address(catapult.DEFAULT), catapult.CATAPULT_PACKAGE_BUS, follow_name_owner_changes = True)
+	proxy = dbus.Interface(dbus_object, catapult.CATAPULT_PACKAGE_IFACE)
 	
 	def _new_flags (self):
 		flags = self.get_new_use_flags()

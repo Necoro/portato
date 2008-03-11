@@ -16,6 +16,7 @@ import re, os
 from gettext import lgettext as _
 from threading import Event
 import dbus
+import catapult
 
 from .package import CatapultPackage
 from ..system_interface import SystemInterface
@@ -28,8 +29,8 @@ class CatapultSystem (SystemInterface):
 		
 		self.bus = dbus.SessionBus()
 		# get the system
-		so = self.bus.get_object("org.gentoo.catapult.portage", "/org/gentoo/catapult/System", follow_name_owner_changes = True)
-		self.proxy = dbus.Interface(so, "org.gentoo.catapult.System")
+		so = self.bus.get_object(catapult.get_dbus_address(catapult.DEFAULT), catapult.CATAPULT_SYSTEM_BUS, follow_name_owner_changes = True)
+		self.proxy = dbus.Interface(so, catapult.CATAPULT_SYSTEM_IFACE)
 
 	def geneticize_list (self, list_of_packages, only_cpv = False):
 		"""Convertes a list of cpv's into L{backend.Package}s.
