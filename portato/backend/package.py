@@ -12,7 +12,9 @@
 
 from __future__ import absolute_import
 
-from ..helper import debug
+from ..helper import debug, paren_reduce
+from ..dependency import DependencyTree
+
 from . import _Package, system, flags
 
 class Package (_Package):
@@ -166,6 +168,42 @@ class Package (_Package):
 		if len(sp):
 			import string
 			return string.join(sp[:-1],"/")
+
+	def get_dependencies (self):
+		"""
+		Returns the tree of dependencies that this package needs.
+
+		@rtype: L{DependencyTree}
+		"""
+		deps = " ".join(map(self.get_package_settings, ("RDEPEND", "PDEPEND", "DEPEND")))
+		deps = paren_reduce(deps)
+		
+		tree = DependencyTree()
+
+		def add (tree, deps):
+			iter = (x for x in deps)
+			for dep in iter:
+				if dep.endswith("?"):
+					ntree = tree.add_flag(dep[:-1])
+					n = iter.next()
+					if not hasattr(n, "__iter__"):
+						n = (n,)
+					add(ntree, n)
+				
+				elif dep == "||":	
+					n = iter.next() # skip
+					if not hasattr(n, "__iter__"):
+						n = tuple(n,)
+					else:
+						n = tuple(n)
+
+					tree.add_or(n)
+				
+				else:
+					tree.add(dep)
+
+		add(tree, deps)
+		return tree
 
 	#
 	# Not implemented
@@ -324,15 +362,6 @@ class Package (_Package):
 
 		@returns: the installed files
 		@rtype: string<iterator>
-		"""
-
-		raise NotImplementedError
-
-	def get_dependencies (self):
-		"""
-		Returns the tree of dependencies that this package needs.
-
-		@rtype: L{DependencyTree}
 		"""
 
 		raise NotImplementedError

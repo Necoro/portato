@@ -147,12 +147,6 @@ class CatapultPackage(Package):
 	def get_files (self):
 		return self.proxy.get_files(self.get_cpv())
 
-	def get_dependencies (self):
-		from ...dependency import DependencyTree
-		d = DependencyTree()
-		d.add("Dependency calculation not supported for Catapult Backend")
-		return d
-
 	def get_name(self):
 		return str(self.proxy.get_name(self.get_cpv()))
 
@@ -161,4 +155,3 @@ class CatapultPackage(Package):
 
 	def get_category(self):
 		return str(self.proxy.get_category(self.get_cpv()))
-

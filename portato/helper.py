@@ -45,6 +45,51 @@ def send_signal_to_group (sig):
 	pgid = os.getpgrp()
 	os.killpg(pgid, sig)
 
+def paren_reduce(mystr):
+	"""
+	Take a string and convert all paren enclosed entities into sublists, optionally
+	futher splitting the list elements by spaces.
+	
+	This function is copied from portage.
+
+	Example usage:
+		>>> paren_reduce('foobar foo ( bar baz )')
+		['foobar', 'foo', ['bar', 'baz']]
+
+	@param mystr: The string to reduce
+	@type mystr: String
+	@rtype: Array
+	@return: The reduced string in an array
+	"""
+	mylist = []
+	while mystr:
+		left_paren = mystr.find("(")
+		has_left_paren = left_paren != -1
+		right_paren = mystr.find(")")
+		has_right_paren = right_paren != -1
+		if not has_left_paren and not has_right_paren:
+			freesec = mystr
+			subsec = None
+			tail = ""
+		elif mystr[0] == ")":
+			return [mylist,mystr[1:]]
+		elif has_left_paren and not has_right_paren:
+			error(_("Invalid dependency string"))
+			return []
+		elif has_left_paren and left_paren < right_paren:
+			freesec,subsec = mystr.split("(",1)
+			subsec,tail = paren_reduce(subsec)
+		else:
+			subsec,tail = mystr.split(")",1)
+			subsec = filter(None, subsec.split(" "))
+			return [mylist+subsec,tail]
+		mystr = tail
+		if freesec:
+			mylist = mylist + filter(None, freesec.split(" "))
+		if subsec is not None:
+			mylist = mylist + [subsec]
+	return mylist
+
 def flatten (listOfLists):
 	"""Flattens the given list of lists.
 

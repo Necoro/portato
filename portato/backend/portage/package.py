@@ -17,7 +17,6 @@ from .. import flags
 from .. import system
 from ..exceptions import BlockedException, PackageNotFoundException, DependencyCalcError
 from ...helper import debug, error, unique_array
-from ...dependency import DependencyTree
 
 import portage, portage_dep
 
@@ -318,35 +317,4 @@ class PortagePackage (Package):
 			return portage.pkgcmp(v1[1:],v2[1:])
 
 	def matches (self, criterion):
-		return system.cpv_matches(self.get_cpv(), criterion)
-
-	def get_dependencies (self):
-		deps = " ".join(map(self.get_package_settings, ("RDEPEND", "PDEPEND", "DEPEND")))
-		deps = portage_dep.paren_reduce(deps)
-		
-		tree = DependencyTree()
-
-		def add (tree, deps):
-			iter = (x for x in deps)
-			for dep in iter:
-				if dep.endswith("?"):
-					ntree = tree.add_flag(dep[:-1])
-					n = iter.next()
-					if not hasattr(n, "__iter__"):
-						n = (n,)
-					add(ntree, n)
-				
-				elif dep == "||":	
-					n = iter.next() # skip
-					if not hasattr(n, "__iter__"):
-						n = tuple(n,)
-					else:
-						n = tuple(n)
-
-					tree.add_or(n)
-				
-				else:
-					tree.add(dep)
-
-		add(tree, deps)
-		return tree
+		return system.cpv_matches(self.get_cpv(), criterion)	
