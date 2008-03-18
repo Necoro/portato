@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-03-06 22:32+0100\n"
+"PO-Revision-Date: 2008-03-18 20:22+0100\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -90,7 +90,7 @@ msgstr "_Kill Emerge"
 
 #: portato/gui/templates/MainWindow.glade:221
 #: portato/gui/templates/MainWindow.glade:1148
-#: portato/gui/gtk/windows.py:1176
+#: portato/gui/windows/main.py:809
 msgid "Queue"
 msgstr "Queue"
 
@@ -100,8 +100,8 @@ msgstr "Oneshot"
 
 #: portato/gui/templates/MainWindow.glade:240
 #: portato/gui/templates/MainWindow.glade:1173
-#: portato/gui/gtk/windows.py:1466
-#: portato/gui/gtk/windows.py:1468
+#: portato/gui/windows/main.py:1122
+#: portato/gui/windows/main.py:1124
 msgid "Console"
 msgstr "Konsole"
 
@@ -161,26 +161,26 @@ msgid "<b>Use Flags:</b>"
 msgstr "<b>Use Flags:</b>"
 
 #: portato/gui/templates/MainWindow.glade:637
-#: portato/gui/gtk/windows.py:855
-#: portato/gui/gtk/windows.py:858
-#: portato/gui/gtk/windows.py:917
-#: portato/gui/gtk/windows.py:921
+#: portato/gui/windows/main.py:481
+#: portato/gui/windows/main.py:484
+#: portato/gui/windows/main.py:544
+#: portato/gui/windows/main.py:548
 msgid "Testing"
 msgstr "Testing"
 
 #: portato/gui/templates/MainWindow.glade:670
-#: portato/gui/gtk/windows.py:838
-#: portato/gui/gtk/windows.py:841
-#: portato/gui/gtk/windows.py:844
-#: portato/gui/gtk/windows.py:944
-#: portato/gui/gtk/windows.py:948
-#: portato/gui/gtk/windows.py:955
-#: portato/gui/gtk/windows.py:959
+#: portato/gui/windows/main.py:464
+#: portato/gui/windows/main.py:467
+#: portato/gui/windows/main.py:470
+#: portato/gui/windows/main.py:571
+#: portato/gui/windows/main.py:575
+#: portato/gui/windows/main.py:582
+#: portato/gui/windows/main.py:586
 msgid "Masked"
 msgstr "Masked"
 
 #: portato/gui/templates/MainWindow.glade:689
-#: portato/gui/gtk/windows.py:709
+#: portato/gui/windows/main.py:335
 msgid "Installed"
 msgstr "Installiert"
 
@@ -427,8 +427,8 @@ msgstr "_Alles auswählen"
 msgid "_Install Selected"
 msgstr "_Installiere ausgewählte"
 
-#: portato/backend/catapult/package.py:76
-#: portato/backend/portage/package.py:116
+#: portato/backend/catapult/package.py:99
+#: portato/backend/portage/package.py:132
 #, python-format
 msgid "BUG in flags.new_masking_status. It returns '%s'"
 msgstr "BUG in flags.new_masking_status. Es gibt '%s' zurück."
@@ -448,16 +448,12 @@ msgstr "Nicht installierte Abhängigkeit gefunden: %s"
 msgid "Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
 msgstr "Es konnte kein bester Treffer für das Paket '%(package)s' ermittelt werden (gebraucht von '%(cpv)s'). Bug?"
 
-#: portato/backend/flags.py:529
+#: portato/backend/flags.py:528
 #, python-format
 msgid "Conflicting values for masking status: %s"
 msgstr "Konflikt beim Masking-Status: %s"
 
-#: portato/gui/gtk/__init__.py:23
-msgid "Loading Portage"
-msgstr "Lade Portage"
-
-#: portato/gui/gtk/dialogs.py:18
+#: portato/gui/dialogs.py:17
 msgid ""
 "There are some packages in the emerge queue and/or an emerge process is running.\n"
 "Do you really want to quit?"
@@ -465,7 +461,7 @@ msgstr ""
 "Es sind noch Pakete in der Emerge-Queue und/oder emerge läuft noch.\n"
 "Wirklich beenden?"
 
-#: portato/gui/gtk/dialogs.py:37
+#: portato/gui/dialogs.py:36
 #, python-format
 msgid ""
 "%(blocked)s is blocked by %(blocks)s.\n"
@@ -474,11 +470,11 @@ msgstr ""
 "%(blocks)s blockiert %(blocked)s.\n"
 "Bitte deinstalliere das blockierende Paket."
 
-#: portato/gui/gtk/dialogs.py:43
+#: portato/gui/dialogs.py:42
 msgid "You are not root."
 msgstr "Du bist nicht root."
 
-#: portato/gui/gtk/dialogs.py:49
+#: portato/gui/dialogs.py:48
 #, python-format
 msgid ""
 "%s seems to be masked.\n"
@@ -487,20 +483,20 @@ msgstr ""
 "%s scheint maskiert zu sein.\n"
 "Soll das Paket und seine Abhängigkeiten demaskiert werden?"
 
-#: portato/gui/gtk/dialogs.py:55
+#: portato/gui/dialogs.py:54
 msgid "Package not found!"
 msgstr "Paket nicht gefunden!"
 
-#: portato/gui/gtk/dialogs.py:62
+#: portato/gui/dialogs.py:61
 #, python-format
 msgid "You have changed %s. Portato will write these changes into the appropriate files. Please backup them if you think it is necessairy."
 msgstr "Du hast die %s geändert. Portato wird diese Änderungen speichern. Bitte sichere die entsprechenden Dateien, wenn du es als notwendig erachtest."
 
-#: portato/gui/gtk/dialogs.py:68
+#: portato/gui/dialogs.py:67
 msgid "You cannot remove dependencies. :)"
 msgstr "Du kannst keine Abhängigkeiten löschen ;)."
 
-#: portato/gui/gtk/dialogs.py:74
+#: portato/gui/dialogs.py:73
 msgid ""
 "This is the updates queue. You cannot remove single elements.\n"
 "Do you want to clear the whole queue instead?"
@@ -508,28 +504,51 @@ msgstr ""
 "Das ist die Update-Queue. Aus dieser können keine einzelnen Pakete entfernt werden.\n"
 "Soll stattdessen die komplette Queue entfernt werden?"
 
-#: portato/gui/gtk/dialogs.py:80
+#: portato/gui/dialogs.py:79
 msgid "Do you really want to clear the whole queue?"
 msgstr "Wirklich die gesamte Queue löschen?"
 
-#: portato/gui/gtk/exception_handling.py:46
+#: portato/gui/updater.py:95
+#, python-format
+msgid "Trying to remove package '%s' from queue which does not exist in system."
+msgstr "Das Paket '%s' sollte aus der Queue entfernt werden, aber es befindet sich nicht im System."
+
+#: portato/gui/__init__.py:22
+msgid "Loading Portage"
+msgstr "Lade Portage"
+
+#: portato/gui/utils.py:116
+msgid "ALL"
+msgstr "ALLE"
+
+#: portato/gui/utils.py:192
+#, python-format
+msgid "Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?"
+msgstr "Catched KeyError => %s scheint keine valide Kategorie zu sein. Hast du mit rsync-excludes gespielt?"
+
+#: portato/gui/utils.py:248
+#, python-format
+msgid "Error while compiling search expression: '%s'."
+msgstr "Fehler beim erstellen des Suchausdrucks: '%s'."
+
+#: portato/gui/exception_handling.py:45
 msgid "A programming error has been detected during the execution of this program."
 msgstr "Ein Fehler ist aufgetreten."
 
-#: portato/gui/gtk/exception_handling.py:47
+#: portato/gui/exception_handling.py:46
 msgid "Bug Detected"
 msgstr "Fehler aufgetreten"
 
-#: portato/gui/gtk/exception_handling.py:48
+#: portato/gui/exception_handling.py:47
 msgid "It probably isn't fatal, but should be reported to the developers nonetheless."
 msgstr "Dies ist möglicherweise nicht kritisch, sollte aber trotzdem an die Entwickler weitergeleitet werden."
 
-#: portato/gui/gtk/exception_handling.py:50
+#: portato/gui/exception_handling.py:49
 msgid "Show Details"
 msgstr "Details"
 
-#: portato/gui/gtk/exception_handling.py:73
-#: portato/gui/gtk/exception_handling.py:119
+#: portato/gui/exception_handling.py:72
+#: portato/gui/exception_handling.py:118
 #, python-format
 msgid ""
 "Exception in thread \"%(thread)s\":\n"
@@ -538,11 +557,11 @@ msgstr ""
 "Exception im Thread \"%(thread)s\":\n"
 "%(trace)s"
 
-#: portato/gui/gtk/exception_handling.py:89
+#: portato/gui/exception_handling.py:88
 msgid "Save traceback..."
 msgstr "Speichere Traceback..."
 
-#: portato/gui/gtk/exception_handling.py:121
+#: portato/gui/exception_handling.py:120
 #, python-format
 msgid ""
 "Exception:\n"
@@ -551,237 +570,245 @@ msgstr ""
 "Exception:\n"
 "%s"
 
-#: portato/gui/gtk/splash.py:37
-#, python-format
-msgid "... is starting up: %s"
-msgstr "... startet: %s"
+#: portato/gui/session.py:21
+msgid "Version mismatch."
+msgstr "Versionen stimmen nicht überein."
 
-#: portato/gui/gtk/views.py:71
+#: portato/gui/session.py:27
+#, python-format
+msgid "Got '%d' - expected '%d'."
+msgstr "Hab '%d' - erwartete '%d'."
+
+#: portato/gui/session.py:30
+msgid "Current session format is too old."
+msgstr "Das aktuelle Sessionformat ist zu alt."
+
+#: portato/gui/session.py:33
+msgid "Current session format is newer than this version supports."
+msgstr "Das aktuelle Sessionformat ist neuer, als diese Portato-Version unterstützt."
+
+#: portato/gui/views.py:70
 msgid "Package is not installed"
 msgstr "Paket ist nicht installiert"
 
-#: portato/gui/gtk/views.py:88
+#: portato/gui/views.py:87
 #, python-format
 msgid "No %(old)s language file installed. Falling back to %(new)s."
 msgstr "Keine \"%(old)s\" Syntaxdatei gefunden. Benutze \"%(new)s\"-Syntax."
 
-#: portato/gui/gtk/views.py:97
+#: portato/gui/views.py:96
 #, python-format
 msgid "No %(old)s language file installed. Disable highlighting."
 msgstr "Keine \"%(old)s\" Syntaxdatei gefunden. Deaktiviere Hervorhebung."
 
-#: portato/gui/gtk/views.py:116
-#: portato/gui/gtk/windows.py:1102
+#: portato/gui/views.py:115
+#: portato/gui/windows/main.py:729
 #, python-format
 msgid "Error: %s"
 msgstr "Fehler: %s"
 
-#: portato/gui/gtk/windows.py:63
-msgid "Disabled"
-msgstr "Deaktiviert"
-
-#: portato/gui/gtk/windows.py:63
-msgid "Temporarily enabled"
-msgstr "Aktiviert (temporär)"
-
-#: portato/gui/gtk/windows.py:63
-#: portato/gui/gtk/windows.py:151
-#: portato/gui/gtk/windows.py:708
-msgid "Enabled"
-msgstr "Aktiviert"
-
-#: portato/gui/gtk/windows.py:63
-msgid "Temporarily disabled"
-msgstr "Deaktiviert (temporär)"
-
-#: portato/gui/gtk/windows.py:82
-msgid "Plugin"
-msgstr "Plugin"
-
-#: portato/gui/gtk/windows.py:85
-msgid "Authors"
-msgstr "Entwickler"
-
-#: portato/gui/gtk/windows.py:94
-msgid "Status"
-msgstr "Status"
-
-#: portato/gui/gtk/windows.py:152
-msgid "Package"
-msgstr "Paket"
-
-#: portato/gui/gtk/windows.py:262
-msgid "Results"
-msgstr "Ergebnisse"
-
-#: portato/gui/gtk/windows.py:375
-msgid "Top"
-msgstr "Oben"
-
-#: portato/gui/gtk/windows.py:375
-msgid "Bottom"
-msgstr "Unten"
-
-#: portato/gui/gtk/windows.py:375
-msgid "Left"
-msgstr "Links"
-
-#: portato/gui/gtk/windows.py:375
-msgid "Right"
-msgstr "Rechts"
-
-#: portato/gui/gtk/windows.py:550
-msgid "<no description>"
-msgstr "<keine Beschreibung>"
-
-#: portato/gui/gtk/windows.py:576
-msgid "The first homepage part does not start with 'http' or 'ftp'."
-msgstr "Der erste Teil der Homepage startet nicht mit 'http' oder 'ftp'."
-
-#: portato/gui/gtk/windows.py:580
-msgid "Blank inside homepage."
-msgstr "Leerzeichen innerhalb der Homepage-URL."
-
-#: portato/gui/gtk/windows.py:620
-#, python-format
-msgid "If '%s' is disabled"
-msgstr "Wenn '%s' deaktiviert ist"
-
-#: portato/gui/gtk/windows.py:622
-#, python-format
-msgid "If '%s' is enabled"
-msgstr "Wenn '%s' aktiviert ist"
-
-#: portato/gui/gtk/windows.py:630
-msgid "One of the following"
-msgstr "Eins der folgenden"
-
-#: portato/gui/gtk/windows.py:669
-msgid "This is an expanded use flag and cannot be selected"
-msgstr "Dies ist ein \"Expanded Use Flag\" und kann daher nicht ausgewählt werden."
-
-#: portato/gui/gtk/windows.py:710
-msgid "Flag"
-msgstr "Flag"
-
-#: portato/gui/gtk/windows.py:711
-msgid "Description"
-msgstr "Beschreibung"
-
-#: portato/gui/gtk/windows.py:785
-#, python-format
-msgid "Package could not be found: %s"
-msgstr "Paket konnte nicht gefunden werden: %s"
-
-#: portato/gui/gtk/windows.py:847
-#: portato/gui/gtk/windows.py:946
-msgid "Masked by user"
-msgstr "Vom Benutzer maskiert"
-
-#: portato/gui/gtk/windows.py:1029
-msgid "Loading Config"
-msgstr "Lade Konfiguration"
-
-#: portato/gui/gtk/windows.py:1041
-msgid "Creating Database"
-msgstr "Erstelle Datenbank"
-
-#: portato/gui/gtk/windows.py:1046
-msgid "Loading Plugins"
-msgstr "Lade Plugins"
-
-#: portato/gui/gtk/windows.py:1059
-msgid "Building frontend"
-msgstr "Erstelle Oberfläche"
-
-#: portato/gui/gtk/windows.py:1141
-msgid "Restoring Session"
-msgstr "Lade Session"
-
-#: portato/gui/gtk/windows.py:1144
-msgid "Finishing startup"
-msgstr "Erledige letzte Handgriffe :)"
-
-#: portato/gui/gtk/windows.py:1179
-msgid "Options"
-msgstr "Optionen"
-
-#: portato/gui/gtk/windows.py:1191
-msgid "Categories"
-msgstr "Kategorien"
-
-#: portato/gui/gtk/windows.py:1227
-msgid "Packages"
-msgstr "Pakete"
-
-#: portato/gui/gtk/windows.py:1597
-msgid "use flags"
-msgstr "Use Flags"
-
-#: portato/gui/gtk/windows.py:1608
-msgid "masking keywords"
-msgstr "Masking Keywords"
-
-#: portato/gui/gtk/wrapper.py:41
+#: portato/gui/wrapper.py:59
 msgid "oneshot"
 msgstr "oneshot"
 
-#: portato/gui/gtk/wrapper.py:46
+#: portato/gui/wrapper.py:64
 #, python-format
 msgid "updating from version %s"
 msgstr "Update von Version %s"
 
-#: portato/gui/gtk/wrapper.py:48
+#: portato/gui/wrapper.py:66
 msgid "updating"
 msgstr "Update"
 
-#: portato/gui/gtk/wrapper.py:53
+#: portato/gui/wrapper.py:71
 #, python-format
 msgid "downgrading from version %s"
 msgstr "Downgrade von Version %s"
 
-#: portato/gui/gtk/wrapper.py:55
+#: portato/gui/wrapper.py:73
 msgid "downgrading"
 msgstr "Downgrade"
 
-#: portato/gui/gtk/wrapper.py:59
+#: portato/gui/wrapper.py:77
 msgid "IUSE changes:"
 msgstr "IUSE Änderungen:"
 
-#: portato/gui/gtk/wrapper.py:68
+#: portato/gui/wrapper.py:95
 msgid "(In Progress)"
 msgstr "(In Bearbeitung)"
 
-#: portato/gui/gtk/wrapper.py:79
+#: portato/gui/wrapper.py:120
 msgid "Install"
 msgstr "Installieren"
 
-#: portato/gui/gtk/wrapper.py:84
+#: portato/gui/wrapper.py:131
 msgid "Uninstall"
 msgstr "Deinstallieren"
 
-#: portato/gui/gtk/wrapper.py:90
+#: portato/gui/wrapper.py:143
 msgid "Update"
 msgstr "Update"
 
-#: portato/gui/gui_helper.py:127
-msgid "ALL"
-msgstr "ALLE"
+#: portato/gui/windows/preference.py:114
+msgid "Top"
+msgstr "Oben"
 
-#: portato/gui/gui_helper.py:203
-#, python-format
-msgid "Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?"
-msgstr "Catched KeyError => %s scheint keine valide Kategorie zu sein. Hast du mit rsync-excludes gespielt?"
+#: portato/gui/windows/preference.py:114
+msgid "Bottom"
+msgstr "Unten"
 
-#: portato/gui/gui_helper.py:259
-#, python-format
-msgid "Error while compiling search expression: '%s'."
-msgstr "Fehler beim erstellen des Suchausdrucks: '%s'."
+#: portato/gui/windows/preference.py:114
+msgid "Left"
+msgstr "Links"
 
-#: portato/gui/updater.py:96
+#: portato/gui/windows/preference.py:114
+msgid "Right"
+msgstr "Rechts"
+
+#: portato/gui/windows/main.py:174
+msgid "<no description>"
+msgstr "<keine Beschreibung>"
+
+#: portato/gui/windows/main.py:200
+msgid "The first homepage part does not start with 'http' or 'ftp'."
+msgstr "Der erste Teil der Homepage startet nicht mit 'http' oder 'ftp'."
+
+#: portato/gui/windows/main.py:204
+msgid "Blank inside homepage."
+msgstr "Leerzeichen innerhalb der Homepage-URL."
+
+#: portato/gui/windows/main.py:246
 #, python-format
-msgid "Trying to remove package '%s' from queue which does not exist in system."
-msgstr "Das Paket '%s' sollte aus der Queue entfernt werden, aber es befindet sich nicht im System."
+msgid "If '%s' is disabled"
+msgstr "Wenn '%s' deaktiviert ist"
+
+#: portato/gui/windows/main.py:248
+#, python-format
+msgid "If '%s' is enabled"
+msgstr "Wenn '%s' aktiviert ist"
+
+#: portato/gui/windows/main.py:256
+msgid "One of the following"
+msgstr "Eins der folgenden"
+
+#: portato/gui/windows/main.py:295
+msgid "This is an expanded use flag and cannot be selected"
+msgstr "Dies ist ein \"Expanded Use Flag\" und kann daher nicht ausgewählt werden."
+
+#: portato/gui/windows/main.py:334
+#: portato/gui/windows/plugin.py:24
+#: portato/gui/windows/update.py:47
+msgid "Enabled"
+msgstr "Aktiviert"
+
+#: portato/gui/windows/main.py:336
+msgid "Flag"
+msgstr "Flag"
+
+#: portato/gui/windows/main.py:337
+msgid "Description"
+msgstr "Beschreibung"
+
+#: portato/gui/windows/main.py:411
+#, python-format
+msgid "Package could not be found: %s"
+msgstr "Paket konnte nicht gefunden werden: %s"
+
+#: portato/gui/windows/main.py:473
+#: portato/gui/windows/main.py:573
+msgid "Masked by user"
+msgstr "Vom Benutzer maskiert"
+
+#: portato/gui/windows/main.py:656
+msgid "Loading Config"
+msgstr "Lade Konfiguration"
+
+#: portato/gui/windows/main.py:668
+msgid "Creating Database"
+msgstr "Erstelle Datenbank"
+
+#: portato/gui/windows/main.py:673
+msgid "Loading Plugins"
+msgstr "Lade Plugins"
+
+#: portato/gui/windows/main.py:686
+msgid "Building frontend"
+msgstr "Erstelle Oberfläche"
+
+#: portato/gui/windows/main.py:768
+msgid "Restoring Session"
+msgstr "Lade Session"
+
+#: portato/gui/windows/main.py:777
+msgid "Finishing startup"
+msgstr "Erledige letzte Handgriffe :)"
+
+#: portato/gui/windows/main.py:812
+msgid "Options"
+msgstr "Optionen"
+
+#: portato/gui/windows/main.py:824
+msgid "Categories"
+msgstr "Kategorien"
+
+#: portato/gui/windows/main.py:860
+msgid "Packages"
+msgstr "Pakete"
+
+#: portato/gui/windows/main.py:928
+#, python-format
+msgid "Translating session from version %d to %d."
+msgstr "Upgrade Session von Version %d auf Version %d."
+
+#: portato/gui/windows/main.py:931
+#, python-format
+msgid "Cannot translate session from version %d to %d."
+msgstr "Kann Session nicht von Version %d nach %d upgraden."
+
+#: portato/gui/windows/main.py:1253
+msgid "use flags"
+msgstr "Use Flags"
+
+#: portato/gui/windows/main.py:1264
+msgid "masking keywords"
+msgstr "Masking Keywords"
+
+#: portato/gui/windows/splash.py:36
+#, python-format
+msgid "... is starting up: %s"
+msgstr "... startet: %s"
+
+#: portato/gui/windows/plugin.py:24
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+#: portato/gui/windows/plugin.py:24
+msgid "Temporarily enabled"
+msgstr "Aktiviert (temporär)"
+
+#: portato/gui/windows/plugin.py:24
+msgid "Temporarily disabled"
+msgstr "Deaktiviert (temporär)"
+
+#: portato/gui/windows/plugin.py:43
+msgid "Plugin"
+msgstr "Plugin"
+
+#: portato/gui/windows/plugin.py:46
+msgid "Authors"
+msgstr "Entwickler"
+
+#: portato/gui/windows/plugin.py:55
+msgid "Status"
+msgstr "Status"
+
+#: portato/gui/windows/update.py:48
+msgid "Package"
+msgstr "Paket"
+
+#: portato/gui/windows/search.py:57
+msgid "Results"
+msgstr "Ergebnisse"
 
 #: portato/plugins/etc_proposals.py:25
 msgid "Cannot start etc-proposals. Not root!"
@@ -808,10 +835,14 @@ msgstr "Fehler-Code: %d"
 msgid "Resume-loop called while process is still running!"
 msgstr "\"Resume-Loop\" aufgerufen, während Emerge noch lief. Bug!"
 
-#: portato/config_parser.py:257
+#: portato/config_parser.py:271
 #, python-format
 msgid "Unrecognized line in configuration: %s"
 msgstr "Unbekannte Zeile in Konfiguration: %s"
+
+#: portato/helper.py:77
+msgid "Invalid dependency string"
+msgstr "Ungültiger Dependency-String."
 
 #: portato/plistener.py:88
 msgid "Listener has not been started."
@@ -864,43 +895,33 @@ msgstr "Laden des Plugins '%(plugin)s\" fehlgeschlagen. Import von '%(import)s' 
 msgid "For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"
 msgstr "Das Plugin '%(plugin)s' definiert bereits einen \"Override\" fürr den Hook '%(hook)s'!"
 
-#: portato.py:42
+#: portato/session.py:47
 #, python-format
-msgid "the frontend to use - possible values are: %s [default: %%default]"
-msgstr "Das zu benutzende Frontend. Möglichkeiten: %s [Default: %%default]"
+msgid "Loading session from '%s'."
+msgstr "Lade Session von '%s'."
 
-#: portato.py:48
+#: portato.py:42
 msgid "validates the given plugin xml instead of launching Portato"
 msgstr "Validiert die gegebene Plugin-XML. Startet nicht Portato."
 
-#: portato.py:51
+#: portato.py:45
 msgid "do not fork off as root"
 msgstr "erzeuge keinen Root-Prozess"
 
-#: portato.py:51
+#: portato.py:45
 msgid "-L is deprecated"
 msgstr "-L ist veraltet"
 
-#: portato.py:59
-#, python-format
-msgid "Unknown frontend '%(frontend)s'. Correct frontends are: %(list)s"
-msgstr "Unbekanntest Frontend '%(frontend)s'. Erlaubte Frontends sind: %(list)s"
-
-#: portato.py:67
-#, python-format
-msgid "'%(frontend)s' should be installed, but cannot be imported. This is definitely a bug. (%(error)s)"
-msgstr "'%(frontend)s' sollte installiert sein, aber das Einbinden schlug fehl. Das ist definitiv ein Bug. (%(error)s)"
-
-#: portato.py:75
+#: portato.py:55
 #, python-format
 msgid "Validation failed. XML syntax error: %s."
 msgstr "Validierung fehlgeschlagen. XML Syntax Fehler: %s."
 
-#: portato.py:78
+#: portato.py:58
 msgid "Validation failed. Does not comply with schema."
 msgstr "Validierung gegen das Schema fehlgeschlagen."
 
-#: portato.py:81
+#: portato.py:61
 msgid "Validation succeeded."
 msgstr "Validierung erfolgreich."
 
