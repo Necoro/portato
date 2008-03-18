@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/basic.py
+# File: portato/gui/gtk/windows/basic.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006-2007 René 'Necoro' Neumann
@@ -20,7 +20,7 @@ import gobject
 from functools import wraps
 import os.path
 
-from ...constants import TEMPLATE_DIR, APP_ICON, APP, LOCALE_DIR
+from ....constants import TEMPLATE_DIR, APP_ICON, APP, LOCALE_DIR
 
 gtk.glade.bindtextdomain (APP, LOCALE_DIR)
 gtk.glade.textdomain (APP)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/windows.py
+# File: portato/gui/gtk/windows/main.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006-2008 René 'Necoro' Neumann
@@ -18,430 +18,33 @@ import gobject
 
 # other
 import os.path
-from subprocess import Popen
-import itertools
-from gettext import lgettext as _
+import itertools as itt
 
 # our backend stuff
-from ... import get_listener, plugin
-from ...helper import debug, warning, error, info, unique_array, N_
-from ...session import Session
-from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
-from ...backend import flags, system
-from ...backend.exceptions import PackageNotFoundException, BlockedException
-from ... import dependency
+from ....backend import flags, system # must be the first to avoid circular deps
+from .... import get_listener, plugin, dependency
+from ....helper import debug, warning, error, info, unique_array, N_, _
+from ....session import Session
+from ....constants import CONFIG_LOCATION, VERSION, APP_ICON
+from ....backend.exceptions import PackageNotFoundException, BlockedException
 
 # more GUI stuff
-from ..gui_helper import Database, Config, EmergeQueue
-from .basic import Window, AbstractDialog, Popup
-from .wrapper import GtkTree, GtkConsole
-from .exception_handling import GtkThread
-from .views import LogView, HighlightView, InstalledOnlyView
-from .dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
+from ...gui_helper import Database, Config, EmergeQueue
+from ..session import SESSION_VERSION, SessionException, OldSessionException, NewSessionException
+from ..wrapper import GtkTree, GtkConsole
+from ..exception_handling import GtkThread
+from ..views import LogView, HighlightView, InstalledOnlyView
+from ..dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
 		nothing_found_dialog, queue_not_empty_dialog, remove_deps_dialog,
 		remove_queue_dialog, remove_updates_dialog, unmask_dialog)
 
-# the current version for saved sessions
-# change this, whenever the change is incompatible with previous versions
-SESSION_VERSION = 1
-
-class SessionException (Exception):
-
-	error = _("Version mismatch.")
-	def __init__ (self, got, expected):
-		self.got = got
-		self.expected = expected
-
-	def __str__ (self):
-		return "%s %s" % (self.error, (_("Got '%d' - expected '%d'.") % (self.got, self.expected)))
-
-class OldSessionException (SessionException):
-	error = _("Current session format is too old.")
-
-class NewSessionException (SessionException):
-	error = _("Current session format is newer than this version supports.")
-
-class AboutWindow (AbstractDialog):
-	"""A window showing the "about"-informations."""
-
-	def __init__ (self, parent):
-
-		AbstractDialog.__init__(self, parent)
-
-		img = gtk.Image()
-		img.set_from_file(APP_ICON)
-
-		self.window.set_version(VERSION)
-		self.window.set_logo(img.get_pixbuf())
-
-		self.window.show_all()
-
-class PluginWindow (AbstractDialog):
-	
-	statsStore = gtk.ListStore(str)
-	
-	for s in (_("Disabled"), _("Temporarily enabled"), _("Enabled"), _("Temporarily disabled")):
-		statsStore.append([s])
-
-	def __init__ (self, parent, plugins):
-		"""Constructor.
-
-		@param parent: the parent window
-		@type parent: gtk.Window"""
-		
-		AbstractDialog.__init__(self, parent)
-		self.plugins = plugins
-		self.changedPlugins = {}
-
-		view = self.tree.get_widget("pluginList")
-		self.store = gtk.ListStore(str,str,str)
-		
-		view.set_model(self.store)
-		
-		cell = gtk.CellRendererText()
-		col = gtk.TreeViewColumn(_("Plugin"), cell, markup = 0)
-		view.append_column(col)
-		
-		col = gtk.TreeViewColumn(_("Authors"), cell, text = 1)
-		view.append_column(col)
-
-		ccell = gtk.CellRendererCombo()
-		ccell.set_property("model", self.statsStore)
-		ccell.set_property("text-column", 0)
-		ccell.set_property("has-entry", False)
-		ccell.set_property("editable", True)
-		ccell.connect("edited", self.cb_status_changed)
-		col = gtk.TreeViewColumn(_("Status"), ccell, markup = 2)
-		view.append_column(col)
-		
-		for p in (("<b>"+p.name+"</b>", p.author, _(self.statsStore[p.status][0])) for p in plugins):
-			self.store.append(p)
-
-		self.window.show_all()
-
-	def cb_status_changed (self, cell, path, new_text):
-		path = int(path)
-		
-		self.store[path][2] = "<b>%s</b>" % new_text
-
-		# convert string to constant
-		const = None
-		for num, val in enumerate(self.statsStore):
-			if val[0] == new_text:
-				const = num
-				break
-
-		assert (const is not None)
-
-		self.changedPlugins.update({self.plugins[path] : const})
-		debug("new changed plugins: %s => %d", self.plugins[path].name, const)
-
-	def cb_ok_clicked (self, btn):
-		for plugin, val in self.changedPlugins.iteritems():
-			plugin.status = val
-
-		self.close()
-		return True
-
-class UpdateWindow (AbstractDialog):
-
-	def __init__ (self, parent, packages, queue, jump_to):
-		AbstractDialog.__init__(self, parent)
-
-		self.queue = queue
-		self.jump = jump_to
-
-		self.packages = system.sort_package_list(packages)
-
-		self.build_list()
-
-		self.window.show_all()
-
-	def build_list (self):
-
-		store = gtk.ListStore(bool, str)
-		self.view = self.tree.get_widget("packageList")
-		self.view.set_model(store)
-
-		cell = gtk.CellRendererText()
-		tCell = gtk.CellRendererToggle()
-		tCell.set_property("activatable", True)
-		tCell.connect("toggled", self.cb_check_toggled) # emulate the normal toggle behavior ...
-		
-		self.view.append_column(gtk.TreeViewColumn(_("Enabled"), tCell, active = 0))
-		self.view.append_column(gtk.TreeViewColumn(_("Package"), cell, text = 1))
-
-		for p in self.packages:
-			store.append([False, p.get_cpv()])
-
-	def cb_set_size (self, *args):
-		"""
-		This callback is called shortly before drawing.
-		It calculates the optimal size of the window.
-		The optimum is defined as: as large as possible w/o scrollbars
-		"""
-
-		bb = self.tree.get_widget("updateBB")
-		vals = (self.view.get_vadjustment().upper+bb.size_request()[1]+10, # max size of list + size of BB + constant
-				self.parent.get_size()[1]) # size of the parent -> maximum size
-		debug("Size values for the list and for the parent: %d / %d", *vals)
-		val = int(min(vals))
-		debug("Minimum value: %d", val)
-		self.window.set_geometry_hints(self.window, min_height = val)
-
-	def cb_select_all_clicked (self, btn):
-		model = self.view.get_model()
-		iter = model.get_iter_first()
-		
-		while iter:
-			model.set_value(iter, 0, True)
-			iter = model.iter_next(iter)
-
-		return True
-
-	def cb_install_clicked (self, btn):
-		model = self.view.get_model()
-		iter = model.get_iter_first()
-		if iter is None: return
-
-		items = []
-		while iter:
-			if model.get_value(iter, 0):
-				items.append(model.get_value(iter, 1))
-			iter = model.iter_next(iter)
-		
-		for item in items:
-			try:
-				try:
-					self.queue.append(item, type = "install", oneshot = True)
-				except PackageNotFoundException, e:
-					if unmask_dialog(e[0]) == gtk.RESPONSE_YES :
-						self.queue.append(item, type = "install", unmask = True, oneshot = True)
-
-			except BlockedException, e:
-				blocked_dialog(e[0], e[1])
-
-		self.close()
-		return True
-
-	def cb_package_selected (self, view):
-		sel = view.get_selection()
-		store, it = sel.get_selected()
-		if it:
-			package = system.new_package(store.get_value(it, 1))
-
-			self.jump(package.get_cp(), package.get_version())
-
-		return True
-
-	def cb_check_toggled (self, cell, path):
-		# for whatever reason we have to define normal toggle behavior explicitly
-		store = self.view.get_model()
-		store[path][0] = not store[path][0]
-		return True
-
-
-class SearchWindow (AbstractDialog):
-	"""A window showing the results of a search process."""
-	
-	def __init__ (self, parent, list, jump_to):
-		"""Constructor.
-
-		@param parent: parent-window
-		@type parent: gtk.Window
-		@param list: list of results to show
-		@type list: string[]
-		@param jump_to: function to call if "OK"-Button is hit
-		@type jump_to: function(string)"""
-		
-		AbstractDialog.__init__(self, parent)
-		
-		self.jump_to = jump_to # function to call for jumping
-		self.list = list
-		self.list.sort()
-		
-		# combo box
-		self.searchList = self.tree.get_widget("searchList")
-		self.build_sort_list()
-		self.searchList.get_selection().select_path(0)
-
-		# finished --> show
-		self.window.show_all()
-
-	def build_sort_list (self):
-		"""Builds the sort list."""
-		
-		store = gtk.ListStore(str)
-		self.searchList.set_model(store)
-
-		# build categories
-		for p in self.list:
-			store.append(["%s/<b>%s</b>" % tuple(p.split("/"))])
-
-		cell = gtk.CellRendererText()
-		col = gtk.TreeViewColumn(_("Results"), cell, markup = 0)
-		self.searchList.append_column(col)
-
-	def ok (self, *args):
-		self.jump()
-		self.close()
-	
-	def jump (self, *args):
-		model, iter = self.searchList.get_selection().get_selected()
-		self.jump_to(self.list[model.get_path(iter)[0]])
-
-	def cb_key_pressed_combo (self, widget, event):
-		"""Emulates a ok-button-click."""
-		keyname = gtk.gdk.keyval_name(event.keyval)
-		if keyname == "Return": # take it as an "OK" if Enter is pressed
-			self.jump()
-			return True
-		else:
-			return False
-
-class PreferenceWindow (AbstractDialog):
-	"""Window displaying some preferences."""
-	
-	# all checkboxes in the window
-	# widget name -> option name
-	checkboxes = {
-			"debugCheck"			: "debug",
-			"deepCheck"				: "deep",
-			"newUseCheck"			: "newuse",
-			"maskPerVersionCheck"	: "maskPerVersion",
-			"minimizeCheck"			: ("hideOnMinimize", "GUI"),
-			"searchOnTypeCheck"		: ("searchOnType", "GUI"),
-			"systrayCheck"			: ("showSystray", "GUI"),
-			"testPerVersionCheck"	: "keywordPerVersion",
-			"titleUpdateCheck"		: ("updateTitle", "GUI"),
-			"usePerVersionCheck"	: "usePerVersion"
-			}
-	
-	# all edits in the window
-	# widget name -> option name
-	edits = {
-			"maskFileEdit"		: "maskFile",
-			"testFileEdit"		: "keywordFile",
-			"useFileEdit"		: "useFile",
-			"syncCommandEdit"	: "syncCommand",
-			"browserEdit"		: ("browserCmd", "GUI")
-			}
-
-	# the mappings for the tabpos combos
-	tabpos = {
-			1 : gtk.POS_TOP,
-			2 : gtk.POS_BOTTOM,
-			3 : gtk.POS_LEFT,
-			4 : gtk.POS_RIGHT
-			}
-
-	def __init__ (self, parent, cfg, console_fn, linkbtn_fn, tabpos_fn):
-		"""Constructor.
-
-		@param parent: parent window
-		@type parent: gtk.Window
-		@param cfg: configuration object
-		@type cfg: gui_helper.Config
-		@param console_fn: function to call to set the console font
-		@type console_fn: function(string)
-		@param linkbtn_fn: function to call to set the linkbutton behavior
-		@type linkbtn_fn: function(string)
-		@param tabpos_fn: function to call to set the tabposition of the notebooks
-		@type tabpos_fn: function(gtk.ComboBox,int)"""
-		
-		AbstractDialog.__init__(self, parent)
-
-		# our config
-		self.cfg = cfg
-
-		# the setter functions
-		self.console_fn = console_fn
-		self.linkbtn_fn = linkbtn_fn
-		self.tabpos_fn = tabpos_fn
-		
-		# set the bg-color of the hint
-		hintEB = self.tree.get_widget("hintEB")
-		hintEB.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#f3f785"))
-
-		# the checkboxes
-		for box, val in self.checkboxes.iteritems():
-			if isinstance(val, tuple):
-				self.tree.get_widget(box).\
-						set_active(self.cfg.get_boolean(val[0], section = val[1]))
-			else:
-				self.tree.get_widget(box).\
-						set_active(self.cfg.get_boolean(val))
-
-		# the edits
-		for edit, val in self.edits.iteritems():
-			if isinstance(val,tuple):
-				self.tree.get_widget(edit).\
-						set_text(self.cfg.get(val[0], section = val[1]))
-			else:
-				self.tree.get_widget(edit).\
-					set_text(self.cfg.get(val))
-
-		# the console font button
-		self.consoleFontBtn = self.tree.get_widget("consoleFontBtn")
-		self.consoleFontBtn.set_font_name(self.cfg.get("consolefont", section = "GTK"))
-
-		# the comboboxes
-		self.systemTabCombo = self.tree.get_widget("systemTabCombo")
-		self.pkgTabCombo = self.tree.get_widget("packageTabCombo")
-
-		for c in (self.systemTabCombo, self.pkgTabCombo):
-			m = c.get_model()
-			m.clear()
-			for i in (_("Top"), _("Bottom"), _("Left"), _("Right")):
-				m.append((i,))
-
-		self.systemTabCombo.set_active(int(self.cfg.get("systemTabPos", section = "GTK"))-1)
-		self.pkgTabCombo.set_active(int(self.cfg.get("packageTabPos", section = "GTK"))-1)
-
-		self.window.show_all()
-
-	def _save(self):
-		"""Sets all options in the Config-instance."""
-		
-		for box, val in self.checkboxes.iteritems():
-			if isinstance(val, tuple):
-				self.cfg.set_boolean(val[0], self.tree.get_widget(box).get_active(), section = val[1])
-			else:
-				self.cfg.set_boolean(val, self.tree.get_widget(box).get_active())
-
-		for edit, val in self.edits.iteritems():
-			if isinstance(val,tuple):
-				self.cfg.set(val[0], self.tree.get_widget(edit).get_text(), section = val[1])
-			else:
-				self.cfg.set(val,self.tree.get_widget(edit).get_text())
-
-		font = self.consoleFontBtn.get_font_name()
-		self.cfg.set("consolefont", font, section = "GTK")
-		self.console_fn(font)
-
-		pkgPos = self.pkgTabCombo.get_active()+1
-		sysPos = self.systemTabCombo.get_active()+1
-
-		self.cfg.set("packageTabPos", str(pkgPos), section = "GTK")
-		self.cfg.set("systemTabPos", str(sysPos), section = "GTK")
-
-		self.tabpos_fn(map(self.tabpos.get, (pkgPos, sysPos)))
-		
-		self.linkbtn_fn(self.cfg.get("browserCmd", section="GUI"))
-
-	def cb_ok_clicked(self, button):
-		"""Saves, writes to config-file and closes the window."""
-		self._save()
-		try:
-			self.cfg.write()
-		except IOError, e:
-			io_ex_dialog(e)
-
-		self.window.destroy()
-
-	def cb_cancel_clicked (self, button):
-		"""Just closes - w/o saving."""
-		self.window.destroy()
+# even more GUI stuff
+from .basic import Window, Popup
+from .about import AboutWindow
+from .plugin import PluginWindow
+from .preference import PreferenceWindow
+from .search import SearchWindow
+from .update import UpdateWindow
 
 class PackageTable:
 	"""A window with data about a specfic package."""
@@ -609,7 +212,7 @@ class PackageTable:
 			self.linkBox.add(link)
 
 		# useflags
-		flaglist = list(itertools.ifilterfalse(pkg.use_expanded, pkg.get_iuse_flags()))
+		flaglist = list(itt.ifilterfalse(pkg.use_expanded, pkg.get_iuse_flags()))
 		flaglist.sort()
 		flags = ", ".join(flaglist)
 
@@ -1324,8 +927,8 @@ class MainWindow (Window):
 				info(_("Translating session from version %d to %d.") % (sessionEx.got, sessionEx.expected))
 				oldVersion = sessionEx.got
 			else:
-				warning(_("Cannot translate session from version %d to %d.") % (session.got, session.expected))
-				raise session_ex
+				warning(_("Cannot translate session from version %d to %d.") % (sessionEx.got, sessionEx.expected))
+				raise sessionEx
 
 		#
 		# the callbacks for the different session variables
