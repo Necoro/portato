@@ -13,11 +13,10 @@
 from __future__ import absolute_import
 
 import gtk
-import gobject
 from gettext import lgettext as _
 
 from ...constants import VERSION, APP_ICON
-from .basic import Window
+from .windows.basic import Window
 
 class SplashScreen (Window):
 	

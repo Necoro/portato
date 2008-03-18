@@ -29,7 +29,8 @@ from ....constants import CONFIG_LOCATION, VERSION, APP_ICON
 from ....backend.exceptions import PackageNotFoundException, BlockedException
 
 # more GUI stuff
-from ...gui_helper import Database, Config, EmergeQueue
+from ...utils import Database, Config
+from ...queue import EmergeQueue
 from ..session import SESSION_VERSION, SessionException, OldSessionException, NewSessionException
 from ..wrapper import GtkTree, GtkConsole
 from ..exception_handling import GtkThread
