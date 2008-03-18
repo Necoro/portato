@@ -39,9 +39,9 @@ class CatapultPackage(Package):
 
 		for flag in flags:
 			if flag[0] == "~":
-				nflags.append(flag[1:], True)
+				nflags.append((flag[1:], True))
 			else:
-				nflags.append(flag, False)
+				nflags.append((flag, False))
 
 		return nflags
 	
@@ -116,7 +116,7 @@ class CatapultPackage(Package):
 		return [str(x) for x in self.proxy.get_matched_dep_packages(self.get_cpv(), self._new_flags())]
 		
 	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"], with_criterions = False):
-		pkgs = self.proxy.get_dep_packages(self.get_cpv(), depvar, self.get_new_use_flags())
+		pkgs = self.proxy.get_dep_packages(self.get_cpv(), depvar, self._new_flags())
 
 		if not with_criterions:
 			return [str(x) for x,y in pkgs]
