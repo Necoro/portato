@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/splash.py
+# File: portato/gui/windows/splash.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2007 René 'Necoro' Neumann
+# Copyright (C) 2007-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -13,10 +13,10 @@
 from __future__ import absolute_import
 
 import gtk
-from gettext import lgettext as _
 
+from .basic import Window
+from ...helper import _
 from ...constants import VERSION, APP_ICON
-from .windows.basic import Window
 
 class SplashScreen (Window):
 	

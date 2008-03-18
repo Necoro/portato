@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/windows/main.py
+# File: portato/gui/windows/main.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006-2008 René 'Necoro' Neumann
@@ -21,16 +21,16 @@ import os.path
 import itertools as itt
 
 # our backend stuff
-from ....backend import flags, system # must be the first to avoid circular deps
-from .... import get_listener, plugin, dependency
-from ....helper import debug, warning, error, info, unique_array, N_, _
-from ....session import Session
-from ....constants import CONFIG_LOCATION, VERSION, APP_ICON
-from ....backend.exceptions import PackageNotFoundException, BlockedException
+from ...backend import flags, system # must be the first to avoid circular deps
+from ... import get_listener, plugin, dependency
+from ...helper import debug, warning, error, info, unique_array, N_, _
+from ...session import Session
+from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
+from ...backend.exceptions import PackageNotFoundException, BlockedException
 
 # more GUI stuff
-from ...utils import Database, Config
-from ...queue import EmergeQueue
+from ..utils import Database, Config
+from ..queue import EmergeQueue
 from ..session import SESSION_VERSION, SessionException, OldSessionException, NewSessionException
 from ..wrapper import GtkTree, GtkConsole
 from ..exception_handling import GtkThread

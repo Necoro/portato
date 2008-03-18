@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/exception_handling.py
+# File: portato/gui/exception_handling.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2007 René 'Necoro' Neumann
+# Copyright (C) 2007-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -17,10 +17,9 @@ import gtk, pango, gobject
 import sys, traceback
 
 from threading import Thread
-from gettext import lgettext as _
 from StringIO import StringIO
 
-from ...helper import debug, error
+from ..helper import _, debug, error
 from .dialogs import file_chooser_dialog, io_ex_dialog
 
 class GtkThread (Thread):

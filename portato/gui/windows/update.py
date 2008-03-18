@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/windows/update.py
+# File: portato/gui/windows/update.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2008 René 'Necoro' Neumann
@@ -15,9 +15,9 @@ from __future__ import absolute_import
 import gtk
 from .basic import AbstractDialog
 from ..dialogs import unmask_dialog, blocked_dialog
-from ....backend import system
-from ....backend.exceptions import PackageNotFoundException, BlockedException
-from ....helper import debug, _
+from ...backend import system
+from ...backend.exceptions import PackageNotFoundException, BlockedException
+from ...helper import _, debug
 
 class UpdateWindow (AbstractDialog):
 

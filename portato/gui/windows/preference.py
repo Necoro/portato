@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/windows/preference.py
+# File: portato/gui/windows/preference.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2008 René 'Necoro' Neumann
@@ -16,7 +16,7 @@ import gtk
 
 from .basic import AbstractDialog
 from ..dialogs import io_ex_dialog
-from ....helper import _, debug
+from ...helper import _, debug
 
 class PreferenceWindow (AbstractDialog):
 	"""Window displaying some preferences."""

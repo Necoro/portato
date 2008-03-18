@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/windows/plugin.py
+# File: portato/gui/windows/plugin.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2008 René 'Necoro' Neumann
@@ -15,7 +15,7 @@ from __future__ import absolute_import
 import gtk
 
 from .basic import AbstractDialog
-from ....helper import debug, _
+from ...helper import _, debug
 
 class PluginWindow (AbstractDialog):
 	

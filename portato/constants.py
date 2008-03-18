@@ -25,11 +25,6 @@ These should be set during the installation.
 @var USE_CATAPULT: use the catapult backend or the normal ones
 @type USE_CATAPULT: boolean
 
-@var FRONTENDS: the list of frontends which are installed
-@type FRONTENDS: string[]
-@var STD_FRONTEND: the frontend uses as the default, i.e. if no other one is given on the cmdline
-@type STD_FRONTEND: string
-
 @var CONFIG_DIR: The configuration directory.
 @type CONFIG_DIR: string
 @var CONFIG_LOCATION: L{CONFIG_DIR} plus name of the config file.
@@ -66,10 +61,6 @@ VERSION = "9999"
 HOME = os.environ["HOME"]
 SU_COMMAND = "gksu -D 'Portato'"
 USE_CATAPULT = True
-
-# frontends
-FRONTENDS = ["gtk"]
-STD_FRONTEND = "gtk"
 
 # config
 CONFIG_DIR = "/etc/portato/"

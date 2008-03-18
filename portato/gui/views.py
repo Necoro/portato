@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/views.py
+# File: portato/gui/views.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006-2007 René 'Necoro' Neumann
+# Copyright (C) 2006-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -12,13 +12,12 @@
 
 from __future__ import absolute_import, with_statement
 
+import gtk
 import pango
 import gtksourceview2
-import gtk
 import logging
 
-from gettext import lgettext as _
-from ...helper import warning
+from ..helper import _, warning
 
 class LazyView (object):
 	def __init__ (self):

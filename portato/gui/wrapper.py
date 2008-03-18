@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/wrapper.py
+# File: portato/gui/wrapper.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006-2008 René 'Necoro' Neumann
@@ -13,9 +13,7 @@
 from __future__ import absolute_import
 
 import vte
-from gettext import lgettext as _
-from ..wrapper import Tree, Console
-from ...helper import debug
+from ..helper import _,debug
 
 class GtkTree (object):
 	"""The implementation of the abstract tree."""

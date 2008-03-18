@@ -13,7 +13,7 @@
 
 import sys, os, os.path
 from distutils.core import setup, Extension
-from portato.constants import FRONTENDS, VERSION, DATA_DIR, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR
+from portato.constants import VERSION, DATA_DIR, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR
 
 ### copied from shm's setup.py ###
 
@@ -122,23 +122,21 @@ def plugin_list (*args):
 	"""Creates a list of correct plugin pathes out of the arguments."""
 	return [("plugins/%s.xml" % x) for x in args]
 
-packages = ["portato", "portato.gui", "portato.plugins", "portato.backend", "portato.backend.portage", "portato.backend.catapult", "portato._shm"]
+packages = ["portato", "portato.gui", "portato.gui.windows", "portato.plugins", "portato.backend", "portato.backend.portage", "portato.backend.catapult", "portato._shm"]
 ext_modules = [Extension("portato._shm.shm", ["_shm/shmmodule.c"], define_macros = MacrosAndDefines, extra_compile_args=["-fPIC"])]
 data_files = [
-		(ICON_DIR, ["icons/portato-icon.png"]), 
+		(TEMPLATE_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if x.endswith(".glade")]),
+		(ICON_DIR, ["icons/portato-icon.png"]),
 		#(PLUGIN_DIR, plugin_list("shutdown", "resume_loop")), 
 		(DATA_DIR, ["plugin.xsd"])]
+
 cmdclass = {}
 package_dir = {"portato._shm" : "_shm"}
-
-if "gtk" in FRONTENDS:
-	packages.append("portato.gui.gtk")
-	data_files.append((TEMPLATE_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if x.endswith(".glade")]))
 
 # do the distutils setup
 setup(name="Portato",
 		version = VERSION,
-		description = "Frontends to Portage",
+		description = "GTK-Frontend to Portage",
 		license = "GPLv2",
 		url = "http://portato.origo.ethz.ch/",
 		author = "René 'Necoro' Neumann",

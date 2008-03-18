@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/windows/search.py
+# File: portato/gui/windows/search.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2008 René 'Necoro' Neumann
@@ -14,7 +14,7 @@ from __future__ import absolute_import
 
 import gtk
 from .basic import AbstractDialog
-from ....helper import _, debug
+from ...helper import _, debug
 
 class SearchWindow (AbstractDialog):
 	"""A window showing the results of a search process."""

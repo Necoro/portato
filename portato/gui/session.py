@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/session.py
+# File: portato/gui/session.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2008 René 'Necoro' Neumann
@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from ...helper import debug, _
+from ..helper import _, debug
 
 # the current version for saved sessions
 # change this, whenever the change is incompatible with previous versions

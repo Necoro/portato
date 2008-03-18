@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/windows/about.py
+# File: portato/gui/windows/about.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2008 René 'Necoro' Neumann
@@ -15,7 +15,7 @@ from __future__ import absolute_import
 import gtk
 
 from .basic import AbstractDialog
-from ....constants import VERSION, APP_ICON
+from ...constants import VERSION, APP_ICON
 
 class AboutWindow (AbstractDialog):
 	"""A window showing the "about"-informations."""

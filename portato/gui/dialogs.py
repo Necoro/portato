@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/gtk/dialogs.py
+# File: portato/gui/dialogs.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006 René 'Necoro' Neumann
+# Copyright (C) 2006-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -11,8 +11,7 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 import gtk
-from ...helper import error
-from gettext import lgettext as _
+from ..helper import _, error
 
 def queue_not_empty_dialog():
 	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, _("There are some packages in the emerge queue and/or an emerge process is running.\nDo you really want to quit?"))

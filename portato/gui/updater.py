@@ -14,9 +14,8 @@ from __future__ import absolute_import
 
 from ..backend import system
 
-from gettext import lgettext as _
 import threading, subprocess, time
-from ..helper import debug, error
+from ..helper import _, debug, error
 
 class Updater (object):
 	"""

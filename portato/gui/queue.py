@@ -25,7 +25,7 @@ from ..waiting_queue import WaitingQueue
 from .updater import Updater
 
 # the wrapper
-from .gtk.wrapper import GtkConsole, GtkTree
+from .wrapper import GtkConsole, GtkTree
 
 class EmergeQueue:
 	"""This class manages the emerge queue."""
