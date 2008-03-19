@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<plugin xmlns="http://portato.sourceforge.net/plugin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://portato.sourceforge.net/plugin http://portato.sourceforge.net/plugin.xsd">
+
+	<author>René 'Necoro' Neumann</author>
+	<name>DBus Initializer</name>
+
+	<import>portato.plugins.dbus_init</import>
+
+	<hooks>
+		<hook type="thread_init" call="dbus_init">
+			<connect type="after" />
+		</hook>
+	</hooks>
+
+</plugin>

@@ -1655,7 +1655,7 @@ class MainWindow (Window):
 		"""
 		Main.
 		"""
-		gobject.threads_init() 
+		plugin.hook("thread_init")(gobject.threads_init)()
 		# now subthreads can run normally, but are not allowed to touch the GUI. If threads should change sth there - use gobject.idle_add().
 		# for more informations on threading and gtk: http://www.async.com.br/faq/pygtk/index.py?req=show&file=faq20.006.htp
 		gtk.main()
