@@ -12,7 +12,7 @@
 
 from __future__ import absolute_import, with_statement
 
-import gtk
+import gtk, gobject
 import pango
 import gtksourceview2
 import logging
@@ -142,5 +142,8 @@ class LogView (logging.Handler):
 				tag = "log_%s" % name
 				break
 
-		self.buf.insert_with_tags_by_name(self.buf.get_end_iter(), "* ", tag)
-		self.buf.insert(self.buf.get_end_iter(), record.getMessage()+"\n")
+		def _add():
+			self.buf.insert_with_tags_by_name(self.buf.get_end_iter(), "* ", tag)
+			self.buf.insert(self.buf.get_end_iter(), record.getMessage()+"\n")
+
+		gobject.idle_add(_add) # logger might be called from another thread
