@@ -127,7 +127,7 @@ ext_modules = [Extension("portato._shm.shm", ["_shm/shmmodule.c"], define_macros
 data_files = [
 		(TEMPLATE_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if x.endswith(".glade")]),
 		(ICON_DIR, ["icons/portato-icon.png"]),
-		#(PLUGIN_DIR, plugin_list("shutdown", "resume_loop")), 
+		(PLUGIN_DIR, plugin_list("dbus_init")), 
 		(DATA_DIR, ["plugin.xsd"])]
 
 cmdclass = {}
