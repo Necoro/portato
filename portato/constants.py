@@ -63,7 +63,7 @@ SU_COMMAND = "gksu -D 'Portato'"
 USE_CATAPULT = True
 
 # config
-CONFIG_DIR = "/etc/portato/"
+CONFIG_DIR = "/home/necoro/dev/portato/version_list/etc/"
 CONFIG_LOCATION = pjoin(CONFIG_DIR, "portato.cfg")
 SESSION_DIR = pjoin(os.environ["HOME"], ".portato")
 
