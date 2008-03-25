@@ -689,6 +689,8 @@ class MainWindow (Window):
 		self.vpaned.set_position(int(self.window.get_size()[1]/2))
 		self.hpaned = self.tree.get_widget("hpaned")
 		self.hpaned.set_position(int(self.window.get_size()[0]/1.5))
+		self.listPaned = self.tree.get_widget("listPaned")
+		self.listPaned.set_position(int(self.window.get_size()[0]/2))
 
 		# cat and pkg list
 		self.sortPkgListByName = True
@@ -921,7 +923,7 @@ class MainWindow (Window):
 			return
 
 		oldVersion = SESSION_VERSION
-		allowedVersions = (0,)
+		allowedVersions = (0,1)
 
 		if sessionEx and isinstance(sessionEx, SessionException):
 			if sessionEx.got in allowedVersions:
@@ -955,10 +957,13 @@ class MainWindow (Window):
 		# PANED
 		def load_paned (*pos):
 			pos = map(int, pos)
-			[x.set_position(p) for x,p in zip((self.vpaned, self.hpaned), pos)]
+			if oldVersion < 2:
+				[x.set_position(p) for x,p in zip((self.vpaned, self.hpaned), pos)]
+			else:
+				[x.set_position(p) for x,p in zip((self.vpaned, self.hpaned, self.listPaned), pos)]
 
 		def save_paned ():
-			return [x.get_position() for x in (self.vpaned, self.hpaned)]
+			return [x.get_position() for x in (self.vpaned, self.hpaned, self.listPaned)]
 
 		# SELECTION
 		def load_selection (list, col):
@@ -1027,7 +1032,7 @@ class MainWindow (Window):
 		map(self.session.add_handler,[
 			([("gtksessionversion", "session")], load_session_version, lambda: SESSION_VERSION),
 			([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
-			([("vpanedpos", "window"), ("hpanedpos", "window")], load_paned, save_paned),
+			([("vpanedpos", "window"), ("hpanedpos", "window"), ("listpanedpos", "window")], load_paned, save_paned),
 			([("catsel", "window")], load_selection(self.catList, 0), save_cat_selection),
 			([("pkgsel", "window")], load_selection(self.pkgList, 1), save_pkg_selection)
 			#([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue),
