@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.1 on Tue Mar 25 15:21:22 2008 -->
+<!--Generated with glade3 3.4.1 on Tue Mar 25 15:26:47 2008 -->
 <glade-interface>
   <widget class="GtkWindow" id="MainWindow">
     <property name="border_width">2</property>
@@ -469,7 +469,7 @@
                               <widget class="GtkTreeView" id="versionList">
                                 <property name="visible">True</property>
                                 <property name="headers_clickable">True</property>
-                                <property name="search_column">0</property>
+                                <property name="search_column">1</property>
                                 <signal name="cursor_changed" handler="cb_version_list_changed"/>
                               </widget>
                             </child>
@@ -563,6 +563,7 @@
                       </widget>
                       <packing>
                         <property name="expand">False</property>
+                        <property name="padding">5</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
