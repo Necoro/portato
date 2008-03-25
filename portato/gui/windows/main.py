@@ -1118,7 +1118,7 @@ class MainWindow (Window):
 				self.tray.set_tooltip(title)
 			
 			window_title_update(title)
-			if title is None: 
+			if title is None or not self.cfg.get_boolean("updateConsole", "GUI"): 
 				title = _("Console")
 			else: 
 				title = ("%s (%s)") % (_("Console"), title)

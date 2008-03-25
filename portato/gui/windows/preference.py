@@ -33,6 +33,7 @@ class PreferenceWindow (AbstractDialog):
 			"systrayCheck"			: ("showSystray", "GUI"),
 			"testPerVersionCheck"	: "keywordPerVersion",
 			"titleUpdateCheck"		: ("updateTitle", "GUI"),
+			"consoleUpdateCheck"	: ("updateConsole", "GUI"),
 			"usePerVersionCheck"	: "usePerVersion"
 			}
 	
