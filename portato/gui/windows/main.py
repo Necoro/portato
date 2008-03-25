@@ -338,11 +338,16 @@ class PackageTable:
 		self.useList.set_enable_tree_lines(True)
 
 	def build_version_list (self):
-		store = gtk.ListStore(gtk.gdk.Pixbuf, str)
+		store = gtk.ListStore(gtk.gdk.Pixbuf, str, str)
 
 		# build view
 		self.versionList.set_model(store)
+		
 		col = gtk.TreeViewColumn(_("Versions"))
+		col.set_property("expand", True)
+		
+		self.slotcol = gtk.TreeViewColumn(_("Slot"))
+		self.slotcol.set_property("expand", True)
 
 		# adding the pixbuf
 		cell = gtk.CellRendererPixbuf()
@@ -354,21 +359,42 @@ class PackageTable:
 		col.pack_start(cell, True)
 		col.add_attribute(cell, "text", 1)
 
+		# adding the slot
+		cell = gtk.CellRendererText()
+		self.slotcol.pack_start(cell, True)
+		self.slotcol.add_attribute(cell, "text", 2)
+
 		self.versionList.append_column(col)
+		self.versionList.append_column(self.slotcol)
 
 	def fill_version_list (self):
 		
 		store = self.versionList.get_model()
+
+		# this is here for performance reasons
+		# to not query the package with info, we do not need
+		if self.main.cfg.get_boolean("showSlots", "GUI"):
+			def get_slot(pkg):
+				return pkg.get_package_settings("SLOT")
+			
+			self.slotcol.set_visible(True)
+		
+		else:
+			def get_slot(*args):
+				return ""
+			
+			self.slotcol.set_visible(False)
 		
 		# append versions
-		for vers, inst in ((x.get_version(), x.is_installed()) for x in self.packages):
+		for vers, inst, slot in ((x.get_version(), x.is_installed(), get_slot(x)) for x in self.packages):
 			if inst:
 				icon = self.main.instPixbuf
 			else:
 				icon = None
-			store.append([icon, vers])
+				
+			store.append([icon, vers, slot])
 
-		sel = self.versionList.get_selection()
+		pos = ((0,)) # default
 		
 		# activate the first one
 		try:
@@ -379,10 +405,13 @@ class PackageTable:
 				best_version = system.find_best_match(self.packages[0].get_cp(), only_installed = (self.instPackages != [])).get_version()
 			for i in range(len(self.packages)):
 				if self.packages[i].get_version() == best_version:
-					sel.select_path((i,))
+					pos = (i,)
 					break
 		except AttributeError: # no package found
-			sel.select_path((0,))
+			pass
+
+		self.versionList.get_selection().select_path(pos)
+		self.versionList.scroll_to_cell(pos)
 
 	def actual_package (self):
 		"""Returns the actual selected package.
