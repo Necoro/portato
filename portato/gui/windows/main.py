@@ -714,7 +714,7 @@ class MainWindow (Window):
 		# notebooks
 		self.sysNotebook = self.tree.get_widget("systemNotebook")
 		self.pkgNotebook = self.tree.get_widget("packageNotebook")
-		self.set_notebook_tabpos(map(PreferenceWindow.tabpos.get, map(int, (self.cfg.get("packageTabPos", "GTK"), self.cfg.get("systemTabPos", "GTK")))))
+		self.set_notebook_tabpos(map(PreferenceWindow.tabpos.get, map(int, (self.cfg.get("packageTabPos", "GUI"), self.cfg.get("systemTabPos", "GUI")))))
 		
 		# the different scrolls
 		ebuildScroll = self.tree.get_widget("ebuildScroll")
@@ -790,7 +790,7 @@ class MainWindow (Window):
 		
 		self.console.set_scrollback_lines(1024)
 		self.console.set_scroll_on_output(True)
-		self.console.set_font_from_string(self.cfg.get("consolefont", "GTK"))
+		self.console.set_font_from_string(self.cfg.get("consolefont", "GUI"))
 		self.console.connect("button-press-event", self.cb_right_click)
 		self.termHB.pack_start(self.console, True, True)
 		

@@ -103,7 +103,7 @@ class PreferenceWindow (AbstractDialog):
 
 		# the console font button
 		self.consoleFontBtn = self.tree.get_widget("consoleFontBtn")
-		self.consoleFontBtn.set_font_name(self.cfg.get("consolefont", section = "GTK"))
+		self.consoleFontBtn.set_font_name(self.cfg.get("consolefont", section = "GUI"))
 
 		# the comboboxes
 		self.systemTabCombo = self.tree.get_widget("systemTabCombo")
@@ -115,8 +115,8 @@ class PreferenceWindow (AbstractDialog):
 			for i in (_("Top"), _("Bottom"), _("Left"), _("Right")):
 				m.append((i,))
 
-		self.systemTabCombo.set_active(int(self.cfg.get("systemTabPos", section = "GTK"))-1)
-		self.pkgTabCombo.set_active(int(self.cfg.get("packageTabPos", section = "GTK"))-1)
+		self.systemTabCombo.set_active(int(self.cfg.get("systemTabPos", section = "GUI"))-1)
+		self.pkgTabCombo.set_active(int(self.cfg.get("packageTabPos", section = "GUI"))-1)
 
 		self.window.show_all()
 
@@ -136,14 +136,14 @@ class PreferenceWindow (AbstractDialog):
 				self.cfg.set(val,self.tree.get_widget(edit).get_text())
 
 		font = self.consoleFontBtn.get_font_name()
-		self.cfg.set("consolefont", font, section = "GTK")
+		self.cfg.set("consolefont", font, section = "GUI")
 		self.console_fn(font)
 
 		pkgPos = self.pkgTabCombo.get_active()+1
 		sysPos = self.systemTabCombo.get_active()+1
 
-		self.cfg.set("packageTabPos", str(pkgPos), section = "GTK")
-		self.cfg.set("systemTabPos", str(sysPos), section = "GTK")
+		self.cfg.set("packageTabPos", str(pkgPos), section = "GUI")
+		self.cfg.set("systemTabPos", str(sysPos), section = "GUI")
 
 		self.tabpos_fn(map(self.tabpos.get, (pkgPos, sysPos)))
 		
