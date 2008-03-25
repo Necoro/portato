@@ -24,16 +24,17 @@ class PreferenceWindow (AbstractDialog):
 	# all checkboxes in the window
 	# widget name -> option name
 	checkboxes = {
+			"consoleUpdateCheck"	: ("updateConsole", "GUI"),
 			"debugCheck"			: "debug",
 			"deepCheck"				: "deep",
 			"newUseCheck"			: "newuse",
 			"maskPerVersionCheck"	: "maskPerVersion",
 			"minimizeCheck"			: ("hideOnMinimize", "GUI"),
 			"searchOnTypeCheck"		: ("searchOnType", "GUI"),
+			"showSlotsCheck"		: ("showSlots", "GUI"),
 			"systrayCheck"			: ("showSystray", "GUI"),
 			"testPerVersionCheck"	: "keywordPerVersion",
 			"titleUpdateCheck"		: ("updateTitle", "GUI"),
-			"consoleUpdateCheck"	: ("updateConsole", "GUI"),
 			"usePerVersionCheck"	: "usePerVersion"
 			}
 	
