@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.1 on Tue Mar 25 15:34:29 2008 -->
+<!--Generated with glade3 3.4.1 on Tue Mar 25 20:23:08 2008 -->
 <glade-interface>
   <widget class="GtkWindow" id="MainWindow">
     <property name="border_width">2</property>
@@ -479,8 +479,8 @@
                 </child>
               </widget>
               <packing>
-                <property name="resize">False</property>
-                <property name="shrink">True</property>
+                <property name="resize">True</property>
+                <property name="shrink">False</property>
               </packing>
             </child>
             <child>
@@ -493,62 +493,89 @@
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                     <child>
-                      <widget class="GtkLabel" id="nameLabel">
+                      <widget class="GtkHBox" id="packageHeaderHB">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="label" translatable="yes">label</property>
-                      </widget>
-                      <packing>
-                        <property name="expand">False</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkToolbar" id="packageTB">
-                        <property name="visible">True</property>
-                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="icon_size">GTK_ICON_SIZE_BUTTON</property>
-                        <property name="icon_size_set">True</property>
+                        <property name="spacing">5</property>
                         <child>
-                          <widget class="GtkToolButton" id="pkgEmergeBtn">
+                          <widget class="GtkLabel" id="nameLabel">
                             <property name="visible">True</property>
+                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="label" translatable="yes">label</property>
+                          </widget>
+                        </child>
+                        <child>
+                          <widget class="GtkButton" id="pkgEmergeBtn">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <property name="tooltip" translatable="yes">Install onto system</property>
-                            <property name="stock_id">gtk-add</property>
+                            <property name="relief">GTK_RELIEF_NONE</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="cb_package_emerge_clicked"/>
+                            <child>
+                              <widget class="GtkImage" id="image1">
+                                <property name="visible">True</property>
+                                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                <property name="stock">gtk-add</property>
+                              </widget>
+                            </child>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
+                            <property name="position">1</property>
                           </packing>
                         </child>
                         <child>
-                          <widget class="GtkToolButton" id="pkgUnmergeBtn">
+                          <widget class="GtkButton" id="pkgUnmergeBtn">
                             <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <property name="tooltip" translatable="yes">Uninstall from system</property>
-                            <property name="stock_id">gtk-remove</property>
+                            <property name="relief">GTK_RELIEF_NONE</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="cb_package_unmerge_clicked"/>
+                            <child>
+                              <widget class="GtkImage" id="image4">
+                                <property name="visible">True</property>
+                                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                <property name="stock">gtk-remove</property>
+                              </widget>
+                            </child>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
+                            <property name="position">2</property>
                           </packing>
                         </child>
                         <child>
-                          <widget class="GtkToolButton" id="pkgRevertBtn">
+                          <widget class="GtkButton" id="pkgRevertBtn">
                             <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                            <property name="tooltip" translatable="yes">Revert changes</property>
-                            <property name="stock_id">gtk-undo</property>
+                            <property name="relief">GTK_RELIEF_NONE</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="cb_package_revert_clicked"/>
+                            <child>
+                              <widget class="GtkImage" id="image5">
+                                <property name="visible">True</property>
+                                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                <property name="stock">gtk-undo</property>
+                              </widget>
+                            </child>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
+                            <property name="position">3</property>
                           </packing>
                         </child>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
-                        <property name="padding">5</property>
-                        <property name="position">1</property>
+                        <property name="padding">4</property>
                       </packing>
                     </child>
                     <child>
@@ -1018,7 +1045,7 @@
                         </child>
                       </widget>
                       <packing>
-                        <property name="position">2</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                   </widget>
