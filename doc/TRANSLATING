@@ -17,7 +17,7 @@ You do need the sources to make translations. The installed program is not suffi
 Change into a local directory where you want to have the sources installed.
 Then do:
 
-> svn co https://svn.origo.ethz.ch/portato/trunk portato
+> bzr pull lp:portato
 
 You now should have the actual sources in the "portato" subdirectory.
 
