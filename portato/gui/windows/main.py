@@ -148,10 +148,8 @@ class PackageTable:
 			self.instPackages = system.sort_package_list(system.find_installed_packages(cp, masked = True))
 
 		# version-combo-box
-		#self.versionCombo.handler_block(self.versionCombo.changeHandler) # block change handler, because it would be called several times
 		self.versionList.get_model().clear()
 		self.fill_version_list()
-		#self.versionCombo.handler_unblock(self.versionCombo.changeHandler) # unblock handler again
 
 		if not self.queue or not self.doEmerge: 
 			self.emergeBtn.set_sensitive(False)
@@ -357,9 +355,6 @@ class PackageTable:
 		col.add_attribute(cell, "text", 1)
 
 		self.versionList.append_column(col)
-
-		# connect
-		#self.versionCombo.changeHandler = self.versionCombo.connect("changed", self.cb_version_combo_changed)
 
 	def fill_version_list (self):
 		
@@ -697,8 +692,6 @@ class MainWindow (Window):
 		self.vpaned.set_position(int(self.window.get_size()[1]/2))
 		self.hpaned = self.tree.get_widget("hpaned")
 		self.hpaned.set_position(int(self.window.get_size()[0]/1.5))
-		self.listPaned = self.tree.get_widget("listPaned")
-		self.listPaned.set_position(int(self.window.get_size()[0]/2))
 
 		# cat and pkg list
 		self.sortPkgListByName = True
@@ -965,13 +958,10 @@ class MainWindow (Window):
 		# PANED
 		def load_paned (*pos):
 			pos = map(int, pos)
-			if oldVersion < 2:
-				[x.set_position(p) for x,p in zip((self.vpaned, self.hpaned), pos)]
-			else:
-				[x.set_position(p) for x,p in zip((self.vpaned, self.hpaned, self.listPaned), pos)]
+			[x.set_position(p) for x,p in zip((self.vpaned, self.hpaned), pos)]
 
 		def save_paned ():
-			return [x.get_position() for x in (self.vpaned, self.hpaned, self.listPaned)]
+			return [x.get_position() for x in (self.vpaned, self.hpaned)]
 
 		# SELECTION
 		def load_selection (list, col):
@@ -1040,7 +1030,7 @@ class MainWindow (Window):
 		map(self.session.add_handler,[
 			([("gtksessionversion", "session")], load_session_version, lambda: SESSION_VERSION),
 			([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
-			([("vpanedpos", "window"), ("hpanedpos", "window"), ("listpanedpos", "window")], load_paned, save_paned),
+			([("vpanedpos", "window"), ("hpanedpos", "window")], load_paned, save_paned),
 			([("catsel", "window")], load_selection(self.catList, 0), save_cat_selection),
 			([("pkgsel", "window")], load_selection(self.pkgList, 1), save_pkg_selection)
 			#([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue),
