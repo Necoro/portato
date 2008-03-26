@@ -780,8 +780,7 @@ class MainWindow (Window):
 		
 		self.window.show_all()
 
-		after = lambda: pass # dummy function doing nothing
-		plugin.hook("after_startup")(after)()
+		plugin.hook("after_startup")(lambda: True)()
 	
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)
