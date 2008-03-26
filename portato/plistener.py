@@ -71,7 +71,7 @@ class PListener (object):
 
 		Popen(cmdlist)
 
-	def do_notify(self, base, descr, icon, urgency):
+	def do_notify(self, base, descr, icon, urgency = None):
 		"""Displays a notify.
 		This will do nothing if pynotify is not present and/or root is running the listener."""
 
@@ -80,7 +80,8 @@ class PListener (object):
 				pynotify.init(APP)
 
 			n = pynotify.Notification(base, descr, icon)
-			n.set_urgency(int(urgency))
+			if urgency is not None and urgency != "":
+				n.set_urgency(int(urgency))
 			n.show()
 
 	def set_send (self, mem = None, sig = None, rw = None):
