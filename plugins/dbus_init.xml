@@ -7,9 +7,7 @@
 	<import>portato.plugins.dbus_init</import>
 
 	<hooks>
-		<hook type="thread_init" call="dbus_init">
-			<connect type="after" />
-		</hook>
+		<hook type="main" call="dbus_init" />
 	</hooks>
 
 </plugin>

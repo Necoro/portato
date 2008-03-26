@@ -779,8 +779,6 @@ class MainWindow (Window):
 		splash(_("Finishing startup"))
 		
 		self.window.show_all()
-
-		plugin.hook("after_startup")(lambda: True)()
 	
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)
@@ -1662,7 +1660,7 @@ class MainWindow (Window):
 		"""
 		Main.
 		"""
-		plugin.hook("thread_init")(gobject.threads_init)()
+		gobject.threads_init()
 		# now subthreads can run normally, but are not allowed to touch the GUI. If threads should change sth there - use gobject.idle_add().
 		# for more informations on threading and gtk: http://www.async.com.br/faq/pygtk/index.py?req=show&file=faq20.006.htp
-		gtk.main()
+		plugin.hook("main")(gtk.main)()

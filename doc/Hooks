@@ -7,7 +7,7 @@ Called: When emerge or every other command given by e.g. the synccmd preference 
 Parameters:
 	- string[] packages: Packages to emerge (includes "world", "system").
 	- string[] command: The exact command to execute.
-	- portato.gui.wrapper.Console console: The console the output will be written to.
+	- vte.Console console: The console the output will be written to.
 	- function(string) -> None title_update: Function which updates the console title in the GUIs.
 
 Return if override: Nothing
@@ -23,12 +23,10 @@ Parameters:
 Return if override: Nothing
 Comment: This uses an extra hook as emerge is started in an extra thread and thus all plugins being wanting to come "after" will be called while emerge is still running.
 
-open_ebuild:
-------------
-Called: When an ebuild window is opened.
-Parameters:
-	- portato.backend.Package package: The current package whose is going to be displayed.
-	- Window parent: The parent window. Exact type depends on the frontend.
+main:
+-----
+Called: When the main routine is being entered. Everything in the application is done inside this main routine. Hooks connecting "after" will be run, when the application is shutdown.
+Parameters: None
+Return if override: Nothing
 
-Return if override: Window-object which can be called by the frontends. Please see the explicit code to see what is expected.
-Comment: If you want to override - do this only for ONE specific frontend.
+Comment: DO NOT OVERRIDE :)
