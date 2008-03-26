@@ -8,7 +8,7 @@ from portato.constants import APP_ICON, APP
 
 def notify (retcode, **kwargs):
 	if retcode is None:
-		warning(_("Notify called while process is still running!"))
+		warning("NOTIFY :: %s", _("Notify called while process is still running!"))
 	else:
 		icon = APP_ICON
 		if retcode == 0:

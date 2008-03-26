@@ -22,7 +22,7 @@ def launch (options = []):
 	if os.getuid() == 0:
 		Popen(PROG+options)
 	else:
-		error(_("Cannot start etc-proposals. Not root!"))
+		error("ETC_PROPOSALS :: %s",_("Cannot start etc-proposals. Not root!"))
 
 def etc_prop (*args, **kwargs):
 	"""Entry point for this plugin."""
