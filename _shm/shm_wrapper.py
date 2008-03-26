@@ -24,6 +24,7 @@ import sys
 
 # Third party modules
 import shm
+from shm import error as shmerror
 
 r"""shm_wrapper - A wrapper for the shm module which provides access
 to System V shared memory and semaphores on *nix systems.
@@ -49,7 +50,7 @@ def create_memory(size, permissions = 0666, InitCharacter = ' '):
         key = random.randint(1, sys.maxint - 1)
         try:
             memory = shm.create_memory(key, size, permissions)
-        except shm.error, ExtraData:
+        except shmerror, ExtraData:
             if shm.memory_haskey(key):
                 # Oops, bad luck, the key exists. I'll try another. I can't call
                 # memory_haskey() before calling create_memory() because that would create
@@ -59,7 +60,7 @@ def create_memory(size, permissions = 0666, InitCharacter = ' '):
                 pass
             else:
                 # Uh-oh, something fundamental is wrong.
-                raise shm.error, ExtraData
+                raise shmerror, ExtraData
 
     # Here I implicitly discard the memory handle object returned to me by shm and instead
     # return my own handle to the shared memory segment.
@@ -90,7 +91,7 @@ class SharedMemoryHandle(object):
             try:
                 if self._MemoryHandle.attached:
                     self._MemoryHandle.detach()
-            except shm.error:
+            except shmerror:
                 pass
 
 
@@ -187,7 +188,7 @@ def create_semaphore(InitialValue = 1, permissions = 0666):
         key = random.randint(1, sys.maxint - 1)
         try:
             semaphore = shm.create_semaphore(key, InitialValue, permissions)
-        except shm.error, ExtraData:
+        except shmerror, ExtraData:
             if shm.semaphore_haskey(key):
                 # Oops, bad luck, the key exists. I'll try another. I can't call
                 # memory_haskey() before calling create_semaphore() because that would create
