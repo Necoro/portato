@@ -14,4 +14,9 @@
 		<item call="find_version">Check for new _versions</item>
 	</menu>
 
+	<options>
+		<option>disabled</option>
+	</options>
+
+
 </plugin>
