@@ -26,4 +26,6 @@ def find_version (*args, **kwargs):
 	rev = v[-1]
 
 	plugin.load_plugins() # to have lp: addresses parsed
-	Thread(target = find_thread, args=(rev,)).start()
+	t = Thread(target = find_thread, args=(rev,))
+	t.setDaemon(True)
+	t.start()

@@ -10,4 +10,8 @@
 		<hook type="after_startup" call="find_version" />
 	</hooks>
 
+	<menu>
+		<item call="find_version">Check for new _versions</item>
+	</menu>
+
 </plugin>
