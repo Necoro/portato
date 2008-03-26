@@ -779,6 +779,7 @@ class MainWindow (Window):
 		splash(_("Finishing startup"))
 		
 		self.window.show_all()
+		plugin.hook("after_startup")(lambda x:pass)()
 	
 	def show_package (self, *args, **kwargs):
 		self.packageTable.update(*args, **kwargs)

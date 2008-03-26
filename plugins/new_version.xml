@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<plugin xmlns="http://portato.sourceforge.net/plugin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://portato.sourceforge.net/plugin http://portato.sourceforge.net/plugin.xsd">
+
+	<author>René 'Necoro' Neumann</author>
+	<name>New Version Reminder</name>
+
+	<import>portato.plugins.new_version</import>
+
+	<hooks>
+		<hook type="after_startup" call="find_version" />
+	</hooks>
+
+</plugin>
