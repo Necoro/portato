@@ -5,15 +5,18 @@ except ImportError:
 
 from threading import Thread
 
+import gobject
+
 from portato.helper import debug, _
 from portato import get_listener
 from portato.constants import VERSION, APP_ICON, APP
 
 def find_thread (rev):
 	b = branch.Branch.open("lp:portato")
-
+	
+	debug("Installed rev: %s - Current rev: %s", rev, b.revno())
 	if int(rev) < int(b.revno()):
-		get_listener().send_notify(base = "New Portato Live Version Found", descr = "You have rev. %s, but the most recent revision is %s." % (rev, b.revno()), icon = APP_ICON)
+		gobject.idle_add(get_listener().send_notify, base = "New Portato Live Version Found", descr = "You have rev. %s, but the most recent revision is %s." % (rev, b.revno()), icon = APP_ICON)
 
 def find_version (*args, **kwargs):
 	if not all((plugin, branch)):
