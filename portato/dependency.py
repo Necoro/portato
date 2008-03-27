@@ -77,8 +77,8 @@ class OrDependency (Dependency):
 
 	:IVariables:
 
-		dep : tuple(string,...)
-			The dependency strings. The tuple and the strings are immutable.
+		dep : tuple(`Dependency`,...)
+			The dependencies. The tuple and the dependencies are immutable.
 	"""
 
 	def __init__ (self, deps):
@@ -89,10 +89,43 @@ class OrDependency (Dependency):
 		:type deps: iter<string>
 		"""
 
-		self._dep = tuple(Dependency(dep) for dep in deps)
+		_dep = []
+		for dep in deps:
+			if not hasattr(dep, "__iter__"):
+				_dep.append(Dependency(dep))
+			else:
+				_dep.append(AllOfDependency(dep))
+
+		self._dep = tuple(_dep)
 	
 	def __str__ (self):
 		return "<|| %s>" % str(self.dep)
+	
+	__repr__ = __str__
+
+class AllOfDependency (Dependency):
+	"""
+	Dependency representing a set of packages inside "or".
+	If the or is: ``|| (a ( b c ) )`` the `AllOfDependency` would be the ``( b c )``.
+
+	:IVariables:
+
+		dep : tuple(`Dependency`,...)
+			The dependencies . The tuple and the deps are immutable.
+	"""
+
+	def __init__ (self, deps):
+		"""
+		Creates an or-dependency out of a list (or tuple) of deps.
+
+		:param deps: The dependencies.
+		:type deps: iter<string>
+		"""
+
+		self._dep = tuple(Dependency(dep) for dep in deps)
+
+	def __str__ (self):
+		return "<ALL %s>" % str(self.dep)
 	
 	__repr__ = __str__
 

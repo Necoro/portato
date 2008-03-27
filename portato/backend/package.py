@@ -177,6 +177,7 @@ class Package (_Package):
 		"""
 		deps = " ".join(map(self.get_package_settings, ("RDEPEND", "PDEPEND", "DEPEND")))
 		deps = paren_reduce(deps)
+		debug("Dependencies: %s", deps)
 		
 		tree = DependencyTree()
 
@@ -193,9 +194,9 @@ class Package (_Package):
 				elif dep == "||":	
 					n = iter.next() # skip
 					if not hasattr(n, "__iter__"):
-						n = tuple(n,)
+						n = [n]
 					else:
-						n = tuple(n)
+						n = list(n)
 
 					tree.add_or(n)
 				

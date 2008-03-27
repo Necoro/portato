@@ -256,7 +256,12 @@ class PackageTable:
 				orit = store.append(it, [self.icons["or"], _("One of the following")])
 
 				for dep in ordep.dep:
-					store.append(orit, [get_icon(dep), dep.dep])
+					if isinstance(dep, dependency.AllOfDependency): # a list inside or
+						allit = store.append(orit, [None, _("All of the following")])
+						for adep in dep.dep:
+							store.append(allit, [get_icon(adep), adep.dep])
+					else:
+						store.append(orit, [get_icon(dep), dep.dep])
 			
 			# normal
 			def sort_key (x):
