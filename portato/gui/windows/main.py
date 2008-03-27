@@ -68,8 +68,8 @@ class PackageTable:
 		self.notebook = self.tree.get_widget("packageNotebook")
 		
 		# the version combo
-		self.versionCombo = self.tree.get_widget("versionCombo")
-		self.build_version_combo()
+		self.versionList = self.tree.get_widget("versionList")
+		self.build_version_list()
 
 		# chechboxes
 		self.installedCheck = self.tree.get_widget("installedCheck")
@@ -148,17 +148,15 @@ class PackageTable:
 			self.instPackages = system.sort_package_list(system.find_installed_packages(cp, masked = True))
 
 		# version-combo-box
-		self.versionCombo.handler_block(self.versionCombo.changeHandler) # block change handler, because it would be called several times
-		self.versionCombo.get_model().clear()
-		self.fill_version_combo()
-		self.versionCombo.handler_unblock(self.versionCombo.changeHandler) # unblock handler again
+		self.versionList.get_model().clear()
+		self.fill_version_list()
 
 		if not self.queue or not self.doEmerge: 
 			self.emergeBtn.set_sensitive(False)
 			self.unmergeBtn.set_sensitive(False)
 		
 		# current status
-		self.cb_version_combo_changed()
+		self.cb_version_list_changed()
 		self.vb.show_all()
 
 	def hide (self):
@@ -344,37 +342,64 @@ class PackageTable:
 		self.useList.set_search_column(2)
 		self.useList.set_enable_tree_lines(True)
 
-	def build_version_combo (self):
-		store = gtk.ListStore(gtk.gdk.Pixbuf, str)
+	def build_version_list (self):
+		store = gtk.ListStore(gtk.gdk.Pixbuf, str, str)
 
 		# build view
-		self.versionCombo.set_model(store)
-		col = gtk.TreeViewColumn("Versions")
+		self.versionList.set_model(store)
+		
+		col = gtk.TreeViewColumn(_("Versions"))
+		col.set_property("expand", True)
+		
+		self.slotcol = gtk.TreeViewColumn(_("Slot"))
+		self.slotcol.set_property("expand", True)
 
 		# adding the pixbuf
 		cell = gtk.CellRendererPixbuf()
-		self.versionCombo.pack_start(cell, False)
-		self.versionCombo.add_attribute(cell, "pixbuf", 0)
+		col.pack_start(cell, False)
+		col.add_attribute(cell, "pixbuf", 0)
 
 		# adding the package name
 		cell = gtk.CellRendererText()
-		self.versionCombo.pack_start(cell, True)
-		self.versionCombo.add_attribute(cell, "text", 1)
+		col.pack_start(cell, True)
+		col.add_attribute(cell, "text", 1)
 
-		# connect
-		self.versionCombo.changeHandler = self.versionCombo.connect("changed", self.cb_version_combo_changed)
+		# adding the slot
+		cell = gtk.CellRendererText()
+		self.slotcol.pack_start(cell, True)
+		self.slotcol.add_attribute(cell, "text", 2)
 
-	def fill_version_combo (self):
+		self.versionList.append_column(col)
+		self.versionList.append_column(self.slotcol)
+
+	def fill_version_list (self):
 		
-		store = self.versionCombo.get_model()
+		store = self.versionList.get_model()
+
+		# this is here for performance reasons
+		# to not query the package with info, we do not need
+		if self.main.cfg.get_boolean("showSlots", "GUI"):
+			def get_slot(pkg):
+				return pkg.get_package_settings("SLOT")
+			
+			self.slotcol.set_visible(True)
+		
+		else:
+			def get_slot(*args):
+				return ""
+			
+			self.slotcol.set_visible(False)
 		
 		# append versions
-		for vers, inst in ((x.get_version(), x.is_installed()) for x in self.packages):
+		for vers, inst, slot in ((x.get_version(), x.is_installed(), get_slot(x)) for x in self.packages):
 			if inst:
 				icon = self.main.instPixbuf
 			else:
 				icon = None
-			store.append([icon, vers])
+				
+			store.append([icon, vers, slot])
+
+		pos = ((0,)) # default
 		
 		# activate the first one
 		try:
@@ -385,18 +410,25 @@ class PackageTable:
 				best_version = system.find_best_match(self.packages[0].get_cp(), only_installed = (self.instPackages != [])).get_version()
 			for i in range(len(self.packages)):
 				if self.packages[i].get_version() == best_version:
-					self.versionCombo.set_active(i)
+					pos = (i,)
 					break
 		except AttributeError: # no package found
-			self.versionCombo.set_active(0)
+			pass
+
+		self.versionList.get_selection().select_path(pos)
+		self.versionList.scroll_to_cell(pos)
 
 	def actual_package (self):
 		"""Returns the actual selected package.
 		
 		@returns: the actual selected package
 		@rtype: backend.Package"""
-		
-		return self.packages[self.versionCombo.get_active()]
+
+		model, iter = self.versionList.get_selection().get_selected()
+		if iter:
+			return self.packages[model.get_path(iter)[0]]
+		else:
+			return self.packages[0]
 
 	def _update_keywords (self, emerge, update = False):
 		if emerge:
@@ -416,7 +448,7 @@ class PackageTable:
 				error(_("Package could not be found: %s"), e[0])
 				#masked_dialog(e[0])
 
-	def cb_version_combo_changed (self, *args):
+	def cb_version_list_changed (self, *args):
 
 		pkg = self.actual_package()
 
@@ -511,9 +543,9 @@ class PackageTable:
 		self.actual_package().remove_new_use_flags()
 		self.actual_package().remove_new_masked()
 		self.actual_package().remove_new_testing()
-		self.versionCombo.get_model().clear()
-		self.fill_version_combo()
-		self.cb_version_combo_changed()
+		self.versionList.get_model().clear()
+		self.fill_version_list()
+		self.cb_version_list_changed()
 		if self.instantChange:
 			self._update_keywords(True, update = True)
 		return True
@@ -694,8 +726,6 @@ class MainWindow (Window):
 		self.vpaned.set_position(int(self.window.get_size()[1]/2))
 		self.hpaned = self.tree.get_widget("hpaned")
 		self.hpaned.set_position(int(self.window.get_size()[0]/1.5))
-		self.listPaned = self.tree.get_widget("listPaned")
-		self.listPaned.set_position(int(self.window.get_size()[0]/2))
 
 		# cat and pkg list
 		self.sortPkgListByName = True
@@ -962,13 +992,10 @@ class MainWindow (Window):
 		# PANED
 		def load_paned (*pos):
 			pos = map(int, pos)
-			if oldVersion < 2:
-				[x.set_position(p) for x,p in zip((self.vpaned, self.hpaned), pos)]
-			else:
-				[x.set_position(p) for x,p in zip((self.vpaned, self.hpaned, self.listPaned), pos)]
+			[x.set_position(p) for x,p in zip((self.vpaned, self.hpaned), pos)]
 
 		def save_paned ():
-			return [x.get_position() for x in (self.vpaned, self.hpaned, self.listPaned)]
+			return [x.get_position() for x in (self.vpaned, self.hpaned)]
 
 		# SELECTION
 		def load_selection (list, col):
@@ -1037,7 +1064,7 @@ class MainWindow (Window):
 		map(self.session.add_handler,[
 			([("gtksessionversion", "session")], load_session_version, lambda: SESSION_VERSION),
 			([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
-			([("vpanedpos", "window"), ("hpanedpos", "window"), ("listpanedpos", "window")], load_paned, save_paned),
+			([("vpanedpos", "window"), ("hpanedpos", "window")], load_paned, save_paned),
 			([("catsel", "window")], load_selection(self.catList, 0), save_cat_selection),
 			([("pkgsel", "window")], load_selection(self.pkgList, 1), save_pkg_selection)
 			#([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue),
