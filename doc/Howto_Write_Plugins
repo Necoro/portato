@@ -60,11 +60,6 @@ Menu:
 
 		Note, that the underscore in front of a character will make it be underlined in the menu and thus accessible by a shortcut.
 
-Frontends:
-		Sometimes, your plugin will only work with a specific frontend - you can therefore add a "frontends" tag with the list of frontends supported:
-		
-		<frontends>gtk qt4</frontends>
-
 Options
 --------
 

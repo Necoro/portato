@@ -3,6 +3,12 @@ next:
 - added uselist to the "Generals" Tab
 - added dependency tab
 - removed frontend flexibility
+- overhauled the layout
+- now showing slots in the version list
+- added Turkish translation (thx to Gürkan Gür)
+
+0.9.0.3:
+- removed the "expanding bug" in 0.9.0.2
 
 0.9.0.2:
 - bugfixes
