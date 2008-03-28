@@ -33,6 +33,9 @@ class PortageSystem (SystemInterface):
 		self.settings = PortageSettings()
 		portage.WORLD_FILE = self.settings.settings["ROOT"]+portage.WORLD_FILE
 
+	def get_version (self):
+		return "Portage %s" % portage.VERSION
+	
 	def new_package (self, cpv):
 		return PortagePackage(cpv)
 
