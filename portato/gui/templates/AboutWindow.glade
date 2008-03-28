@@ -27,7 +27,8 @@ Thanks goto:
 	- the Sabayon-Distro for making Portato the default Portage-GUI</property>
     <property name="translator_credits">Catalan - Roger Calvó
 German - René 'Necoro' Neumann
-Polish - Tomasz Osiński</property>
+Polish - Tomasz Osiński
+Turkish - Gürkan Gür</property>
     <property name="artists">p4r4d0x (inspired by wolfden)</property>
     <signal name="response" handler="close"/>
     <child internal-child="vbox">
