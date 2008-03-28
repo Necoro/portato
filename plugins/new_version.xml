@@ -7,10 +7,10 @@
 	<import>portato.plugins.new_version</import>
 
 	<hooks>
-		<hook type="main" call="find_version" />
+		<hook type="main" call="run" />
 	</hooks>
 
 	<menu>
-		<item call="find_version">Check for new _versions</item>
+		<item call="run_menu">Check for new _versions</item>
 	</menu>
 </plugin>

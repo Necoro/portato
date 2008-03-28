@@ -2,16 +2,14 @@ try:
 	from bzrlib import plugin, branch
 except ImportError:
 	plugin = branch =  None
-
-from threading import Thread
-
 import gobject
 
 from portato.helper import debug, warning
 from portato import get_listener
 from portato.constants import VERSION, APP_ICON, APP
+from portato.gui.exception_handling import GtkThread
 
-def find_thread (rev):
+def find_version (rev):
 	try:
 		b = branch.Branch.open("lp:portato")
 	except Exception, e:
@@ -26,17 +24,35 @@ def find_thread (rev):
 		
 		gobject.idle_add(callback)
 
-def find_version (*args, **kwargs):
+def start_thread(rev):
+	t = GtkThread(target = find_version, name = "Version Updater Thread", args = (rev,))
+	t.setDaemon(True)
+	t.start()
+	return True
+
+def run_menu (*args, **kwargs):
+	"""
+	Run the thread once.
+	"""
 	if not all((plugin, branch)):
-		return
+		return None
 
 	v = VERSION.split()
 	if len(v) != 3 or v[0] != "9999":
-		return
+		return None
 
 	rev = v[-1]
 
 	plugin.load_plugins() # to have lp: addresses parsed
-	t = Thread(target = find_thread, args=(rev,))
-	t.setDaemon(True)
-	t.start()
+	
+	start_thread(rev)
+	return rev
+
+def run (*args, **kwargs):
+	"""
+	Run the thread once and add a 30 minutes timer.
+	"""
+	rev = run_menu()
+
+	if rev is not None:
+		gobject.timeout_add(30*60*1000, start_thread, rev) # call it every 30 minutes
