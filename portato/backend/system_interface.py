@@ -12,6 +12,13 @@
 
 class SystemInterface (object):
 
+	def get_version (self):
+		"""Returns the version of the used backend.
+
+		@rtype: string
+		"""
+		raise NotImplementedError
+
 	def split_cpv (self, cpv):
 		"""Splits a cpv into all its parts.
 

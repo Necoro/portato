@@ -32,6 +32,10 @@ class CatapultSystem (SystemInterface):
 		so = self.bus.get_object(catapult.get_dbus_address(catapult.DEFAULT), catapult.CATAPULT_SYSTEM_BUS, follow_name_owner_changes = True)
 		self.proxy = dbus.Interface(so, catapult.CATAPULT_SYSTEM_IFACE)
 
+	def get_version (self):
+		admint = dbus.Interface(self.bus.get_object(catapult.get_dbus_address(catapult.DEFAULT), catapult.CATAPULT_BUS), catapult.CATAPULT_ADMIN_IFACE)
+		return "Catapult: %s v. %s" % (self.proxy.bus_name.split(".")[-1], str(admint.version()))
+
 	def geneticize_list (self, list_of_packages, only_cpv = False):
 		"""Convertes a list of cpv's into L{backend.Package}s.
 		

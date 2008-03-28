@@ -63,6 +63,8 @@ def main ():
 	
 	elif options.nofork or os.getuid() == 0: # start GUI
 		from portato.gui import run
+		from portato.helper import info
+		info("%s v. %s", _("Starting Portato"), VERSION)
 		
 		if options.shm:
 			get_listener().set_send(*options.shm)
