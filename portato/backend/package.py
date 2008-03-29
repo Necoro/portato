@@ -184,6 +184,10 @@ class Package (_Package):
 		def add (tree, deps):
 			iter = (x for x in deps)
 			for dep in iter:
+				if hasattr(dep, "__iter__"):
+					debug("Following dep is an unsupposed list: %s", dep)
+					assert(len(dep) == 1)
+					dep = dep[0]
 				if dep.endswith("?"):
 					ntree = tree.add_flag(dep[:-1])
 					n = iter.next()
