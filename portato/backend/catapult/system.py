@@ -149,11 +149,11 @@ class CatapultSystem (SystemInterface):
 		return self._wrap_find_all(name, True, "system", withVersion, only_cpv)
 
 	def list_categories (self, name = None):
-		if not name:
-			name = ".*"
-		else:
-			name = ".*%s.*" % name
-		return [str(x) for x in self.proxy.list_categories(name)]
+		cats = self.proxy.list_categories()
+		if name:
+			cats = catapult.filter_list("*%s*" % name, cats)
+		
+		return map(str, cats)
 
 	def sort_package_list(self, pkglist):
 		return self.geneticize_list(self.proxy.sort_package_list([x.get_cpv() for x in pkglist]))
