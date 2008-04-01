@@ -209,9 +209,6 @@ class CatapultSystem (SystemInterface):
 	def get_config_path (self):
 		return str(self.proxy.get_config_path())
 
-	def get_world_file_path (self):
-		return str(self.proxy.get_world_file_path())
-	
 	def get_sync_command (self):
 		return [str(x) for x in self.proxy.get_sync_command()]
 
@@ -237,6 +234,21 @@ class CatapultSystem (SystemInterface):
 		return [str(x) for x in self.proxy.get_unmerge_option()]
 
 	def get_environment (self):
-		env = self.proxy.get_environment()
-		env.update(TERM = "xterm") # emulate terminal :)
-		return env
+		default_opts = self.get_global_settings("EMERGE_DEFAULT_OPTS")
+		opts = dict(os.environ)
+
+		if default_opts:
+			opt_list = default_opts.split()
+			changed = False
+
+			for option in ["--ask", "-a", "--pretend", "-p"]:
+				if option in opt_list:
+					opt_list.remove(option)
+					changed = True
+			
+			if changed:
+				opts.update(EMERGE_DEFAULT_OPTS = " ".join(opt_list))
+		
+		opts.update(TERM = "xterm")
+
+		return opts

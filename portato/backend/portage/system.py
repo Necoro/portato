@@ -42,9 +42,6 @@ class PortageSystem (SystemInterface):
 	def get_config_path (self):
 		return portage.USER_CONFIG_PATH
 
-	def get_world_file_path (self):
-		return portage.WORLD_FILE
-
 	def get_merge_command (self):
 		return ["/usr/bin/python", "/usr/bin/emerge"]
 

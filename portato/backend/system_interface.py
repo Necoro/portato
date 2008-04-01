@@ -299,15 +299,6 @@ class SystemInterface (object):
 
 		raise NotImplementedError
 
-	def get_world_file_path (self):
-		"""Returns the path to the world file.
-
-		@returns: the path of the world file
-		@rtype: string
-		"""
-
-		raise NotImplementedError
-
 	def get_sync_command (self):
 		"""Returns the command(s) to run for syncing. This can be overridden by the user.
 
