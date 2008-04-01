@@ -177,7 +177,6 @@ class Package (_Package):
 		"""
 		deps = " ".join(map(self.get_package_settings, ("RDEPEND", "PDEPEND", "DEPEND")))
 		deps = paren_reduce(deps)
-		debug("Dependencies: %s", deps)
 		
 		tree = DependencyTree()
 

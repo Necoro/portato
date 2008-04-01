@@ -86,9 +86,8 @@ class CatapultSystem (SystemInterface):
 			l = self.proxy.find_packages(key, set, masked, withVersion)
 		except dbus.DBusException, e:
 			name, data = str(e).split("\n")[-2].split(": ")[1:]
-			debug((name, data))
 
-			if name ==  "org.gentoo.catapult.AmbigousPackageError":
+			if name == catapult.CATAPULT_ERR_AMBIGUOUS_PACKAGE:
 				debug("Ambigous packages: %s.", data)
 				l = []
 				for cp in data.split(","):
