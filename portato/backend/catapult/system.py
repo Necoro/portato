@@ -79,11 +79,30 @@ class CatapultSystem (SystemInterface):
 				return str(p)
 		return None
 
+	def _wrap_find(self, key, masked, set, withVersion, only_cpv):
+		
+		l = []
+		try:
+			l = self.proxy.find_packages(key, set, masked, withVersion)
+		except dbus.DBusException, e:
+			name, data = str(e).split("\n")[-2].split(": ")[1:]
+			debug((name, data))
+
+			if name ==  "org.gentoo.catapult.AmbigousPackageError":
+				debug("Ambigous packages: %s.", data)
+				l = []
+				for cp in data.split(","):
+					l += self.proxy.find_packages(cp, set, masked, withVersion)
+			else:
+				raise
+
+		return self.geneticize_list(l, not(withVersion) or only_cpv)
+
 	def find_packages (self, search_key, masked = False, only_cpv = False):
-		return self.geneticize_list(self.proxy.find_packages(search_key, "all", masked, True), only_cpv)
+		return self._wrap_find(search_key, masked, "all", True, only_cpv)
 
 	def find_installed_packages (self, search_key, masked = False, only_cpv = False):
-		return self.geneticize_list(self.proxy.find_packages(search_key, "installed", masked, True), only_cpv)
+		return self._wrap_find(search_key, masked, "installed", True, only_cpv)
 
 	def find_system_packages (self, only_cpv = False):
 #		result = self.proxy.find_system_packages()
@@ -91,7 +110,7 @@ class CatapultSystem (SystemInterface):
 #			return result
 #		else:
 #			return tuple(map(self.geneticize_list, result))
-		return (self.geneticize_list(self.proxy.find_packages(search_key, "system", False, True), only_cpv), [])
+		return (self._wrap_find(search_key, False, "system", True, only_cpv), [])
 
 	def find_world_packages (self, only_cpv = False):
 #		result = self.proxy.find_world_packages()
@@ -99,42 +118,35 @@ class CatapultSystem (SystemInterface):
 #			return result
 #		else:
 #			return tuple(map(self.geneticize_list, result))
-		return (self.geneticize_list(self.proxy.find_packages(search_key, "world", False, True), only_cpv), [])
+		return (self._wrap_find(search_key, False, "world", True, only_cpv), [])
+
+	def _wrap_find_all (self, key, masked, set, withVersion, only_cpv):
+		if not key:
+			key = ""
+		else:
+			key = "*%s*" % key
+
+		l = self.proxy.find_packages("", set, masked, withVersion)
+
+		if key:
+			l = catapult.filter_list(key, l)
+		
+		return self.geneticize_list(l, not(withVersion) or only_cpv)
 
 	def find_all_installed_packages (self, name = None, withVersion = True, only_cpv = False):
-		if not name:
-			name = ".*"
-		else:
-			name = ".*%s.*" % name
-		return self.geneticize_list(self.proxy.find_packages(name, "installed", True, withVersion), (not withVersion) or only_cpv)
+		return self._wrap_find_all(name, True, "installed", withVersion, only_cpv)
 
 	def find_all_uninstalled_packages (self, name = None, only_cpv = False):
-		if not name:
-			name = ".*"
-		else:
-			name = ".*%s.*" % name
-		return self.geneticize_list(self.proxy.find_packages(name, "uninstalled", True, withVersion), (not withVersion) or only_cpv)
+		return self._wrap_find_all(name, True, "uninstalled", True, only_cpv)
 
 	def find_all_packages (self, name = None, withVersion = True, only_cpv = False):
-		if not name:
-			name = ".*"
-		else:
-			name = ".*%s.*" % name
-		return self.geneticize_list(self.proxy.find_packages(name, "all", True, withVersion), (not withVersion) or only_cpv)
+		return self._wrap_find_all(name, True, "all", withVersion, only_cpv)
 
 	def find_all_world_packages (self, name = None, only_cpv = False):
-		if not name:
-			name = ".*"
-		else:
-			name = ".*%s.*" % name
-		return self.geneticize_list(self.proxy.find_packages(name, "world", True, True), (not withVersion) or only_cpv)
+		return self._wrap_find_all(name, True, "world", withVersion, only_cpv)
 	
 	def find_all_system_packages (self, name = None, only_cpv = False):
-		if not name:
-			name = ".*"
-		else:
-			name = ".*%s.*" % name
-		return self.geneticize_list(self.proxy.find_packages(name, "system", True, True), (not withVersion) or only_cpv)
+		return self._wrap_find_all(name, True, "system", withVersion, only_cpv)
 
 	def list_categories (self, name = None):
 		if not name:
