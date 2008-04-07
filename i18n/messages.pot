@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-27 22:38+0100\n"
+"POT-Creation-Date: 2008-04-07 20:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -471,7 +471,7 @@ msgstr ""
 msgid "Show Details"
 msgstr ""
 
-#: portato/gui/exception_handling.py:72 portato/gui/exception_handling.py:118
+#: portato/gui/exception_handling.py:72 portato/gui/exception_handling.py:135
 #, python-format
 msgid ""
 "Exception in thread \"%(thread)s\":\n"
@@ -482,7 +482,7 @@ msgstr ""
 msgid "Save traceback..."
 msgstr ""
 
-#: portato/gui/exception_handling.py:120
+#: portato/gui/exception_handling.py:137
 #, python-format
 msgid ""
 "Exception:\n"
@@ -811,7 +811,7 @@ msgid "No %(old)s language file installed. Disable highlighting."
 msgstr ""
 
 #: portato/gui/__init__.py:22
-msgid "Loading Portage"
+msgid "Loading Backend"
 msgstr ""
 
 #: portato/backend/catapult/package.py:99
@@ -919,4 +919,8 @@ msgstr ""
 
 #: portato.py:61
 msgid "Validation succeeded."
+msgstr ""
+
+#: portato.py:67
+msgid "Starting Portato"
 msgstr ""

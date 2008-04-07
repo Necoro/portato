@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-03-27 22:40+0100\n"
+"PO-Revision-Date: 2008-04-07 20:07+0100\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -480,7 +480,7 @@ msgid "Show Details"
 msgstr "Details"
 
 #: portato/gui/exception_handling.py:72
-#: portato/gui/exception_handling.py:118
+#: portato/gui/exception_handling.py:135
 #, python-format
 msgid ""
 "Exception in thread \"%(thread)s\":\n"
@@ -493,7 +493,7 @@ msgstr ""
 msgid "Save traceback..."
 msgstr "Speichere Traceback..."
 
-#: portato/gui/exception_handling.py:120
+#: portato/gui/exception_handling.py:137
 #, python-format
 msgid ""
 "Exception:\n"
@@ -829,8 +829,8 @@ msgid "No %(old)s language file installed. Disable highlighting."
 msgstr "Keine \"%(old)s\" Syntaxdatei gefunden. Deaktiviere Hervorhebung."
 
 #: portato/gui/__init__.py:22
-msgid "Loading Portage"
-msgstr "Lade Portage"
+msgid "Loading Backend"
+msgstr "Lade Backend"
 
 #: portato/backend/catapult/package.py:99
 #: portato/backend/portage/package.py:132
@@ -938,4 +938,8 @@ msgstr "Validierung gegen das Schema fehlgeschlagen."
 #: portato.py:61
 msgid "Validation succeeded."
 msgstr "Validierung erfolgreich."
+
+#: portato.py:67
+msgid "Starting Portato"
+msgstr "Starte Portato"
 
