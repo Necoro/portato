@@ -15,6 +15,7 @@ from __future__ import absolute_import
 # some stuff needed
 import re
 import logging
+from collections import defaultdict
 
 # some backend things
 from ..backend import flags, system, set_system
@@ -110,6 +111,22 @@ class Config (ConfigParser):
 		ConfigParser.write(self)
 		self.modify_external_configs()
 
+class PkgData:
+
+	def __init__ (self, cat, pkg, inst):
+		self.cat = cat
+		self.pkg = pkg
+		self.inst = inst
+
+	def __iter__ (self):
+		return iter((self.cat, self.pkg, self.inst))
+
+	def __cmp__ (self, other):
+		return cmp(self.pkg.lower(), other.pkg.lower())
+
+	def __repr__ (self):
+		return "<Package (%(cat)s, %(pkg)s, %(inst)s)>" % self.__dict__
+
 class Database (object):
 	"""An internal database which holds a simple dictionary cat -> [package_list]."""
 
@@ -120,12 +137,12 @@ class Database (object):
 		self.__initialize()
 
 	def __initialize (self):
-		self._db = {self.ALL:[]}
+		self._db = defaultdict(list)
 		self.inst_cats = set([self.ALL])
 		self._restrict = None
 
 	def __sort_key (self, x):
-		return x[1].lower()
+		return x.pkg.lower()
 
 	def populate (self, category = None):
 		"""Populates the database.
@@ -141,9 +158,8 @@ class Database (object):
 		# cycle through packages
 		for p in packages:
 			cat, pkg = p.split("/")
-			if not cat in self._db: self._db[cat] = []
 			inst = p in installed
-			t = (cat, pkg, inst)
+			t = PkgData(cat, pkg, inst)
 			self._db[cat].append(t)
 			self._db[self.ALL].append(t)
 
@@ -167,24 +183,24 @@ class Database (object):
 		if not cat:
 			cat = self.ALL
 
+		def get_pkgs():
+			if byName:
+				for pkg in self._db[cat]:
+					yield pkg
+			else:
+				ninst = []
+				for pkg in self._db[cat]:
+					if pkg[2]:
+						yield pkg
+					else:
+						ninst.append(pkg)
+
+				for pkg in ninst:
+					yield pkg
+
 		try:
-			def get_pkgs():
-				if byName:
-					for pkg in self._db[cat]:
-						yield pkg
-				else:
-					ninst = []
-					for pkg in self._db[cat]:
-						if pkg[2]:
-							yield pkg
-						else:
-							ninst.append(pkg)
-
-					for pkg in ninst:
-						yield pkg
-
 			if self.restrict:
-				return (pkg for pkg in get_pkgs() if self.restrict.search(pkg[1]))#if pkg[1].find(self.restrict) != -1)
+				return (pkg for pkg in get_pkgs() if self.restrict.search(pkg.pkg))#if pkg[1].find(self.restrict) != -1)
 			else:
 				return get_pkgs()
 
@@ -208,9 +224,9 @@ class Database (object):
 
 		else:
 			if installed:
-				cats = set((pkg[0] for pkg in self.get_cat(self.ALL) if pkg[2]))
+				cats = set((pkg.cat for pkg in self.get_cat(self.ALL) if pkg.inst))
 			else:
-				cats = set((pkg[0] for pkg in self.get_cat(self.ALL)))
+				cats = set((pkg.cat for pkg in self.get_cat(self.ALL)))
 
 			if len(cats)>1:
 				cats.add(self.ALL)
@@ -230,6 +246,8 @@ class Database (object):
 				self.inst_cats.remove(cat)
 			except KeyError: # not in inst_cats - can be ignored
 				pass
+			
+			self._db[self.ALL] = filter(lambda x: x.cat != cat, self._db[self.ALL])
 			self.populate(cat+"/")
 		else:
 			self.__initialize()
