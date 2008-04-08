@@ -10,12 +10,14 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 # some stuff needed
 import re
 import logging
 from collections import defaultdict
+from threading import RLock
+from functools import wraps
 
 # some backend things
 from ..backend import flags, system, set_system
@@ -135,6 +137,16 @@ class Database (object):
 	def __init__ (self):
 		"""Constructor."""
 		self.__initialize()
+		self._lock = RLock()
+
+	def lock (f):
+		@wraps(f)
+		def wrapper (self, *args, **kwargs):
+			with self._lock:
+				r = f(self, *args, **kwargs)
+			return r
+		
+		return wrapper
 
 	def __initialize (self):
 		self._db = defaultdict(list)
@@ -144,6 +156,7 @@ class Database (object):
 	def __sort_key (self, x):
 		return x.pkg.lower()
 
+	@lock
 	def populate (self, category = None):
 		"""Populates the database.
 		
@@ -169,6 +182,7 @@ class Database (object):
 		for key in self._db: # sort alphabetically
 			self._db[key].sort(key = self.__sort_key)
 
+	@lock
 	def get_cat (self, cat = None, byName = True):
 		"""Returns the packages in the category.
 		
@@ -207,6 +221,7 @@ class Database (object):
 		except KeyError: # cat is in category list - but not in portage
 			info(_("Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?"), cat)
 
+	@lock
 	def get_categories (self, installed = False):
 		"""Returns all categories.
 		
@@ -233,6 +248,7 @@ class Database (object):
 
 		return (cat for cat in cats)
 
+	@lock
 	def reload (self, cat = None):
 		"""Reloads the given category.
 		
@@ -256,6 +272,7 @@ class Database (object):
 	def get_restrict (self):
 		return self._restrict
 
+	@lock
 	def set_restrict (self, restrict):
 		if not restrict:
 			self._restrict = None
