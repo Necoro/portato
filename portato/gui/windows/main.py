@@ -193,7 +193,7 @@ class PackageTable:
 		ftexts = []
 
 		for count, t in enumerate(texts):
-			if not t.startswith(("http:", "ftp:")):
+			if not t.startswith(("http", "ftp")):
 				if count == 0:
 					error(_("The first homepage part does not start with 'http' or 'ftp'."))
 					ftexts.append(t)
@@ -225,9 +225,8 @@ class PackageTable:
 
 	def fill_dep_list(self):
 
-		deptree = self.actual_package().get_dependencies()
 		store = self.depList.get_model()
-
+				
 		def add (tree, it):
 
 			def get_icon (dep):
@@ -274,8 +273,15 @@ class PackageTable:
 			ndeps.sort(key = sort_key)
 			for dep in ndeps:
 				store.append(it, [get_icon(dep), dep.dep])
-
-		add (deptree, None)
+		
+		try:
+			deptree = self.actual_package().get_dependencies()
+		except AssertionError:
+			w =  _("Can't display dependencies: This package has an unsupported dependency string.")
+			error(w)
+			store.append(None, [None, w])
+		else:
+			add(deptree, None)
 
 	def fill_use_list(self):
 

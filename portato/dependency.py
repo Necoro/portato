@@ -63,10 +63,10 @@ class Dependency (object):
 
 	__repr__ = __str__
 
-	def _get_dep (self):
+	@property
+	def dep (self):
 		return self._dep
 
-	dep = property(_get_dep)
 	satisfied = property(is_satisfied)
 
 class OrDependency (Dependency):
@@ -92,6 +92,7 @@ class OrDependency (Dependency):
 		_dep = []
 		for dep in deps:
 			if not hasattr(dep, "__iter__"):
+				assert not dep.endswith("?")
 				_dep.append(Dependency(dep))
 			else:
 				_dep.append(AllOfDependency(dep))

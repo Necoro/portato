@@ -181,21 +181,21 @@ class Package (_Package):
 		tree = DependencyTree()
 
 		def add (tree, deps):
-			iter = (x for x in deps)
-			for dep in iter:
+			it = iter(deps)
+			for dep in it:
 				if hasattr(dep, "__iter__"):
 					debug("Following dep is an unsupposed list: %s", dep)
 					assert(len(dep) == 1)
 					dep = dep[0]
 				if dep.endswith("?"):
 					ntree = tree.add_flag(dep[:-1])
-					n = iter.next()
+					n = it.next()
 					if not hasattr(n, "__iter__"):
 						n = (n,)
 					add(ntree, n)
 				
 				elif dep == "||":	
-					n = iter.next() # skip
+					n = it.next() # skip
 					if not hasattr(n, "__iter__"):
 						n = [n]
 					else:
