@@ -32,17 +32,13 @@ Main Point: user preferences:
 - if a package has been merged, but there are still dependencies to be merged - move the dependencies up the tree (Updater)
 - use alternative way of displaying categories (tree-like - see Porthole)
 - move GUI prefs out of the system config
-
-GTK:
-----
 - make oneshot better
-- show dependencies
+- show reverse dependencies
 - reload package table when emerge is finished
-- dependency tree out of the installed packages
+- show which package has a dependency that causes a block
 
-Qt (stopped):
----
-- better terminal
-- find a way to use markup in CheckBoxes, Lists etc.
-- some hangups ...
-- color chooser for the ebuild hl-colors
+[quote]
+I would like to be able to see at a glance:
+1. How many packages I have installed. (Hopefully in the menubar)
+a. How many of the packages are installed, and the number there are in each category. (Just like you do with the queue: "x of y"::"installed of available")
+[/quote]

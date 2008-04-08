@@ -75,10 +75,13 @@ def main ():
 		
 	else: # start us again in root modus and launch listener
 		
-		try:
-			import shm_wrapper as shm
+		try: # local version
+			from _shm import shm_wrapper as shm 
 		except ImportError:
-			from portato._shm import shm_wrapper as shm
+			try: # version installed together with portato
+				from portato._shm import shm_wrapper as shm 
+			except ImportError: # the normal shm module
+				import shm_wrapper as shm
 
 		mem = shm.create_memory(1024, permissions=0600)
 		sig = shm.create_semaphore(InitialValue = 0, permissions = 0600)
