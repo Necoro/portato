@@ -1,4 +1,3 @@
-from gettext import lgettext as _
 import pynotify
 
 from portato import get_listener

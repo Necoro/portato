@@ -14,7 +14,6 @@ from portato.helper import error
 
 import os
 from subprocess import Popen
-from gettext import lgettext as _
 
 PROG=["/usr/sbin/etc-proposals"]
 

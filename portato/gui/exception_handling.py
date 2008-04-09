@@ -19,7 +19,7 @@ import sys, traceback
 from threading import Thread
 from StringIO import StringIO
 
-from ..helper import _, debug, error
+from ..helper import debug, error
 from .dialogs import file_chooser_dialog, io_ex_dialog
 
 class GtkThread (Thread):

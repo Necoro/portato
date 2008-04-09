@@ -13,7 +13,7 @@
 from __future__ import absolute_import
 
 import vte
-from ..helper import _,debug
+from ..helper import debug
 
 class GtkTree (object):
 	"""The implementation of the abstract tree."""

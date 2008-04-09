@@ -21,7 +21,7 @@ from functools import wraps
 
 # some backend things
 from ..backend import flags, system, set_system
-from ..helper import _, debug, info, set_log_level 
+from ..helper import debug, info, set_log_level 
 from ..constants import USE_CATAPULT
 
 # parser

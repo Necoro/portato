@@ -16,7 +16,7 @@ import gtk
 
 from .basic import AbstractDialog
 from ..dialogs import io_ex_dialog
-from ...helper import _, debug
+from ...helper import debug
 
 class PreferenceWindow (AbstractDialog):
 	"""Window displaying some preferences."""

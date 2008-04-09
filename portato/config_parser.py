@@ -44,7 +44,6 @@ from __future__ import absolute_import, with_statement
 __docformat__ = "restructuredtext"
 
 import re
-from gettext import lgettext as _
 from threading import Lock
 
 from .helper import debug, error

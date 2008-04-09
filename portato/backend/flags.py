@@ -15,7 +15,6 @@ from __future__ import absolute_import, with_statement
 import os
 import os.path
 from subprocess import Popen, PIPE # needed for grep
-from gettext import lgettext as _
 
 from . import system, is_package
 from ..helper import debug, error, unique_array

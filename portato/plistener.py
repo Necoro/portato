@@ -14,7 +14,6 @@ from __future__ import absolute_import
 
 import os
 from subprocess import Popen
-from gettext import lgettext as _
 
 try:
 	import pynotify

@@ -17,7 +17,7 @@ import pango
 import gtksourceview2
 import logging
 
-from ..helper import _, warning
+from ..helper import warning
 
 class LazyView (object):
 	def __init__ (self):

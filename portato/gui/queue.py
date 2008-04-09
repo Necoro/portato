@@ -20,7 +20,7 @@ from subprocess import Popen
 # some backend things
 from .. import backend, plugin
 from ..backend import flags, system
-from ..helper import _, debug, info, send_signal_to_group, unique_array
+from ..helper import debug, info, send_signal_to_group, unique_array
 from ..waiting_queue import WaitingQueue
 from .updater import Updater
 

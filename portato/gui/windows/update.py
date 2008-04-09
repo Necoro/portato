@@ -17,7 +17,7 @@ from .basic import AbstractDialog
 from ..dialogs import unmask_dialog, blocked_dialog
 from ...backend import system
 from ...backend.exceptions import PackageNotFoundException, BlockedException
-from ...helper import _, debug
+from ...helper import debug
 
 class UpdateWindow (AbstractDialog):
 

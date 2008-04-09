@@ -23,7 +23,7 @@ import itertools as itt
 # our backend stuff
 from ...backend import flags, system # must be the first to avoid circular deps
 from ... import get_listener, plugin, dependency
-from ...helper import debug, warning, error, info, unique_array, N_, _
+from ...helper import debug, warning, error, info, unique_array
 from ...session import Session
 from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
 from ...backend.exceptions import PackageNotFoundException, BlockedException
