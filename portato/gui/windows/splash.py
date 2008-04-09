@@ -15,7 +15,6 @@ from __future__ import absolute_import
 import gtk
 
 from .basic import Window
-from ...helper import _
 from ...constants import VERSION, APP_ICON
 
 class SplashScreen (Window):

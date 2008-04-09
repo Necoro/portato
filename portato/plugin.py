@@ -17,7 +17,6 @@ from __future__ import absolute_import
 import os, os.path
 from xml.dom.minidom import parse
 from lxml import etree
-from gettext import lgettext as _
 
 from .constants import PLUGIN_DIR, XSD_LOCATION
 from .helper import debug, info, warning, error, flatten

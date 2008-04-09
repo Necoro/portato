@@ -12,7 +12,6 @@
 
 from __future__ import absolute_import
 
-from ..helper import _
 from .. import get_listener
 from .exception_handling import register_ex_handler
 

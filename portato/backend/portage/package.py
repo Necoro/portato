@@ -21,7 +21,6 @@ from ...helper import debug, error, unique_array
 import portage, portage_dep
 
 import os.path
-from gettext import lgettext as _
 
 class PortagePackage (Package):
 	"""This is a class abstracting a normal package which can be installed for the portage-system."""

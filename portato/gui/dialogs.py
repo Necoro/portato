@@ -11,7 +11,7 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 import gtk
-from ..helper import _, error
+from ..helper import error
 
 def queue_not_empty_dialog():
 	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, _("There are some packages in the emerge queue and/or an emerge process is running.\nDo you really want to quit?"))

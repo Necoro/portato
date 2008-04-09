@@ -12,7 +12,6 @@
 
 import pty, time
 from subprocess import Popen, STDOUT
-from gettext import lgettext as _
 from portato.backend import system
 from portato.helper import debug, warning
 

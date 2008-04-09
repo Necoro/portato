@@ -24,9 +24,7 @@ from portato.constants import VERSION, XSD_LOCATION, LOCALE_DIR, APP, SU_COMMAND
 def main ():
 	# set gettext stuff
 	locale.setlocale(locale.LC_ALL, '')
-	gettext.bindtextdomain(APP, LOCALE_DIR)
-	gettext.textdomain(APP)
-	_ = gettext.lgettext
+	gettext.install(APP, LOCALE_DIR, unicode = True)
 
 	# build the parser
 	desc = "Portato - A Portage GUI."

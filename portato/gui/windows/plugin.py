@@ -15,7 +15,7 @@ from __future__ import absolute_import
 import gtk
 
 from .basic import AbstractDialog
-from ...helper import _, debug
+from ...helper import debug
 
 class PluginWindow (AbstractDialog):
 	

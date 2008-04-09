@@ -16,7 +16,7 @@ import os, os.path
 
 from .config_parser import ConfigParser
 from .constants import SESSION_DIR
-from .helper import _,debug, info
+from .helper import debug, info
 
 class Session (object):
 	"""

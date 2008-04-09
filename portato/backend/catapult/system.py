@@ -13,7 +13,6 @@
 from __future__ import absolute_import
 
 import re, os
-from gettext import lgettext as _
 from threading import Event
 import dbus
 import catapult

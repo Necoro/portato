@@ -22,7 +22,6 @@ import dbus
 import catapult
 
 import os.path
-from gettext import lgettext as _
 
 class CatapultPackage(Package):
 

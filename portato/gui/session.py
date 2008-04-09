@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from ..helper import _, debug
+from ..helper import debug
 
 # the current version for saved sessions
 # change this, whenever the change is incompatible with previous versions
