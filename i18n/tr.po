@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-03-27 22:38+0100\n"
-"PO-Revision-Date: 2008-03-28 08:26+0200\n"
-"Last-Translator: seqizz <seqizz@gmail.com>\n"
+"PO-Revision-Date: 2008-04-10 17:47+0200\n"
+"Last-Translator: Gürkan gür <seqizz@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,13 +19,13 @@ msgstr ""
 #: portato/gui/templates/MainWindow.glade:190
 #: portato/gui/templates/MainWindow.glade:282
 msgid "Emerge _Paused"
-msgstr "Yarım kalmış emerge'ye de_vam et"
+msgstr "Son kesilen işleme de_vam et"
 
 #: portato/gui/templates/popups.glade:19
 #: portato/gui/templates/MainWindow.glade:198
 #: portato/gui/templates/MainWindow.glade:264
 msgid "_Kill Emerge"
-msgstr "Emerge'yi _Durdur"
+msgstr "İşlemi _Durdur"
 
 #: portato/gui/templates/popups.glade:37
 #: portato/gui/templates/MainWindow.glade:68
@@ -398,7 +398,7 @@ msgstr "Bağımlılıklar"
 
 #: portato/gui/templates/MainWindow.glade:984
 msgid "Ebuild"
-msgstr ""
+msgstr "Ebuild"
 
 #: portato/gui/templates/MainWindow.glade:1011
 msgid "Changelog"
@@ -596,6 +596,8 @@ msgid ""
 "This is the updates queue. You cannot remove single elements.\n"
 "Do you want to clear the whole queue instead?"
 msgstr ""
+"Bu güncelleştirme kuyruğu. Sadece bir öğeyi kaldıramazsınız.\n"
+"Bütün kuyruktakileri kaldırmak ister misiniz?"
 
 #: portato/gui/dialogs.py:79
 msgid "Do you really want to clear the whole queue?"
@@ -622,7 +624,7 @@ msgstr "<tanım yok>"
 
 #: portato/gui/windows/main.py:198
 msgid "The first homepage part does not start with 'http' or 'ftp'."
-msgstr ""
+msgstr "Anasayfa 'http' veya 'ftp' ile başlamıyor."
 
 #: portato/gui/windows/main.py:202
 msgid "Blank inside homepage."
@@ -813,7 +815,7 @@ msgstr ""
 
 #: portato/gui/views.py:70
 msgid "Package is not installed"
-msgstr "Paket kurulmadı"
+msgstr "Paket kurulu değil"
 
 #: portato/gui/views.py:87
 #, python-format
@@ -843,7 +845,7 @@ msgstr "Maskelemede çelişen değerler: %s"
 #: portato/backend/portage/system.py:333
 #, python-format
 msgid "No best match for %s. It seems not to be in the tree anymore."
-msgstr ""
+msgstr "%s için iyi bir eşleşme bulunamadı. Artık portage ağacında olmayacak gibi görünüyor."
 
 #: portato/backend/portage/system.py:403
 #, python-format
@@ -853,7 +855,7 @@ msgstr "Kurulmamış bir bağımlılık bulundu: %s."
 #: portato/backend/portage/system.py:445
 #, python-format
 msgid "Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
-msgstr ""
+msgstr "Hata? '%(package)s' için iyi bir eşlenme bulunamadı. Ancak pakede '%(cpv)s' tarafından ihtiyaç duyuluyor."
 
 #: portato/plugin.py:298
 #: portato/plugin.py:304
@@ -921,7 +923,7 @@ msgstr ""
 
 #: portato.py:45
 msgid "-L is deprecated"
-msgstr ""
+msgstr "-L kullanılmıyor"
 
 #: portato.py:55
 #, python-format
