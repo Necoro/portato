@@ -451,7 +451,7 @@ class PluginQueue:
 						elif connect.depend_plugin == "-*":
 							self.hooks[hook.hook][2][0:0] = [connect]
 						else:
-							named = [x.plugin.name for x in self.hooks[hook.hook][2]]
+							named = [x.hook.plugin.name for x in self.hooks[hook.hook][2]]
 							if connect.depend_plugin in named:
 								self.hooks[hook.hook][2].insert(named.index(connect.depend_plugin)+1, connect)
 							else:
