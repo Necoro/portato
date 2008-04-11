@@ -4,16 +4,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pl\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-01-22 13:16+0000\n"
-"Last-Translator: Tomasz Osiński <osinskit[_at_spamfree_]gmail[_dot_]com>\n"
-"Language-Team: Polski <pl@li.org>\n"
+"PO-Revision-Date: 2008-04-10 16:47+0200\n"
+"Last-Translator: Tomasz Osinski <osinskit@gmail.com>\n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Polish\n"
 "X-Poedit-Country: POLAND\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: KBabel 1.11.4\n"
 
 #: portato/gui/templates/portato.glade:20
 msgid "_File"
@@ -39,12 +38,12 @@ msgstr "_Emerge"
 #: portato/gui/templates/portato.glade:89
 #: portato/gui/templates/portato.glade:494
 msgid "_Install"
-msgstr "_Instalacja"
+msgstr "_Zainstaluj"
 
 #: portato/gui/templates/portato.glade:105
 #: portato/gui/templates/portato.glade:508
 msgid "_Uninstall"
-msgstr "_De-instalacja"
+msgstr "_Odinstaluj"
 
 #: portato/gui/templates/portato.glade:121
 #: portato/gui/templates/portato.glade:1001
@@ -77,7 +76,7 @@ msgstr "Emerge _wstrzymane"
 #: portato/gui/templates/portato.glade:264
 #: portato/gui/templates/portato.glade:1994
 msgid "_Kill Emerge"
-msgstr "_Kill Emerge"
+msgstr "_Zabij Emerge"
 
 #: portato/gui/templates/portato.glade:221
 #: portato/gui/gtk/windows.py:1075
@@ -147,7 +146,7 @@ msgstr "Przy_wróć"
 #: portato/gui/gtk/windows.py:833
 #: portato/gui/gtk/windows.py:837
 msgid "Testing"
-msgstr "Testowanie"
+msgstr "Testowe"
 
 #: portato/gui/templates/portato.glade:613
 #: portato/gui/gtk/windows.py:746
@@ -469,7 +468,7 @@ msgstr "\"Notify\" wywołane, podczas gdy działa proces emerge."
 
 #: portato/plugins/notify.py:15
 msgid "Emerge finished!"
-msgstr "Emerge zakończony!"
+msgstr "Emerge skończył!"
 
 #: portato/plugins/notify.py:19
 msgid "Emerge failed!"
@@ -495,21 +494,21 @@ msgstr "... startuje: %s"
 
 #: portato/gui/gtk/windows.py:61
 msgid "Disabled"
-msgstr "Nieaktywne"
+msgstr "Wyłączone"
 
 #: portato/gui/gtk/windows.py:61
 msgid "Temporarily enabled"
-msgstr "Czasowo uaktywnione"
+msgstr "Czasowo włączone"
 
 #: portato/gui/gtk/windows.py:61
 #: portato/gui/gtk/windows.py:149
 #: portato/gui/gtk/windows.py:616
 msgid "Enabled"
-msgstr "Aktywne"
+msgstr "Włączone"
 
 #: portato/gui/gtk/windows.py:61
 msgid "Temporarily disabled"
-msgstr "Czasowo nieaktywne"
+msgstr "Czasowo wyłączone"
 
 #: portato/gui/gtk/windows.py:80
 msgid "Plugin"
@@ -561,7 +560,7 @@ msgstr "\"Pusty\" znak w adresie Strony Domowej."
 
 #: portato/gui/gtk/windows.py:594
 msgid "This is an expanded use flag and cannot be selected"
-msgstr "To jest \"Expanded Use Flag\" i nie może zostać zaznaczona."
+msgstr "To jest  rozwijalna flaga Use i nie może zostać zaznaczona."
 
 #: portato/gui/gtk/windows.py:618
 msgid "Flag"
@@ -574,7 +573,7 @@ msgstr "Opis"
 #: portato/gui/gtk/windows.py:698
 #, python-format
 msgid "Package could not be found: %s"
-msgstr "Pakiet nie może zostać znaleziony: %s"
+msgstr "Nie znaleziono pakietu: %s"
 
 #: portato/gui/gtk/windows.py:755
 #: portato/gui/gtk/windows.py:862
@@ -595,7 +594,7 @@ msgstr "Ładowanie wtyczek"
 
 #: portato/gui/gtk/windows.py:967
 msgid "Building frontend"
-msgstr "Tworzenie Frontendu"
+msgstr "Tworzenie interfejsu"
 
 #: portato/gui/gtk/windows.py:1007
 #: portato/gui/gtk/views.py:111
@@ -609,7 +608,7 @@ msgstr "Przywracanie sesji"
 
 #: portato/gui/gtk/windows.py:1049
 msgid "Finishing startup"
-msgstr "Kończenie uruchamiania :)"
+msgstr "Kończenie uruchamiania"
 
 #: portato/gui/gtk/windows.py:1078
 msgid "Options"
@@ -629,7 +628,7 @@ msgstr "Flagi Use"
 
 #: portato/gui/gtk/windows.py:1401
 msgid "masking keywords"
-msgstr "Masking Keywords"
+msgstr "Słowa maskujące"
 
 #: portato/gui/gtk/__init__.py:23
 msgid "Loading Portage"
@@ -667,22 +666,22 @@ msgstr "(w toku)"
 
 #: portato/gui/gtk/wrapper.py:79
 msgid "Install"
-msgstr "Instalacja"
+msgstr "Instaluj"
 
 #: portato/gui/gtk/wrapper.py:84
 msgid "Uninstall"
-msgstr "De-instalacja"
+msgstr "Odinstaluj"
 
 #: portato/gui/gtk/wrapper.py:90
 msgid "Update"
-msgstr "Aktualizacja"
+msgstr "Aktualizuj"
 
 #: portato/gui/gtk/dialogs.py:18
 msgid ""
 "There are some packages in the emerge queue and/or an emerge process is running.\n"
 "Do you really want to quit?"
 msgstr ""
-"Wciąż niektóre pakiety są w kolejce emerge i/lub proces emerge działa.\n"
+"Wciąż niektóre pakiety są w kolejce emerge i/lub proces emerge jest aktywny.\n"
 "Na pewno chcesz wyjść?"
 
 #: portato/gui/gtk/dialogs.py:37
@@ -705,7 +704,7 @@ msgid ""
 "Do you want to unmask it and its dependencies?"
 msgstr ""
 "%s wygląda na zamaskowany.\n"
-"Czy chcesz usunąć maskowanie tego pakietu i jego zależności?"
+"Czy chcesz usunąć maskowanie tego pakietu a także jego zależności?"
 
 #: portato/gui/gtk/dialogs.py:55
 msgid "Package not found!"
@@ -718,7 +717,7 @@ msgstr "Zmieniłeś %s. Portato zapisze te zmiany do stosownych plików. Proszę
 
 #: portato/gui/gtk/dialogs.py:68
 msgid "You cannot remove dependencies. :)"
-msgstr "Nie możesz usunąć zależności ;)."
+msgstr "Nie możesz usunąć zależności :)."
 
 #: portato/gui/gtk/dialogs.py:74
 msgid ""
@@ -726,7 +725,7 @@ msgid ""
 "Do you want to clear the whole queue instead?"
 msgstr ""
 "To jest kolejka uaktualnień. Nie możesz usunąć pojedynczych elementów.\n"
-"Czy zamiast tego wyczyścić całą kolejkę?"
+"Czy zamiast tego chcesz wyczyścić całą kolejkę?"
 
 #: portato/gui/gtk/dialogs.py:80
 msgid "Do you really want to clear the whole queue?"
@@ -783,7 +782,7 @@ msgstr "Żaden \"%(old)s\" plik językowy nie jest zainstalowany. Przywracanie \
 #: portato/gui/gtk/views.py:92
 #, python-format
 msgid "No %(old)s language file installed. Disable highlighting."
-msgstr "Żaden \"%(old)s\" plik językowy nie jest zainstalowany. Dezaktywacja podświetlania."
+msgstr "Żaden \"%(old)s\" plik językowy nie jest zainstalowany. Wyłączenie podświetlania."
 
 #: portato/gui/gui_helper.py:126
 msgid "ALL"
@@ -855,7 +854,7 @@ msgstr "BUG w flags.new_masking_status. Zwraca '%s'."
 #: portato/backend/portage/system.py:333
 #, python-format
 msgid "No best match for %s. It seems not to be in the tree anymore."
-msgstr "Nie znaleziono najlepszego dopasowania dla %s . Wydaje się nie być go w drzewie Portage."
+msgstr "Nie znaleziono wyniku dla %s . Wydaje się nie być go w drzewie Portage."
 
 #: portato/backend/portage/system.py:403
 #, python-format
@@ -865,7 +864,7 @@ msgstr "Znaleziono niezainstalowane zależności: %s"
 #: portato/backend/portage/system.py:441
 #, python-format
 msgid "Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
-msgstr "Nie ma najlepszego dopasowania dla '%(package)s' potrzebnego przez '%(cpv)s'). Bug?"
+msgstr "Nie ma wyniku dla '%(package)s' potrzebnego przez '%(cpv)s'). Bug?"
 
 #: portato/backend/flags.py:512
 #, python-format
