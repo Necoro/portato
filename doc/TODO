@@ -16,6 +16,7 @@ Backend:
 - rewrite flags handling 
 
 - do not alert a block, if a package blocks a version of one package which is updated to a new one not being blocked anymore
+- also check installed packages if they block the current one
 
 - make sure, a package being removed from the queue is not needed as a dependency by another package
 - binary package support
@@ -36,6 +37,7 @@ Main Point: user preferences:
 - show reverse dependencies
 - reload package table when emerge is finished
 - show which package has a dependency that causes a block
+- make the max length of the console title a user setting
 
 [quote]
 I would like to be able to see at a glance:
