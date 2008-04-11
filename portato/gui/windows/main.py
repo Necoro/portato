@@ -1166,6 +1166,7 @@ class MainWindow (Window):
 			else: 
 				title = ("%s (%s)") % (_("Console"), title)
 			
+			if (len(title) > 60): title = "%s..." % title[:57]
 			self.sysNotebook.set_tab_label_text(self.termHB, title)
 
 			return False
