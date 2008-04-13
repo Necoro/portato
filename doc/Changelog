@@ -6,6 +6,7 @@
 - overhauled the layout
 - now showing slots in the version list
 - added Turkish translation (thx to Gürkan Gür)
+- appended important version information to the exceptions
 
 0.9.0.3:
 - removed the "expanding bug" in 0.9.0.2
