@@ -290,7 +290,7 @@ class EmergeQueue:
 			# open tty
 			if self.console:
 				self.console.reset()
-			
+
 			def pre ():
 				os.setsid() # new session
 				if self.console:
@@ -299,6 +299,9 @@ class EmergeQueue:
 					os.dup2(self.pty[1], 0)
 					os.dup2(self.pty[1], 1)
 					os.dup2(self.pty[1], 2)
+
+			# get all categories that are being touched during the emerge process
+			cats = set(map(lambda x: x.split("/")[0], it.iterkeys()))
 
 			# start emerge
 			self.process = Popen(command+options+packages, shell = False, env = system.get_environment(), preexec_fn = pre)
@@ -342,7 +345,7 @@ class EmergeQueue:
 			@plugin.hook("after_emerge", packages = packages, retcode = ret)
 			def update_packages():
 				if self.db:
-					for cat in unique_array([system.split_cpv(p)[0] for p in packages if p not in ["world", "system"]]):
+					for cat in cats:
 						self.db.reload(cat)
 						debug("Category %s refreshed", cat)
 
