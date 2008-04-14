@@ -465,10 +465,10 @@ class EmergeQueue:
 		try:
 			while True:
 				idx = command.index("&&")
-				self.doEmerge([],[],[], command[:idx], caller = self.sync)
+				self.doEmerge([],[],{}, command[:idx], caller = self.sync)
 				command = command[idx+1:]
 		except ValueError: # no && in command
-			self.doEmerge([],[],[], command, caller = self.sync)
+			self.doEmerge([],[],{}, command, caller = self.sync)
 
 	def kill_emerge (self):
 		"""Kills the emerge process."""
