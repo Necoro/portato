@@ -22,8 +22,14 @@ from StringIO import StringIO
 from ..helper import debug, error
 from .dialogs import file_chooser_dialog, io_ex_dialog
 
+# for the i18n
+from ..constants import LOCALE_DIR, APP
+import gettext
+
 class GtkThread (Thread):
 	def run(self):
+		# for some reason, I have to install this for each thread ...
+		gettext.install(APP, LOCALE_DIR, unicode = True)
 		try:
 			Thread.run(self)
 		except SystemExit:
