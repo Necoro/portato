@@ -169,10 +169,22 @@ class EmergeQueue:
 					changedUse.append("+"+i)
 
 		except backend.PackageNotFoundException, e: # package not found / package is masked -> delete current tree and re-raise the exception
-			if self.tree.iter_has_parent(it):
-				while self.tree.iter_has_parent(it):
+			if type == "update": # remove complete tree
+				if self.tree.iter_has_parent(it):
+					while self.tree.iter_has_parent(it):
+						it = self.tree.parent_iter(it)
+					self.remove_with_children(it, removeNewFlags = False)
+			elif type == "install": # remove only the intentionally added package
+				top = self.tree.first_iter(it)
+				parent = self.tree.parent_iter(it)
+				while not self.tree.iter_equal(top, parent):
+					parent = self.tree.parent_iter(parent)
 					it = self.tree.parent_iter(it)
+
 				self.remove_with_children(it, removeNewFlags = False)
+
+				if not self.tree.iter_has_children(top): # remove completely if nothing left
+					self.remove(top)
 			raise
 
 		# add iter
