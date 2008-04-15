@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: ca\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-09 00:53+0200\n"
-"PO-Revision-Date: 2008-04-14 19:29+0000\n"
+"PO-Revision-Date: 2008-04-15 10:27+0000\n"
 "Last-Translator: Roger Calvó <rcalvoi@yahoo.com>\n"
 "Language-Team: Català\n"
 "MIME-Version: 1.0\n"
@@ -943,5 +943,5 @@ msgstr "Validació reeixida."
 
 #: portato.py:67
 msgid "Starting Portato"
-msgstr ""
+msgstr "S'està inicialitzant Portato"
 
