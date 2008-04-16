@@ -170,10 +170,8 @@ class EmergeQueue:
 
 		except backend.PackageNotFoundException, e: # package not found / package is masked -> delete current tree and re-raise the exception
 			if type == "update": # remove complete tree
-				if self.tree.iter_has_parent(it):
-					while self.tree.iter_has_parent(it):
-						it = self.tree.parent_iter(it)
-					self.remove_with_children(it, removeNewFlags = False)
+				self.remove_with_children(self.tree.first_iter(it), removeNewFlags = False)
+			
 			elif type == "install": # remove only the intentionally added package
 				top = self.tree.first_iter(it)
 				parent = self.tree.parent_iter(it)
@@ -224,11 +222,10 @@ class EmergeQueue:
 		@raises portato.backend.PackageNotFoundException: if trying to add a package which does not exist"""
 		
 		if type in ("install", "update"): # emerge
-			# insert dependencies
-			pkg = self._get_pkg_from_cpv(cpv, unmask)
-			deps = pkg.get_dep_packages()
-			
 			if update:
+				pkg = self._get_pkg_from_cpv(cpv, unmask)
+				deps = pkg.get_dep_packages()
+				
 				if not forceUpdate and cpv in self.deps[type] and deps == self.deps[type][cpv]:
 					return # nothing changed - return
 				else:
