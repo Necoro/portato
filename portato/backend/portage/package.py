@@ -200,13 +200,7 @@ class PortagePackage (Package):
 		
 		deps = deps[1]
 
-		retlist = []
-		
-		for d in deps:
-			if not d[0] == "!":
-				retlist.append(d)
-
-		return retlist
+		return [d for d in deps if d[0] != "!"]
 
 	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"], with_criterions = False):
 		dep_pkgs = [] # the package list

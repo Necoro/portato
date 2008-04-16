@@ -443,8 +443,17 @@ class PortageSystem (SystemInterface):
 							if not bm: 
 								warning(_("Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."), {"package" : i, "cpv": p.get_cpv()})
 							else:
-								for pkg in bm: 
+								for pkg in bm:
 									if not pkg: continue
+									if pkg.is_masked() or pkg.is_testing(True): # check to not update unnecessairily
+										cont = False
+										for inst in self.find_installed_packages(pkg.get_cp(), only_cpv = True):
+											if self.cpv_matches(inst, i):
+												debug("The installed %s matches %s. Discarding upgrade to masked version.", inst, i)
+												cont = True
+												break
+										if cont: continue
+											
 									check(pkg, state[1], appended) # XXX: should be 'or'ed with prev_appended?
 
 		for p in self.get_new_packages(packages):
