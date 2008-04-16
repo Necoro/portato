@@ -175,11 +175,13 @@ class EmergeQueue:
 			elif type == "install": # remove only the intentionally added package
 				top = self.tree.first_iter(it)
 				parent = self.tree.parent_iter(it)
-				while not self.tree.iter_equal(top, parent):
-					parent = self.tree.parent_iter(parent)
-					it = self.tree.parent_iter(it)
+				
+				if parent:
+					while not self.tree.iter_equal(top, parent):
+						parent = self.tree.parent_iter(parent)
+						it = self.tree.parent_iter(it)
 
-				self.remove_with_children(it, removeNewFlags = False)
+					self.remove_with_children(it, removeNewFlags = False)
 
 				if not self.tree.iter_has_children(top): # remove completely if nothing left
 					self.remove(top)
