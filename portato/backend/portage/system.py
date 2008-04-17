@@ -3,17 +3,18 @@
 # File: portato/backend/portage/system.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006-2007 René 'Necoro' Neumann
+# Copyright (C) 2006-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
-import re, os
+import re, os, os.path
 import portage
+from collections import defaultdict
 
 from .package import PortagePackage
 from .settings import PortageSettings
@@ -30,7 +31,10 @@ class PortageSystem (SystemInterface):
 	def __init__ (self):
 		"""Constructor."""
 		self.settings = PortageSettings()
-		portage.WORLD_FILE = self.settings.settings["ROOT"]+portage.WORLD_FILE
+		portage.WORLD_FILE = os.path.join(self.settings.settings["ROOT"],portage.WORLD_FILE)
+
+		self.use_descs = {}
+		self.local_use_descs = defaultdict(dict)
 
 	def get_version (self):
 		return "Portage %s" % portage.VERSION
@@ -461,46 +465,48 @@ class PortageSystem (SystemInterface):
 			check(p, True)
 		
 		return updating
-	
-	use_descs = {}
-	local_use_descs = {}
+
 	def get_use_desc (self, flag, package = None):
 		# In the first run the dictionaries 'use_descs' and 'local_use_descs' are filled.
 		
 		# fill cache if needed
-		if self.use_descs == {} or self.local_use_descs == {}:
-			# read use.desc
-			fd = open(self.settings.settings["PORTDIR"]+"/profiles/use.desc")
-			lines = fd.readlines()
-			fd.close()
-			for line in lines:
-				line = line.strip()
-				if line != "" and line[0] != '#':
-					fields = [x.strip() for x in line.split(" - ",1)]
-					if len(fields) == 2:
-						self.use_descs[fields[0]] = fields[1]
+		if not self.use_descs and not self.local_use_descs:
+			for dir in [self.settings.settings["PORTDIR"]] + self.settings.settings["PORTDIR_OVERLAY"].split():
+				
+				# read use.desc
+				try:
+					f = open(os.path.join(dir, "profiles/use.desc"))
+					for line in f:
+						line = line.strip()
+						if line and line[0] != '#':
+							fields = [x.strip() for x in line.split(" - ",1)]
+							if len(fields) == 2:
+								self.use_descs[fields[0]] = fields[1]
+				except IOError:
+					pass
+				finally:
+					f.close()
 
-			# read use.local.desc
-			fd = open(self.settings.settings["PORTDIR"]+"/profiles/use.local.desc")
-			lines = fd.readlines()
-			fd.close()
-			for line in lines:
-				line = line.strip()
-				if line != "" and line[0] != '#':
-					fields = [x.strip() for x in line.split(":",1)]
-					if len(fields) == 2:
-						if not fields[0] in self.local_use_descs: # create
-							self.local_use_descs[fields[0]] = {}
-						subfields = [x.strip() for x in fields[1].split(" - ",1)]
-						if len(subfields) == 2:
-							self.local_use_descs[fields[0]][subfields[0]] = subfields[1]
+				# read use.local.desc
+				try:
+					f = open(os.path.join(dir, "profiles/use.local.desc"))
+					for line in f:
+						line = line.strip()
+						if line and line[0] != '#':
+							fields = [x.strip() for x in line.split(":",1)]
+							if len(fields) == 2:
+								subfields = [x.strip() for x in fields[1].split(" - ",1)]
+								if len(subfields) == 2:
+									self.local_use_descs[fields[0]].update([subfields])
+				except IOError:
+					pass
+				finally:
+					f.close()
 		
 		# start
-		desc = ""
-		if flag in self.use_descs:
-			desc = self.use_descs[flag]
-		if package != None:
+		desc = self.use_descs.get(flag, "")
+		if package is not None:
 			if package in self.local_use_descs:
-				if flag in self.local_use_descs[package]:
-					desc = self.local_use_descs[package][flag]
+				desc = self.local_use_descs[package].get(flag, desc)
+		
 		return desc
