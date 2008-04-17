@@ -36,6 +36,8 @@ class PortageSystem (SystemInterface):
 		self.use_descs = {}
 		self.local_use_descs = defaultdict(dict)
 
+		self._version = tuple([x.split("_")[0] for x in portage.VERSION.split(".")])
+
 	def get_version (self):
 		return "Portage %s" % portage.VERSION
 	
@@ -155,7 +157,7 @@ class PortageSystem (SystemInterface):
 			return PortagePackage(portage.best(list))
 
 	def find_best_match (self, search_key, masked = False, only_installed = False, only_cpv = False):
-		t = None
+		t = []
 		
 		if not only_installed:
 			try:
@@ -173,11 +175,14 @@ class PortageSystem (SystemInterface):
 							t += self.settings.porttree.dbapi.match(cp)
 				else:
 					raise
-		else:
-			t = self.find_installed_packages(search_key, masked, only_cpv = True)
+		
+		if self._version >= (2,1,5) or only_installed:
+			t += [pkg.get_cpv() for pkg in self.find_installed_packages(search_key) if not pkg.is_masked()]
 
 		if t:
+			t = unique_array(t)
 			return self.find_best(t, only_cpv)
+
 		return None
 
 	def find_packages (self, search_key, masked=False, only_cpv = False):
@@ -373,7 +378,7 @@ class PortageSystem (SystemInterface):
 		# append system packages
 		packages.extend(unique_array([p.get_cp() for p in self.find_all_system_packages()]))
 		
-		states = [(["RDEPEND"], True)]
+		states = [(["RDEPEND", "PDEPEND"], True)]
 		if self.with_bdeps():
 			states.append((["DEPEND"], True))
 
