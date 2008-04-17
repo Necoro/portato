@@ -3,14 +3,14 @@
 # File: portato/backend/portage/system.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006-2007 René 'Necoro' Neumann
+# Copyright (C) 2006-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 import re, os, os.path
 import portage
@@ -467,17 +467,24 @@ class PortageSystem (SystemInterface):
 		# fill cache if needed
 		if not self.use_descs and not self.local_use_descs:
 			for dir in [self.settings.settings["PORTDIR"]] + self.settings.settings["PORTDIR_OVERLAY"].split():
+				
 				# read use.desc
-				with open(os.path.join(dir, "profiles/use.desc")) as f:
+				try:
+					f = open(os.path.join(dir, "profiles/use.desc"))
 					for line in f:
 						line = line.strip()
 						if line and line[0] != '#':
 							fields = [x.strip() for x in line.split(" - ",1)]
 							if len(fields) == 2:
 								self.use_descs[fields[0]] = fields[1]
+				except IOError:
+					pass
+				finally:
+					f.close()
 
 				# read use.local.desc
-				with open(os.path.join(dir, "profiles/use.local.desc")) as f:
+				try:
+					f = open(os.path.join(dir, "profiles/use.local.desc"))
 					for line in f:
 						line = line.strip()
 						if line and line[0] != '#':
@@ -486,13 +493,15 @@ class PortageSystem (SystemInterface):
 								subfields = [x.strip() for x in fields[1].split(" - ",1)]
 								if len(subfields) == 2:
 									self.local_use_descs[fields[0]].update([subfields])
+				except IOError:
+					pass
+				finally:
+					f.close()
 		
 		# start
-		desc = self.use_descs.get(flag)
+		desc = self.use_descs.get(flag, "")
 		if package is not None:
 			if package in self.local_use_descs:
-				desc = self.local_use_descs[package].get(flag)
+				desc = self.local_use_descs[package].get(flag, desc)
 		
-		if desc is None: return ""
-
 		return desc
