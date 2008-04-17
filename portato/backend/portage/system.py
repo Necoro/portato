@@ -12,8 +12,9 @@
 
 from __future__ import absolute_import
 
-import re, os
+import re, os, os.path
 import portage
+from collections import defaultdict
 
 from .package import PortagePackage
 from .settings import PortageSettings
@@ -30,7 +31,10 @@ class PortageSystem (SystemInterface):
 	def __init__ (self):
 		"""Constructor."""
 		self.settings = PortageSettings()
-		portage.WORLD_FILE = self.settings.settings["ROOT"]+portage.WORLD_FILE
+		portage.WORLD_FILE = os.path.join(self.settings.settings["ROOT"], portage.WORLD_FILE)
+
+		self.use_descs = {}
+		self.local_use_descs = defaultdict(dict)
 
 	def get_version (self):
 		return "Portage %s" % portage.VERSION
@@ -175,46 +179,98 @@ class PortageSystem (SystemInterface):
 		if t:
 			return self.find_best(t, only_cpv)
 		return None
+	
+	def find_packages (self, key = "", pkgSet = "all", masked = False, with_version = True, only_cpv = False):
 
-	def find_packages (self, search_key, masked=False, only_cpv = False):
-		try:
-			if masked:
-				t = self.settings.porttree.dbapi.xmatch("match-all", search_key)
-				t += self.settings.vartree.dbapi.match(search_key)
+		is_regexp = key == "" or ("*" in key and key[0] not in ("*","=","<",">","~","!"))
+		
+		def installed(key):
+			if is_regexp:
+				if with_version:
+					t = self.settings.vartree.dbapi.cpv_all()
+					t = self.settings.vartree.dbapi.cp_all()
+
+				if key:
+					t = filter(lambda x: re.match(key, x, re.I), t)
+
+				return t
+			else:	
+				return self.settings.vartree.dbapi.match(key)
+
+		def tree(key):
+			if is_regexp:
+				if with_version:
+					t = self.settings.porttree.dbapi.cpv_all()
+				else:
+					t = self.settings.porttree.dbapi.cp_all()
+
+				if key:
+					t = filter(lambda x: re.match(key, x, re.I), t)
+			
+			elif masked:	
+				t = self.settings.porttree.dbapi.xmatch("match-all", key)
 			else:
-				t = self.settings.porttree.dbapi.match(search_key)
-				t += self.settings.vartree.dbapi.match(search_key)
+				t = self.settings.porttree.dbapi.match(key)
+			
+			return t
+		
+		def all(key):
+			return unique_array(installed(key)+tree(key))
+
+		def uninstalled (key):
+			alist = set(all(key))
+			inst = set(installed(key))
+			return list(alist - inst)
+
+		def _ws (key, crit, pkglist):
+			list = self.__find_resolved_unresolved(pkglist, crit)[0]
+			if not with_version:
+				list = [self.pkg.get_cp(x) for x in list]
+
+			if is_regexp:
+				return filter(lambda x: re.match(key, x, re.I), list)
+			
+			return list
+
+		def world (key):
+			with open(portage.WORLD_FILE) as f:
+				pkglist = f.readlines()
+
+			return _ws(key, lambda cpv: cpv[0] != "#", pkglist)
+
+		def system (key):
+			return _ws(key, lambda cpv: cpv[0] == "*", self.settings.settings.packages)
+
+		pkgSet = pkgSet.lower()
+		if pkgSet == "" or pkgSet == "all":
+			func = all
+		elif pkgSet == "installed":
+			func = installed
+		elif pkgSet == "uninstalled":
+			func = uninstalled
+		elif pkgSet == "world":
+			func = world
+		elif pkgSet == "system":
+			func = system
+		elif pkgSet == "tree":
+			func = tree
+		
+		try:
+			t = func(key)
 		# catch the "ambigous package" Exception
 		except ValueError, e:
 			if isinstance(e[0], list):
 				t = []
 				for cp in e[0]:
-					if masked:
-						t += self.settings.porttree.dbapi.xmatch("match-all", cp)
-						t += self.settings.vartree.dbapi.match(cp)
-					else:
-						t += self.settings.porttree.dbapi.match(cp)
-						t += self.settings.vartree.dbapi.match(cp)
+					t += func(cp)
 			else:
 				raise
+
 		# Make the list of packages unique
 		t = unique_array(t)
 		t.sort()
-		return self.geneticize_list(t, only_cpv)
 
-	def find_installed_packages (self, search_key, masked = False, only_cpv = False):
-		try:
-			t = self.settings.vartree.dbapi.match(search_key)
-		# catch the "ambigous package" Exception
-		except ValueError, e:
-			if isinstance(e[0], list):
-				t = []
-				for cp in e[0]:
-					t += self.settings.vartree.dbapi.match(cp)
-			else:
-				raise ValueError(e)
-
-		return self.geneticize_list(t, only_cpv)
+		return geneticize_list(t, only_cpv)
 
 	def __find_resolved_unresolved (self, list, check, only_cpv = False):
 		"""Checks a given list and divides it into a "resolved" and an "unresolved" part.
@@ -239,63 +295,6 @@ class PortageSystem (SystemInterface):
 				else:
 					unresolved.append(self.find_best_match(cpv, True, only_cpv = only_cpv))
 		return (resolved, unresolved)
-	
-	def find_system_packages (self, only_cpv = False):
-		pkglist = self.settings.settings.packages
-
-		return self.__find_resolved_unresolved(pkglist, lambda cpv: cpv[0] == "*", only_cpv)
-
-	def find_world_packages (self, only_cpv = False):
-		f = open(portage.WORLD_FILE)
-		pkglist = f.readlines()
-		f.close()
-
-		return self.__find_resolved_unresolved(pkglist, lambda cpv: cpv[0] != "#", only_cpv)
-
-	def find_all_installed_packages (self, name = None, withVersion=True, only_cpv = False):
-		if withVersion:
-			t = self.settings.vartree.dbapi.cpv_all()
-			if name:
-				t = filter(self.find_lambda(name),t)
-			return self.geneticize_list(t, only_cpv)
-		
-		else:
-			t = self.settings.vartree.dbapi.cp_all()
-			if name:
-				t = filter(self.find_lambda(name),t)
-			return t
-
-	def find_all_uninstalled_packages (self, name = None, only_cpv = False):
-		alist = self.find_all_packages(name)
-		return self.geneticize_list([x.get_cpv() for x in alist if not x.is_installed()], only_cpv)	
-
-	def find_all_packages (self, name = None, withVersion = True, only_cpv = False):
-		t = self.settings.porttree.dbapi.cp_all()
-		t += self.settings.vartree.dbapi.cp_all()
-		if name:
-			t = filter(self.find_lambda(name),t)
-		
-		t = filter(lambda x: not self.unwantedPkgsRE.match(x), unique_array(t))
-		
-		if withVersion:
-			t2 = []
-			for x in t:
-				t2 += self.settings.porttree.dbapi.cp_list(x)
-				t2 += self.settings.vartree.dbapi.cp_list(x)
-				t2 = unique_array(t2)
-			return self.geneticize_list(t2, only_cpv)
-		else:
-			return t
-
-	def find_all_world_packages (self, name = None, only_cpv = False):
-		world = filter(self.find_lambda(name), self.find_world_packages(only_cpv = True)[0])
-		world = unique_array(world)
-		return self.geneticize_list(world, only_cpv)
-
-	def find_all_system_packages (self, name = None):
-		sys = filter(self.find_lambda(name), self.find_system_packages(only_cpv = True)[0])
-		sys = unique_array(sys)
-		return self.geneticize_list(sys)
 
 	def list_categories (self, name = None):
 		categories = self.settings.settings.categories
@@ -461,46 +460,39 @@ class PortageSystem (SystemInterface):
 			check(p, True)
 		
 		return updating
-	
-	use_descs = {}
-	local_use_descs = {}
+
 	def get_use_desc (self, flag, package = None):
 		# In the first run the dictionaries 'use_descs' and 'local_use_descs' are filled.
 		
 		# fill cache if needed
-		if self.use_descs == {} or self.local_use_descs == {}:
-			# read use.desc
-			fd = open(self.settings.settings["PORTDIR"]+"/profiles/use.desc")
-			lines = fd.readlines()
-			fd.close()
-			for line in lines:
-				line = line.strip()
-				if line != "" and line[0] != '#':
-					fields = [x.strip() for x in line.split(" - ",1)]
-					if len(fields) == 2:
-						self.use_descs[fields[0]] = fields[1]
+		if not self.use_descs and not self.local_use_descs:
+			for dir in [self.settings.settings["PORTDIR"]] + self.settings.settings["PORTDIR_OVERLAY"].split():
+				# read use.desc
+				with open(os.path.join(dir, "profiles/use.desc")) as f:
+					for line in f:
+						line = line.strip()
+						if line and line[0] != '#':
+							fields = [x.strip() for x in line.split(" - ",1)]
+							if len(fields) == 2:
+								self.use_descs[fields[0]] = fields[1]
 
-			# read use.local.desc
-			fd = open(self.settings.settings["PORTDIR"]+"/profiles/use.local.desc")
-			lines = fd.readlines()
-			fd.close()
-			for line in lines:
-				line = line.strip()
-				if line != "" and line[0] != '#':
-					fields = [x.strip() for x in line.split(":",1)]
-					if len(fields) == 2:
-						if not fields[0] in self.local_use_descs: # create
-							self.local_use_descs[fields[0]] = {}
-						subfields = [x.strip() for x in fields[1].split(" - ",1)]
-						if len(subfields) == 2:
-							self.local_use_descs[fields[0]][subfields[0]] = subfields[1]
+				# read use.local.desc
+				with open(os.path.join(dir, "profiles/use.local.desc")) as f:
+					for line in f:
+						line = line.strip()
+						if line and line[0] != '#':
+							fields = [x.strip() for x in line.split(":",1)]
+							if len(fields) == 2:
+								subfields = [x.strip() for x in fields[1].split(" - ",1)]
+								if len(subfields) == 2:
+									self.local_use_descs[fields[0]].update([subfields])
 		
 		# start
-		desc = ""
-		if flag in self.use_descs:
-			desc = self.use_descs[flag]
-		if package != None:
+		desc = self.use_descs.get(flag)
+		if package is not None:
 			if package in self.local_use_descs:
-				if flag in self.local_use_descs[package]:
-					desc = self.local_use_descs[package][flag]
+				desc = self.local_use_descs[package].get(flag)
+		
+		if desc is None: return ""
+
 		return desc
