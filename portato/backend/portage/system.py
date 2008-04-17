@@ -270,7 +270,7 @@ class PortageSystem (SystemInterface):
 		t = unique_array(t)
 		t.sort()
 
-		return geneticize_list(t, only_cpv)
+		return geneticize_list(t, only_cpv or not with_version)
 
 	def __find_resolved_unresolved (self, list, check, only_cpv = False):
 		"""Checks a given list and divides it into a "resolved" and an "unresolved" part.
