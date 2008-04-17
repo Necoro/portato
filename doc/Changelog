@@ -7,6 +7,8 @@
 - now showing slots in the version list
 - added Turkish translation (thx to Gürkan Gür)
 - appended important version information to the exceptions
+- also display useflag descriptions from overlays
+- fixes lots of errors
 
 0.9.0.3:
 - removed the "expanding bug" in 0.9.0.2
