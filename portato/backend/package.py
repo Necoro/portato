@@ -369,13 +369,13 @@ class Package (_Package):
 
 		raise NotImplementedError
 
-	def get_package_settings(self, var, tree = None):
+	def get_package_settings(self, var, installed = True):
 		"""Returns a package specific setting, such as DESCRIPTION, SRC_URI, IUSE ...
 		
 		@param var: the setting to get
 		@type var: string
-		@param tree: an object defining whether to take the information from the installed package or from the ebuild
-		@type tree: unknown
+		@param installed: take the vartree or the porttree
+		@type installed: boolean
 		
 		@returns: the value of the setting
 		@rtype: string"""

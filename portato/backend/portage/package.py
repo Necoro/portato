@@ -163,12 +163,10 @@ class PortagePackage (Package):
 			return reason
 
 	def get_iuse_flags (self, installed = False, removeForced = True):		
-		if installed or not self.is_in_system():
-			tree = self._settings.vartree
-		else:
-			tree = self._settings.porttree
+		if not self.is_in_system():
+			installed = True
 		
-		iuse = flags.filter_defaults(self.get_package_settings("IUSE", tree = tree).split())
+		iuse = flags.filter_defaults(self.get_package_settings("IUSE", installed = installed).split())
 
 		iuse = set(iuse)
 
@@ -184,11 +182,11 @@ class PortagePackage (Package):
 		depstring = ""
 		try:
 			for d in depvar:
-				depstring += self.get_package_settings(d, tree = self._settings.porttree)+" "
+				depstring += self.get_package_settings(d, installed = False)+" "
 		except KeyError: # not found in porttree - use vartree
 			depstring = ""
 			for d in depvar:
-				depstring += self.get_package_settings(d, tree = self._settings.vartree)+" "
+				depstring += self.get_package_settings(d, installed = True)+" "
 
 		deps = portage.dep_check(depstring, None, self._settings.settings, myuse = actual, trees = self._trees)
 
@@ -210,7 +208,7 @@ class PortagePackage (Package):
 
 		depstring = ""
 		for d in depvar:
-			depstring += self.get_package_settings(d, tree=self._settings.porttree)+" "
+			depstring += self.get_package_settings(d, installed = False)+" "
 
 		# let portage do the main stuff ;)
 		# pay attention to any changes here
@@ -280,20 +278,19 @@ class PortagePackage (Package):
 				for line in f:
 					yield line.split()[1].strip()
 
-	def get_package_settings(self, var, tree = None):
-		if not tree:
+	def get_package_settings(self, var, installed = True):
+		if installed and self.is_installed():
 			mytree = self._settings.vartree
-			if not self.is_installed():
-				mytree = self._settings.porttree
 		else:
-			mytree = tree
+			mytree = self._settings.porttree
+
 		r = mytree.dbapi.aux_get(self._cpv,[var])
 		
 		return r[0]
 
 	def get_installed_use_flags(self):
 		if self.is_installed():
-			return self.get_package_settings("USE", tree = self._settings.vartree).split()
+			return self.get_package_settings("USE", installed = True).split()
 		else: return []
 
 	def compare_version(self,other):
