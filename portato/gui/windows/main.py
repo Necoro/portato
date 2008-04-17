@@ -173,7 +173,7 @@ class PackageTable:
 		self.descLabel.set_label(desc)
 
 		# overlay
-		if pkg.is_overlay():
+		if pkg.is_in_overlay():
 			self.overlayLabel.set_label(pkg.get_overlay_path())
 			self.overlayLabel.show()
 			self.overlayLL.show()

@@ -165,9 +165,8 @@ class Package (_Package):
 		
 		p = self.get_ebuild_path()
 		sp = p.split("/")
-		if len(sp):
-			import string
-			return string.join(sp[:-1],"/")
+		if sp:
+			return "/".join(sp[:-1])
 
 	def get_dependencies (self):
 		"""
@@ -243,7 +242,7 @@ class Package (_Package):
 
 		raise NotImplementedError
 
-	def is_overlay(self):
+	def is_in_overlay(self):
 		"""Returns true if the package is in an overlay.
 		@rtype: boolean"""
 

@@ -88,7 +88,7 @@ class PortagePackage (Package):
 	def is_installed(self):
 		return self._settings.vartree.dbapi.cpv_exists(self._cpv)
 
-	def is_overlay(self):
+	def is_in_overlay(self):
 		dir,ovl = self._settings.porttree.dbapi.findname2(self._cpv)
 		return ovl != self._settings.settings["PORTDIR"] and str(ovl) != "0"
 
