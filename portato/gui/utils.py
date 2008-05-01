@@ -204,7 +204,7 @@ class Database (object):
 			else:
 				ninst = []
 				for pkg in self._db[cat]:
-					if pkg[2]:
+					if pkg.inst:
 						yield pkg
 					else:
 						ninst.append(pkg)
