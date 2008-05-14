@@ -156,30 +156,19 @@ class PortageSystem (SystemInterface):
 
 	def find_best_match (self, search_key, masked = False, only_installed = False, only_cpv = False):
 		t = None
-		
+
 		if not only_installed:
-			try:
-				if masked:
-					t = self.settings.porttree.dbapi.xmatch("match-all", search_key)
-				else:
-					t = self.settings.porttree.dbapi.match(search_key)
-			except ValueError, e: # ambigous package
-				if isinstance(e[0], list):
-					t = []
-					for cp in e[0]:
-						if masked:
-							t += self.settings.porttree.dbapi.xmatch("match-all", cp)
-						else:
-							t += self.settings.porttree.dbapi.match(cp)
-				else:
-					raise
+			pkgSet = "tree"
 		else:
-			t = self.find_installed_packages(search_key, masked, only_cpv = True)
+			pkgSet = "installed"
+
+		t = self.find_packages(search_key, pkgSet = pkgSet, masked = masked, with_version = True)
 
 		if t:
-			return self.find_best(t, only_cpv)
-		return None
-	
+			return self.find_best(t)
+		
+		return t
+
 	def find_packages (self, key = "", pkgSet = "all", masked = False, with_version = True, only_cpv = False):
 
 		is_regexp = key == "" or ("*" in key and key[0] not in ("*","=","<",">","~","!"))
@@ -322,7 +311,7 @@ class PortageSystem (SystemInterface):
 
 		new_packages = []
 		for p in packages:
-			inst = self.find_installed_packages(p)
+			inst = self.find_packages(p, "installed")
 			
 			best_p = self.find_best_match(p)
 			if best_p is None:
@@ -341,9 +330,7 @@ class PortageSystem (SystemInterface):
 				myslots.add(best_p.get_package_settings("SLOT")) # add the slot of the best package in portage
 				for slot in myslots:
 					new_packages.append(\
-							self.find_best(\
-							[x.get_cpv() for x in self.find_packages("%s:%s" % (i.get_cp(), slot))]\
-							))
+							self.find_best(self.find_packages("%s:%s" % (i.get_cp(), slot), only_cpv = True)))
 			else:
 				new_packages.append(best_p)
 
