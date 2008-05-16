@@ -177,7 +177,7 @@ class PortageSystem (SystemInterface):
 					raise
 		
 		if self._version >= (2,1,5) or only_installed:
-			t += [pkg.get_cpv() for pkg in self.find_installed_packages(search_key) if not pkg.is_masked()]
+			t += [pkg.get_cpv() for pkg in self.find_installed_packages(search_key) if not (pkg.is_testing(True) or pkg.is_masked())]
 
 		if t:
 			t = unique_array(t)
@@ -454,7 +454,7 @@ class PortageSystem (SystemInterface):
 							else:
 								for pkg in bm:
 									if not pkg: continue
-									if pkg.is_masked() or pkg.is_testing(True): # check to not update unnecessairily
+									if not pkg.is_installed() and (pkg.is_masked() or pkg.is_testing(True)): # check to not update unnecessairily
 										cont = False
 										for inst in self.find_installed_packages(pkg.get_cp(), only_cpv = True):
 											if self.cpv_matches(inst, i):
