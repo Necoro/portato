@@ -31,10 +31,12 @@ class PortageSystem (SystemInterface):
 	def __init__ (self):
 		"""Constructor."""
 		self.settings = PortageSettings()
-		portage.WORLD_FILE = os.path.join(self.settings.settings["ROOT"], portage.WORLD_FILE)
+		portage.WORLD_FILE = os.path.join(self.settings.settings["ROOT"],portage.WORLD_FILE)
 
 		self.use_descs = {}
 		self.local_use_descs = defaultdict(dict)
+
+		self._version = tuple([x.split("_")[0] for x in portage.VERSION.split(".")])
 
 	def get_version (self):
 		return "Portage %s" % portage.VERSION
@@ -155,17 +157,23 @@ class PortageSystem (SystemInterface):
 			return PortagePackage(portage.best(list))
 
 	def find_best_match (self, search_key, masked = False, only_installed = False, only_cpv = False):
-		t = None
-
+		t = []
+		
 		if not only_installed:
 			pkgSet = "tree"
 		else:
 			pkgSet = "installed"
 
 		t = self.find_packages(search_key, pkgSet = pkgSet, masked = masked, with_version = True, only_cpv = True)
+		
+		if self._version >= (2,1,5):
+			t += [pkg.get_cpv() for pkg in self.find_installed_packages(search_key) if not (pkg.is_testing(True) or pkg.is_masked())]
 
 		if t:
+			t = unique_array(t)
 			return self.find_best(t, only_cpv)
+
+		return None
 
 	def find_packages (self, key = "", pkgSet = "all", masked = False, with_version = True, only_cpv = False):
 		if key is None: key = ""
@@ -355,7 +363,7 @@ class PortageSystem (SystemInterface):
 		# append system packages
 		packages.extend(unique_array([p.get_cp() for p in self.find_packages(pkgSet = "system")]))
 		
-		states = [(["RDEPEND"], True)]
+		states = [(["RDEPEND", "PDEPEND"], True)]
 		if self.with_bdeps():
 			states.append((["DEPEND"], True))
 
@@ -431,7 +439,7 @@ class PortageSystem (SystemInterface):
 							else:
 								for pkg in bm:
 									if not pkg: continue
-									if pkg.is_masked() or pkg.is_testing(True): # check to not update unnecessairily
+									if not pkg.is_installed() and (pkg.is_masked() or pkg.is_testing(True)): # check to not update unnecessairily
 										cont = False
 										for inst in self.find_packages(pkg.get_cp(), "installed", only_cpv = True):
 											if self.cpv_matches(inst, i):

@@ -16,7 +16,7 @@
     <property name="has_separator">False</property>
     <property name="program_name">Portato</property>
     <property name="copyright" translatable="yes">This software is licensed under the terms of the GPLv2.
-Copyright (C) 2006-2007 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;</property>
+Copyright (C) 2006-2008 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;</property>
     <property name="comments">A Portage GUI</property>
     <property name="website">http://portato.necoro.net</property>
     <property name="authors">René 'Necoro' Neumann
@@ -28,7 +28,7 @@ Thanks goto:
     <property name="translator_credits">Catalan - Roger Calvó
 German - René 'Necoro' Neumann
 Polish - Tomasz Osiński
-Turkish - Gürkan Gür</property>
+Turkish - Gürkan 'seqizz' Gür</property>
     <property name="artists">p4r4d0x (inspired by wolfden)</property>
     <signal name="response" handler="close"/>
     <child internal-child="vbox">

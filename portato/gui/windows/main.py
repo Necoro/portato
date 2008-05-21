@@ -25,7 +25,7 @@ from ...backend import flags, system # must be the first to avoid circular deps
 from ... import get_listener, plugin, dependency
 from ...helper import debug, warning, error, info, unique_array
 from ...session import Session
-from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
+from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, ICON_DIR
 from ...backend.exceptions import PackageNotFoundException, BlockedException
 
 # more GUI stuff
@@ -829,7 +829,7 @@ class MainWindow (Window):
 		Builds the terminal.
 		"""
 		
-		self.console.set_scrollback_lines(1024)
+		self.console.set_scrollback_lines(2**20)
 		self.console.set_scroll_on_output(True)
 		self.console.set_font_from_string(self.cfg.get("consolefont", "GUI"))
 		self.console.connect("button-press-event", self.cb_right_click)
@@ -1599,8 +1599,10 @@ class MainWindow (Window):
 			self.emergePaused = cb.get_active()
 			if not self.emergePaused:
 				self.queue.continue_emerge()
+				self.tray.set_from_file(APP_ICON)
 			else:
 				self.queue.stop_emerge()
+				self.tray.set_from_file(os.path.join(ICON_DIR, "pausing.png"))
 
 			# block the handlers of the other buttons
 			# so that calling "set_active" does not call this callback recursivly
