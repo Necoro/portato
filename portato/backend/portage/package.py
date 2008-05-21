@@ -130,7 +130,7 @@ class PortagePackage (Package):
 			
 			# get the normal masked ones
 			if self._status and ("profile" in self._status or "package.mask" in self._status):
-				return flags.is_locally_masked(self, changes = False) # assume that if it is locally masked, it is not masked by the system
+				return not flags.is_locally_masked(self, changes = False) # assume that if it is locally masked, it is not masked by the system
 			else: # more difficult: get the ones we unmasked, but are masked by the system
 				try:
 					masked = self._settings.settings.pmaskdict[self.get_cp()]

@@ -167,7 +167,7 @@ class PortageSystem (SystemInterface):
 		t = self.find_packages(search_key, pkgSet = pkgSet, masked = masked, with_version = True, only_cpv = True)
 		
 		if self._version >= (2,1,5):
-			t += [pkg.get_cpv() for pkg in self.find_installed_packages(search_key) if not (pkg.is_testing(True) or pkg.is_masked())]
+			t += [pkg.get_cpv() for pkg in self.find_packages(search_key, "installed") if not (pkg.is_testing(True) or pkg.is_masked())]
 
 		if t:
 			t = unique_array(t)
