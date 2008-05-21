@@ -145,7 +145,7 @@ class PackageTable:
 			self.instPackages = self.packages = system.find_packages("=%s-%s" % (cp, version), masked = True)
 		else:
 			self.packages = system.sort_package_list(system.find_packages(cp, masked = True))
-			self.instPackages = system.sort_package_list(system.find_installed_packages(cp, masked = True))
+			self.instPackages = system.sort_package_list(system.find_packages(cp, "installed", masked = True))
 
 		# version-combo-box
 		self.versionList.get_model().clear()
@@ -1252,7 +1252,7 @@ class MainWindow (Window):
 		if pkg.is_installed():
 			installed = set(pkg.get_iuse_flags()).intersection(pkg.get_installed_use_flags())
 		else:
-			inst = system.find_installed_packages(pkg.get_slot_cp())
+			inst = system.find_packages(pkg.get_slot_cp(), "installed")
 			if inst:
 				installed = set(inst[0].get_iuse_flags()).intersection(inst[0].get_installed_use_flags())
 			else:
@@ -1428,7 +1428,7 @@ class MainWindow (Window):
 			if "/" not in text:
 				text = "/.*"+text # only look for package names
 
-			packages = system.find_all_packages(text, withVersion = False)
+			packages = system.find_packages(text, withVersion = False)
 
 			if packages == []:
 				nothing_found_dialog()

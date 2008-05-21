@@ -337,7 +337,7 @@ class PortageSystem (SystemInterface):
 		return new_packages
 
 	def get_updated_packages (self):
-		packages = self.get_new_packages(self.find_all_installed_packages(withVersion = False))
+		packages = self.get_new_packages(self.find_packages(set = "installed", withVersion = False))
 		packages = [x for x in packages if x is not None and not x.is_installed()]
 		return packages
 
@@ -353,7 +353,7 @@ class PortageSystem (SystemInterface):
 		world.close()
 
 		# append system packages
-		packages.extend(unique_array([p.get_cp() for p in self.find_all_system_packages()]))
+		packages.extend(unique_array([p.get_cp() for p in self.find_packages(set = "system")]))
 		
 		states = [(["RDEPEND"], True)]
 		if self.with_bdeps():
@@ -379,11 +379,11 @@ class PortageSystem (SystemInterface):
 			tempDeep = False
 
 			if not p.is_installed():
-				oldList = self.find_installed_packages(p.get_slot_cp())
+				oldList = self.find_packages(p.get_slot_cp(), "installed")
 				if oldList: 
 					old = oldList[0] # we should only have one package here - else it is a bug
 				else:
-					oldList = self.sort_package_list(self.find_installed_packages(p.get_cp()))
+					oldList = self.sort_package_list(self.find_packages(p.get_cp(), "installed"))
 					if not oldList:
 						info(_("Found a not installed dependency: %s.") % p.get_cpv())
 						oldList = [p]
@@ -433,7 +433,7 @@ class PortageSystem (SystemInterface):
 									if not pkg: continue
 									if pkg.is_masked() or pkg.is_testing(True): # check to not update unnecessairily
 										cont = False
-										for inst in self.find_installed_packages(pkg.get_cp(), only_cpv = True):
+										for inst in self.find_packages(pkg.get_cp(), "installed", only_cpv = True):
 											if self.cpv_matches(inst, i):
 												debug("The installed %s matches %s. Discarding upgrade to masked version.", inst, i)
 												cont = True

@@ -139,7 +139,7 @@ class EmergeQueue:
 		try:
 			pkg = self._get_pkg_from_cpv(cpv, unmask)
 			if not pkg.is_installed():
-				old = system.find_installed_packages(pkg.get_slot_cp())
+				old = system.find_packages(pkg.get_slot_cp(), "installed")
 				if old: 
 					old = old[0] # assume we have only one there
 					cmp = pkg.compare_version(old)
