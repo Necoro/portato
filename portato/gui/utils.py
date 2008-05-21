@@ -165,8 +165,8 @@ class Database (object):
 		"""
 		
 		# get the lists
-		packages = system.find_packages(category, withVersion = False)
-		installed = system.find_packages(category, set = "installed", withVersion = False)
+		packages = system.find_packages(category, with_version = False)
+		installed = system.find_packages(category, set = "installed", with_version = False)
 		
 		# cycle through packages
 		for p in packages:

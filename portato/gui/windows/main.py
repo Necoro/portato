@@ -1428,7 +1428,7 @@ class MainWindow (Window):
 			if "/" not in text:
 				text = "/.*"+text # only look for package names
 
-			packages = system.find_packages(text, withVersion = False)
+			packages = system.find_packages(text, with_version = False)
 
 			if packages == []:
 				nothing_found_dialog()

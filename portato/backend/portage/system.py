@@ -337,7 +337,7 @@ class PortageSystem (SystemInterface):
 		return new_packages
 
 	def get_updated_packages (self):
-		packages = self.get_new_packages(self.find_packages(set = "installed", withVersion = False))
+		packages = self.get_new_packages(self.find_packages(set = "installed", with_version = False))
 		packages = [x for x in packages if x is not None and not x.is_installed()]
 		return packages
 
