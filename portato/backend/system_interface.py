@@ -75,7 +75,7 @@ class SystemInterface (object):
 
 		raise NotImplementedError
 
-	def find_packages (self, key, set = "all", masked = False, with_version = True, only_cpv = False):
+	def find_packages (self, key, pkgSet = "all", masked = False, with_version = True, only_cpv = False):
 		"""This returns a list of packages matching the key.
 		As key, it is allowed to use basic regexps (".*") and the normal package specs. But not a combination
 		of them.

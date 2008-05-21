@@ -162,21 +162,23 @@ class PortageSystem (SystemInterface):
 		else:
 			pkgSet = "installed"
 
-		t = self.find_packages(search_key, pkgSet = pkgSet, masked = masked, with_version = True)
+		t = self.find_packages(search_key, pkgSet = pkgSet, masked = masked, with_version = True, only_cpv = True)
 
 		if t:
 			return self.find_best(t)
 		
-		return t
+		return self.geneticize_list(t, only_cpv)
 
 	def find_packages (self, key = "", pkgSet = "all", masked = False, with_version = True, only_cpv = False):
-
+		if key is None: key = ""
+		
 		is_regexp = key == "" or ("*" in key and key[0] not in ("*","=","<",">","~","!"))
 		
 		def installed(key):
 			if is_regexp:
 				if with_version:
 					t = self.settings.vartree.dbapi.cpv_all()
+				else:
 					t = self.settings.vartree.dbapi.cp_all()
 
 				if key:
@@ -259,7 +261,7 @@ class PortageSystem (SystemInterface):
 		t = unique_array(t)
 		t.sort()
 
-		return geneticize_list(t, only_cpv or not with_version)
+		return self.geneticize_list(t, only_cpv or not with_version)
 
 	def __find_resolved_unresolved (self, list, check, only_cpv = False):
 		"""Checks a given list and divides it into a "resolved" and an "unresolved" part.
@@ -337,7 +339,7 @@ class PortageSystem (SystemInterface):
 		return new_packages
 
 	def get_updated_packages (self):
-		packages = self.get_new_packages(self.find_packages(set = "installed", with_version = False))
+		packages = self.get_new_packages(self.find_packages(pkgSet = "installed", with_version = False))
 		packages = [x for x in packages if x is not None and not x.is_installed()]
 		return packages
 
@@ -353,7 +355,7 @@ class PortageSystem (SystemInterface):
 		world.close()
 
 		# append system packages
-		packages.extend(unique_array([p.get_cp() for p in self.find_packages(set = "system")]))
+		packages.extend(unique_array([p.get_cp() for p in self.find_packages(pkgSet = "system")]))
 		
 		states = [(["RDEPEND"], True)]
 		if self.with_bdeps():
