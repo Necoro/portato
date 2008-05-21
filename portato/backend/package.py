@@ -88,13 +88,15 @@ class Package (_Package):
 			if f[0] == "~":
 				f = f[1:]
 				removed = True
+
+			invf = flags.invert_use_flag(f)	
 			
 			if f[0] == '-':
-				if flags.invert_use_flag(f) in i_flags and not (removed and flags.invert_use_flag(f) in m_flags):
-					i_flags.remove(flags.invert_use_flag(f))
+				if invf in i_flags and not (removed and invf in m_flags):
+					i_flags.remove(invf)
 				
 			elif f not in i_flags:
-				if not (removed and flags.invert_use_flag(f) in m_flags):
+				if not (removed and invf in m_flags):
 					i_flags.append(f)
 
 		return i_flags
@@ -270,7 +272,7 @@ class Package (_Package):
 
 		raise NotImplementedError
 		
-	def is_testing(self, use_keywords = False):
+	def is_testing(self, use_keywords = True):
 		"""Checks whether a package is marked as testing.
 		
 		@param use_keywords: Controls whether possible keywords are taken into account or not.
