@@ -165,9 +165,7 @@ class PortageSystem (SystemInterface):
 		t = self.find_packages(search_key, pkgSet = pkgSet, masked = masked, with_version = True, only_cpv = True)
 
 		if t:
-			return self.find_best(t)
-		
-		return self.geneticize_list(t, only_cpv)
+			return self.find_best(t, only_cpv)
 
 	def find_packages (self, key = "", pkgSet = "all", masked = False, with_version = True, only_cpv = False):
 		if key is None: key = ""
@@ -214,14 +212,14 @@ class PortageSystem (SystemInterface):
 			return list(alist - inst)
 
 		def _ws (key, crit, pkglist):
-			list = self.__find_resolved_unresolved(pkglist, crit)[0]
+			pkgs = self.__find_resolved_unresolved(pkglist, crit, only_cpv = with_version)[0]
 			if not with_version:
-				list = [self.pkg.get_cp(x) for x in list]
+				pkgs = [x.get_cp(x) for x in list]
 
 			if is_regexp:
-				return filter(lambda x: re.match(key, x, re.I), list)
+				return filter(lambda x: re.match(key, x, re.I), pkgs)
 			
-			return list
+			return pkgs
 
 		def world (key):
 			with open(portage.WORLD_FILE) as f:
@@ -232,19 +230,19 @@ class PortageSystem (SystemInterface):
 		def system (key):
 			return _ws(key, lambda cpv: cpv[0] == "*", self.settings.settings.packages)
 
+		funcmap = {
+				"all" : all,
+				"installed" : installed,
+				"uninstalled" : uninstalled,
+				"world" : world,
+				"system" : system,
+				"tree" : tree
+				}
+
 		pkgSet = pkgSet.lower()
-		if pkgSet == "" or pkgSet == "all":
-			func = all
-		elif pkgSet == "installed":
-			func = installed
-		elif pkgSet == "uninstalled":
-			func = uninstalled
-		elif pkgSet == "world":
-			func = world
-		elif pkgSet == "system":
-			func = system
-		elif pkgSet == "tree":
-			func = tree
+		if pkgSet == "": pkgSet = "all"
+
+		func = funcmap[pkgSet]
 		
 		try:
 			t = func(key)
