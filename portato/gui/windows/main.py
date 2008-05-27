@@ -1599,10 +1599,10 @@ class MainWindow (Window):
 			self.emergePaused = cb.get_active()
 			if not self.emergePaused:
 				self.queue.continue_emerge()
-				self.tray.set_from_file(APP_ICON)
+				#self.tray.set_from_file(APP_ICON)
 			else:
 				self.queue.stop_emerge()
-				self.tray.set_from_file(os.path.join(ICON_DIR, "pausing.png"))
+				#self.tray.set_from_file(os.path.join(ICON_DIR, "pausing.png"))
 
 			# block the handlers of the other buttons
 			# so that calling "set_active" does not call this callback recursivly
