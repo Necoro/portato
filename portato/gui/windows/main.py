@@ -67,10 +67,6 @@ class PackageTable:
 		# the notebook
 		self.notebook = self.tree.get_widget("packageNotebook")
 		
-		# the version combo
-		self.versionList = self.tree.get_widget("versionList")
-		self.build_version_list()
-
 		# chechboxes
 		self.installedCheck = self.tree.get_widget("installedCheck")
 		self.maskedCheck = self.tree.get_widget("maskedCheck")
@@ -117,15 +113,13 @@ class PackageTable:
 		self.icons["or"] = self.window.render_icon(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_MENU)
 		self.icons["block"] = self.window.render_icon(gtk.STOCK_NO, gtk.ICON_SIZE_MENU)
 
-	def update (self, cp, queue = None, version = None, doEmerge = True, instantChange = False, type = None):
+	def update (self, pkg, queue = None, doEmerge = True, instantChange = False, type = None):
 		"""Updates the table to show the contents for the package.
 		
-		@param cp: the selected package
-		@type cp: string (cp)
+		@param pkg: the selected package
+		@type pkg: Package
 		@param queue: emerge-queue (if None the emerge-buttons are disabled)
 		@type queue: EmergeQueue
-		@param version: if not None, specifies the version to select
-		@type version: string
 		@param doEmerge: if False, the emerge buttons are disabled
 		@type doEmerge: boolean
 		@param instantChange: if True the changed keywords are updated instantly
@@ -133,37 +127,25 @@ class PackageTable:
 		@param type: the type of the queue this package is in; if None there is no queue :)
 		@type type: string"""
 		
-		self.cp = cp # category/package
-		self.version = version # version - if not None this is used
+		self.pkg = pkg
 		self.queue = queue
 		self.doEmerge = doEmerge
 		self.instantChange = instantChange
 		self.type = type
-
-		# packages and installed packages
-		if not self.doEmerge:
-			self.instPackages = self.packages = system.find_packages("=%s-%s" % (cp, version), masked = True)
-		else:
-			self.packages = system.sort_package_list(system.find_packages(cp, masked = True))
-			self.instPackages = system.sort_package_list(system.find_installed_packages(cp, masked = True))
-
-		# version-combo-box
-		self.versionList.get_model().clear()
-		self.fill_version_list()
 
 		if not self.queue or not self.doEmerge: 
 			self.emergeBtn.set_sensitive(False)
 			self.unmergeBtn.set_sensitive(False)
 		
 		# current status
-		self.cb_version_list_changed()
+		self._update_table()
 		self.vb.show_all()
 
 	def hide (self):
 		self.vb.hide_all()
 
 	def set_labels (self):
-		pkg = self.actual_package()
+		pkg = self.pkg
 		
 		# name
 		self.nameLabel.set_markup("<b>%s</b>" % pkg.get_cpv())
@@ -275,7 +257,7 @@ class PackageTable:
 				store.append(it, [get_icon(dep), dep.dep])
 		
 		try:
-			deptree = self.actual_package().get_dependencies()
+			deptree = self.pkg.get_dependencies()
 		except AssertionError:
 			w =  _("Can't display dependencies: This package has an unsupported dependency string.")
 			error(w)
@@ -285,7 +267,7 @@ class PackageTable:
 
 	def fill_use_list(self):
 
-		pkg = self.actual_package()
+		pkg = self.pkg
 		pkg_flags = pkg.get_iuse_flags()
 		pkg_flags.sort()
 	
@@ -309,7 +291,7 @@ class PackageTable:
 
 			enabled = use in euse
 			installed = use in instuse
-			store.append(actual_exp_it, [enabled, installed, use, system.get_use_desc(use, self.cp)])
+			store.append(actual_exp_it, [enabled, installed, use, system.get_use_desc(use, self.pkg.get_cp())])
 		
 	def build_dep_list (self):
 		store = gtk.TreeStore(gtk.gdk.Pixbuf, str)
@@ -348,115 +330,27 @@ class PackageTable:
 		self.useList.set_search_column(2)
 		self.useList.set_enable_tree_lines(True)
 
-	def build_version_list (self):
-		store = gtk.ListStore(gtk.gdk.Pixbuf, str, str)
-
-		# build view
-		self.versionList.set_model(store)
-		
-		col = gtk.TreeViewColumn(_("Versions"))
-		col.set_property("expand", True)
-		
-		self.slotcol = gtk.TreeViewColumn(_("Slot"))
-		self.slotcol.set_property("expand", True)
-
-		# adding the pixbuf
-		cell = gtk.CellRendererPixbuf()
-		col.pack_start(cell, False)
-		col.add_attribute(cell, "pixbuf", 0)
-
-		# adding the package name
-		cell = gtk.CellRendererText()
-		col.pack_start(cell, True)
-		col.add_attribute(cell, "text", 1)
-
-		# adding the slot
-		cell = gtk.CellRendererText()
-		self.slotcol.pack_start(cell, True)
-		self.slotcol.add_attribute(cell, "text", 2)
-
-		self.versionList.append_column(col)
-		self.versionList.append_column(self.slotcol)
-
-	def fill_version_list (self):
-		
-		store = self.versionList.get_model()
-
-		# this is here for performance reasons
-		# to not query the package with info, we do not need
-		if self.main.cfg.get_boolean("showSlots", "GUI"):
-			def get_slot(pkg):
-				return pkg.get_package_settings("SLOT")
-			
-			self.slotcol.set_visible(True)
-		
-		else:
-			def get_slot(*args):
-				return ""
-			
-			self.slotcol.set_visible(False)
-		
-		# append versions
-		for vers, inst, slot in ((x.get_version(), x.is_installed(), get_slot(x)) for x in self.packages):
-			if inst:
-				icon = self.main.instPixbuf
-			else:
-				icon = None
-				
-			store.append([icon, vers, slot])
-
-		pos = ((0,)) # default
-		
-		# activate the first one
-		try:
-			best_version = ""
-			if self.version:
-				best_version = self.version
-			else:
-				best_version = system.find_best_match(self.packages[0].get_cp(), only_installed = (self.instPackages != [])).get_version()
-			for i in range(len(self.packages)):
-				if self.packages[i].get_version() == best_version:
-					pos = (i,)
-					break
-		except AttributeError: # no package found
-			pass
-
-		self.versionList.get_selection().select_path(pos)
-		self.versionList.scroll_to_cell(pos)
-
-	def actual_package (self):
-		"""Returns the actual selected package.
-		
-		@returns: the actual selected package
-		@rtype: backend.Package"""
-
-		model, iter = self.versionList.get_selection().get_selected()
-		if iter:
-			return self.packages[model.get_path(iter)[0]]
-		else:
-			return self.packages[0]
-
 	def _update_keywords (self, emerge, update = False):
 		if emerge:
 			type = "install" if not self.type else self.type
 			try:
 				try:
-					self.queue.append(self.actual_package().get_cpv(), type = type, update = update)
+					self.queue.append(self.pkg.get_cpv(), type = type, update = update)
 				except PackageNotFoundException, e:
 					if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
-						self.queue.append(self.actual_package().get_cpv(), type = type, unmask = True, update = update)
+						self.queue.append(self.pkg.get_cpv(), type = type, unmask = True, update = update)
 			except BlockedException, e:
 				blocked_dialog(e[0], e[1])
 		else:
 			try:
-				self.queue.append(self.actual_package().get_cpv(), type = "uninstall")
+				self.queue.append(self.pkg.get_cpv(), type = "uninstall")
 			except PackageNotFoundException, e:
 				error(_("Package could not be found: %s"), e[0])
 				#masked_dialog(e[0])
 
-	def cb_version_list_changed (self, *args):
+	def _update_table (self, *args):
 
-		pkg = self.actual_package()
+		pkg = self.pkg
 
 		# set the views
 		for v in (self.ebuildView, self.changelogView, self.filesView):
@@ -530,7 +424,7 @@ class PackageTable:
 
 		if self.doEmerge:
 			# set emerge-button-label
-			if not self.actual_package().is_installed():
+			if not pkg.is_installed():
 				self.unmergeBtn.set_sensitive(False)
 			else:
 				self.unmergeBtn.set_sensitive(True)
@@ -546,12 +440,10 @@ class PackageTable:
 
 	def cb_package_revert_clicked (self, button):
 		"""Callback for pressed revert-button."""
-		self.actual_package().remove_new_use_flags()
-		self.actual_package().remove_new_masked()
-		self.actual_package().remove_new_testing()
-		self.versionList.get_model().clear()
-		self.fill_version_list()
-		self.cb_version_list_changed()
+		self.pkg.remove_new_use_flags()
+		self.pkg.remove_new_masked()
+		self.pkg.remove_new_testing()
+		self._update_table()
 		if self.instantChange:
 			self._update_keywords(True, update = True)
 		return True
@@ -573,21 +465,21 @@ class PackageTable:
 		status = button.get_active()
 
 		# end of recursion :)
-		if self.actual_package().is_testing(use_keywords = False) == status:
+		if self.pkg.is_testing(use_keywords = False) == status:
 			return False
 
 		# if the package is not testing - don't allow to set it as such
-		if not self.actual_package().is_testing(use_keywords = False):
+		if not self.pkg.is_testing(use_keywords = False):
 			button.set_active(False)
 			return True
 
 		# re-set to testing status
-		if not self.actual_package().is_testing(use_keywords = True):
-			self.actual_package().set_testing(False)
+		if not self.pkg.is_testing(use_keywords = True):
+			self.pkg.set_testing(False)
 			button.set_label(_("Testing"))
 			button.set_active(True)
 		else: # disable testing
-			self.actual_package().set_testing(True)
+			self.pkg.set_testing(True)
 			button.set_label("<i>(%s)</i>" % _("Testing"))
 			button.get_child().set_use_markup(True)
 			button.set_active(True)
@@ -600,7 +492,7 @@ class PackageTable:
 	def cb_masked_toggled (self, button):
 		"""Callback for toggled masking-checkbox."""
 		status = button.get_active()
-		pkg = self.actual_package()
+		pkg = self.pkg
 
 		if pkg.is_masked(use_changed = False) == status and not pkg.is_locally_masked():
 			return False
@@ -637,7 +529,7 @@ class PackageTable:
 	def cb_use_flag_toggled (self, cell, path, store):
 		"""Callback for a toggled use-flag button."""
 		flag = store[path][2]
-		pkg = self.actual_package()
+		pkg = self.pkg
 		
 		if pkg.use_expanded(flag): # ignore expanded flags
 			return False
@@ -733,12 +625,17 @@ class MainWindow (Window):
 		self.hpaned = self.tree.get_widget("hpaned")
 		self.hpaned.set_position(int(self.window.get_size()[0]/1.5))
 
-		# cat and pkg list
+		# lists
+		self.selCatName = ""
+		self.selCP = ""
+		self.selCPV = ""
 		self.sortPkgListByName = True
 		self.catList = self.tree.get_widget("catList")
 		self.pkgList = self.tree.get_widget("pkgList")
+		self.versionList = self.tree.get_widget("versionList")
 		self.build_cat_list()
 		self.build_pkg_list()
+		self.build_version_list()
 
 		# search entry
 		self.searchEntry = self.tree.get_widget("searchEntry")
@@ -821,8 +718,25 @@ class MainWindow (Window):
 		
 		self.window.show_all()
 	
-	def show_package (self, *args, **kwargs):
-		self.packageTable.update(*args, **kwargs)
+	def show_package (self, pkg = None, cpv = None, cp = None, version = None, **kwargs):
+		p = None
+
+		if pkg:
+			p = pkg
+		elif cpv:
+			p = system.find_packages("="+cpv, masked = True)[0]
+		elif cp:
+			if version:
+				p = system.find_packages("=%s-%s" % (cp, version), masked = True)[0]
+			
+			else:
+				best = system.find_best_match(cp)
+				if best:
+					p = best
+				else:
+					p = system.find_packages(cp)[0]
+		
+		self.packageTable.update(p, **kwargs)
 
 	def build_terminal (self):
 		"""
@@ -861,22 +775,27 @@ class MainWindow (Window):
 		"""
 		
 		store = gtk.ListStore(str)
+		self.fill_cat_store(store)
 
 		self.catList.set_model(store)
 		cell = gtk.CellRendererText()
 		col = gtk.TreeViewColumn(_("Categories"), cell, text = 0)
 		self.catList.append_column(col)
 
-		self.fill_cat_store(store)
 		self.catList.get_selection().connect("changed", self.cb_cat_list_selection)
 
-	def fill_cat_store (self, store):
+	def fill_cat_store (self, store = None):
 		"""
 		Fills the category store with data.
-
+	
 		@param store: the store to fill
 		@type store: gtk.ListStore
 		"""
+
+		if store is None:
+			store = self.catList.get_model()
+		
+		store.clear()
 
 		cats = self.db.get_categories(installed = not self.showAll)
 
@@ -895,7 +814,7 @@ class MainWindow (Window):
 		"""
 		
 		store = gtk.ListStore(gtk.gdk.Pixbuf, str, str)
-		self.fill_pkg_store(store,name)
+		self.fill_pkg_store(store, name)
 		
 		# build view
 		self.pkgList.set_model(store)
@@ -918,7 +837,7 @@ class MainWindow (Window):
 
 		self.pkgList.get_selection().connect("changed", self.cb_pkg_list_selection)
 
-	def fill_pkg_store (self, store, name = None):
+	def fill_pkg_store (self, store = None, name = None):
 		"""
 		Fills a given ListStore with the packages in a category.
 		
@@ -927,6 +846,10 @@ class MainWindow (Window):
 		@param name: the name of the category
 		@type name: string
 		"""
+		
+		if store is None:
+			store = self.pkgList.get_model()
+		store.clear()
 
 		if name:
 			for cat, pkg, is_inst in self.db.get_cat(name, self.sortPkgListByName):
@@ -938,19 +861,96 @@ class MainWindow (Window):
 					icon = None
 				store.append([icon, pkg, cat])
 
+	def build_version_list (self):
+		store = gtk.ListStore(gtk.gdk.Pixbuf, str, str)
+
+		# build view
+		self.versionList.set_model(store)
+		
+		col = gtk.TreeViewColumn(_("Versions"))
+		col.set_property("expand", True)
+		
+		self.slotcol = gtk.TreeViewColumn(_("Slot"))
+		self.slotcol.set_property("expand", True)
+
+		# adding the pixbuf
+		cell = gtk.CellRendererPixbuf()
+		col.pack_start(cell, False)
+		col.add_attribute(cell, "pixbuf", 0)
+
+		# adding the package name
+		cell = gtk.CellRendererText()
+		col.pack_start(cell, True)
+		col.add_attribute(cell, "text", 1)
+
+		# adding the slot
+		cell = gtk.CellRendererText()
+		self.slotcol.pack_start(cell, True)
+		self.slotcol.add_attribute(cell, "text", 2)
+
+		self.versionList.append_column(col)
+		self.versionList.append_column(self.slotcol)
+
+		self.versionList.get_selection().connect("changed", self.cb_vers_list_selection)
+
+	def fill_version_list (self, cp, version = None):
+		
+		store = self.versionList.get_model()
+		store.clear()
+
+		# this is here for performance reasons
+		# to not query the package with info, we do not need
+		if self.cfg.get_boolean("showSlots", "GUI"):
+			def get_slot(pkg):
+				return pkg.get_package_settings("SLOT")
+			
+			self.slotcol.set_visible(True)
+		
+		else:
+			def get_slot(*args):
+				return ""
+			
+			self.slotcol.set_visible(False)
+
+		packages = system.sort_package_list(system.find_packages(cp, masked=True))
+		
+		# append versions
+		for vers, inst, slot in ((x.get_version(), x.is_installed(), get_slot(x)) for x in packages):
+			if inst:
+				icon = self.instPixbuf
+			else:
+				icon = None
+				
+			store.append([icon, vers, slot])
+
+		pos = ((0,)) # default
+		
+		# activate the first one
+		try:
+			best_version = ""
+			if version:
+				best_version = version
+			else:
+				best_version = system.find_best_match(packages[0].get_cp()).get_version()
+			for i, p in enumerate(packages):
+				if p.get_version() == best_version:
+					pos = (i,)
+					break
+		except AttributeError: # no package found
+			pass
+
+		self.versionList.get_selection().select_path(pos)
+		self.versionList.scroll_to_cell(pos)
+
 	def refresh_stores (self):
 		"""
 		Refreshes the category and package stores.
 		"""
-		store = self.catList.get_model()
-		store.clear()
-		self.fill_cat_store(store)
+		self.fill_cat_store()
 
-		store = self.pkgList.get_model()
-		store.clear()
-		try:
-			self.fill_pkg_store(store, self.selCatName)
-		except AttributeError: # no selCatName -> so no category selected --> ignore
+		if self.selCatName:
+			self.fill_pkg_store(name = self.selCatName)
+		else: # no selCatName -> so no category selected --> ignore
 			debug("No category selected --> should be no harm.")
 
 	def load_session(self, sessionEx = None):
@@ -1107,7 +1107,7 @@ class MainWindow (Window):
 				debug("Unexpected number of %s returned after search: %d", what, len(pathes))
 				break
 
-		self.show_package(cp, self.queue, version = version)
+		self.show_package(cp = cp, version = version, queue = self.queue)
 
 	def set_uri_hook (self, browser):
 		"""
@@ -1183,25 +1183,35 @@ class MainWindow (Window):
 		store, it = selection.get_selected()
 		if it:
 			self.selCatName = store.get_value(it, 0)
-			self.pkgList.get_model().clear()
-			self.fill_pkg_store(self.pkgList.get_model(), self.selCatName)
+			self.fill_pkg_store(name = self.selCatName)
 		return True
 
 	def cb_pkg_list_selection (self, selection):
 		"""
 		Callback for a package-list selection.
-		Updates the package info.
+		Updates the version list.
 		"""
 		store, it = selection.get_selected()
 		if it:
-			cp = "%s/%s" % (store.get_value(it, 2), store.get_value(it, 1))
-			self.show_package(cp, self.queue)
+			self.selCP = "%s/%s" % (store.get_value(it, 2), store.get_value(it, 1))
+			self.fill_version_list(self.selCP)
 		return True
 
 	def cb_pkg_list_header_clicked(self, col):
 		self.sortPkgListByName = not self.sortPkgListByName
-		self.pkgList.get_model().clear()
-		self.fill_pkg_store(self.pkgList.get_model(), self.selCatName)
+		self.fill_pkg_store(name = self.selCatName)
+		return True
+
+	def cb_vers_list_selection (self, selection):
+		"""
+		Callback for a package-list selection.
+		Updates the version list.
+		"""
+		store, it = selection.get_selected()
+		if it:
+			self.selCPV = "%s-%s" % (self.selCP, store.get_value(it, 1))
+			self.show_package(cpv = self.selCPV, queue = self.queue)
+		
 		return True
 
 	def cb_queue_row_activated (self, view, path, *args):
@@ -1211,8 +1221,6 @@ class MainWindow (Window):
 			iterator = store.get_original().get_iter(path)
 			if store.iter_has_parent(iterator):
 				package = store.get_value(iterator, store.get_cpv_column())
-				cat, name, vers, rev = system.split_cpv(package)
-				if rev != "r0": vers = vers+"-"+rev
 
 				if store.is_in_emerge(iterator):
 					type = "install"
@@ -1221,7 +1229,7 @@ class MainWindow (Window):
 				elif store.is_in_update(iterator):
 					type = "update"
 
-				self.show_package(cat+"/"+name, queue = self.queue, version = vers, instantChange = True, doEmerge = False, type = type)
+				self.show_package(cpv = package, queue = self.queue, instantChange = True, doEmerge = False, type = type)
 		return True
 	
 	def cb_queue_tooltip_queried (self, view, x, y, is_keyboard, tooltip):
