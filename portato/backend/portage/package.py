@@ -271,7 +271,10 @@ class PortagePackage (Package):
 		return v
 
 	def get_ebuild_path(self):
-		return self._settings.porttree.dbapi.findname(self._cpv)
+		if self.is_in_system():
+			return self._settings.porttree.dbapi.findname(self._cpv)
+		else:
+			return self._settings.vartree.dbapi.findname(self._cpv)
 
 	def get_files (self):
 		if self.is_installed():
