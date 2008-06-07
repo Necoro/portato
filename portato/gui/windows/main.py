@@ -19,6 +19,7 @@ import gobject
 # other
 import os.path
 import itertools as itt
+from collections import defaultdict
 
 # our backend stuff
 from ...backend import flags, system # must be the first to avoid circular deps
@@ -774,7 +775,11 @@ class MainWindow (Window):
 		Builds the category list.
 		"""
 		
-		store = gtk.ListStore(str)
+		if False:
+			store = gtk.ListStore(str)
+		else:
+			store = gtk.TreeStore(str)
+
 		self.fill_cat_store(store)
 
 		self.catList.set_model(store)
@@ -799,8 +804,27 @@ class MainWindow (Window):
 
 		cats = self.db.get_categories(installed = not self.showAll)
 
-		for p in cats:
-			store.append([p])
+		if False:
+			for p in cats:
+				store.append([p])
+		else:
+			splitCats = defaultdict(list)
+			for c in cats:
+				try:
+					pre, post = c.split("-", 1)
+				except ValueError: # no "-" in cat name -- do not split
+					debug("Category '%s' can't be split up. Should be no harm.", c)
+					splitCats["not-split"].append(c)
+				else:
+					splitCats[pre].append(post)
+
+			for sc in splitCats:
+				if sc == "not-split":
+					it = None # append not splitted stuff to root
+				else:
+					it = store.append(None, [sc])
+				for cat in splitCats[sc]:
+					store.append(it, [cat])
 		
 		# sort them alphabetically
 		store.set_sort_column_id(0, gtk.SORT_ASCENDING)
@@ -1183,7 +1207,18 @@ class MainWindow (Window):
 		# get the selected category
 		store, it = selection.get_selected()
 		if it:
-			self.selCatName = store.get_value(it, 0)
+			if False:
+				self.selCatName = store.get_value(it, 0)
+			else:
+				parent = store.iter_parent(it)
+				if parent is None:
+					if store.iter_has_child(it): # this is a split up selector -> do nothing
+						return True
+					else:
+						self.selCatName = store.get_value(it, 0) # this is a non-split up top
+				else:
+					self.selCatName = ("%s-%s" % (store.get_value(parent, 0), store.get_value(it, 0)))
+
 			self.fill_pkg_store(name = self.selCatName)
 		return True
 

@@ -37,7 +37,6 @@ Main Point: user preferences:
 - show reverse dependencies
 - reload package table when emerge is finished
 - show which package has a dependency that causes a block
-- make the max length of the console title a user setting
 
 [quote]
 I would like to be able to see at a glance:
