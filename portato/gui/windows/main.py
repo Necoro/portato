@@ -1036,7 +1036,25 @@ class MainWindow (Window):
 					for cname, path in ((x[col], x.path) for x in list.get_model()):
 						if cname == name:
 							pos = path
+							break
+
+					if pos == "0" and isinstance(list.get_model(), gtk.TreeStore): # try the new split up
+						try:
+							pre, post = name.split("-", 1)
+						except ValueError: # nothing to split
+							pass
+						else:
+							for row in list.get_model():
+								if row[col] == pre: # found first part
+									pos = row.path
+									list.expand_row(pos, False)
+									for cname, path in ((x[col], x.path) for x in row.iterchildren()):
+										if cname == post: # found second
+											pos = ":".join(map(str,path))
+											break
+									break
 				
+				debug("Selecting path '%s'.", pos)
 				list.get_selection().select_path(pos)
 				list.scroll_to_cell(pos)
 			
