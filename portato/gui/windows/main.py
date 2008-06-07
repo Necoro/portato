@@ -166,7 +166,7 @@ class PackageTable:
 		pkg = self.actual_package()
 		
 		# name
-		self.nameLabel.set_markup("<b>%s</b>" % pkg.get_cp())
+		self.nameLabel.set_markup("<b>%s</b>" % pkg.get_cpv())
 		
 		# description
 		desc = pkg.get_package_settings("DESCRIPTION") or _("<no description>")
