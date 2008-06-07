@@ -775,10 +775,7 @@ class MainWindow (Window):
 		Builds the category list.
 		"""
 		
-		if False:
-			store = gtk.ListStore(str)
-		else:
-			store = gtk.TreeStore(str)
+		store = gtk.TreeStore(str)
 
 		self.fill_cat_store(store)
 
@@ -804,9 +801,9 @@ class MainWindow (Window):
 
 		cats = self.db.get_categories(installed = not self.showAll)
 
-		if False:
+		if not self.cfg.get_boolean("collapseCats", "GUI"):
 			for p in cats:
-				store.append([p])
+				store.append(None, [p])
 		else:
 			splitCats = defaultdict(list)
 			for c in cats:
@@ -1038,7 +1035,9 @@ class MainWindow (Window):
 							pos = path
 							break
 
-					if pos == "0" and isinstance(list.get_model(), gtk.TreeStore): # try the new split up
+					if self.cfg.get_boolean("collapseCats", "GUI") and \
+							pos == "0" and isinstance(list.get_model(), gtk.TreeStore): # try the new split up
+
 						try:
 							pre, post = name.split("-", 1)
 						except ValueError: # nothing to split
@@ -1225,7 +1224,7 @@ class MainWindow (Window):
 		# get the selected category
 		store, it = selection.get_selected()
 		if it:
-			if False:
+			if not self.cfg.get_boolean("collapseCats", "GUI"):
 				self.selCatName = store.get_value(it, 0)
 			else:
 				parent = store.iter_parent(it)
@@ -1532,7 +1531,7 @@ class MainWindow (Window):
 		"""
 		User wants to open preferences.
 		"""
-		PreferenceWindow(self.window, self.cfg, self.console.set_font_from_string, self.set_uri_hook, self.set_notebook_tabpos)
+		PreferenceWindow(self.window, self.cfg, self.console.set_font_from_string, self.set_uri_hook, self.set_notebook_tabpos, self.fill_cat_store)
 		return True
 
 	def cb_about_clicked (self, *args):

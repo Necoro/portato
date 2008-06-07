@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.4 on Sun Jun  8 00:05:22 2008 -->
+<!--Generated with glade3 3.4.4 on Sun Jun  8 01:45:17 2008 -->
 <glade-interface>
   <widget class="GtkWindow" id="PreferenceWindow">
     <property name="border_width">5</property>
@@ -749,13 +749,33 @@
                             <property name="left_padding">12</property>
                             <property name="right_padding">5</property>
                             <child>
-                              <widget class="GtkCheckButton" id="showSlotsCheck">
+                              <widget class="GtkVBox" id="vbox3">
                                 <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                <property name="label" translatable="yes">Show slots in the version list</property>
-                                <property name="response_id">0</property>
-                                <property name="draw_indicator">True</property>
+                                <child>
+                                  <widget class="GtkCheckButton" id="showSlotsCheck">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                    <property name="label" translatable="yes">Show slots in the version list</property>
+                                    <property name="response_id">0</property>
+                                    <property name="draw_indicator">True</property>
+                                  </widget>
+                                </child>
+                                <child>
+                                  <widget class="GtkCheckButton" id="collapseCatCheck">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="has_tooltip">True</property>
+                                    <property name="tooltip_markup">Organize the categories in a tree. Thereby collapse categories with the same prefix:
+As an example: &lt;i&gt;app-admin&lt;/i&gt;, &lt;i&gt;app-emacs&lt;/i&gt;, and &lt;i&gt;app-vim&lt;/i&gt; would be collapsed into &lt;i&gt;&lt;b&gt;app&lt;/b&gt;&lt;/i&gt; as root and &lt;i&gt;admin&lt;/i&gt;, &lt;i&gt;emacs&lt;/i&gt;, and &lt;i&gt;vim&lt;/i&gt; as children.</property>
+                                    <property name="label" translatable="yes">Collapse categories with same prefix</property>
+                                    <property name="response_id">0</property>
+                                    <property name="draw_indicator">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
                               </widget>
                             </child>
                           </widget>

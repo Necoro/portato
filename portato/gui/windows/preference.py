@@ -24,6 +24,7 @@ class PreferenceWindow (AbstractDialog):
 	# all checkboxes in the window
 	# widget name -> option name
 	checkboxes = {
+			"collapseCatCheck"		: ("collapseCats", "GUI"),
 			"consoleUpdateCheck"	: ("updateConsole", "GUI"),
 			"debugCheck"			: "debug",
 			"deepCheck"				: "deep",
@@ -56,7 +57,7 @@ class PreferenceWindow (AbstractDialog):
 			4 : gtk.POS_RIGHT
 			}
 
-	def __init__ (self, parent, cfg, console_fn, linkbtn_fn, tabpos_fn):
+	def __init__ (self, parent, cfg, console_fn, linkbtn_fn, tabpos_fn, catmodel_fn):
 		"""Constructor.
 
 		@param parent: parent window
@@ -68,7 +69,9 @@ class PreferenceWindow (AbstractDialog):
 		@param linkbtn_fn: function to call to set the linkbutton behavior
 		@type linkbtn_fn: function(string)
 		@param tabpos_fn: function to call to set the tabposition of the notebooks
-		@type tabpos_fn: function(gtk.ComboBox,int)"""
+		@type tabpos_fn: function(gtk.ComboBox,int)
+		@param catmodel_fn: function to call to set the model of the cat list (collapsed/not collapsed)
+		@type catmodel_fn: function()"""
 		
 		AbstractDialog.__init__(self, parent)
 
@@ -79,6 +82,7 @@ class PreferenceWindow (AbstractDialog):
 		self.console_fn = console_fn
 		self.linkbtn_fn = linkbtn_fn
 		self.tabpos_fn = tabpos_fn
+		self.catmodel_fn = catmodel_fn
 		
 		# set the bg-color of the hint
 		hintEB = self.tree.get_widget("hintEB")
@@ -144,7 +148,7 @@ class PreferenceWindow (AbstractDialog):
 		self.cfg.set("consolefont", font, section = "GUI")
 		self.console_fn(font)
 
-		self.cfg.set("titlelength", self.titleLengthSpinBtn.get_value(), section = "GUI")
+		self.cfg.set("titlelength", str(self.titleLengthSpinBtn.get_value_as_int()), section = "GUI")
 
 		pkgPos = self.pkgTabCombo.get_active()+1
 		sysPos = self.systemTabCombo.get_active()+1
@@ -155,6 +159,8 @@ class PreferenceWindow (AbstractDialog):
 		self.tabpos_fn(map(self.tabpos.get, (pkgPos, sysPos)))
 		
 		self.linkbtn_fn(self.cfg.get("browserCmd", section="GUI"))
+
+		self.catmodel_fn()
 
 	def cb_ok_clicked(self, button):
 		"""Saves, writes to config-file and closes the window."""
