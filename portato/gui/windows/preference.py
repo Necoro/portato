@@ -106,6 +106,10 @@ class PreferenceWindow (AbstractDialog):
 		self.consoleFontBtn = self.tree.get_widget("consoleFontBtn")
 		self.consoleFontBtn.set_font_name(self.cfg.get("consolefont", section = "GUI"))
 
+		# the console title length spin button
+		self.titleLengthSpinBtn = self.tree.get_widget("titleLengthSpinBtn")
+		self.titleLengthSpinBtn.set_value(int(self.cfg.get("titlelength", section = "GUI")))
+
 		# the comboboxes
 		self.systemTabCombo = self.tree.get_widget("systemTabCombo")
 		self.pkgTabCombo = self.tree.get_widget("packageTabCombo")
@@ -139,6 +143,8 @@ class PreferenceWindow (AbstractDialog):
 		font = self.consoleFontBtn.get_font_name()
 		self.cfg.set("consolefont", font, section = "GUI")
 		self.console_fn(font)
+
+		self.cfg.set("titlelength", self.titleLengthSpinBtn.get_value(), section = "GUI")
 
 		pkgPos = self.pkgTabCombo.get_active()+1
 		sysPos = self.systemTabCombo.get_active()+1

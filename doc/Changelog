@@ -1,4 +1,5 @@
 next:
+- make max. title length of the console changeable by the user
 - added shortcut for "Reload Portage"
 - increased the maximum scrollback lines
 - now only use external "shm" package
