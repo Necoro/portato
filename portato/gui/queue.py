@@ -15,13 +15,16 @@ from __future__ import absolute_import
 # some stuff needed
 import os, pty
 import signal, threading, time
+import itertools as itt
 from subprocess import Popen
 
 # some backend things
 from .. import backend, plugin
 from ..backend import flags, system
-from ..helper import debug, info, send_signal_to_group, unique_array
+from ..backend.exceptions import BlockedException
+from ..helper import debug, info, warning, send_signal_to_group, unique_array, flatten
 from ..waiting_queue import WaitingQueue
+from ..odict import OrderedDict
 from .updater import Updater
 
 # the wrapper
@@ -55,6 +58,7 @@ class EmergeQueue:
 		# dictionaries with data about the packages in the queue
 		self.iters = {"install" : {}, "uninstall" : {}, "update" : {}} # iterator in the tree
 		self.deps = {"install" : {}, "update" : {}} # all the deps of the package
+		self.blocks = {"install" : OrderedDict(), "update" : OrderedDict()}
 		
 		# member vars
 		self.tree = tree
@@ -189,20 +193,21 @@ class EmergeQueue:
 
 		# add iter
 		subIt = self.tree.append(it, self.tree.build_append_value(cpv, oneshot = oneshot, update = update, downgrade = downgrade, version = uVersion, useChange = changedUse))
-		self.iters[type].update({cpv: subIt})
+		self.iters[type][cpv] = subIt
 		
 		# get dependencies
-		deps = pkg.get_dep_packages() # this might raise a BlockedException
-		self.deps[type].update({cpv : deps})
+		deps = pkg.get_dep_packages(return_blocks = True)
+		self.deps[type][cpv] = deps
 		
-		# recursive call
 		for d in deps:
-			try:
+			if d[0] == "!": # block
+				dep = d[1:]
+				if not dep in self.blocks[type]:
+					self.blocks[type][dep] = set()
+
+				self.blocks[type][dep].add(cpv)
+			else: # recursive call
 				self.update_tree(subIt, d, unmask, type = type)
-			except backend.BlockedException, e: # BlockedException occured -> delete current tree and re-raise exception
-				debug("Something blocked: %s", e[0])
-				self.remove_with_children(subIt)
-				raise
 		
 	def append (self, cpv, type = "install", update = False, forceUpdate = False, unmask = False, oneshot = False):
 		"""Appends a cpv either to the merge queue or to the unmerge-queue.
@@ -226,7 +231,7 @@ class EmergeQueue:
 		if type in ("install", "update"): # emerge
 			if update:
 				pkg = self._get_pkg_from_cpv(cpv, unmask)
-				deps = pkg.get_dep_packages()
+				deps = pkg.get_dep_packages(return_blocks = True)
 				
 				if not forceUpdate and cpv in self.deps[type] and deps == self.deps[type][cpv]:
 					return # nothing changed - return
@@ -248,6 +253,51 @@ class EmergeQueue:
 						self.update_tree(self.tree.get_emerge_it(), cpv, unmask, type = type, oneshot = oneshot)
 				elif type == "update" and self.tree:
 					self.update_tree(self.tree.get_update_it(), cpv, unmask, type = type, oneshot = oneshot)
+
+			# handle blocks
+			if self.blocks[type]:
+				# check whether anything blocks something in the queue
+				for block in self.blocks[type]:
+					for c in self.iters[type]:
+						if system.cpv_matches(c, block):
+							blocked = ", ".join(self.blocks[type][block]) 
+							warning("'%s' is blocked by: %s", c, blocked)
+							self.remove_with_children(self.iters[type][c], False)
+							raise BlockedException(c, blocked)
+
+				#
+				# check whether we block a version that we are going to replace nevertheless
+				#
+				
+				# get the blocks that block an installed package
+				inst = []
+				for block in self.blocks[type]:
+					pkgs = system.find_installed_packages(block)
+					if pkgs:
+						inst.append((pkgs, block))
+
+				# the slot-cp's of the packages in the queue
+				slots = {}
+				for c in self.iters[type]:
+					slots[system.new_package(c).get_slot_cp()] = cpv
+
+				# check the installed blocks against the slot-cp's
+				for pkgs, block in inst[:]:
+					done = False
+					for pkg in pkgs:
+						done = False
+						if pkg.get_slot_cp() in slots:
+							debug("Block '%s' can be ignored, because the blocking package is going to be replaced with '%s'.", block, slots[pkg.get_slot_cp()])
+							done = True
+					if done:
+						inst.remove((pkgs,block))
+
+				if inst: # there is still something left to block
+					for pkgs, block in inst:
+						blocked = ", ".join(self.blocks[type][block])
+						warning("'%s' blocks the installation of: %s", pkgs[0].get_cpv(), blocked)
+						self.remove_with_children(self.iters[type][cpv], False)
+						raise BlockedException(blocked, pkgs[0].get_cpv())
 			
 		else: # unmerge
 			self.unmergequeue.append(cpv)
@@ -544,15 +594,32 @@ class EmergeQueue:
 		@type it: Iterator
 		@param removeNewFlags: True if new flags should be removed; False otherwise. Default: True.
 		@type removeNewFlags: boolean"""
+
+		def __remove (type, cpv):
+			del self.iters[type][cpv]
+			try:
+				del self.deps[type][cpv]
+			except KeyError: # this seems to be removed due to a BlockedException - so no deps here atm ;)
+				debug("Catched KeyError => %s seems not to be in self.deps. Should be no harm in normal cases.", cpv)
+
+			for key in self.blocks[type].keys():
+				if cpv in self.blocks[type][key]:
+					self.blocks[type][key].remove(cpv)
+
+				if not self.blocks[type][key]: # list is empty -> remove the whole key
+					del self.blocks[type][key]
+			
+			if removeNewFlags: # remove the changed flags
+				flags.remove_new_use_flags(cpv)
+				flags.remove_new_masked(cpv)
+				flags.remove_new_testing(cpv)
 		
 		if self.tree.iter_has_parent(it):
 			cpv = self.tree.get_value(it, self.tree.get_cpv_column())
 			if self.tree.is_in_emerge(it): # Emerge
-				del self.iters["install"][cpv]
-				try:
-					del self.deps["install"][cpv]
-				except KeyError: # this seems to be removed due to a BlockedException - so no deps here atm ;)
-					debug("Catched KeyError => %s seems not to be in self.deps. Should be no harm in normal cases.", cpv)
+				
+				__remove("install", cpv)
+
 				try:
 					self.mergequeue.remove(cpv)
 				except ValueError: # this is a dependency - ignore
@@ -560,27 +627,14 @@ class EmergeQueue:
 						self.oneshotmerge.remove(cpv)
 					except ValueError:
 						debug("Catched ValueError => %s seems not to be in merge-queue. Should be no harm.", cpv)
-				
-				if removeNewFlags: # remove the changed flags
-					flags.remove_new_use_flags(cpv)
-					flags.remove_new_masked(cpv)
-					flags.remove_new_testing(cpv)
 			
 			elif self.tree.is_in_unmerge(it): # in Unmerge
 				del self.iters["uninstall"][cpv]
 				self.unmergequeue.remove(cpv)
 			
 			elif self.tree.is_in_update(it):
-				del self.iters["update"][cpv]
-				try:
-					del self.deps["update"][cpv]
-				except KeyError: # this seems to be removed due to a BlockedException - so no deps here atm ;)
-					debug("Catched KeyError => %s seems not to be in self.deps. Should be no harm in normal cases.", cpv)
+				__remove("update", cpv)
 
-				if removeNewFlags: # remove the changed flags
-					flags.remove_new_use_flags(cpv)
-					flags.remove_new_masked(cpv)
-					flags.remove_new_testing(cpv)
 			
 		self.tree.remove(it)
 

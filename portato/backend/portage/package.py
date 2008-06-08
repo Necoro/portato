@@ -202,7 +202,7 @@ class PortagePackage (Package):
 
 		return [d for d in deps if d[0] != "!"]
 
-	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"], with_criterions = False):
+	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"], with_criterions = False, return_blocks = False):
 		dep_pkgs = [] # the package list
 		
 		# change the useflags, because we have internally changed some, but not made them visible for portage
@@ -234,30 +234,37 @@ class PortagePackage (Package):
 
 		for dep in deps:
 			if dep[0] == '!': # blocking sth
-				dep = dep[1:]
-				blocked = system.find_installed_packages(dep)
-				if blocked:
-					if blocked[0].get_slot_cp() != self.get_slot_cp(): # blocks in the same slot are harmless
-						raise BlockedException, (self.get_cpv(), blocked[0].get_cpv())
+				blocked = system.find_installed_packages(dep[1:])
+				if len(blocked) == 1: # only exact one match allowed to be harmless
+					if blocked[0].get_slot_cp() == self.get_slot_cp(): # blocks in the same slot are harmless
+						continue
+
+				if return_blocks:
+					if with_criterions:
+						dep_pkgs.append((dep, dep))
+					else:
+						dep_pkgs.append(dep)
+				else:
+					raise BlockedException, (self.get_cpv(), blocked[0].get_cpv())
+				
 				continue # finished with the blocking one -> next
 
 			pkg = system.find_best_match(dep)
 			if not pkg: # try to find masked ones
-				list = system.find_packages(dep, masked = True)
-				if not list:
+				pkgs = system.find_packages(dep, masked = True)
+				if not pkgs:
 					raise PackageNotFoundException, dep
 
-				list = system.sort_package_list(list)
-				list.reverse()
+				pkgs = system.sort_package_list(pkgs)
+				pkgs.reverse()
 				done = False
-				for i in range(len(list)):
-					p = list[i]
+				for p in pkgs:
 					if not p.is_masked():
 						dep_pkgs.append(create_dep_pkgs_data(dep, p))
 						done = True
 						break
 				if not done:
-					dep_pkgs.append(create_dep_pkgs_data(dep, list[0]))
+					dep_pkgs.append(create_dep_pkgs_data(dep, pkgs[0]))
 			else:
 				dep_pkgs.append(create_dep_pkgs_data(dep, pkg))
 
