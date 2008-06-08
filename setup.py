@@ -23,7 +23,7 @@ packages = ["portato", "portato.gui", "portato.gui.windows", "portato.plugins", 
 data_files = [
 		(TEMPLATE_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if x.endswith(".glade")]),
 		(ICON_DIR, ["icons/portato-icon.png"]),
-		(PLUGIN_DIR, plugin_list("dbus_init")), 
+#		(PLUGIN_DIR, plugin_list("dbus_init")), 
 		(DATA_DIR, ["plugin.xsd"])]
 
 # do the distutils setup
