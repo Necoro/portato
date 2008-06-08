@@ -235,9 +235,9 @@ class PortagePackage (Package):
 		for dep in deps:
 			if dep[0] == '!': # blocking sth
 				dep = dep[1:]
-				if dep != self.get_cp(): # not cpv, because a version might explicitly block another one
-					blocked = system.find_installed_packages(dep)
-					if blocked != []:
+				blocked = system.find_installed_packages(dep)
+				if blocked:
+					if blocked[0].get_slot_cp() != self.get_slot_cp(): # blocks in the same slot are harmless
 						raise BlockedException, (self.get_cpv(), blocked[0].get_cpv())
 				continue # finished with the blocking one -> next
 
