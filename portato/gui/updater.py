@@ -93,7 +93,7 @@ q
 					return p
 		elif not pkgs: # nothing found =|
 			if not masked:
-				warning(_("No unmasked version of package '%s' found. Trying masked ones. This normally should not happen..."))
+				warning(_("No unmasked version of package '%s' found. Trying masked ones. This normally should not happen..."), pv)
 				return self.find(pv, True)
 			
 			else:
