@@ -702,9 +702,6 @@ class MainWindow (Window):
 		self.queueTree = GtkTree(self.queueList.get_model())
 		self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update, threadClass = GtkThread)
 		
-		self.catList.get_selection().select_path(1)
-		self.pkgList.get_selection().select_path(0)
-		
 		# session
 		splash(_("Restoring Session"))
 		try:
@@ -1107,13 +1104,19 @@ class MainWindow (Window):
 			elif version > SESSION_VERSION:
 				raise NewSessionException(version, SESSION_VERSION)
 
+		def _add (value):
+			if len(value) == 4:
+				self.session.add_handler(value[:3], default = value[3])
+			else:
+				self.session.add_handler(value)
+
 		# set the simple ones :)
-		map(self.session.add_handler,[
+		map(_add,[
 			([("gtksessionversion", "session")], load_session_version, lambda: SESSION_VERSION),
 			([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
 			([("vpanedpos", "window"), ("hpanedpos", "window")], load_paned, save_paned),
-			([("catsel", "window")], load_selection(self.catList, 0), save_cat_selection),
-			([("pkgsel", "window")], load_selection(self.pkgList, 1), save_pkg_selection)
+			([("catsel", "window")], load_selection(self.catList, 0), save_cat_selection, ["app-portage"]),
+			([("pkgsel", "window")], load_selection(self.pkgList, 1), save_pkg_selection, ["portato"])
 			#([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue),
 			])
 
