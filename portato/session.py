@@ -75,7 +75,7 @@ class Session (object):
 			else:
 				debug("Loading %s with values %s.", options, loaded)
 				lfn(*loaded)
-				return
+				continue
 
 			if default:
 				debug("Loading %s with defaults %s.", options, default)
