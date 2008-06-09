@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.1 on Fri Feb 29 00:01:56 2008 -->
+<!--Generated with glade3 3.4.4 on Mon Jun  9 20:49:26 2008 -->
 <glade-interface>
   <widget class="GtkMenu" id="systrayPopup">
     <property name="visible">True</property>
@@ -18,7 +18,7 @@
         <property name="visible">True</property>
         <property name="label" translatable="yes">_Kill Emerge</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="cb_kill_emerge"/>
+        <signal name="activate" handler="cb_kill_clicked"/>
         <child internal-child="image">
           <widget class="GtkImage" id="menu-item-image16">
             <property name="visible">True</property>
