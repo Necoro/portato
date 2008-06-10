@@ -7,7 +7,7 @@
 				<xs:element name="author" type="string" />
 				<xs:element name="import" type="importString" minOccurs="0"/>
 				<xs:element name="frontends" type="stringList" minOccurs="0" />
-				<xs:element name="hooks">
+				<xs:element name="hooks" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="hook" minOccurs="1" maxOccurs="unbounded">
