@@ -3,7 +3,7 @@
 # File: portato/backend/system_interface.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2007 René 'Necoro' Neumann
+# Copyright (C) 2007-2008 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -75,132 +75,23 @@ class SystemInterface (object):
 
 		raise NotImplementedError
 
-	def find_packages (self, search_key, masked = False, only_cpv = False):
-		"""This returns a list of packages which have to fit exactly. Additionally ranges like '<,>,=,~,!' et. al. are possible.
+	def find_packages (self, key, pkgSet = "all", masked = False, with_version = True, only_cpv = False):
+		"""This returns a list of packages matching the key.
+		As key, it is allowed to use basic regexps (".*") and the normal package specs. But not a combination
+		of them.
 		
-		@param search_key: the key to look for
-		@type search_key: string
+		@param key: the key to look for
+		@type key: string
+		@param all: the package set to use
+		@type all: string
 		@param masked: if True, also look for masked packages
 		@type masked: boolean
-		@param only_cpv: do not return package but only the cpv
+		@param with_version: if True, return CPVs - else CP
+		@type with_version: boolean
+		@param only_cpv: do not return package but only the cpv. if with_version is False, this is ignored
 		@type only_cpv: boolean
 		
 		@returns: list of found packages
-		@rtype: backend.Package[] or string[]
-		"""
-
-		raise NotImplementedError
-
-
-	def find_installed_packages (self, search_key, masked = False, only_cpv = False):
-		"""This returns a list of packages which have to fit exactly. Additionally ranges like '<,>,=,~,!' et. al. are possible.
-		
-		@param search_key: the key to look for
-		@type search_key: string
-		@param masked: if True, also look for masked packages
-		@type masked: boolean
-		@param only_cpv: do not return package but only the cpv
-		@type only_cpv: boolean
-		
-		@returns: list of found packages
-		@rtype: backend.Package[] or string[]
-		"""
-
-		raise NotImplementedError
-
-	def find_system_packages (self, only_cpv = False):
-		"""Looks for all packages saved as "system-packages".
-		
-		@param only_cpv: do not return package but only the cpv
-		@type only_cpv: boolean
-
-		@returns: a tuple of (resolved_packages, unresolved_packages).
-		@rtype: (backend.Package[], backend.Package[]) or (string[], string[])
-		"""
-
-		raise NotImplementedError
-
-	def find_world_packages (self, only_cpv = False):
-		"""Looks for all packages saved in the world-file.
-		
-		@param only_cpv: do not return package but only the cpv
-		@type only_cpv: boolean
-
-		@returns: a tuple of (resolved_packages, unresolved_packages).
-		@rtype: (backend.Package[], backend.Package[]) or (string[], string[])
-		"""
-
-		raise NotImplementedError
-
-	def find_all_installed_packages (self, name = None, withVersion = True, only_cpv = False):
-		"""Finds all installed packages matching a name or all if no name is specified.
-
-		@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
-		@type name: string or None
-		@param withVersion: if True version-specific packages are returned; else only the cat/package-strings a delivered
-		@type withVersion: boolean
-		@param only_cpv: do not return package but only the cpv
-		@type only_cpv: boolean
-
-		@returns: all packages/cp-strings found
-		@rtype: backend.Package[] or string[]
-		"""
-
-		raise NotImplementedError
-
-	def find_all_uninstalled_packages (self, name = None, only_cpv = False):
-		"""Finds all uninstalled packages matching a name or all if no name is specified.
-
-		@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
-		@type name: string or None
-		@param only_cpv: do not return package but only the cpv
-		@type only_cpv: boolean
-
-		@returns: all packages found
-		@rtype: backend.Package[] or string[]
-		"""
-
-		raise NotImplementedError
-
-	def find_all_packages (self, name = None, withVersion = True, only_cpv = False):
-		"""Finds all packages matching a name or all if no name is specified.
-
-		@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
-		@type name: string or None
-		@param withVersion: if True version-specific packages are returned; else only the cat/package-strings a delivered
-		@type withVersion: boolean
-		@param only_cpv: do not return package but only the cpv
-		@type only_cpv: boolean
-
-		@returns: all packages/cp-strings found
-		@rtype: backend.Package[] or string[]
-		"""
-
-		raise NotImplementedError
-		
-	def find_all_world_packages (self, name = None, only_cpv = False):
-		"""Finds all world packages matching a name or all if no name is specified.
-
-		@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
-		@type name: string or None
-		@param only_cpv: do not return package but only the cpv
-		@type only_cpv: boolean
-
-		@returns: all packages found
-		@rtype: backend.Package[] or string[]
-		"""
-
-		raise NotImplementedError
-
-	def find_all_system_packages (self, name = None, only_cpv = False):
-		"""Finds all system packages matching a name or all if no name is specified.
-
-		@param name: the name to look for - it is expanded to .*name.* ; if None, all packages are returned
-		@type name: string or None
-		@param only_cpv: do not return package but only the cpv
-		@type only_cpv: boolean
-
-		@returns: all packages found
 		@rtype: backend.Package[] or string[]
 		"""
 

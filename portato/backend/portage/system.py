@@ -160,26 +160,16 @@ class PortageSystem (SystemInterface):
 		t = []
 		
 		if not only_installed:
-			try:
-				if masked:
-					t = self.settings.porttree.dbapi.xmatch("match-all", search_key)
-				else:
-					t = self.settings.porttree.dbapi.match(search_key)
-			except ValueError, e: # ambigous package
-				if isinstance(e[0], list):
-					t = []
-					for cp in e[0]:
-						if masked:
-							t += self.settings.porttree.dbapi.xmatch("match-all", cp)
-						else:
-							t += self.settings.porttree.dbapi.match(cp)
-				else:
-					raise
-		
-			if self._version >= (2,1,5):
-				t += [pkg.get_cpv() for pkg in self.find_installed_packages(search_key) if not (pkg.is_testing(True) or pkg.is_masked())]
+			pkgSet = "tree"
 		else:
-			t = self.find_installed_packages(search_key, only_cpv=True)
+			pkgSet = "installed"
+
+		t = self.find_packages(search_key, pkgSet = pkgSet, masked = masked, with_version = True, only_cpv = True)
+		
+		if self._version >= (2,1,5):
+			t += [pkg.get_cpv() for pkg in self.find_packages(search_key, "installed") if not (pkg.is_testing(True) or pkg.is_masked())]
+		else:
+			t = self.find_packages(search_key, "installed", only_cpv=True)
 
 		if t:
 			t = unique_array(t)
@@ -187,45 +177,99 @@ class PortageSystem (SystemInterface):
 
 		return None
 
-	def find_packages (self, search_key, masked=False, only_cpv = False):
-		try:
-			if masked:
-				t = self.settings.porttree.dbapi.xmatch("match-all", search_key)
-				t += self.settings.vartree.dbapi.match(search_key)
+	def find_packages (self, key = "", pkgSet = "all", masked = False, with_version = True, only_cpv = False):
+		if key is None: key = ""
+		
+		is_regexp = key == "" or ("*" in key and key[0] not in ("*","=","<",">","~","!"))
+		
+		def installed(key):
+			if is_regexp:
+				if with_version:
+					t = self.settings.vartree.dbapi.cpv_all()
+				else:
+					t = self.settings.vartree.dbapi.cp_all()
+
+				if key:
+					t = filter(lambda x: re.match(key, x, re.I), t)
+
+				return t
+			else:	
+				return self.settings.vartree.dbapi.match(key)
+
+		def tree(key):
+			if is_regexp:
+				if with_version:
+					t = self.settings.porttree.dbapi.cpv_all()
+				else:
+					t = self.settings.porttree.dbapi.cp_all()
+
+				if key:
+					t = filter(lambda x: re.match(key, x, re.I), t)
+			
+			elif masked:	
+				t = self.settings.porttree.dbapi.xmatch("match-all", key)
 			else:
-				t = self.settings.porttree.dbapi.match(search_key)
-				t += self.settings.vartree.dbapi.match(search_key)
+				t = self.settings.porttree.dbapi.match(key)
+			
+			return t
+		
+		def all(key):
+			return unique_array(installed(key)+tree(key))
+
+		def uninstalled (key):
+			alist = set(all(key))
+			inst = set(installed(key))
+			return list(alist - inst)
+
+		def _ws (key, crit, pkglist):
+			pkgs = self.__find_resolved_unresolved(pkglist, crit, only_cpv = with_version)[0]
+			if not with_version:
+				pkgs = [x.get_cp(x) for x in list]
+
+			if is_regexp:
+				return filter(lambda x: re.match(key, x, re.I), pkgs)
+			
+			return pkgs
+
+		def world (key):
+			with open(portage.WORLD_FILE) as f:
+				pkglist = f.readlines()
+
+			return _ws(key, lambda cpv: cpv[0] != "#", pkglist)
+
+		def system (key):
+			return _ws(key, lambda cpv: cpv[0] == "*", self.settings.settings.packages)
+
+		funcmap = {
+				"all" : all,
+				"installed" : installed,
+				"uninstalled" : uninstalled,
+				"world" : world,
+				"system" : system,
+				"tree" : tree
+				}
+
+		pkgSet = pkgSet.lower()
+		if pkgSet == "": pkgSet = "all"
+
+		func = funcmap[pkgSet]
+		
+		try:
+			t = func(key)
 		# catch the "ambigous package" Exception
 		except ValueError, e:
 			if isinstance(e[0], list):
 				t = []
 				for cp in e[0]:
-					if masked:
-						t += self.settings.porttree.dbapi.xmatch("match-all", cp)
-						t += self.settings.vartree.dbapi.match(cp)
-					else:
-						t += self.settings.porttree.dbapi.match(cp)
-						t += self.settings.vartree.dbapi.match(cp)
+					t += func(cp)
 			else:
 				raise
+
 		# Make the list of packages unique
 		t = unique_array(t)
 		t.sort()
-		return self.geneticize_list(t, only_cpv)
 
-	def find_installed_packages (self, search_key, masked = False, only_cpv = False):
-		try:
-			t = self.settings.vartree.dbapi.match(search_key)
-		# catch the "ambigous package" Exception
-		except ValueError, e:
-			if isinstance(e[0], list):
-				t = []
-				for cp in e[0]:
-					t += self.settings.vartree.dbapi.match(cp)
-			else:
-				raise ValueError(e)
-
-		return self.geneticize_list(t, only_cpv)
+		return self.geneticize_list(t, only_cpv or not with_version)
 
 	def __find_resolved_unresolved (self, list, check, only_cpv = False):
 		"""Checks a given list and divides it into a "resolved" and an "unresolved" part.
@@ -250,63 +294,6 @@ class PortageSystem (SystemInterface):
 				else:
 					unresolved.append(self.find_best_match(cpv, True, only_cpv = only_cpv))
 		return (resolved, unresolved)
-	
-	def find_system_packages (self, only_cpv = False):
-		pkglist = self.settings.settings.packages
-
-		return self.__find_resolved_unresolved(pkglist, lambda cpv: cpv[0] == "*", only_cpv)
-
-	def find_world_packages (self, only_cpv = False):
-		f = open(portage.WORLD_FILE)
-		pkglist = f.readlines()
-		f.close()
-
-		return self.__find_resolved_unresolved(pkglist, lambda cpv: cpv[0] != "#", only_cpv)
-
-	def find_all_installed_packages (self, name = None, withVersion=True, only_cpv = False):
-		if withVersion:
-			t = self.settings.vartree.dbapi.cpv_all()
-			if name:
-				t = filter(self.find_lambda(name),t)
-			return self.geneticize_list(t, only_cpv)
-		
-		else:
-			t = self.settings.vartree.dbapi.cp_all()
-			if name:
-				t = filter(self.find_lambda(name),t)
-			return t
-
-	def find_all_uninstalled_packages (self, name = None, only_cpv = False):
-		alist = self.find_all_packages(name)
-		return self.geneticize_list([x.get_cpv() for x in alist if not x.is_installed()], only_cpv)	
-
-	def find_all_packages (self, name = None, withVersion = True, only_cpv = False):
-		t = self.settings.porttree.dbapi.cp_all()
-		t += self.settings.vartree.dbapi.cp_all()
-		if name:
-			t = filter(self.find_lambda(name),t)
-		
-		t = filter(lambda x: not self.unwantedPkgsRE.match(x), unique_array(t))
-		
-		if withVersion:
-			t2 = []
-			for x in t:
-				t2 += self.settings.porttree.dbapi.cp_list(x)
-				t2 += self.settings.vartree.dbapi.cp_list(x)
-				t2 = unique_array(t2)
-			return self.geneticize_list(t2, only_cpv)
-		else:
-			return t
-
-	def find_all_world_packages (self, name = None, only_cpv = False):
-		world = filter(self.find_lambda(name), self.find_world_packages(only_cpv = True)[0])
-		world = unique_array(world)
-		return self.geneticize_list(world, only_cpv)
-
-	def find_all_system_packages (self, name = None):
-		sys = filter(self.find_lambda(name), self.find_system_packages(only_cpv = True)[0])
-		sys = unique_array(sys)
-		return self.geneticize_list(sys)
 
 	def list_categories (self, name = None):
 		categories = self.settings.settings.categories
@@ -334,7 +321,7 @@ class PortageSystem (SystemInterface):
 
 		new_packages = []
 		for p in packages:
-			inst = self.find_installed_packages(p)
+			inst = self.find_packages(p, "installed")
 			
 			best_p = self.find_best_match(p)
 			if best_p is None:
@@ -353,16 +340,14 @@ class PortageSystem (SystemInterface):
 				myslots.add(best_p.get_package_settings("SLOT")) # add the slot of the best package in portage
 				for slot in myslots:
 					new_packages.append(\
-							self.find_best(\
-							[x.get_cpv() for x in self.find_packages("%s:%s" % (i.get_cp(), slot))]\
-							))
+							self.find_best(self.find_packages("%s:%s" % (i.get_cp(), slot), only_cpv = True)))
 			else:
 				new_packages.append(best_p)
 
 		return new_packages
 
 	def get_updated_packages (self):
-		packages = self.get_new_packages(self.find_all_installed_packages(withVersion = False))
+		packages = self.get_new_packages(self.find_packages(pkgSet = "installed", with_version = False))
 		packages = [x for x in packages if x is not None and not x.is_installed()]
 		return packages
 
@@ -378,7 +363,7 @@ class PortageSystem (SystemInterface):
 		world.close()
 
 		# append system packages
-		packages.extend(unique_array([p.get_cp() for p in self.find_all_system_packages()]))
+		packages.extend(unique_array([p.get_cp() for p in self.find_packages(pkgSet = "system")]))
 		
 		states = [(["RDEPEND", "PDEPEND"], True)]
 		if self.with_bdeps():
@@ -404,11 +389,11 @@ class PortageSystem (SystemInterface):
 			tempDeep = False
 
 			if not p.is_installed():
-				oldList = self.find_installed_packages(p.get_slot_cp())
+				oldList = self.find_packages(p.get_slot_cp(), "installed")
 				if oldList: 
 					old = oldList[0] # we should only have one package here - else it is a bug
 				else:
-					oldList = self.sort_package_list(self.find_installed_packages(p.get_cp()))
+					oldList = self.sort_package_list(self.find_packages(p.get_cp(), "installed"))
 					if not oldList:
 						info(_("Found a not installed dependency: %s.") % p.get_cpv())
 						oldList = [p]
@@ -458,7 +443,7 @@ class PortageSystem (SystemInterface):
 									if not pkg: continue
 									if not pkg.is_installed() and (pkg.is_masked() or pkg.is_testing(True)): # check to not update unnecessairily
 										cont = False
-										for inst in self.find_installed_packages(pkg.get_cp(), only_cpv = True):
+										for inst in self.find_packages(pkg.get_cp(), "installed", only_cpv = True):
 											if self.cpv_matches(inst, i):
 												debug("The installed %s matches %s. Discarding upgrade to masked version.", inst, i)
 												cont = True

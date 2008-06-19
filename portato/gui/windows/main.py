@@ -156,7 +156,7 @@ class PackageTable:
 		self.descLabel.set_label(desc)
 
 		# overlay
-		if pkg.is_overlay():
+		if pkg.is_in_overlay():
 			self.overlayLabel.set_label(pkg.get_overlay_path())
 			self.overlayLabel.show()
 			self.overlayLL.show()
@@ -1316,7 +1316,7 @@ class MainWindow (Window):
 		if pkg.is_installed():
 			installed = set(pkg.get_iuse_flags()).intersection(pkg.get_installed_use_flags())
 		else:
-			inst = system.find_installed_packages(pkg.get_slot_cp())
+			inst = system.find_packages(pkg.get_slot_cp(), "installed")
 			if inst:
 				installed = set(inst[0].get_iuse_flags()).intersection(inst[0].get_installed_use_flags())
 			else:
@@ -1492,7 +1492,7 @@ class MainWindow (Window):
 			if "/" not in text:
 				text = "/.*"+text # only look for package names
 
-			packages = system.find_all_packages(text, withVersion = False)
+			packages = system.find_packages(text, with_version = False)
 
 			if packages == []:
 				nothing_found_dialog()

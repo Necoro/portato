@@ -88,13 +88,15 @@ class Package (_Package):
 			if f[0] == "~":
 				f = f[1:]
 				removed = True
+
+			invf = flags.invert_use_flag(f)	
 			
 			if f[0] == '-':
-				if flags.invert_use_flag(f) in i_flags and not (removed and flags.invert_use_flag(f) in m_flags):
-					i_flags.remove(flags.invert_use_flag(f))
+				if invf in i_flags and not (removed and invf in m_flags):
+					i_flags.remove(invf)
 				
 			elif f not in i_flags:
-				if not (removed and flags.invert_use_flag(f) in m_flags):
+				if not (removed and invf in m_flags):
 					i_flags.append(f)
 
 		return i_flags
@@ -165,9 +167,8 @@ class Package (_Package):
 		
 		p = self.get_ebuild_path()
 		sp = p.split("/")
-		if len(sp):
-			import string
-			return string.join(sp[:-1],"/")
+		if sp:
+			return "/".join(sp[:-1])
 
 	def get_dependencies (self):
 		"""
@@ -243,7 +244,7 @@ class Package (_Package):
 
 		raise NotImplementedError
 
-	def is_overlay(self):
+	def is_in_overlay(self):
 		"""Returns true if the package is in an overlay.
 		@rtype: boolean"""
 
@@ -271,7 +272,7 @@ class Package (_Package):
 
 		raise NotImplementedError
 		
-	def is_testing(self, use_keywords = False):
+	def is_testing(self, use_keywords = True):
 		"""Checks whether a package is marked as testing.
 		
 		@param use_keywords: Controls whether possible keywords are taken into account or not.
@@ -370,13 +371,13 @@ class Package (_Package):
 
 		raise NotImplementedError
 
-	def get_package_settings(self, var, tree = None):
+	def get_package_settings(self, var, installed = True):
 		"""Returns a package specific setting, such as DESCRIPTION, SRC_URI, IUSE ...
 		
 		@param var: the setting to get
 		@type var: string
-		@param tree: an object defining whether to take the information from the installed package or from the ebuild
-		@type tree: unknown
+		@param installed: take the vartree or the porttree
+		@type installed: boolean
 		
 		@returns: the value of the setting
 		@rtype: string"""

@@ -88,8 +88,8 @@ class PortagePackage (Package):
 	def is_installed(self):
 		return self._settings.vartree.dbapi.cpv_exists(self._cpv)
 
-	def is_overlay(self):
-		dir,ovl = self._settings.porttree.dbapi.findname2(self._cpv)
+	def is_in_overlay(self):
+		ovl = self.get_overlay_path()
 		return ovl != self._settings.settings["PORTDIR"] and str(ovl) != "0"
 
 	def get_overlay_path (self):
@@ -100,23 +100,17 @@ class PortagePackage (Package):
 		return (self._status != None)
 
 	def is_missing_keyword(self):
-		if self._status and "missing keyword" in self._status:
-			return True
-		return False
+		return self._status and "missing keyword" in self._status
 
-	def is_testing(self, use_keywords = False):
+	def is_testing(self, use_keywords = True):
 		testArch = "~" + self.get_global_settings("ARCH")
 		if not use_keywords: # keywords are NOT taken into account
-			if testArch in self.get_package_settings("KEYWORDS").split():
-				return True
-			return False
+			return testArch in self.get_package_settings("KEYWORDS").split()
 		
 		else: # keywords are taken into account
 			status = flags.new_testing_status(self.get_cpv())
 			if status is None: # we haven't changed it in any way
-				if self._status and testArch+" keyword" in self._status:
-					return True
-				return False
+				return self._status and testArch+" keyword" in self._status
 			else:
 				return status
 	
@@ -130,15 +124,13 @@ class PortagePackage (Package):
 				else:
 					error(_("BUG in flags.new_masking_status. It returns \'%s\'"), status)
 			else: # we have not touched the status
-				if self._status and ("profile" in self._status or "package.mask" in self._status):
-					return True
-				return False
+				return self._status and ("profile" in self._status or "package.mask" in self._status)
+		
 		else: # we want the original portage value XXX: bug if masked by user AND by system
 			
 			# get the normal masked ones
 			if self._status and ("profile" in self._status or "package.mask" in self._status):
-				if not flags.is_locally_masked(self, changes = False): # assume that if it is locally masked, it is not masked by the system
-					return True
+				return not flags.is_locally_masked(self, changes = False) # assume that if it is locally masked, it is not masked by the system
 			else: # more difficult: get the ones we unmasked, but are masked by the system
 				try:
 					masked = self._settings.settings.pmaskdict[self.get_cp()]
@@ -147,10 +139,7 @@ class PortagePackage (Package):
 
 				for cpv in masked:
 					if self.matches(cpv):
-						if not flags.is_locally_masked(self, changes = False): # assume that if it is locally masked, it is not masked by the system
-							return True
-						else:
-							return False
+						return not flags.is_locally_masked(self, changes = False) # assume that if it is locally masked, it is not masked by the system
 
 			return False
 
@@ -158,17 +147,15 @@ class PortagePackage (Package):
 		reason = portage.getmaskingreason(self.get_cpv(), settings = self._settings.settings)
 
 		if reason:
-			return reason[:-1] # strip of last \n
+			return reason.strip()
 		else:
 			return reason
 
 	def get_iuse_flags (self, installed = False, removeForced = True):		
-		if installed or not self.is_in_system():
-			tree = self._settings.vartree
-		else:
-			tree = self._settings.porttree
+		if not self.is_in_system():
+			installed = True
 		
-		iuse = flags.filter_defaults(self.get_package_settings("IUSE", tree = tree).split())
+		iuse = flags.filter_defaults(self.get_package_settings("IUSE", installed = installed).split())
 
 		iuse = set(iuse)
 
@@ -184,11 +171,11 @@ class PortagePackage (Package):
 		depstring = ""
 		try:
 			for d in depvar:
-				depstring += self.get_package_settings(d, tree = self._settings.porttree)+" "
+				depstring += self.get_package_settings(d, installed = False)+" "
 		except KeyError: # not found in porttree - use vartree
 			depstring = ""
 			for d in depvar:
-				depstring += self.get_package_settings(d, tree = self._settings.vartree)+" "
+				depstring += self.get_package_settings(d, installed = True)+" "
 
 		deps = portage.dep_check(depstring, None, self._settings.settings, myuse = actual, trees = self._trees)
 
@@ -210,7 +197,7 @@ class PortagePackage (Package):
 
 		depstring = ""
 		for d in depvar:
-			depstring += self.get_package_settings(d, tree=self._settings.porttree)+" "
+			depstring += self.get_package_settings(d, installed = False)+" "
 
 		# let portage do the main stuff ;)
 		# pay attention to any changes here
@@ -234,7 +221,7 @@ class PortagePackage (Package):
 
 		for dep in deps:
 			if dep[0] == '!': # blocking sth
-				blocked = system.find_installed_packages(dep[1:])
+				blocked = system.find_packages(dep, "installed", only_cpv = True)
 				if len(blocked) == 1: # only exact one match allowed to be harmless
 					if blocked[0].get_slot_cp() == self.get_slot_cp(): # blocks in the same slot are harmless
 						continue
@@ -290,20 +277,19 @@ class PortagePackage (Package):
 				for line in f:
 					yield line.split()[1].strip()
 
-	def get_package_settings(self, var, tree = None):
-		if not tree:
+	def get_package_settings(self, var, installed = True):
+		if installed and self.is_installed():
 			mytree = self._settings.vartree
-			if not self.is_installed():
-				mytree = self._settings.porttree
 		else:
-			mytree = tree
+			mytree = self._settings.porttree
+
 		r = mytree.dbapi.aux_get(self._cpv,[var])
 		
 		return r[0]
 
 	def get_installed_use_flags(self):
 		if self.is_installed():
-			return self.get_package_settings("USE", tree = self._settings.vartree).split()
+			return self.get_package_settings("USE", installed = True).split()
 		else: return []
 
 	def compare_version(self,other):
