@@ -189,7 +189,7 @@ class PortagePackage (Package):
 
 		return [d for d in deps if d[0] != "!"]
 
-	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"], with_criterions = False):
+	def get_dep_packages (self, depvar = ["RDEPEND", "PDEPEND", "DEPEND"], with_criterions = False, return_blocks = False):
 		dep_pkgs = [] # the package list
 		
 		# change the useflags, because we have internally changed some, but not made them visible for portage
@@ -221,28 +221,37 @@ class PortagePackage (Package):
 
 		for dep in deps:
 			if dep[0] == '!': # blocking sth
-				dep = dep[1:]
-				if dep != self.get_cp(): # not cpv, because a version might explicitly block another one
-					blocked = system.find_packages(dep, "installed", only_cpv = True)
-					if blocked != []:
-						raise BlockedException, (self.get_cpv(), blocked[0])
+				blocked = system.find_packages(dep, "installed", only_cpv = True)
+				if len(blocked) == 1: # only exact one match allowed to be harmless
+					if blocked[0].get_slot_cp() == self.get_slot_cp(): # blocks in the same slot are harmless
+						continue
+
+				if return_blocks:
+					if with_criterions:
+						dep_pkgs.append((dep, dep))
+					else:
+						dep_pkgs.append(dep)
+				else:
+					raise BlockedException, (self.get_cpv(), blocked[0].get_cpv())
+				
 				continue # finished with the blocking one -> next
 
 			pkg = system.find_best_match(dep)
 			if not pkg: # try to find masked ones
-				list = system.find_packages(dep, masked = True)
-				if not list:
+				pkgs = system.find_packages(dep, masked = True)
+				if not pkgs:
 					raise PackageNotFoundException, dep
 
-				list = system.sort_package_list(list)
+				pkgs = system.sort_package_list(pkgs)
+				pkgs.reverse()
 				done = False
-				for p in reversed(list):
+				for p in pkgs:
 					if not p.is_masked():
 						dep_pkgs.append(create_dep_pkgs_data(dep, p))
 						done = True
 						break
 				if not done:
-					dep_pkgs.append(create_dep_pkgs_data(dep, list[0]))
+					dep_pkgs.append(create_dep_pkgs_data(dep, pkgs[0]))
 			else:
 				dep_pkgs.append(create_dep_pkgs_data(dep, pkg))
 
@@ -256,7 +265,10 @@ class PortagePackage (Package):
 		return v
 
 	def get_ebuild_path(self):
-		return self._settings.porttree.dbapi.findname(self._cpv)
+		if self.is_in_system():
+			return self._settings.porttree.dbapi.findname(self._cpv)
+		else:
+			return self._settings.vartree.dbapi.findname(self._cpv)
 
 	def get_files (self):
 		if self.is_installed():

@@ -3,7 +3,8 @@ Main author: René 'Necoro' Neumann <necoro@necoro.net>
 Application icon: P4r4D0X (after an idea by wolfden)
 
 Shipped with code from:
-	- Philip Semanchuk (shm module)
+	- Nicola Larosa & Michael Foord (portato.odict)
+		see: http://www.voidspace.org.uk/python/odict.html
 
 Many thanks to the Porthole team which often inspired me or gave me hints.
 (And sometimes I even copied files ^^ ;))

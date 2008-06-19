@@ -180,12 +180,13 @@ class Plugin:
 		"""Gets an <hooks>-elements and parses it.
 
 		@param hooks: the hooks node
-		@type hooks: Node"""
+		@type hooks: NodeList"""
 
-		for h in hooks.getElementsByTagName("hook"):
-			hook = Hook(self, str(h.getAttribute("type")), str(h.getAttribute("call")))
-			hook.parse_connects(h.getElementsByTagName("connect"))
-			self.hooks.append(hook)
+		if hooks:
+			for h in hooks[0].getElementsByTagName("hook"):
+				hook = Hook(self, str(h.getAttribute("type")), str(h.getAttribute("call")))
+				hook.parse_connects(h.getElementsByTagName("connect"))
+				self.hooks.append(hook)
 
 	def parse_menus (self, menus):
 		"""Get a list of <menu>-elements and parses them.
@@ -388,7 +389,7 @@ class PluginQueue:
 
 				if frontendOK is None or frontendOK == True:
 					plugin = Plugin(p, elem.getElementsByTagName("name")[0], elem.getElementsByTagName("author")[0])
-					plugin.parse_hooks(elem.getElementsByTagName("hooks")[0])
+					plugin.parse_hooks(elem.getElementsByTagName("hooks"))
 					plugin.set_import(elem.getElementsByTagName("import"))
 					plugin.parse_menus(elem.getElementsByTagName("menu"))
 					plugin.parse_options(elem.getElementsByTagName("options"))

@@ -54,20 +54,20 @@ class Session (object):
 		# add version check
 		self.add_handler(([("version", "session")], self.check_version, lambda: self.VERSION))
 
-	def add_handler (self, (options, load_fn, save_fn)):
+	def add_handler (self, (options, load_fn, save_fn), default = None):
 		"""
 		Adds a handler to this session. A handler is a three-tuple consisting of:
 			- a list of (key,section) values
 			- a function getting number of option arguments and applying them to the program
 			- a function returning the number of option return values - getting them out of the program
 		"""
-		self._handlers.append((options, load_fn, save_fn))
+		self._handlers.append((options, load_fn, save_fn, default))
 
 	def load (self):
 		"""
 		Loads and applies all values of the session.
 		"""
-		for options, lfn, sfn in self._handlers:
+		for options, lfn, sfn, default in self._handlers:
 			try:
 				loaded = [self._cfg.get(*x) for x in options]
 			except KeyError: # does not exist -> ignore
@@ -75,13 +75,18 @@ class Session (object):
 			else:
 				debug("Loading %s with values %s.", options, loaded)
 				lfn(*loaded)
+				continue
+
+			if default:
+				debug("Loading %s with defaults %s.", options, default)
+				lfn(*default)
 
 	def save (self):
 		"""
 		Saves all options into the file.
 		"""
 
-		for options, lfn, sfn in self._handlers:
+		for options, lfn, sfn, default in self._handlers:
 			vals = sfn()
 			
 			# map into list if necessairy
