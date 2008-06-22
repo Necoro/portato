@@ -21,6 +21,7 @@ from StringIO import StringIO
 
 from ..helper import debug, error
 from .dialogs import file_chooser_dialog, io_ex_dialog
+from .windows.mailinfo import MailInfoWindow
 
 # for the i18n
 from ..constants import LOCALE_DIR, APP
@@ -53,6 +54,7 @@ class UncaughtExceptionDialog(gtk.MessageDialog):
 		self.format_secondary_text(_("It probably isn't fatal, but should be reported to the developers nonetheless."))
 
 		self.add_button(_("Show Details"), 1)
+		self.add_button(_("Send..."), 3)
 		self.add_button(gtk.STOCK_SAVE_AS, 2)
 		self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
@@ -103,6 +105,9 @@ class UncaughtExceptionDialog(gtk.MessageDialog):
 
 				else:
 					debug("Nothing to save")
+			elif resp == 3:
+				debug("Send bug per mail")
+				MailInfoWindow(self, self.text)
 			else:
 				break
 		self.destroy()
