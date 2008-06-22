@@ -21,7 +21,6 @@ from StringIO import StringIO
 
 from ..helper import debug, error
 from .dialogs import file_chooser_dialog, io_ex_dialog
-from .windows.mailinfo import MailInfoWindow
 
 # for the i18n
 from ..constants import LOCALE_DIR, APP
@@ -43,6 +42,8 @@ class GtkThread (Thread):
 				raise type, val, tb # let normal thread handle it
 			finally:
 				del type, val, tb
+
+from .windows.mailinfo import MailInfoWindow
 
 class UncaughtExceptionDialog(gtk.MessageDialog):
 	"""Original idea by Gustavo Carneiro - original code: http://www.daa.com.au/pipermail/pygtk/attachments/20030828/2d304204/gtkexcepthook.py."""
@@ -107,7 +108,9 @@ class UncaughtExceptionDialog(gtk.MessageDialog):
 					debug("Nothing to save")
 			elif resp == 3:
 				debug("Send bug per mail")
-				MailInfoWindow(self, self.text)
+				self.destroy()
+				MailInfoWindow(None, self.text)
+				return
 			else:
 				break
 		self.destroy()
