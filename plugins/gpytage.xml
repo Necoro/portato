@@ -2,7 +2,7 @@
 <plugin xmlns="http://portato.sourceforge.net/plugin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://portato.sourceforge.net/plugin http://portato.sourceforge.net/plugin.xsd">
 
 	<author>René 'Necoro' Neumann</author>
-	<name>Etc-proposals</name>
+	<name>GPytage</name>
 
 	<import>portato.plugins.gpytage</import>
 
