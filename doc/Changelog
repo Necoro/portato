@@ -5,6 +5,7 @@ next:
 - increased the maximum scrollback lines
 - now only use external "shm" package
 - allow to send bug report directly per mail
+- allowed to dismiss the warning dialogs for keywords/useflags
 - bug fixes
 
 0.10:

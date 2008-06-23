@@ -1357,7 +1357,8 @@ class MainWindow (Window):
 		"""Execute the current queue."""
 		
 		if len(flags.newUseFlags) > 0:
-			changed_flags_dialog(_("use flags"))
+			if not self.session.get_boolean("useflags", "dialogs"):
+				self.session.set("useflags", changed_flags_dialog(_("use flags"))[1], "dialogs")
 			try:
 				flags.write_use_flags()
 			except IOError, e:
@@ -1368,7 +1369,8 @@ class MainWindow (Window):
 			debug("new masked: %s",flags.new_masked)
 			debug("new unmasked: %s", flags.new_unmasked)
 			debug("new testing: %s", flags.newTesting)
-			changed_flags_dialog(_("masking keywords"))
+			if not self.session.get_boolean("keywords", "dialogs"):
+				self.session.set("keywords", changed_flags_dialog(_("masking keywords"))[1], "dialogs")
 			try:
 				flags.write_masked()
 				flags.write_testing()

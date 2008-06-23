@@ -57,11 +57,15 @@ def nothing_found_dialog ():
 	return ret
 
 def changed_flags_dialog (what = "flags"):
+	check = gtk.CheckButton(_("Do not show this dialog again."))
 	hintMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
-						_("You have changed %s. Portato will write these changes into the appropriate files. Please backup them if you think it is necessairy.") % what)
+						_("You have changed %s.\nPortato will write these changes into the appropriate files.\nPlease backup them if you think it is necessairy.") % what)
+	hintMB.vbox.add(check)
+	hintMB.vbox.show_all()
 	ret = hintMB.run()
 	hintMB.destroy()
-	return ret
+
+	return ret, check.get_active()
 
 def remove_deps_dialog ():
 	infoMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("You cannot remove dependencies. :)"))

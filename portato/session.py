@@ -105,9 +105,18 @@ class Session (object):
 		except SectionNotFoundException:
 			self._cfg.add_section(section)
 			self._cfg.add(key, value, section, with_blankline = False)
-
+	
 	def get (self, key, section):
-		return self._cfg.get(key, section)
+		try:
+			return self._cfg.get(key, section)
+		except KeyError:
+			return None
+	
+	def get_boolean (self, key, section):
+		try:
+			return self._cfg.get_boolean(key, section)
+		except KeyError:
+			return None
 
 	def check_version (self, vers):
 		pass # do nothing atm
