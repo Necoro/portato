@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<plugin xmlns="http://portato.sourceforge.net/plugin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://portato.sourceforge.net/plugin http://portato.sourceforge.net/plugin.xsd">
+
+	<author>René 'Necoro' Neumann</author>
+	<name>Exception Thrower</name>
+
+	<import>portato.plugins.exception</import>
+
+	<menu>
+		<item call="throw">Throw exception</item>
+	</menu>
+
+</plugin>
