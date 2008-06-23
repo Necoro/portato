@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-06-23 22:35+0200\n"
+"POT-Creation-Date: 2008-06-23 23:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -572,24 +572,29 @@ msgstr ""
 msgid "Package not found!"
 msgstr ""
 
-#: portato/gui/dialogs.py:61
-#, python-format
-msgid ""
-"You have changed %s. Portato will write these changes into the appropriate "
-"files. Please backup them if you think it is necessairy."
+#: portato/gui/dialogs.py:60
+msgid "Do not show this dialog again."
 msgstr ""
 
-#: portato/gui/dialogs.py:67
+#: portato/gui/dialogs.py:62
+#, python-format
+msgid ""
+"You have changed %s.\n"
+"Portato will write these changes into the appropriate files.\n"
+"Please backup them if you think it is necessairy."
+msgstr ""
+
+#: portato/gui/dialogs.py:71
 msgid "You cannot remove dependencies. :)"
 msgstr ""
 
-#: portato/gui/dialogs.py:73
+#: portato/gui/dialogs.py:77
 msgid ""
 "This is the updates queue. You cannot remove single elements.\n"
 "Do you want to clear the whole queue instead?"
 msgstr ""
 
-#: portato/gui/dialogs.py:79
+#: portato/gui/dialogs.py:83
 msgid "Do you really want to clear the whole queue?"
 msgstr ""
 
@@ -825,11 +830,11 @@ msgstr ""
 msgid "Cannot translate session from version %d to %d."
 msgstr ""
 
-#: portato/gui/windows/main.py:1360
+#: portato/gui/windows/main.py:1361
 msgid "use flags"
 msgstr ""
 
-#: portato/gui/windows/main.py:1371
+#: portato/gui/windows/main.py:1373
 msgid "masking keywords"
 msgstr ""
 

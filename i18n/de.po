@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-06-23 22:37+0100\n"
+"PO-Revision-Date: 2008-06-23 23:48+0100\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -593,16 +593,26 @@ msgstr ""
 msgid "Package not found!"
 msgstr "Paket nicht gefunden!"
 
-#: portato/gui/dialogs.py:61
-#, python-format
-msgid "You have changed %s. Portato will write these changes into the appropriate files. Please backup them if you think it is necessairy."
-msgstr "Du hast die %s geändert. Portato wird diese Änderungen speichern. Bitte sichere die entsprechenden Dateien, wenn du es als notwendig erachtest."
+#: portato/gui/dialogs.py:60
+msgid "Do not show this dialog again."
+msgstr "Diesen Dialog nicht wieder anzeigen."
 
-#: portato/gui/dialogs.py:67
+#: portato/gui/dialogs.py:62
+#, python-format
+msgid ""
+"You have changed %s.\n"
+"Portato will write these changes into the appropriate files.\n"
+"Please backup them if you think it is necessairy."
+msgstr ""
+"Du hast die %s geändert.\n"
+"Portato wird diese Änderungen speichern.\n"
+"Bitte sichere die entsprechenden Dateien, wenn du es als notwendig erachtest."
+
+#: portato/gui/dialogs.py:71
 msgid "You cannot remove dependencies. :)"
 msgstr "Du kannst keine Abhängigkeiten löschen ;)."
 
-#: portato/gui/dialogs.py:73
+#: portato/gui/dialogs.py:77
 msgid ""
 "This is the updates queue. You cannot remove single elements.\n"
 "Do you want to clear the whole queue instead?"
@@ -610,7 +620,7 @@ msgstr ""
 "Das ist die Update-Queue. Aus dieser können keine einzelnen Pakete entfernt werden.\n"
 "Soll stattdessen die komplette Queue entfernt werden?"
 
-#: portato/gui/dialogs.py:79
+#: portato/gui/dialogs.py:83
 msgid "Do you really want to clear the whole queue?"
 msgstr "Wirklich die gesamte Queue löschen?"
 
@@ -845,11 +855,11 @@ msgstr "Upgrade Session von Version %d auf Version %d."
 msgid "Cannot translate session from version %d to %d."
 msgstr "Kann Session nicht von Version %d nach %d upgraden."
 
-#: portato/gui/windows/main.py:1360
+#: portato/gui/windows/main.py:1361
 msgid "use flags"
 msgstr "Use Flags"
 
-#: portato/gui/windows/main.py:1371
+#: portato/gui/windows/main.py:1373
 msgid "masking keywords"
 msgstr "Masking Keywords"
 
