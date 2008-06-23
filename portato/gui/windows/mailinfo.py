@@ -12,13 +12,12 @@
 
 from __future__ import absolute_import
 
-import gtk
 import smtplib
 import time
 
 from .basic import AbstractDialog
 from ..utils import GtkThread
-from ...helper import debug
+from ...helper import debug, info
 from ...constants import VERSION
 
 class MailInfoWindow (AbstractDialog):
