@@ -14,11 +14,11 @@ from __future__ import absolute_import, with_statement
 
 import os, os.path
 
-from .config_parser import ConfigParser
+from .config_parser import ConfigParser, SectionNotFoundException
 from .constants import SESSION_DIR
 from .helper import debug, info
 
-class Session (ConfigParser):
+class Session (object):
 	"""
 	A small class allowing to save certain states of a program.
 	This class works in a quite abstract manner, as it works with handlers, which
@@ -38,16 +38,15 @@ class Session (ConfigParser):
 		@param file: the file in L{SESSION_DIR}, where the options will be saved.
 		"""
 
+		self._cfg = None
 		self._handlers = []
 
 		if not (os.path.exists(SESSION_DIR) and os.path.isdir(SESSION_DIR)):
 			os.mkdir(SESSION_DIR)
-		
-		ConfigParser.__init__(self, os.path.join(SESSION_DIR, file))
-		info(_("Loading session from '%s'.") % self.file)
-
+		self._cfg = ConfigParser(os.path.join(SESSION_DIR, file))
+		info(_("Loading session from '%s'.") % self._cfg.file)
 		try:
-			self.parse()
+			self._cfg.parse()
 		except IOError, e:
 			if e.errno == 2: pass
 			else: raise
@@ -70,7 +69,7 @@ class Session (ConfigParser):
 		"""
 		for options, lfn, sfn, default in self._handlers:
 			try:
-				loaded = [self.get(*x) for x in options]
+				loaded = [self._cfg.get(*x) for x in options]
 			except KeyError: # does not exist -> ignore
 				debug("No values for %s.", options)
 			else:
@@ -96,10 +95,19 @@ class Session (ConfigParser):
 			debug("Saving %s with values %s", options, vals)
 
 			for value, (option, section) in zip(vals, options):
-				self.add_section(section)
-				self.add(option, str(value), section = section, with_blankline = False)
+				self.set(option, str(value), section)
 		
-		self.write()
+		self._cfg.write()
+
+	def set (self, key, value, section):
+		try:
+			self._cfg.add(key, value, section, with_blankline = False)
+		except SectionNotFoundException:
+			self._cfg.add_section(section)
+			self._cfg.add(key, value, section, with_blankline = False)
+
+	def get (self, key, section):
+		return self._cfg.get(key, section)
 
 	def check_version (self, vers):
 		pass # do nothing atm
