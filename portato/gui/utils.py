@@ -14,18 +14,37 @@ from __future__ import absolute_import, with_statement
 
 # some stuff needed
 import re
+import sys
 import logging
+import gettext
 from collections import defaultdict
-from threading import RLock
+from threading import Thread, RLock
 from functools import wraps
 
 # some backend things
 from ..backend import flags, system, set_system
 from ..helper import debug, info, set_log_level 
-from ..constants import USE_CATAPULT
+from ..constants import USE_CATAPULT, APP, LOCALE_DIR
 
 # parser
 from ..config_parser import ConfigParser
+
+class GtkThread (Thread):
+	def run(self):
+		# for some reason, I have to install this for each thread ...
+		gettext.install(APP, LOCALE_DIR, unicode = True)
+		try:
+			Thread.run(self)
+		except SystemExit:
+			raise # let normal thread handle it
+		except:
+			type, val, tb = sys.exc_info()
+			try:
+				sys.excepthook(type, val, tb, thread = self.getName())
+			except TypeError:
+				raise type, val, tb # let normal thread handle it
+			finally:
+				del type, val, tb
 
 class Config (ConfigParser):
 	

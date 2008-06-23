@@ -16,34 +16,12 @@ from __future__ import absolute_import, with_statement
 import gtk, pango, gobject
 import sys, traceback
 
-from threading import Thread
 from StringIO import StringIO
 
 from ..helper import debug, error
 from .dialogs import file_chooser_dialog, io_ex_dialog
-
-# for the i18n
-from ..constants import LOCALE_DIR, APP
-import gettext
-
-class GtkThread (Thread):
-	def run(self):
-		# for some reason, I have to install this for each thread ...
-		gettext.install(APP, LOCALE_DIR, unicode = True)
-		try:
-			Thread.run(self)
-		except SystemExit:
-			raise # let normal thread handle it
-		except:
-			type, val, tb = sys.exc_info()
-			try:
-				sys.excepthook(type, val, tb, thread = self.getName())
-			except TypeError:
-				raise type, val, tb # let normal thread handle it
-			finally:
-				del type, val, tb
-
 from .windows.mailinfo import MailInfoWindow
+from .utils import GtkThread
 
 class UncaughtExceptionDialog(gtk.MessageDialog):
 	"""Original idea by Gustavo Carneiro - original code: http://www.daa.com.au/pipermail/pygtk/attachments/20030828/2d304204/gtkexcepthook.py."""

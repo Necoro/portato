@@ -7,7 +7,7 @@ import gobject
 from portato.helper import debug, warning
 from portato import get_listener
 from portato.constants import VERSION, APP_ICON, APP
-from portato.gui.exception_handling import GtkThread
+from portato.gui.utils import GtkThread
 
 def find_version (rev):
 	try:

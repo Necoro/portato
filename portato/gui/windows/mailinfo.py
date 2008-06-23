@@ -17,7 +17,7 @@ import smtplib
 import time
 
 from .basic import AbstractDialog
-from ..exception_handling import GtkThread
+from ..utils import GtkThread
 from ...helper import debug
 from ...constants import VERSION
 

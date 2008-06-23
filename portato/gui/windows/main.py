@@ -30,11 +30,10 @@ from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, ICON_DIR
 from ...backend.exceptions import PackageNotFoundException, BlockedException
 
 # more GUI stuff
-from ..utils import Database, Config
+from ..utils import Database, Config, GtkThread
 from ..queue import EmergeQueue
 from ..session import SESSION_VERSION, SessionException, OldSessionException, NewSessionException
 from ..wrapper import GtkTree, GtkConsole
-from ..exception_handling import GtkThread
 from ..views import LogView, HighlightView, InstalledOnlyView
 from ..dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
 		nothing_found_dialog, queue_not_empty_dialog, remove_deps_dialog,
