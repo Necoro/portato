@@ -18,7 +18,7 @@ from .config_parser import ConfigParser
 from .constants import SESSION_DIR
 from .helper import debug, info
 
-class Session (object):
+class Session (ConfigParser):
 	"""
 	A small class allowing to save certain states of a program.
 	This class works in a quite abstract manner, as it works with handlers, which
@@ -38,15 +38,16 @@ class Session (object):
 		@param file: the file in L{SESSION_DIR}, where the options will be saved.
 		"""
 
-		self._cfg = None
 		self._handlers = []
 
 		if not (os.path.exists(SESSION_DIR) and os.path.isdir(SESSION_DIR)):
 			os.mkdir(SESSION_DIR)
-		self._cfg = ConfigParser(os.path.join(SESSION_DIR, file))
-		info(_("Loading session from '%s'.") % self._cfg.file)
+		
+		ConfigParser.__init__(self, os.path.join(SESSION_DIR, file))
+		info(_("Loading session from '%s'.") % self.file)
+
 		try:
-			self._cfg.parse()
+			self.parse()
 		except IOError, e:
 			if e.errno == 2: pass
 			else: raise
@@ -69,7 +70,7 @@ class Session (object):
 		"""
 		for options, lfn, sfn, default in self._handlers:
 			try:
-				loaded = [self._cfg.get(*x) for x in options]
+				loaded = [self.get(*x) for x in options]
 			except KeyError: # does not exist -> ignore
 				debug("No values for %s.", options)
 			else:
@@ -95,10 +96,10 @@ class Session (object):
 			debug("Saving %s with values %s", options, vals)
 
 			for value, (option, section) in zip(vals, options):
-				self._cfg.add_section(section)
-				self._cfg.add(option, str(value), section = section, with_blankline = False)
+				self.add_section(section)
+				self.add(option, str(value), section = section, with_blankline = False)
 		
-		self._cfg.write()
+		self.write()
 
 	def check_version (self, vers):
 		pass # do nothing atm
