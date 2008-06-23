@@ -4,6 +4,7 @@ next:
 - added shortcut for "Reload Portage"
 - increased the maximum scrollback lines
 - now only use external "shm" package
+- allow to send bug report directly per mail
 - bug fixes
 
 0.10:

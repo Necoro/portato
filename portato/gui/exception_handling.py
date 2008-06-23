@@ -16,32 +16,12 @@ from __future__ import absolute_import, with_statement
 import gtk, pango, gobject
 import sys, traceback
 
-from threading import Thread
 from StringIO import StringIO
 
 from ..helper import debug, error
 from .dialogs import file_chooser_dialog, io_ex_dialog
-
-# for the i18n
-from ..constants import LOCALE_DIR, APP
-import gettext
-
-class GtkThread (Thread):
-	def run(self):
-		# for some reason, I have to install this for each thread ...
-		gettext.install(APP, LOCALE_DIR, unicode = True)
-		try:
-			Thread.run(self)
-		except SystemExit:
-			raise # let normal thread handle it
-		except:
-			type, val, tb = sys.exc_info()
-			try:
-				sys.excepthook(type, val, tb, thread = self.getName())
-			except TypeError:
-				raise type, val, tb # let normal thread handle it
-			finally:
-				del type, val, tb
+from .windows.mailinfo import MailInfoWindow
+from .utils import GtkThread
 
 class UncaughtExceptionDialog(gtk.MessageDialog):
 	"""Original idea by Gustavo Carneiro - original code: http://www.daa.com.au/pipermail/pygtk/attachments/20030828/2d304204/gtkexcepthook.py."""
@@ -53,6 +33,7 @@ class UncaughtExceptionDialog(gtk.MessageDialog):
 		self.format_secondary_text(_("It probably isn't fatal, but should be reported to the developers nonetheless."))
 
 		self.add_button(_("Show Details"), 1)
+		self.add_button(_("Send..."), 3)
 		self.add_button(gtk.STOCK_SAVE_AS, 2)
 		self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
@@ -103,6 +84,11 @@ class UncaughtExceptionDialog(gtk.MessageDialog):
 
 				else:
 					debug("Nothing to save")
+			elif resp == 3:
+				debug("Send bug per mail")
+				self.destroy()
+				MailInfoWindow(None, self.text)
+				return
 			else:
 				break
 		self.destroy()
