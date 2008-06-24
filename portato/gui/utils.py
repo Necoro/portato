@@ -283,7 +283,7 @@ class Database (object):
 				pass
 			
 			self._db[self.ALL] = filter(lambda x: x.cat != cat, self._db[self.ALL])
-			self.populate(cat+"/")
+			self.populate(cat+"/*")
 		else:
 			self.__initialize()
 			self.populate()
