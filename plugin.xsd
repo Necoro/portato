@@ -6,7 +6,13 @@
 				<xs:element name="name" type="string" />
 				<xs:element name="author" type="string" />
 				<xs:element name="import" type="importString" minOccurs="0"/>
-				<xs:element name="frontends" type="stringList" minOccurs="0" />
+				<xs:element name="dependencies" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="dependency" type="string" maxOccurs="unbounded" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 				<xs:element name="hooks" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
@@ -75,14 +81,6 @@
 	</xs:simpleType>
 	<xs:simpleType name="string">
 		<xs:restriction base="xs:string">
-			<xs:minLength value="1" />
-		</xs:restriction>
-	</xs:simpleType>
-	<xs:simpleType name="_stringList">
-		<xs:list itemType="string"/>
-	</xs:simpleType>
-	<xs:simpleType name="stringList">
-		<xs:restriction base="_stringList">
 			<xs:minLength value="1" />
 		</xs:restriction>
 	</xs:simpleType>
