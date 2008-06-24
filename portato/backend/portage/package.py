@@ -221,7 +221,7 @@ class PortagePackage (Package):
 
 		for dep in deps:
 			if dep[0] == '!': # blocking sth
-				blocked = system.find_packages(dep, "installed", only_cpv = True)
+				blocked = system.find_packages(dep, "installed")
 				if len(blocked) == 1: # only exact one match allowed to be harmless
 					if blocked[0].get_slot_cp() == self.get_slot_cp(): # blocks in the same slot are harmless
 						continue
