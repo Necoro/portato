@@ -3,7 +3,6 @@
 
 	<author>René 'Necoro' Neumann</author>
 	<name>Notify</name>
-	<frontends>gtk</frontends>
 
 	<import>portato.plugins.notify</import>
 
