@@ -18,7 +18,12 @@ from .. import system
 from ..exceptions import BlockedException, PackageNotFoundException, DependencyCalcError
 from ...helper import debug, error, unique_array
 
-import portage, portage_dep
+import portage
+
+try:
+	import portage.dep as portage_dep
+except ImportError:
+	import portage_dep
 
 import os.path
 

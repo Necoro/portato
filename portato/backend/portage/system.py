@@ -142,7 +142,7 @@ class PortageSystem (SystemInterface):
 		"""
 		
 		if not only_cpv:
-			return [PortagePackage(x) for x in list_of_packages]
+			return [self.new_package(x) for x in list_of_packages]
 		else:
 			return list_of_packages
 
@@ -154,7 +154,7 @@ class PortageSystem (SystemInterface):
 		if only_cpv:
 			return portage.best(list)
 		else:
-			return PortagePackage(portage.best(list))
+			return self.new_package(portage.best(list))
 
 	def find_best_match (self, search_key, masked = False, only_installed = False, only_cpv = False):
 		t = []
@@ -287,7 +287,7 @@ class PortageSystem (SystemInterface):
 		unresolved = []
 		for x in list:
 			cpv = x.strip()
-			if len(cpv) and check(cpv):
+			if cpv and check(cpv):
 				pkg = self.find_best_match(cpv, only_cpv = only_cpv)
 				if pkg:
 					resolved.append(pkg)
@@ -304,7 +304,7 @@ class PortageSystem (SystemInterface):
 		return portage.catpkgsplit(cpv)
 
 	def sort_package_list(self, pkglist):
-		pkglist.sort(PortagePackage.compare_version)
+		pkglist.sort(PortagePackage.compare_version) # XXX: waaah ... direct package naming... =/
 		return pkglist
 
 	def reload_settings (self):
