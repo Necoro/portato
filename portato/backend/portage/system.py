@@ -16,6 +16,7 @@ import re, os, os.path
 import portage
 from collections import defaultdict
 
+from . import VERSION
 from .package import PortagePackage
 from .settings import PortageSettings
 from ..system_interface import SystemInterface
@@ -35,8 +36,6 @@ class PortageSystem (SystemInterface):
 
 		self.use_descs = {}
 		self.local_use_descs = defaultdict(dict)
-
-		self._version = tuple([x.split("_")[0] for x in portage.VERSION.split(".")])
 
 	def get_version (self):
 		return "Portage %s" % portage.VERSION
@@ -166,7 +165,7 @@ class PortageSystem (SystemInterface):
 
 		t = self.find_packages(search_key, pkgSet = pkgSet, masked = masked, with_version = True, only_cpv = True)
 		
-		if self._version >= (2,1,5):
+		if VERSION >= (2,1,5):
 			t += [pkg.get_cpv() for pkg in self.find_packages(search_key, "installed") if not (pkg.is_testing(True) or pkg.is_masked())]
 		else:
 			t = self.find_packages(search_key, "installed", only_cpv=True)

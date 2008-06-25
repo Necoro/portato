@@ -12,7 +12,7 @@
 
 from __future__ import absolute_import
 
-import portage
+import portage.sets
 from .settings import PortageSettings
 
 class PortageSettings_22 (PortageSettings):

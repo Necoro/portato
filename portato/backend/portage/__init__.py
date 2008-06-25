@@ -12,5 +12,13 @@
 
 from __future__ import absolute_import
 
-from .system import PortageSystem
-from .package import PortagePackage
+from portage import VERSION as PV
+
+VERSION = tuple(map(int, (x.split("_")[0] for x in PV.split("."))))
+
+if VERSION >= (2, 2):
+	from .system_22 import PortageSystem_22 as PortageSystem
+	from .package_22 import PortagePackage_22 as PortagePackage
+else:
+	from .system import PortageSystem
+	from .package import PortagePackage

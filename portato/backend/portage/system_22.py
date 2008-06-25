@@ -12,6 +12,11 @@
 
 from __future__ import absolute_import, with_statement
 
+import os
+import portage
+
+from collections import defaultdict
+
 from .package_22 import PortagePackage_22
 from .settings_22 import PortageSettings_22
 from .system import PortageSystem
@@ -24,8 +29,6 @@ class PortageSystem_22 (PortageSystem):
 
 		self.use_descs = {}
 		self.local_use_descs = defaultdict(dict)
-
-		self._version = tuple([x.split("_")[0] for x in portage.VERSION.split(".")])
 
 	def new_package (self, cpv):
 		return PortagePackage_22(cpv)
