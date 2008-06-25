@@ -16,6 +16,7 @@ import re, os, os.path
 import portage
 from collections import defaultdict
 
+from . import VERSION
 from .package import PortagePackage
 from .settings import PortageSettings
 from ..system_interface import SystemInterface
@@ -35,8 +36,6 @@ class PortageSystem (SystemInterface):
 
 		self.use_descs = {}
 		self.local_use_descs = defaultdict(dict)
-
-		self._version = tuple([x.split("_")[0] for x in portage.VERSION.split(".")])
 
 	def get_version (self):
 		return "Portage %s" % portage.VERSION
@@ -142,7 +141,7 @@ class PortageSystem (SystemInterface):
 		"""
 		
 		if not only_cpv:
-			return [PortagePackage(x) for x in list_of_packages]
+			return [self.new_package(x) for x in list_of_packages]
 		else:
 			return list_of_packages
 
@@ -154,7 +153,7 @@ class PortageSystem (SystemInterface):
 		if only_cpv:
 			return portage.best(list)
 		else:
-			return PortagePackage(portage.best(list))
+			return self.new_package(portage.best(list))
 
 	def find_best_match (self, search_key, masked = False, only_installed = False, only_cpv = False):
 		t = []
@@ -166,7 +165,7 @@ class PortageSystem (SystemInterface):
 
 		t = self.find_packages(search_key, pkgSet = pkgSet, masked = masked, with_version = True, only_cpv = True)
 		
-		if self._version >= (2,1,5):
+		if VERSION >= (2,1,5):
 			t += [pkg.get_cpv() for pkg in self.find_packages(search_key, "installed") if not (pkg.is_testing(True) or pkg.is_masked())]
 		else:
 			t = self.find_packages(search_key, "installed", only_cpv=True)
@@ -287,7 +286,7 @@ class PortageSystem (SystemInterface):
 		unresolved = []
 		for x in list:
 			cpv = x.strip()
-			if len(cpv) and check(cpv):
+			if cpv and check(cpv):
 				pkg = self.find_best_match(cpv, only_cpv = only_cpv)
 				if pkg:
 					resolved.append(pkg)
@@ -304,7 +303,7 @@ class PortageSystem (SystemInterface):
 		return portage.catpkgsplit(cpv)
 
 	def sort_package_list(self, pkglist):
-		pkglist.sort(PortagePackage.compare_version)
+		pkglist.sort(PortagePackage.compare_version) # XXX: waaah ... direct package naming... =/
 		return pkglist
 
 	def reload_settings (self):
