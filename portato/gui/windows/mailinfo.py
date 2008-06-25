@@ -12,11 +12,12 @@
 
 from __future__ import absolute_import
 
-import smtplib
+import smtplib, socket
 import time
 
 from .basic import AbstractDialog
 from ..utils import GtkThread
+from ..dialogs import mail_failure_dialog
 from ...helper import debug, info
 from ...constants import VERSION
 
@@ -59,20 +60,23 @@ Subject: %s
 		self.message = message
 
 	def send (self):
-		debug("Connecting to server")
-		server = smtplib.SMTP("mail.necoro.eu")
-		debug("Sending mail")
 		try:
+			debug("Connecting to server")
+			server = smtplib.SMTP("mail.necoro.eu")
+			debug("Sending mail")
 			try:
-				server.sendmail(self.addr, self.TO, self.message)
-			except smtplib.SMTPRecipientsRefused, e:
-				info(_("An error occurred while sending. I think we where greylisted. The error: %s") % e)
-				info(_("Wait 60 seconds and try again."))
-				time.sleep(60)
-				server.sendmail(self.addr, self.TO, self.message)
-			debug("Sent")
-		finally:
-			server.quit()
+				try:
+					server.sendmail(self.addr, self.TO, self.message)
+				except smtplib.SMTPRecipientsRefused, e:
+					info(_("An error occurred while sending. I think we where greylisted. The error: %s") % e)
+					info(_("Wait 60 seconds and try again."))
+					time.sleep(60)
+					server.sendmail(self.addr, self.TO, self.message)
+				debug("Sent")
+			finally:
+				server.quit()
+		except socket.error, e:
+			mail_failure_dialog("%s (Code: %s)" % (e.args[1], e.args[0]))
 		
 	def cb_cancel_clicked (self, *args):
 

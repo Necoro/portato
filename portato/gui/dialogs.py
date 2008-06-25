@@ -13,6 +13,13 @@
 import gtk
 from ..helper import error
 
+def mail_failure_dialog(e):
+	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, _("Mail could not be sent"))
+	dialog.format_secondary_text(_("The error was: %s") % e)
+	ret = dialog.run()
+	dialog.destroy()
+	return ret
+
 def queue_not_empty_dialog():
 	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, _("There are some packages in the emerge queue and/or an emerge process is running.\nDo you really want to quit?"))
 	#dialog.add_buttons(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_SAVE, gtk.RESPONSE_YES, gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
