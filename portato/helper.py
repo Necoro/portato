@@ -110,7 +110,6 @@ def unique_array(s):
 	"""Stolen from portage_utils:
 	lifted from python cookbook, credit: Tim Peters
 	Return a list of the elements in s in arbitrary order, sans duplicates"""
-	n = len(s)
 	# assume all elements are hashable, if so, it's linear
 	try:
 		return list(set(s))
@@ -124,6 +123,7 @@ def unique_array(s):
 	except TypeError:
 		pass
 	else:
+		n = len(s)
 		assert n > 0
 		last = t[0]
 		lasti = i = 1

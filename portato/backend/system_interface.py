@@ -23,7 +23,7 @@ class SystemInterface (object):
 		"""Returns all supported sets in tuples consisting of name and description.
 		If sets aren't supported, at least "world" and "system" have to be returned.
 
-		@rtype: (string, string)[]
+		@rtype: iter(string, string)
 		"""
 		raise NotImplementedError
 

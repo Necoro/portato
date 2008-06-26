@@ -14,6 +14,11 @@ from __future__ import absolute_import, with_statement
 
 import re, os, os.path
 import portage
+try:
+	import portage.dep as portage_dep
+except ImportError:
+	import portage_dep
+
 from collections import defaultdict
 
 from . import VERSION
@@ -226,24 +231,30 @@ class PortageSystem (SystemInterface):
 			inst = set(installed(key))
 			return list(alist - inst)
 
-		def _ws (key, crit, pkglist):
-			pkgs = self.__find_resolved_unresolved(pkglist, crit, only_cpv = with_version)[0]
-			if not with_version:
-				pkgs = [x.get_cp(x) for x in list]
-
-			if is_regexp:
-				return filter(lambda x: re.match(key, x, re.I), pkgs)
-			
-			return pkgs
-
 		def world (key):
 			with open(portage.WORLD_FILE) as f:
-				pkglist = f.readlines()
+				for cp in f:
+					cp = cp.strip()
+					if cp and cp[0] != "#":
+						if is_regexp:
+							if not re.match(key, cp, re.I): continue
 
-			return _ws(key, lambda cpv: cpv[0] != "#", pkglist)
+						if not with_version:
+							yield portage_dep.dep_getkey(cp)
+						
+						yield self.find_best_match(cp, only_cpv = True)
 
 		def system (key):
-			return _ws(key, lambda cpv: cpv[0] == "*", self.settings.settings.packages)
+			for cp in self.settings.settings.packages:
+				if cp[0] != "*": continue
+				
+				if is_regexp:
+					if not re.match(key, cp, re.I): continue
+
+				if not with_version:
+					yield portage_dep.dep_getkey(cp)
+
+				yield self.find_best_match(cp, only_cpv = True)
 
 		funcmap = {
 				"all" : all,
@@ -272,33 +283,8 @@ class PortageSystem (SystemInterface):
 
 		# Make the list of packages unique
 		t = unique_array(t)
-		t.sort()
 
 		return self.geneticize_list(t, only_cpv or not with_version)
-
-	def __find_resolved_unresolved (self, list, check, only_cpv = False):
-		"""Checks a given list and divides it into a "resolved" and an "unresolved" part.
-
-		@param list: list of cpv's
-		@type list: string[]
-		@param check: function called to check whether an entry is ok
-		@type check: function(cpv)
-		@param only_cpv: do not return packages but cpv-strings
-		@type only_cpv: boolean
-
-		@returns: the divided list: (resolved, unresolved)
-		@rtype: (Package[], Package[]) or (string[], string[])"""
-		resolved = []
-		unresolved = []
-		for x in list:
-			cpv = x.strip()
-			if cpv and check(cpv):
-				pkg = self.find_best_match(cpv, only_cpv = only_cpv)
-				if pkg:
-					resolved.append(pkg)
-				else:
-					unresolved.append(self.find_best_match(cpv, True, only_cpv = only_cpv))
-		return (resolved, unresolved)
 
 	def list_categories (self, name = None):
 		categories = self.settings.settings.categories
@@ -357,19 +343,9 @@ class PortageSystem (SystemInterface):
 		return packages
 
 	def update_world (self, newuse = False, deep = False):
-		# read world file
-		world = open(portage.WORLD_FILE)
-		packages = []
-		for line in world:
-			line = line.strip()
-			if len(line) == 0: continue # empty line
-			if line[0] == "#": continue # comment
-			packages.append(line)
-		world.close()
+		packages = self.find_packages(pkgSet="world", with_version = False)
+		packages.extend(self.find_packages(pkgSet = "system", with_version = False))
 
-		# append system packages
-		packages.extend(unique_array([p.get_cp() for p in self.find_packages(pkgSet = "system")]))
-		
 		states = [(["RDEPEND", "PDEPEND"], True)]
 		if self.with_bdeps():
 			states.append((["DEPEND"], True))
