@@ -37,6 +37,12 @@ class PortageSystem (SystemInterface):
 		self.use_descs = {}
 		self.local_use_descs = defaultdict(dict)
 
+	def has_set_support (self):
+		return False
+
+	def get_sets (self):
+		return (("world", "The world set."), ("system", "The system set."))
+
 	def get_version (self):
 		return "Portage %s" % portage.VERSION
 	

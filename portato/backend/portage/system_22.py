@@ -30,5 +30,11 @@ class PortageSystem_22 (PortageSystem):
 		self.use_descs = {}
 		self.local_use_descs = defaultdict(dict)
 
+	def has_set_support (self):
+		return True
+
+	def get_sets (self):
+		return ((name, set.description) for name, set in self.settings.setsconfig.getSets().iteritems())
+
 	def new_package (self, cpv):
 		return PortagePackage_22(cpv)

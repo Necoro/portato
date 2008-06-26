@@ -12,6 +12,21 @@
 
 class SystemInterface (object):
 
+	def has_set_support (self):
+		"""Signals, whether this backend supports sets.
+
+		@rtype: boolean
+		"""
+		raise NotImplementedError
+
+	def get_sets (self):
+		"""Returns all supported sets in tuples consisting of name and description.
+		If sets aren't supported, at least "world" and "system" have to be returned.
+
+		@rtype: (string, string)[]
+		"""
+		raise NotImplementedError
+
 	def get_version (self):
 		"""Returns the version of the used backend.
 
