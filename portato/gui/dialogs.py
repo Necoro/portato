@@ -21,8 +21,8 @@ def mail_failure_dialog(e):
 	return ret
 
 def queue_not_empty_dialog():
-	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, _("There are some packages in the emerge queue and/or an emerge process is running.\nDo you really want to quit?"))
-	#dialog.add_buttons(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_SAVE, gtk.RESPONSE_YES, gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
+	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, _("Do you really want to quit?"))
+	dialog.format_secondary_text(_("There are some packages in the emerge queue and/or an emerge process is running."))
 	dialog.add_buttons(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 	ret = dialog.run()
 	dialog.destroy()
@@ -40,7 +40,8 @@ def io_ex_dialog (io_ex):
 	return ret
 
 def blocked_dialog (blocked, blocks):
-	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, _("%(blocked)s is blocked by %(blocks)s.\nPlease unmerge the blocking package.") % {"blocked":blocked, "blocks" : blocks})
+	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, _("%(blocked)s is blocked by %(blocks)s.") % {"blocked":blocked, "blocks" : blocks})
+	dialog.format_secondary_text(_("Please unmerge the blocking package."))
 	ret = dialog.run()
 	dialog.destroy()
 	return ret
@@ -52,7 +53,8 @@ def not_root_dialog ():
 	return ret
 
 def unmask_dialog (cpv):
-	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("%s seems to be masked.\nDo you want to unmask it and its dependencies?") % cpv)
+	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("%s seems to be masked.") % cpv )
+	dialog.format_secondary_text(_("Do you want to unmask it and its dependencies?"))
 	ret = dialog.run()
 	dialog.destroy()
 	return ret
@@ -65,8 +67,8 @@ def nothing_found_dialog ():
 
 def changed_flags_dialog (what = "flags"):
 	check = gtk.CheckButton(_("Do not show this dialog again."))
-	hintMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
-						_("You have changed %s.\nPortato will write these changes into the appropriate files.\nPlease backup them if you think it is necessairy.") % what)
+	hintMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("Changed %s") % what)
+	hintMB.format_secondary_text(_("Portato will write these changes into the appropriate files.\nPlease backup them if you think it is necessairy."))
 	hintMB.vbox.add(check)
 	hintMB.vbox.show_all()
 	ret = hintMB.run()
