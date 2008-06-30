@@ -18,10 +18,14 @@ import os, os.path
 from xml.dom.minidom import parse
 from lxml import etree
 
+from .backend import system
 from .constants import PLUGIN_DIR, XSD_LOCATION
 from .helper import debug, info, warning, error, flatten
 
 class PluginImportException (ImportError):
+	pass
+
+class UnmatchedDepsException (Exception):
 	pass
 
 class Options (object):
@@ -72,7 +76,10 @@ class Menu:
 			try:
 				mod = __import__(imp, globals(), locals(), [call])
 			except ImportError:
-				raise PluginImportException, imp
+				if self.plugin.unmatched_deps:
+					raise UnmatchedDepsException
+				else:
+					raise PluginImportException, imp
 
 			try:
 				self.call = eval("mod."+call) # build function
@@ -172,6 +179,8 @@ class Plugin:
 		self._import = None
 		self.hooks = []
 		self.menus = []
+		self.deps = []
+		self.unmatched_deps = []
 		self.options = Options()
 
 		self.status = self.STAT_ENABLED
@@ -205,6 +214,15 @@ class Plugin:
 				self.options.parse(o.getElementsByTagName("option"))
 
 		self.status = self.STAT_DISABLED if self.options.get("disabled") else self.STAT_ENABLED
+
+	def parse_deps (self, deps):
+		if deps:
+			for d in deps.firstChild.getElementsByTagName("dependency"):
+				self.deps.append(d.firstChild.nodeValue.strip())
+
+		for d in self.deps:
+			if not system.find_packages(d, "installed", with_version = False):
+				self.unmatched_deps.append(d)
 	
 	def set_import (self, imports):
 		"""This gets a list of imports and parses them - setting the import needed to call the plugin.
@@ -221,7 +239,10 @@ class Plugin:
 				mod = __import__(self._import)
 				del mod
 			except ImportError:
-				raise PluginImportException, self._import
+				if self.unmatched_deps:
+					raise UnmatchedDepsException
+				else:
+					raise PluginImportException, self._import
 
 	def needs_import (self):
 		"""Returns True if an import is required prior to calling the plugin.
@@ -389,6 +410,7 @@ class PluginQueue:
 
 				if frontendOK is None or frontendOK == True:
 					plugin = Plugin(p, elem.getElementsByTagName("name")[0], elem.getElementsByTagName("author")[0])
+					plugin.parse_deps(elem.getElementsByTagName("dependencies"))
 					plugin.parse_hooks(elem.getElementsByTagName("hooks"))
 					plugin.set_import(elem.getElementsByTagName("import"))
 					plugin.parse_menus(elem.getElementsByTagName("menu"))
