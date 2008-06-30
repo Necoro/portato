@@ -248,9 +248,9 @@ class EmergeQueue:
 					self.update_tree(parentIt, cpv, unmask, oneshot = oneshot, type = type)
 			else: # not update
 				if type == "install":
-					self._queue_append(cpv, oneshot)
 					if self.tree:
 						self.update_tree(self.tree.get_emerge_it(), cpv, unmask, type = type, oneshot = oneshot)
+					self._queue_append(cpv, oneshot)
 				elif type == "update" and self.tree:
 					self.update_tree(self.tree.get_update_it(), cpv, unmask, type = type, oneshot = oneshot)
 
