@@ -176,6 +176,7 @@ class Plugin:
 		self.file = file
 		self.name = name.firstChild.nodeValue.strip()
 		self.author = author.firstChild.nodeValue.strip()
+		self.description = ""
 		self._import = None
 		self.hooks = []
 		self.menus = []

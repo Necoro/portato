@@ -34,48 +34,40 @@ class PluginWindow (AbstractDialog):
 		self.plugins = plugins
 		self.changedPlugins = {}
 
-		view = self.tree.get_widget("pluginList")
-		self.store = gtk.ListStore(str,str,str)
+		self.buttons = map(self.tree.get_widget, ("disabledRB", "tempEnabledRB", "enabledRB", "tempDisabledRB"))
+		map(lambda b: b.set_mode(False), self.buttons)
+
+		self.descrLabel = self.tree.get_widget("descrLabel")
+		self.authorLabel = self.tree.get_widget("authorLabel")
+
+		self.depExpander = self.tree.get_widget("depExpander")
+		self.installBtn = self.tree.get_widget("installBtn")
 		
-		view.set_model(self.store)
+		self.view = self.tree.get_widget("pluginList")
+		self.store = gtk.ListStore(str)
+		
+		self.view.set_model(self.store)
 		
 		cell = gtk.CellRendererText()
-		col = gtk.TreeViewColumn(_("Plugin"), cell, markup = 0)
-		view.append_column(col)
+		col = gtk.TreeViewColumn("Plugin", cell, markup = 0)
+		self.view.append_column(col)
 		
-		col = gtk.TreeViewColumn(_("Authors"), cell, text = 1)
-		view.append_column(col)
+		for p in plugins:
+			self.store.append(["<b>%s</b>" % p.name])
 
-		ccell = gtk.CellRendererCombo()
-		ccell.set_property("model", self.statsStore)
-		ccell.set_property("text-column", 0)
-		ccell.set_property("has-entry", False)
-		ccell.set_property("editable", True)
-		ccell.connect("edited", self.cb_status_changed)
-		col = gtk.TreeViewColumn(_("Status"), ccell, markup = 2)
-		view.append_column(col)
-		
-		for p in (("<b>"+p.name+"</b>", p.author, _(self.statsStore[p.status][0])) for p in plugins):
-			self.store.append(p)
+		self.view.get_selection().connect("changed", self.cb_list_selection)
 
 		self.window.show_all()
 
-	def cb_status_changed (self, cell, path, new_text):
-		path = int(path)
-		
-		self.store[path][2] = "<b>%s</b>" % new_text
+	def cb_state_toggled (self, rb):
+	
+		plugin = self.get_actual()
 
-		# convert string to constant
-		const = None
-		for num, val in enumerate(self.statsStore):
-			if val[0] == new_text:
-				const = num
-				break
+		if plugin:
+			state = self.buttons.index(rb)
 
-		assert (const is not None)
-
-		self.changedPlugins.update({self.plugins[path] : const})
-		debug("new changed plugins: %s => %d", self.plugins[path].name, const)
+			self.changedPlugins[plugin] = state
+			debug("new changed plugins: %s => %d", plugin.name, state)
 
 	def cb_ok_clicked (self, btn):
 		for plugin, val in self.changedPlugins.iteritems():
@@ -83,3 +75,29 @@ class PluginWindow (AbstractDialog):
 
 		self.close()
 		return True
+
+	def cb_list_selection (self, selection):
+		plugin = self.get_actual()
+		
+		if plugin:
+			if not plugin.description:
+				self.descrLabel.hide()
+			else:
+				self.descrLabel.set_label(plugin.description)
+				self.descrLabel.show()
+
+			self.authorLabel.set_label(plugin.author)
+			
+			status = self.changedPlugins.get(plugin, plugin.status)
+			self.buttons[status].set_active(True)
+
+			self.installBtn.hide()
+			self.depExpander.hide()
+
+	def get_actual (self):
+		store, it = self.view.get_selection().get_selected()
+
+		if it:
+			return self.plugins[int(store.get_path(it)[0])]
+		else:
+			return None
