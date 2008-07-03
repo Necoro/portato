@@ -19,7 +19,7 @@ import gettext, locale
 from optparse import OptionParser, SUPPRESS_HELP
 
 from portato import get_listener
-from portato.constants import VERSION, XSD_LOCATION, LOCALE_DIR, APP, SU_COMMAND
+from portato.constants import VERSION, LOCALE_DIR, APP, SU_COMMAND
 
 def main ():
 	# set gettext stuff
