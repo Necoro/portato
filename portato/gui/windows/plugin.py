@@ -42,6 +42,10 @@ class PluginWindow (AbstractDialog):
 
 		self.depExpander = self.tree.get_widget("depExpander")
 		self.installBtn = self.tree.get_widget("installBtn")
+		self.depList = self.tree.get_widget("depList")
+		self.build_dep_list()
+
+		self.instIcon = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
 		
 		self.view = self.tree.get_widget("pluginList")
 		self.store = gtk.ListStore(str)
@@ -58,6 +62,32 @@ class PluginWindow (AbstractDialog):
 		self.view.get_selection().connect("changed", self.cb_list_selection)
 
 		self.window.show_all()
+
+	def build_dep_list (self):
+		store = gtk.TreeStore(gtk.gdk.Pixbuf, str)
+
+		self.depList.set_model(store)
+
+		col = gtk.TreeViewColumn()
+
+		cell = gtk.CellRendererPixbuf()
+		col.pack_start(cell, False)
+		col.add_attribute(cell, "pixbuf", 0)
+
+		cell = gtk.CellRendererText()
+		col.pack_start(cell, True)
+		col.add_attribute(cell, "text", 1)
+
+		self.depList.append_column(col)
+
+	def fill_dep_list (self, inst = [], ninst = []):
+		store = self.depList.get_model()
+		store.clear()
+
+		for dep in inst:
+			store.append([self.instIcon, dep])
+		for dep in ninst:
+			store.append([None, dep])
 
 	def cb_state_toggled (self, rb):
 	
@@ -91,8 +121,24 @@ class PluginWindow (AbstractDialog):
 			status = self.changedPlugins.get(plugin, plugin.status)
 			self.buttons[status].set_active(True)
 
-			self.installBtn.hide()
-			self.depExpander.hide()
+			if plugin.deps:
+				inst = []
+				ninst = []
+
+				for dep in plugin.deps:
+					if system.find_packages(dep, pkgSet = "installed"):
+						inst.append(dep)
+					else:
+						ninst.append(dep)
+
+				self.fill_dep_list(inst, ninst)
+				self.depExpander.show()
+				
+				self.installBtn.show()
+				self.installBtn.set_sensitive(bool(ninst))
+			else:
+				self.installBtn.hide()
+				self.depExpander.hide()
 
 	def get_actual (self):
 		store, it = self.view.get_selection().get_selected()
