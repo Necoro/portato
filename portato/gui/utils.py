@@ -132,7 +132,8 @@ class Config (ConfigParser):
 		ConfigParser.write(self)
 		self.modify_external_configs()
 
-class PkgData:
+class PkgData (object):
+	__slots__ = ("cat", "pkg", "inst")
 
 	def __init__ (self, cat, pkg, inst):
 		self.cat = cat
@@ -146,7 +147,7 @@ class PkgData:
 		return cmp(self.pkg.lower(), other.pkg.lower())
 
 	def __repr__ (self):
-		return "<Package (%(cat)s, %(pkg)s, %(inst)s)>" % self.__dict__
+		return "<Package (%(cat)s, %(pkg)s, %(inst)s)>" % {"cat" : self.cat, "pkg" : self.pkg, "inst" : self.inst}
 
 class Database (object):
 	"""An internal database which holds a simple dictionary cat -> [package_list]."""
