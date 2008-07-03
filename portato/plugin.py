@@ -12,10 +12,17 @@
 
 from __future__ import absolute_import
 
+import os
+import os.path as osp
 from collections import defaultdict
 from functools import wraps
 
-from .helper import debug, warning, info
+from .helper import debug, warning, info, error
+from .constants import PLUGIN_DIR
+from . import plugins as plugin_module
+
+class PluginLoadException (Exception):
+	pass
 
 class Menu (object):
 	__slots__ = ("label", "call")
@@ -49,7 +56,7 @@ class Plugin (object):
 	def __init__ (self):
 		self.__menus = []
 		self.__calls = []
-		self.state = STAT_ENABLED
+		self.status = self.STAT_ENABLED
 
 	@property
 	def author (self):
@@ -93,13 +100,37 @@ class PluginQueue (object):
 
 		self.plugins = []
 		self.hooks = defaultdict(Hook)
-		self._load()
 
 	def get_plugins (self, list_disabled = True):
 		return (x for x in self.plugins if (x.is_enabled() or list_disabled))
 
-	def _load (self):
+	def load (self):
 		"""Load the plugins."""
+
+		plugins = []
+		for f in os.listdir(PLUGIN_DIR):
+			path = osp.join(PLUGIN_DIR, f)
+			if osp.isdir(path):
+				if osp.isfile(osp.join(path, "__init__.py")):
+					plugins.append(f)
+				else:
+					debug("'%s' is not a plugin: __init__.py missing", path)
+			else:
+				if f.endswith(".py"):
+					plugins.append(f[:-3])
+				else:
+					debug("'%s' is not a plugin: not a .py file", path)
+
+		plugin_module.__path__.insert(0, PLUGIN_DIR.rstrip("/"))
+		plugin_module.__builtins__["Plugin"] = Plugin
+		plugin_module.__builtins__["register"] = register
+
+		for p in plugins:
+			try:
+				exec "from portato.plugins import %s" % p in {}
+			except PluginLoadException, e:
+				error(_("Loading plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : e.message})
+
 		self._organize()
 
 	def add (self, plugin):
@@ -108,7 +139,7 @@ class PluginQueue (object):
 	def hook (self, hook, *hargs, **hkwargs):
 
 		def hook_decorator (func):
-			h = self.hooks.hook
+			h = self.hooks[hook]
 
 			active = Hook()
 
@@ -242,6 +273,8 @@ def load_plugins():
 	global __plugins
 	if __plugins is None:
 		__plugins = PluginQueue()
+		__plugins.load()
+	
 
 def get_plugin_queue():
 	"""Returns the actual L{PluginQueue}. If it is C{None}, they are not being loaded yet.
@@ -260,4 +293,12 @@ def hook(hook, *args, **kwargs):
 
 def register (plugin):
 	if __plugins is not None:
-		__plugins.add(plugin)
+		if callable(plugin) and Plugin in plugin.__bases__:
+			p = plugin() # need an instance and not the class
+		elif isinstance(plugin, Plugin):
+			p = plugin
+		else:
+			raise PluginLoadException, "Is neither a subclass nor an instance of Plugin."
+
+		info(_("Plugin '%s' loaded."), p.name)
+		__plugins.add(p)

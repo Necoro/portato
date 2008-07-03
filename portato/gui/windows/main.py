@@ -607,13 +607,13 @@ class MainWindow (Window):
 		# set plugins and plugin-menu
 		splash(_("Loading Plugins"))
 
-		plugin.load_plugins("gtk")
-		menus = plugin.get_plugin_queue().get_plugin_menus()
+		plugin.load_plugins()
+		menus = [p.menus for p in plugin.get_plugin_queue().get_plugins()]
 		if menus:
 			self.tree.get_widget("pluginMenuItem").set_no_show_all(False)
 			pluginMenu = self.tree.get_widget("pluginMenu")
 
-			for m in menus:
+			for m in itt.chain(*menus):
 				item = gtk.MenuItem(m.label)
 				item.connect("activate", m.call)
 				pluginMenu.append(item)
@@ -1082,13 +1082,8 @@ class MainWindow (Window):
 		
 		def save_plugin (p):
 			def _save ():
-				stat_on = p.status >= p.STAT_ENABLED
-				hard_on = not p.get_option("disabled")
-
-				if stat_on != hard_on:
-					return int(stat_on)
-				else:
-					return ""
+				return int(p.status >= p.STAT_ENABLED)
+			
 			return _save
 
 		# SESSION VERSION
@@ -1553,8 +1548,8 @@ class MainWindow (Window):
 		if queue is None:
 			plugins = []
 		else:
-			plugins = queue.get_plugins()
-		
+			plugins = list(queue.get_plugins())
+
 		PluginWindow(self.window, plugins)
 		return True
 	
