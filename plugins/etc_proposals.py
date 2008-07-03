@@ -18,7 +18,7 @@ from subprocess import Popen
 class EtcProposals (Plugin):
 	__author__ = "René 'Necoro' Neumann"
 	__description__ = "Adds support for <b>etc-proposals</b>, a graphical etc-update replacement."
-	__dependency__ = "app-portage/etc-proposals"
+	__dependency__ = ["app-portage/etc-proposals"]
 
 	def __init__ (self):
 		Plugin.__init__(self)

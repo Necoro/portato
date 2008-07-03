@@ -81,6 +81,13 @@ class Plugin (object):
 	def calls (self):
 		return iter(self.__calls)
 
+	@property
+	def deps (self):
+		if hasattr(self, "__dependency__"):
+			return iter(self.__dependency__)
+		else:
+			return []
+
 	def add_menu (self, label, callable):
 		self.__menus.append(Menu(label, callable))
 
