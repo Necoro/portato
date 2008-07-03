@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/plugins/gpytage.py
+# File: plugins/gpytage.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2008 René 'Necoro' Neumann
@@ -12,5 +12,16 @@
 
 from subprocess import Popen
 
-def gpytage(*args, **kwargs):
-	Popen(["/usr/bin/gpytage"])
+class GPytage (Plugin):
+	__author__ = "René 'Necoro' Neumann"
+	__description__ = "Adds a menu entry to directly start <b>gpytage</b>, a config editor."
+	__dependency__ = ["app-portage/gpytage"]
+
+	def __init__ (self):
+		Plugin.__init__(self)
+		self.add_menu("Config _Editor", self.menu)
+
+	def menu (self, *args):
+		Popen(["/usr/bin/gpytage"])
+
+register(GPytage)
