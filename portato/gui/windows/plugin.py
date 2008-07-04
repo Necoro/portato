@@ -15,7 +15,9 @@ from __future__ import absolute_import
 import gtk
 
 from .basic import AbstractDialog
+from ..dialogs import blocked_dialog, unmask_dialog
 from ...backend import system
+from ...backend.exceptions import PackageNotFoundException, BlockedException
 from ...helper import debug
 
 class PluginWindow (AbstractDialog):
@@ -25,7 +27,7 @@ class PluginWindow (AbstractDialog):
 	for s in (_("Disabled"), _("Temporarily enabled"), _("Enabled"), _("Temporarily disabled")):
 		statsStore.append([s])
 
-	def __init__ (self, parent, plugins):
+	def __init__ (self, parent, plugins, queue = None):
 		"""Constructor.
 
 		@param parent: the parent window
@@ -33,7 +35,10 @@ class PluginWindow (AbstractDialog):
 		
 		AbstractDialog.__init__(self, parent)
 		self.plugins = plugins
+		self.queue = queue
 		self.changedPlugins = {}
+		self.inst = []
+		self.ninst = []
 
 		self.buttons = map(self.tree.get_widget, ("disabledRB", "tempEnabledRB", "enabledRB", "tempDisabledRB"))
 		map(lambda b: b.set_mode(False), self.buttons)
@@ -45,6 +50,8 @@ class PluginWindow (AbstractDialog):
 		self.installBtn = self.tree.get_widget("installBtn")
 		self.depList = self.tree.get_widget("depList")
 		self.build_dep_list()
+
+		self.buttonBox = self.tree.get_widget("buttonBox")
 
 		self.instIcon = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
 		
@@ -109,6 +116,8 @@ class PluginWindow (AbstractDialog):
 
 	def cb_list_selection (self, selection):
 		plugin = self.get_actual()
+		self.inst = []
+		self.ninst = []
 		
 		if plugin:
 			if not plugin.description:
@@ -123,23 +132,45 @@ class PluginWindow (AbstractDialog):
 			self.buttons[status].set_active(True)
 
 			if plugin.deps:
-				inst = []
-				ninst = []
 
 				for dep in plugin.deps:
-					if system.find_packages(dep, pkgSet = "installed"):
-						inst.append(dep)
+					if system.find_packages(dep, pkgSet = "installed", with_version = False):
+						self.inst.append(dep)
 					else:
-						ninst.append(dep)
+						self.ninst.append(dep)
 
-				self.fill_dep_list(inst, ninst)
+				self.fill_dep_list(self.inst, self.ninst)
 				self.depExpander.show()
 				
 				self.installBtn.show()
-				self.installBtn.set_sensitive(bool(ninst))
+				self.installBtn.set_sensitive(bool(self.ninst))
+
 			else:
 				self.installBtn.hide()
 				self.depExpander.hide()
+			
+			self.buttonBox.set_sensitive(not plugin._unresolved_deps and plugin.status != plugin.STAT_HARD_DISABLED)
+
+	def cb_install_clicked (self, *args):
+		if not self.queue:
+			return False
+		
+		for cpv in self.ninst:
+
+			pkg = system.find_best_match(cpv, masked = False, only_cpv = True)
+			if not pkg:
+				pkg = system.find_best_match(cpv, masked = True, only_cpv = True)
+
+			try:
+				try:
+					self.queue.append(pkg, type = "install")
+				except PackageNotFoundException, e:
+					if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
+						self.queue.append(pkg, type = "install", unmask = True)
+			except BlockedException, e:
+				blocked_dialog(e[0], e[1])
+
+		return True
 
 	def get_actual (self):
 		store, it = self.view.get_selection().get_selected()

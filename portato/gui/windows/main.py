@@ -1553,7 +1553,7 @@ class MainWindow (Window):
 		else:
 			plugins = list(queue.get_plugins())
 
-		PluginWindow(self.window, plugins)
+		PluginWindow(self.window, plugins, self.queue)
 		return True
 	
 	def cb_show_updates_clicked (self, *args):
