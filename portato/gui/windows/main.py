@@ -1082,6 +1082,9 @@ class MainWindow (Window):
 		
 		def save_plugin (p):
 			def _save ():
+				if p.status == p.STAT_HARD_DISABLED:
+					return ""
+
 				return int(p.status >= p.STAT_ENABLED)
 			
 			return _save

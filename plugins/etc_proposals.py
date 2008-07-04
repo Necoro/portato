@@ -20,9 +20,7 @@ class EtcProposals (Plugin):
 	__description__ = "Adds support for <b>etc-proposals</b>, a graphical etc-update replacement."
 	__dependency__ = ["app-portage/etc-proposals"]
 
-	def __init__ (self):
-		Plugin.__init__(self)
-
+	def init (self):
 		self.prog = ["/usr/sbin/etc-proposals"]
 		self.add_call("after_emerge", self.hook, type = "after")
 		self.add_menu("Et_c-Proposals", self.menu)

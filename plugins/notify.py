@@ -10,7 +10,12 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-import pynotify
+disable = False
+
+try:
+	import pynotify
+except ImportError:
+	disable = True
 
 from portato import get_listener
 
@@ -22,8 +27,7 @@ class Notify (Plugin):
 	__description__ = "Show notifications when an emerge process finishes."
 	__dependency__ = ["dev-python/notify-python"]
 
-	def __init__ (self):
-		Plugin.__init__(self)
+	def init (self):
 		self.add_call("after_emerge", self.notify)
 
 	def notify (self, retcode, **kwargs):
@@ -42,4 +46,4 @@ class Notify (Plugin):
 
 			get_listener().send_notify(base = text, descr = descr, icon = icon, urgency = urgency)
 
-register(Notify)
+register(Notify, disable)

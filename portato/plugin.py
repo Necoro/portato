@@ -19,6 +19,7 @@ from functools import wraps
 
 from .helper import debug, warning, info, error
 from .constants import PLUGIN_DIR
+from .backend import system
 from . import plugins as plugin_module
 
 class PluginLoadException (Exception):
@@ -52,11 +53,30 @@ class Hook (object):
 class Plugin (object):
 
 	(STAT_DISABLED, STAT_TEMP_ENABLED, STAT_ENABLED, STAT_TEMP_DISABLED) = range(4)
+	STAT_HARD_DISABLED = -1
 
-	def __init__ (self):
+	def __init__ (self, disable = False):
 		self.__menus = []
 		self.__calls = []
-		self.status = self.STAT_ENABLED
+		self._unresolved_deps = False
+
+		if not disable:
+			self.status = self.STAT_ENABLED
+		else:
+			self.status = self.STAT_HARD_DISABLED
+
+	def _init (self):
+
+		for d in self.deps:
+			if not system.find_packages(d, pkgSet="installed", with_version = False):
+				self._unresolved_deps = True
+				break
+		
+		if self.status != self.STAT_HARD_DISABLED and not self._unresolved_deps:
+			self.init()
+	
+	def init (self):
+		pass
 
 	@property
 	def author (self):
@@ -140,8 +160,28 @@ class PluginQueue (object):
 
 		self._organize()
 
-	def add (self, plugin):
-		self.plugins.append(plugin)
+	def add (self, plugin, disable = False):
+		if callable(plugin) and Plugin in plugin.__bases__:
+			p = plugin(disable = disable) # need an instance and not the class
+		elif isinstance(plugin, Plugin):
+			p = plugin
+			if disable:
+				p.status = p.STAT_HARD_DISABLED
+		else:
+			raise PluginLoadException, "Is neither a subclass nor an instance of Plugin."
+
+		p._init()
+
+		self.plugins.append(p)
+		
+		if p.status == p.STAT_HARD_DISABLED:
+			msg = _("Plugin is disabled!")
+		elif p._unresolved_deps:
+			msg = _("Plugin has unresolved dependencies - disabled!")
+		else:
+			msg = ""
+		
+		info("%s %s", _("Plugin '%s' loaded.") % p.name, msg)
 
 	def hook (self, hook, *hargs, **hkwargs):
 
@@ -298,14 +338,6 @@ def hook(hook, *args, **kwargs):
 	else:
 		return __plugins.hook(hook, *args, **kwargs)
 
-def register (plugin):
+def register (plugin, disable = False):
 	if __plugins is not None:
-		if callable(plugin) and Plugin in plugin.__bases__:
-			p = plugin() # need an instance and not the class
-		elif isinstance(plugin, Plugin):
-			p = plugin
-		else:
-			raise PluginLoadException, "Is neither a subclass nor an instance of Plugin."
-
-		info(_("Plugin '%s' loaded."), p.name)
-		__plugins.add(p)
+		__plugins.add(plugin, disable)
