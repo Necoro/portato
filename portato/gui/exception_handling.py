@@ -106,8 +106,7 @@ def get_version_infos():
 		"Python version: %s" % sys.version,
 		"Used backend: %s" % system.get_version(),
 		"pygtk: %s (using GTK+: %s)" % (convert(gtk.pygtk_version), convert(gtk.gtk_version)),
-		"pygobject: %s (using GLib: %s)" % (convert(gobject.pygobject_version), convert(gobject.glib_version))
-		""))
+		"pygobject: %s (using GLib: %s)" % (convert(gobject.pygobject_version), convert(gobject.glib_version))))
 
 def get_trace(type, value, tb):
 	trace = StringIO()
