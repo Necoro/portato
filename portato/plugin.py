@@ -14,6 +14,7 @@ from __future__ import absolute_import
 
 import os
 import os.path as osp
+import traceback
 from collections import defaultdict
 from functools import wraps
 
@@ -145,6 +146,8 @@ class PluginQueue (object):
 			else:
 				if f.endswith(".py"):
 					plugins.append(f[:-3])
+				elif f.endswith(".pyc") or f.endswith(".pyo"):
+					pass # ignore .pyc and .pyo
 				else:
 					debug("'%s' is not a plugin: not a .py file", path)
 
@@ -157,6 +160,9 @@ class PluginQueue (object):
 				exec "from portato.plugins import %s" % p in {}
 			except PluginLoadException, e:
 				error(_("Loading plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : e.message})
+			except:
+				tb = traceback.format_exc()
+				error(_("Loading plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : tb})
 
 		self._organize()
 
