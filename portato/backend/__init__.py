@@ -13,14 +13,10 @@
 from __future__ import absolute_import
 
 from ..helper import debug
-from ..constants import USE_CATAPULT
 from .system_interface import SystemInterface
 from .exceptions import BlockedException, PackageNotFoundException, DependencyCalcError, InvalidSystemError
 
-if USE_CATAPULT:
-	SYSTEM = "catapult"
-else:
-	SYSTEM = "portage" # the name of the current system
+SYSTEM = "portage" # the name of the current system
 _sys = None # the SystemInterface-instance
 
 class _Package (object):
@@ -45,8 +41,9 @@ def set_system (new_sys):
 	@type new_sys: string"""
 
 	global SYSTEM
-	SYSTEM = new_sys
-	load_system()
+	if new_sys != SYSTEM:
+		SYSTEM = new_sys
+		load_system()
 
 def load_system ():
 	"""Loads the current chosen system.

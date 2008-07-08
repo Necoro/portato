@@ -24,7 +24,7 @@ from functools import wraps
 # some backend things
 from ..backend import flags, system, set_system
 from ..helper import debug, info, set_log_level 
-from ..constants import USE_CATAPULT, APP, LOCALE_DIR
+from ..constants import APP, LOCALE_DIR
 
 # parser
 from ..config_parser import ConfigParser
@@ -86,8 +86,7 @@ class Config (ConfigParser):
 	def modify_system_config (self):
 		"""Sets the system config.
 		@see: L{backend.set_system()}"""
-		if not USE_CATAPULT:
-			set_system(self.get("system"))
+		set_system(self.get("system"))
 
 	def modify_external_configs (self):
 		"""Convenience function setting all external configs."""
