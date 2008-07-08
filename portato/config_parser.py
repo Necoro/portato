@@ -285,8 +285,8 @@ class ConfigParser:
 
 		:Exceptions:
 			
-			KeyNotFoundException : Raised if the specified key could not be found.
-			SectionNotFoundException : Raised if the specified section could not be found.
+			- `KeyNotFoundException` : Raised if the specified key could not be found.
+			- `SectionNotFoundException` : Raised if the specified section could not be found.
 		"""
 		
 		try:
@@ -315,8 +315,8 @@ class ConfigParser:
 		
 		:Exceptions:
 			
-			KeyNotFoundException : Raised if the specified key could not be found.
-			SectionNotFoundException : Raised if the specified section could not be found.
+			- `KeyNotFoundException` : Raised if the specified key could not be found.
+			- `SectionNotFoundException` : Raised if the specified section could not be found.
 		"""
 
 		section = section.upper()
@@ -339,9 +339,9 @@ class ConfigParser:
 
 		:Exceptions:
 			
-			KeyNotFoundException : Raised if the specified key could not be found.
-			SectionNotFoundException : Raised if the specified section could not be found.
-			ValueError : Raised if the key accessed is not a boolean.
+			- `KeyNotFoundException` : Raised if the specified key could not be found.
+			- `SectionNotFoundException` : Raised if the specified section could not be found.
+			- `ValueError` : Raised if the key accessed is not a boolean.
 		"""
 		
 		section = section.upper()
@@ -369,8 +369,8 @@ class ConfigParser:
 		
 		:Exceptions:
 			
-			KeyNotFoundException : Raised if the specified key could not be found.
-			SectionNotFoundException : Raised if the specified section could not be found.
+			- `KeyNotFoundException` : Raised if the specified key could not be found.
+			- `SectionNotFoundException` : Raised if the specified section could not be found.
 		"""
 		
 		section = section.upper()
@@ -394,9 +394,9 @@ class ConfigParser:
 
 		:Exceptions:
 			
-			KeyNotFoundException : Raised if the specified key could not be found.
-			SectionNotFoundException : Raised if the specified section could not be found.
-			ValueError : if the old/new value is not a boolean
+			- `KeyNotFoundException` : Raised if the specified key could not be found.
+			- `SectionNotFoundException` : Raised if the specified section could not be found.
+			- `ValueError` : if the old/new value is not a boolean
 		"""
 		
 		section = section.upper()

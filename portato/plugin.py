@@ -10,7 +10,12 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+"""
+A module managing the plugins for Portato.
+"""
+
 from __future__ import absolute_import
+__docformat__ = "restructuredtext"
 
 import os
 import os.path as osp
@@ -24,9 +29,23 @@ from .backend import system
 from . import plugins as plugin_module
 
 class PluginLoadException (Exception):
+	"""
+	Exception signaling a failed plugin loading.
+	"""
 	pass
 
 class Menu (object):
+	"""
+	One single menu entry.
+
+	:IVariables:
+
+		label : string
+			The label of the entry. Can have underscores to define the shortcut.
+
+		call
+			The function to call, if the entry is clicked.
+	"""
 	__slots__ = ("label", "call")
 
 	def __init__ (self, label, call):
@@ -34,6 +53,36 @@ class Menu (object):
 		self.call = call
 
 class Call (object):
+	"""
+	This class represents an object, which is attached to a specified hook.
+
+	:IVariables:
+
+		plugin : `Plugin`
+			The plugin where this call belongs to.
+
+		hook : string
+			The name of the corresponding hook.
+
+		call
+			The function to call.
+
+		type : string
+			This is either ``before``, ``after`` or ``override`` and defines the type of the call:
+
+				before
+					access before the original function
+				override
+					access *instead of* the original function. **USE THIS ONLY IF YOU KNOW WHAT YOU ARE DOING**
+				after
+					access after the original function has been called
+
+			Default: ``before``
+
+		dep : string
+			This defines a plugin which should be executed after/before this one.
+			``"*"`` means all and ``"-*"`` means none.
+	"""
 	__slots__ = ("plugin", "hook", "call", "type", "dep")
 
 	def __init__ (self, plugin, hook, call, type = "before", dep = None):
@@ -44,6 +93,10 @@ class Call (object):
 		self.dep = dep
 
 class Hook (object):
+	"""
+	Representing a hook with all the `Call` s for the different types.
+	"""
+			
 	__slots__ = ("before", "override", "after")
 
 	def __init__ (self):
@@ -52,21 +105,49 @@ class Hook (object):
 		self.after = []
 
 class Plugin (object):
+	"""
+	This is the main plugin object. It is used where ever a plugin is wanted, and it is the one, which needs to be subclassed by plugin authors.
+
+	:CVariables:
+
+		STAT_DISABLED : status
+			Status: Disabled.
+
+		STAT_TEMP_ENABLED : status
+			Status: Enabled for this session only.
+
+		STAT_ENABLED : status
+			Status: Enabled.
+
+		STAT_TEMP_DISABLED : status
+			Status: Disabled for this session only.
+
+		STAT_HARD_DISABLED : status
+			Status: Forced disabled by program (i.e. because of errors in the plugin).
+	"""
 
 	(STAT_DISABLED, STAT_TEMP_ENABLED, STAT_ENABLED, STAT_TEMP_DISABLED) = range(4)
 	STAT_HARD_DISABLED = -1
 
 	def __init__ (self, disable = False):
-		self.__menus = []
-		self.__calls = []
-		self._unresolved_deps = False
+		"""
+		:param disable: Forcefully disable the plugin
+		:type disable: bool
+		"""
+		self.__menus = [] #: List of `Menu`
+		self.__calls = [] #: List of `Call`
+		self._unresolved_deps = False #: Does this plugin has unresolved dependencies?
 
-		if not disable:
-			self.status = self.STAT_ENABLED
-		else:
+		self.status = self.STAT_ENABLED #: The status of this plugin
+		
+		if disable:
 			self.status = self.STAT_HARD_DISABLED
 
 	def _init (self):
+		"""
+		Method called from outside to init the extension parts of this plugin.
+		If the current status is `STAT_HARD_DISABLED` or there are unresolved dependencies, the init process is not started.
+		"""
 
 		for d in self.deps:
 			if not system.find_packages(d, pkgSet="installed", with_version = False):
@@ -77,14 +158,31 @@ class Plugin (object):
 			self.init()
 	
 	def init (self):
+		"""
+		This method is called by `_init` and should be overriden by the plugin author.
+
+		:precond: No unresolved deps and the status is not `STAT_HARD_DISABLED`.
+		"""
 		pass
 
 	@property
 	def author (self):
+		"""
+		Returns the plugin's author.
+		The author is given by the ``__author__`` variable.
+
+		:rtype: string
+		"""
 		return getattr(self, "__author__", "")
 
 	@property
 	def description (self):
+		"""
+		Returns the description of this plugin.
+		It is given by either a ``__description__`` variable or by the normal class docstring.
+
+		:rtype: string
+		"""
 		if hasattr(self, "__description__"):
 			return self.__description__
 		else:
@@ -92,34 +190,83 @@ class Plugin (object):
 
 	@property
 	def name (self):
+		"""
+		The name of the plugin. If no ``__name__`` variable is given, the class name is taken.
+
+		:rtype: string
+		"""
 		return getattr(self, "__name__", self.__class__.__name__)
 
 	@property
 	def menus (self):
+		"""
+		Returns an iterator over the menus for this plugin.
+
+		:rtype: iter<`Menu`>
+		"""
 		return iter(self.__menus)
 
 	@property
 	def calls (self):
+		"""
+		Returns an iterator over the registered calls for this plugin.
+
+		:rtype: iter<`Call`>
+		"""
 		return iter(self.__calls)
 
 	@property
 	def deps (self):
+		"""
+		Returns an iterator of the dependencies or ``None`` if there are none.
+		The dependencies are given in the ``__dependency__`` variable.
+
+		:rtype: None or iter<string>
+		"""
 		if hasattr(self, "__dependency__"):
 			return iter(self.__dependency__)
 		else:
-			return []
+			return None
 
+	@property
+	def enabled (self):
+		"""
+		Returns ``True`` if the plugin is enabled.
+
+		:rtype: boolean
+		:see: `status`
+		"""
+		return (self.status in (self.STAT_ENABLED, self.STAT_TEMP_ENABLED))
+	
 	def add_menu (self, label, callable):
+		"""
+		Adds a new menu item for this plugin.
+
+		:see: `Menu`
+		"""
 		self.__menus.append(Menu(label, callable))
 
 	def add_call (self, hook, callable, type = "before", dep = None):
+		"""
+		Adds a new call for this plugin.
+
+		:see: `Call`
+		"""
 		self.__calls.append(Call(self, hook, callable, type, dep))
 
-	def is_enabled (self):
-		return (self.status in (self.STAT_ENABLED, self.STAT_TEMP_ENABLED))
 
 class PluginQueue (object):
-	"""Class managing and loading the plugins."""
+	"""
+	Class managing and loading the plugins.
+	
+	:IVariables:
+
+		plugins : `Plugin` []
+			The list of managed plugins.
+
+		hooks : string -> `Hook`
+			For each hook name map to a `Hook` object holding the corresponding `Call` objects.
+	"""
 
 	def __init__ (self):
 		"""
@@ -130,11 +277,25 @@ class PluginQueue (object):
 		self.hooks = defaultdict(Hook)
 
 	def get_plugins (self, list_disabled = True):
-		return (x for x in self.plugins if (x.is_enabled() or list_disabled))
+		"""
+		Returns the plugins.
+
+		:param list_disabled: Also list disabled plugins.
+		:type list_disabled: boolean
+
+		:rtype: iter<`Plugin`>
+		"""
+		return (x for x in self.plugins if (x.enabled or list_disabled))
 
 	def load (self):
-		"""Load the plugins."""
+		"""
+		Load the plugins.
+		
+		This method scans the `portato.constants.PLUGIN_DIR` for python modules and tries to load them. If the modules are real plugins,
+		they have called `register` and thus the plugins are added.
+		"""
 
+		# look them up
 		plugins = []
 		for f in os.listdir(PLUGIN_DIR):
 			path = osp.join(PLUGIN_DIR, f)
@@ -151,11 +312,13 @@ class PluginQueue (object):
 				else:
 					debug("'%s' is not a plugin: not a .py file", path)
 
-		plugin_module.__path__.insert(0, PLUGIN_DIR.rstrip("/"))
+		# some magic ...
+		plugin_module.__path__.insert(0, PLUGIN_DIR.rstrip("/")) # make the plugins loadable as "portato.plugins.name"
+		# add Plugin and register to the builtins, so the plugins always have the correct version :)
 		plugin_module.__builtins__["Plugin"] = Plugin
 		plugin_module.__builtins__["register"] = register
 
-		for p in plugins:
+		for p in plugins: # import them
 			try:
 				exec "from portato.plugins import %s" % p in {}
 			except PluginLoadException, e:
@@ -167,6 +330,20 @@ class PluginQueue (object):
 		self._organize()
 
 	def add (self, plugin, disable = False):
+		"""
+		Adds a plugin to the internal list.
+
+		:Parameters:
+
+			plugin : `Plugin`
+				``Plugin`` subclass or instance to add. If a class is passed, it is instantiated.
+
+			disable : boolean
+				Disable the plugin.
+
+		:raise PluginLoadException: passed plugin is not of class `Plugin`
+		"""
+
 		if callable(plugin) and Plugin in plugin.__bases__:
 			p = plugin(disable = disable) # need an instance and not the class
 		elif isinstance(plugin, Plugin):
@@ -190,8 +367,18 @@ class PluginQueue (object):
 		info("%s %s", _("Plugin '%s' loaded.") % p.name, msg)
 
 	def hook (self, hook, *hargs, **hkwargs):
+		"""
+		The decorator to use in the program.
+		All parameters except ``hook`` are passed to plugins.
+
+		:param hook: the name of the hook
+		:type hook: string
+		"""
 
 		def hook_decorator (func):
+			"""
+			The real decorator.
+			"""
 			h = self.hooks[hook]
 
 			active = Hook()
@@ -201,10 +388,10 @@ class PluginQueue (object):
 				calls = getattr(h, type)
 				aCalls = getattr(active, type)
 				for call in calls:
-					if call.plugin.is_enabled():
+					if call.plugin.enabled:
 						aCalls.append(call)
 
-			if h.override and h.override.plugin.is_enabled():
+			if h.override and h.override.plugin.enabled:
 				active.override = h.override
 
 			@wraps(func)
@@ -234,7 +421,9 @@ class PluginQueue (object):
 		return hook_decorator
 
 	def _organize (self):
-		"""Creates the lists of connects in a way, that all dependencies are fullfilled."""
+		"""
+		Organizes the lists of `Call` in a way, that all dependencies are fullfilled.
+		"""
 		unresolved_before = defaultdict(list)
 		unresolved_after = defaultdict(list)
 		star_before = defaultdict(Hook) # should be _before_ all other
@@ -330,13 +519,16 @@ def load_plugins():
 	
 
 def get_plugin_queue():
-	"""Returns the actual L{PluginQueue}. If it is C{None}, they are not being loaded yet.
+	"""
+	Returns the actual `PluginQueue`. If it is ``None``, they are not being loaded yet.
 
-	@returns: the actual L{PluginQueue} or C{None}
-	@rtype: PluginQueue"""
+	:rtype: `PluginQueue` or ``None``"""
 	return __plugins
 
 def hook(hook, *args, **kwargs):
+	"""
+	Shortcut to `PluginQueue.hook`. If no `PluginQueue` is loaded, this does nothing.
+	"""
 	if __plugins is None:
 		def pseudo_decorator(f):
 			return f
@@ -345,5 +537,10 @@ def hook(hook, *args, **kwargs):
 		return __plugins.hook(hook, *args, **kwargs)
 
 def register (plugin, disable = False):
+	"""
+	Registers a plugin.
+
+	:see: `PluginQueue.add`
+	"""
 	if __plugins is not None:
 		__plugins.add(plugin, disable)
