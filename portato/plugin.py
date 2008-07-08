@@ -186,7 +186,12 @@ class Plugin (object):
 		if hasattr(self, "__description__"):
 			return self.__description__
 		else:
-			return getattr(self, "__doc__", "")
+			doc = getattr(self, "__doc__", "")
+
+			if not doc or doc == Plugin.__doc__:
+				return ""
+			else:
+				return doc
 
 	@property
 	def name (self):
@@ -218,15 +223,15 @@ class Plugin (object):
 	@property
 	def deps (self):
 		"""
-		Returns an iterator of the dependencies or ``None`` if there are none.
+		Returns an iterator of the dependencies or ``[]`` if there are none.
 		The dependencies are given in the ``__dependency__`` variable.
 
-		:rtype: None or iter<string>
+		:rtype: [] or iter<string>
 		"""
 		if hasattr(self, "__dependency__"):
 			return iter(self.__dependency__)
 		else:
-			return None
+			return []
 
 	@property
 	def enabled (self):
