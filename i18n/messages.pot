@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-08 15:51+0200\n"
+"POT-Creation-Date: 2008-07-08 16:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -743,57 +743,67 @@ msgid "The error was: %s"
 msgstr ""
 
 #: portato/gui/dialogs.py:24
+msgid "Do you really want to quit?"
+msgstr ""
+
+#: portato/gui/dialogs.py:25
 msgid ""
 "There are some packages in the emerge queue and/or an emerge process is "
-"running.\n"
-"Do you really want to quit?"
+"running."
 msgstr ""
 
 #: portato/gui/dialogs.py:43
 #, python-format
-msgid ""
-"%(blocked)s is blocked by %(blocks)s.\n"
-"Please unmerge the blocking package."
+msgid "%(blocked)s is blocked by %(blocks)s."
 msgstr ""
 
-#: portato/gui/dialogs.py:49
+#: portato/gui/dialogs.py:44
+msgid "Please unmerge the blocking package."
+msgstr ""
+
+#: portato/gui/dialogs.py:50
 msgid "You are not root."
 msgstr ""
 
-#: portato/gui/dialogs.py:55
+#: portato/gui/dialogs.py:56
 #, python-format
-msgid ""
-"%s seems to be masked.\n"
-"Do you want to unmask it and its dependencies?"
+msgid "%s seems to be masked."
 msgstr ""
 
-#: portato/gui/dialogs.py:61
+#: portato/gui/dialogs.py:57
+msgid "Do you want to unmask it and its dependencies?"
+msgstr ""
+
+#: portato/gui/dialogs.py:63
 msgid "Package not found!"
 msgstr ""
 
-#: portato/gui/dialogs.py:67
+#: portato/gui/dialogs.py:69
 msgid "Do not show this dialog again."
 msgstr ""
 
-#: portato/gui/dialogs.py:69
+#: portato/gui/dialogs.py:70
 #, python-format
+msgid "Changed %s"
+msgstr ""
+
+#: portato/gui/dialogs.py:71
 msgid ""
-"You have changed %s.\n"
 "Portato will write these changes into the appropriate files.\n"
 "Please backup them if you think it is necessairy."
 msgstr ""
 
-#: portato/gui/dialogs.py:78
+#: portato/gui/dialogs.py:80
 msgid "You cannot remove dependencies. :)"
 msgstr ""
 
-#: portato/gui/dialogs.py:84
+#: portato/gui/dialogs.py:86
 msgid ""
 "This is the updates queue. You cannot remove single elements.\n"
 "Do you want to clear the whole queue instead?"
 msgstr ""
 
-#: portato/gui/dialogs.py:90
+#: portato/gui/dialogs.py:92
 msgid "Do you really want to clear the whole queue?"
 msgstr ""
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-07-08 15:56+0100\n"
+"PO-Revision-Date: 2008-07-08 16:43+0100\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -758,59 +758,61 @@ msgid "The error was: %s"
 msgstr "Der Fehler war: %s"
 
 #: portato/gui/dialogs.py:24
-msgid ""
-"There are some packages in the emerge queue and/or an emerge process is running.\n"
-"Do you really want to quit?"
-msgstr ""
-"Es sind noch Pakete in der Emerge-Queue und/oder emerge läuft noch.\n"
-"Wirklich beenden?"
+msgid "Do you really want to quit?"
+msgstr "Wirklich beenden?"
+
+#: portato/gui/dialogs.py:25
+msgid "There are some packages in the emerge queue and/or an emerge process is running."
+msgstr "Es sind noch Pakete in der Emerge-Queue und/oder emerge läuft noch."
 
 #: portato/gui/dialogs.py:43
 #, python-format
-msgid ""
-"%(blocked)s is blocked by %(blocks)s.\n"
-"Please unmerge the blocking package."
-msgstr ""
-"%(blocks)s blockiert %(blocked)s.\n"
-"Bitte deinstalliere das blockierende Paket."
+msgid "%(blocked)s is blocked by %(blocks)s."
+msgstr "%(blocks)s blockiert %(blocked)s."
 
-#: portato/gui/dialogs.py:49
+#: portato/gui/dialogs.py:44
+msgid "Please unmerge the blocking package."
+msgstr "Bitte deinstalliere das blockierende Paket."
+
+#: portato/gui/dialogs.py:50
 msgid "You are not root."
 msgstr "Du bist nicht root."
 
-#: portato/gui/dialogs.py:55
+#: portato/gui/dialogs.py:56
 #, python-format
-msgid ""
-"%s seems to be masked.\n"
-"Do you want to unmask it and its dependencies?"
+msgid "%s seems to be masked."
 msgstr ""
-"%s scheint maskiert zu sein.\n"
-"Soll das Paket und seine Abhängigkeiten demaskiert werden?"
 
-#: portato/gui/dialogs.py:61
+#: portato/gui/dialogs.py:57
+msgid "Do you want to unmask it and its dependencies?"
+msgstr "Soll das Paket und seine Abhängigkeiten demaskiert werden?"
+
+#: portato/gui/dialogs.py:63
 msgid "Package not found!"
 msgstr "Paket nicht gefunden!"
 
-#: portato/gui/dialogs.py:67
+#: portato/gui/dialogs.py:69
 msgid "Do not show this dialog again."
 msgstr "Diesen Dialog nicht wieder anzeigen."
 
-#: portato/gui/dialogs.py:69
+#: portato/gui/dialogs.py:70
 #, python-format
+msgid "Changed %s"
+msgstr "%s wurde geändert"
+
+#: portato/gui/dialogs.py:71
 msgid ""
-"You have changed %s.\n"
 "Portato will write these changes into the appropriate files.\n"
 "Please backup them if you think it is necessairy."
 msgstr ""
-"Du hast die %s geändert.\n"
 "Portato wird diese Änderungen speichern.\n"
 "Bitte sichere die entsprechenden Dateien, wenn du es als notwendig erachtest."
 
-#: portato/gui/dialogs.py:78
+#: portato/gui/dialogs.py:80
 msgid "You cannot remove dependencies. :)"
 msgstr "Du kannst keine Abhängigkeiten löschen ;)."
 
-#: portato/gui/dialogs.py:84
+#: portato/gui/dialogs.py:86
 msgid ""
 "This is the updates queue. You cannot remove single elements.\n"
 "Do you want to clear the whole queue instead?"
@@ -818,7 +820,7 @@ msgstr ""
 "Das ist die Update-Queue. Aus dieser können keine einzelnen Pakete entfernt werden.\n"
 "Soll stattdessen die komplette Queue entfernt werden?"
 
-#: portato/gui/dialogs.py:90
+#: portato/gui/dialogs.py:92
 msgid "Do you really want to clear the whole queue?"
 msgstr "Wirklich die gesamte Queue löschen?"
 
