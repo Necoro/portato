@@ -100,16 +100,13 @@ def convert (version):
 def get_version_infos():
 	from ..constants import VERSION
 	from ..backend import system
-	from lxml import etree
 	
 	return "\n".join((
 		"Portato version: %s" % VERSION,
 		"Python version: %s" % sys.version,
 		"Used backend: %s" % system.get_version(),
 		"pygtk: %s (using GTK+: %s)" % (convert(gtk.pygtk_version), convert(gtk.gtk_version)),
-		"pygobject: %s (using GLib: %s)" % (convert(gobject.pygobject_version), convert(gobject.glib_version)),
-		"lxml: %s" % convert(etree.LXML_VERSION),
-		""))
+		"pygobject: %s (using GLib: %s)" % (convert(gobject.pygobject_version), convert(gobject.glib_version))))
 
 def get_trace(type, value, tb):
 	trace = StringIO()

@@ -45,8 +45,6 @@ These should be set during the installation.
 @type SETTINGS_DIR: string
 @var TEMPLATE_DIR: Directory containing the UI template files.
 @type TEMPLATE_DIR: string
-@var XSD_LOCATION: Path of the plugin schema.
-@type XSD_LOCATION: string
 """
 import os
 from os.path import join as pjoin
@@ -73,5 +71,3 @@ LOCALE_DIR = "i18n/"
 PLUGIN_DIR = pjoin(DATA_DIR, "plugins/")
 SETTINGS_DIR = pjoin(HOME, "."+APP)
 TEMPLATE_DIR = "portato/gui/templates/"
-
-XSD_LOCATION = pjoin(DATA_DIR, "plugin.xsd")

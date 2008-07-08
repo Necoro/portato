@@ -19,7 +19,7 @@ import gettext, locale
 from optparse import OptionParser, SUPPRESS_HELP
 
 from portato import get_listener
-from portato.constants import VERSION, XSD_LOCATION, LOCALE_DIR, APP, SU_COMMAND
+from portato.constants import VERSION, LOCALE_DIR, APP, SU_COMMAND
 
 def main ():
 	# set gettext stuff
@@ -36,30 +36,13 @@ def main ():
 	parser.add_option("--shm", action = "store", nargs = 3, type="long", dest = "shm",
 			help = SUPPRESS_HELP)
 
-	parser.add_option("-x", "--validate", action = "store", dest = "validate", metavar="PLUGIN",
-			help = _("validates the given plugin xml instead of launching Portato"))
-
 	parser.add_option("-F", "--no-fork", "-L", action = "store_true", dest = "nofork", default = False, 
 			help = _("do not fork off as root") + (" (%s)" % _("-L is deprecated")))
 
 	# run parser
 	(options, args) = parser.parse_args()
 
-	if options.validate: # validate a plugin
-		from lxml import etree
-		try:
-			etree.XMLSchema(file = XSD_LOCATION).assertValid(etree.parse(options.validate))
-		except etree.XMLSyntaxError, e:
-			print _("Validation failed. XML syntax error: %s.") % e[0]
-			sys.exit(3)
-		except etree.DocumentInvalid:
-			print _("Validation failed. Does not comply with schema.")
-			sys.exit(3)
-		else:
-			print _("Validation succeeded.")
-			return
-	
-	elif options.nofork or os.getuid() == 0: # start GUI
+	if options.nofork or os.getuid() == 0: # start GUI
 		from portato.gui import run
 		from portato.helper import info
 		info("%s v. %s", _("Starting Portato"), VERSION)
