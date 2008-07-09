@@ -18,6 +18,7 @@ from ...backend import system
 
 from .basic import AbstractDialog
 from ..dialogs import io_ex_dialog
+from ..utils import get_color
 from ...helper import debug
 
 class PreferenceWindow (AbstractDialog):
@@ -88,7 +89,7 @@ class PreferenceWindow (AbstractDialog):
 		
 		# set the bg-color of the hint
 		hintEB = self.tree.get_widget("hintEB")
-		hintEB.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#f3f785"))
+		hintEB.modify_bg(gtk.STATE_NORMAL, get_color(self.cfg, "prefhint"))
 
 		# the checkboxes
 		for box, val in self.checkboxes.iteritems():

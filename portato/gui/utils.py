@@ -21,6 +21,8 @@ from collections import defaultdict
 from threading import Thread, RLock
 from functools import wraps
 
+import gtk
+
 # some backend things
 from ..backend import flags, system, set_system
 from ..helper import debug, info, set_log_level 
@@ -28,6 +30,9 @@ from ..constants import APP, LOCALE_DIR
 
 # parser
 from ..config_parser import ConfigParser
+
+def get_color (cfg, name):
+	return gtk.gdk.color_parse("#%s" % cfg.get(name, section = "COLORS"))
 
 class GtkThread (Thread):
 	def run(self):

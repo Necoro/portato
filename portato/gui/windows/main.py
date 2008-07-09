@@ -30,7 +30,7 @@ from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, ICON_DIR
 from ...backend.exceptions import PackageNotFoundException, BlockedException
 
 # more GUI stuff
-from ..utils import Database, Config, GtkThread
+from ..utils import Database, Config, GtkThread, get_color
 from ..queue import EmergeQueue
 from ..session import SESSION_VERSION, SessionException, OldSessionException, NewSessionException
 from ..wrapper import GtkTree, GtkConsole
@@ -75,7 +75,7 @@ class PackageTable:
 
 		# labels
 		generalVB = self.tree.get_widget("generalVB")
-		generalVB.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#FFFFFF"))
+		generalVB.modify_bg(gtk.STATE_NORMAL, get_color(self.main.cfg, "packagetable"))
 		
 		self.nameLabel = self.tree.get_widget("nameLabel")
 		self.descLabel = self.tree.get_widget("descLabel")
