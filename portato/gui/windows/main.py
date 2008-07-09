@@ -1394,7 +1394,7 @@ class MainWindow (Window):
 		elif self.queueTree.is_in_unmerge(iter):
 			self.queue.unmerge(force = True)
 		else:
-			self.queue.update_world(force=True, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
+			self.queue.update_world(sets = self.updateSets, force=True, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
 
 		return True
 		
@@ -1420,13 +1420,13 @@ class MainWindow (Window):
 			watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
 			self.window.window.set_cursor(watch)
 			try:
-				sets = ("world", "system") # default
+				self.updateSets = ("world", "system") # default
 				if system.has_set_support():
 					confsets = [x.strip() for x in self.cfg.get("updatesets").split(",")]
 					syssets = system.get_sets()
-					sets = [s for s in confsets if s in syssets]
+					self.updateSets = [s for s in confsets if s in syssets]
 
-				updating = system.update_world(sets = sets, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
+				updating = system.update_world(sets = self.updateSets, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
 				debug("updating list: %s --> length: %s", [(x.get_cpv(), y.get_cpv()) for x,y in updating], len(updating))
 				gobject.idle_add(cb_idle_append, updating)
 			finally:

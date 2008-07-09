@@ -488,9 +488,11 @@ class EmergeQueue:
 
 		self.doEmerge(s,list, it, caller = self.unmerge)
 
-	def update_world(self, force = False, newuse = False, deep = False, options = None):
+	def update_world(self, sets = ("world",), force = False, newuse = False, deep = False, options = None):
 		"""Does an update world. newuse and deep are the arguments handed to emerge.
 
+		@param sets: The sets to update.
+		@type sets: string[]
 		@param force: If False, '-pv' is send to emerge. Default: False.
 		@type force: boolean
 		@param newuse: If True, append newuse options
@@ -512,7 +514,7 @@ class EmergeQueue:
 		else:
 			it = {}
 
-		self.doEmerge(opts, ["world"], it, caller = self.update_world)
+		self.doEmerge(opts, sets, it, caller = self.update_world)
 
 	def sync (self, command = None):
 		"""Calls "emerge --sync".

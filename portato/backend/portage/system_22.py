@@ -38,6 +38,9 @@ class PortageSystem_22 (PortageSystem):
 				self.SET_TREE : syssets.TreeSet
 				}
 
+	def get_update_option (self):
+		return ["--update", "--oneshot"] # --oneshot to not record the used sets in world file
+
 	def has_set_support (self):
 		return True
 
