@@ -20,6 +20,7 @@ except ImportError:
 	import portage_dep
 
 from collections import defaultdict
+import itertools as itt
 
 from . import VERSION
 from .package import PortagePackage
@@ -45,8 +46,11 @@ class PortageSystem (SystemInterface):
 	def has_set_support (self):
 		return False
 
-	def get_sets (self):
-		return (("world", "The world set."), ("system", "The system set."))
+	def get_sets (self, description = False):
+		if description:
+			return (("world", "The world set."), ("system", "The system set."))
+		else:
+			return ("world", "system")
 
 	def get_version (self):
 		return "Portage %s" % portage.VERSION
@@ -342,9 +346,9 @@ class PortageSystem (SystemInterface):
 		packages = [x for x in packages if x is not None and not x.is_installed()]
 		return packages
 
-	def update_world (self, newuse = False, deep = False):
-		packages = self.find_packages(pkgSet="world", with_version = False)
-		packages.extend(self.find_packages(pkgSet = "system", with_version = False))
+	def update_world (self, sets = ("world", "system"), newuse = False, deep = False):
+		packages = set()
+		map(packages.add, itt.chain(*(self.find_packages(pkgSet = s, with_version = False) for s in sets)))
 
 		states = [(["RDEPEND", "PDEPEND"], True)]
 		if self.with_bdeps():

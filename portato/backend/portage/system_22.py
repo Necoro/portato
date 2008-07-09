@@ -33,8 +33,11 @@ class PortageSystem_22 (PortageSystem):
 	def has_set_support (self):
 		return True
 
-	def get_sets (self):
-		return ((name, set.description) for name, set in self.settings.setsconfig.getSets().iteritems())
+	def get_sets (self, description = False):
+		if description:
+			return ((name, set.description) for name, set in self.settings.setsconfig.getSets().iteritems())
+		else:
+			return tuple(self.settings.setsconfig.getSets())
 
 	def new_package (self, cpv):
 		return PortagePackage_22(cpv)

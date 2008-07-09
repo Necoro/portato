@@ -177,7 +177,7 @@ class PreferenceWindow (AbstractDialog):
 
 		enabled = [x.strip() for x in self.cfg.get("updatesets").split(",")]
 		
-		for set, descr in system.get_sets():
+		for set, descr in system.get_sets(description = True):
 			store.append([set in enabled, "<i>%s</i>" % set, descr, set])
 
 		tCell = gtk.CellRendererToggle()
