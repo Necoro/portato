@@ -14,7 +14,14 @@ from __future__ import absolute_import, with_statement
 
 import re
 
+import portage
+try:
+	import portage.dep as portage_dep
+except ImportError:
+	import portage_dep
+
 from .. import system
+from ...helper import debug
 
 class Set(object):
 
@@ -56,6 +63,15 @@ class FilterSet (Set):
 			t.add(system.find_best_match(pkg, only_cpv = True))
 
 		return t
+
+class PortageSet (FilterSet):
+	def __init__ (self, name):
+		FilterSet.__init__(self)
+		debug("Loading portage set '%s'", name)
+		self.portageSet = system.settings.setsconfig.getSets()[name]
+
+	def get_list(self):
+		return self.portageSet.getAtoms()
 
 class SystemSet (FilterSet):
 
@@ -126,3 +142,4 @@ class UninstalledSet (Set):
 
 	def find (self, *args, **kwargs):
 		return self.all.find(*args, **kwargs) - self.installed.find(*args, **kwargs)
+
