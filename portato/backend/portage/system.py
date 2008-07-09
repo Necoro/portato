@@ -14,9 +14,16 @@ from __future__ import absolute_import, with_statement
 
 import re, os, os.path
 import portage
+try:
+	import portage.dep as portage_dep
+except ImportError:
+	import portage_dep
+
 from collections import defaultdict
+import itertools as itt
 
 from . import VERSION
+from . import sets as syssets
 from .package import PortagePackage
 from .settings import PortageSettings
 from ..system_interface import SystemInterface
@@ -36,6 +43,24 @@ class PortageSystem (SystemInterface):
 
 		self.use_descs = {}
 		self.local_use_descs = defaultdict(dict)
+
+		self.setmap = {
+				self.SET_ALL : syssets.AllSet,
+				self.SET_INSTALLED : syssets.InstalledSet,
+				self.SET_UNINSTALLED : syssets.UninstalledSet,
+				self.SET_TREE : syssets.TreeSet,
+				"world" : syssets.WorldSet,
+				"system" : syssets.SystemSet
+				}
+
+	def has_set_support (self):
+		return False
+
+	def get_sets (self, description = False):
+		if description:
+			return (("world", "The world set."), ("system", "The system set."))
+		else:
+			return ("world", "system")
 
 	def get_version (self):
 		return "Portage %s" % portage.VERSION
@@ -142,6 +167,8 @@ class PortageSystem (SystemInterface):
 		
 		if not only_cpv:
 			return [self.new_package(x) for x in list_of_packages]
+		elif not isinstance(list_of_packages, list):
+			return list(list_of_packages)
 		else:
 			return list_of_packages
 
@@ -159,16 +186,16 @@ class PortageSystem (SystemInterface):
 		t = []
 		
 		if not only_installed:
-			pkgSet = "tree"
+			pkgSet = self.SET_TREE
 		else:
-			pkgSet = "installed"
+			pkgSet = self.SET_INSTALLED
 
 		t = self.find_packages(search_key, pkgSet = pkgSet, masked = masked, with_version = True, only_cpv = True)
 		
 		if VERSION >= (2,1,5):
-			t += [pkg.get_cpv() for pkg in self.find_packages(search_key, "installed") if not (pkg.is_testing(True) or pkg.is_masked())]
+			t += [pkg.get_cpv() for pkg in self.find_packages(search_key, self.SET_INSTALLED) if not (pkg.is_testing(True) or pkg.is_masked())]
 		elif not only_installed: # no need to run twice
-			t += self.find_packages(search_key, "installed", only_cpv=True)
+			t += self.find_packages(search_key, self.SET_INSTALLED, only_cpv=True)
 
 		if t:
 			t = unique_array(t)
@@ -176,123 +203,14 @@ class PortageSystem (SystemInterface):
 
 		return None
 
-	def find_packages (self, key = "", pkgSet = "all", masked = False, with_version = True, only_cpv = False):
-		if key is None: key = ""
-		
-		is_regexp = key == "" or ("*" in key and key[0] not in ("*","=","<",">","~","!"))
-		
-		def installed(key):
-			if is_regexp:
-				if with_version:
-					t = self.settings.vartree.dbapi.cpv_all()
-				else:
-					t = self.settings.vartree.dbapi.cp_all()
-
-				if key:
-					t = filter(lambda x: re.match(key, x, re.I), t)
-
-				return t
-			else:	
-				return self.settings.vartree.dbapi.match(key)
-
-		def tree(key):
-			if is_regexp:
-				if with_version:
-					t = self.settings.porttree.dbapi.cpv_all()
-				else:
-					t = self.settings.porttree.dbapi.cp_all()
-
-				if key:
-					t = filter(lambda x: re.match(key, x, re.I), t)
-			
-			elif masked:	
-				t = self.settings.porttree.dbapi.xmatch("match-all", key)
-			else:
-				t = self.settings.porttree.dbapi.match(key)
-			
-			return t
-		
-		def all(key):
-			return unique_array(installed(key)+tree(key))
-
-		def uninstalled (key):
-			alist = set(all(key))
-			inst = set(installed(key))
-			return list(alist - inst)
-
-		def _ws (key, crit, pkglist):
-			pkgs = self.__find_resolved_unresolved(pkglist, crit, only_cpv = with_version)[0]
-			if not with_version:
-				pkgs = [x.get_cp(x) for x in list]
-
-			if is_regexp:
-				return filter(lambda x: re.match(key, x, re.I), pkgs)
-			
-			return pkgs
-
-		def world (key):
-			with open(portage.WORLD_FILE) as f:
-				pkglist = f.readlines()
-
-			return _ws(key, lambda cpv: cpv[0] != "#", pkglist)
-
-		def system (key):
-			return _ws(key, lambda cpv: cpv[0] == "*", self.settings.settings.packages)
-
-		funcmap = {
-				"all" : all,
-				"installed" : installed,
-				"uninstalled" : uninstalled,
-				"world" : world,
-				"system" : system,
-				"tree" : tree
-				}
-
+	def _get_set (self, pkgSet):
 		pkgSet = pkgSet.lower()
-		if pkgSet == "": pkgSet = "all"
+		if pkgSet == "": pkgSet = self.SET_ALL
 
-		func = funcmap[pkgSet]
-		
-		try:
-			t = func(key)
-		# catch the "ambigous package" Exception
-		except ValueError, e:
-			if isinstance(e[0], list):
-				t = []
-				for cp in e[0]:
-					t += func(cp)
-			else:
-				raise
+		return self.setmap[pkgSet]()
 
-		# Make the list of packages unique
-		t = unique_array(t)
-		t.sort()
-
-		return self.geneticize_list(t, only_cpv or not with_version)
-
-	def __find_resolved_unresolved (self, list, check, only_cpv = False):
-		"""Checks a given list and divides it into a "resolved" and an "unresolved" part.
-
-		@param list: list of cpv's
-		@type list: string[]
-		@param check: function called to check whether an entry is ok
-		@type check: function(cpv)
-		@param only_cpv: do not return packages but cpv-strings
-		@type only_cpv: boolean
-
-		@returns: the divided list: (resolved, unresolved)
-		@rtype: (Package[], Package[]) or (string[], string[])"""
-		resolved = []
-		unresolved = []
-		for x in list:
-			cpv = x.strip()
-			if cpv and check(cpv):
-				pkg = self.find_best_match(cpv, only_cpv = only_cpv)
-				if pkg:
-					resolved.append(pkg)
-				else:
-					unresolved.append(self.find_best_match(cpv, True, only_cpv = only_cpv))
-		return (resolved, unresolved)
+	def find_packages (self, key = "", pkgSet = SystemInterface.SET_ALL, masked = False, with_version = True, only_cpv = False):
+		return self.geneticize_list(self._get_set(pkgSet).find(key, masked, with_version, only_cpv), only_cpv or not with_version)
 
 	def list_categories (self, name = None):
 		categories = self.settings.settings.categories
@@ -333,7 +251,7 @@ class PortageSystem (SystemInterface):
 			new_packages.append(best)
 
 		for p in packages:
-			inst = self.find_packages(p, "installed")
+			inst = self.find_packages(p, self.SET_INSTALLED)
 			
 			best_p = self.find_best_match(p)
 			if best_p is None:
@@ -359,24 +277,14 @@ class PortageSystem (SystemInterface):
 		return new_packages
 
 	def get_updated_packages (self):
-		packages = self.get_new_packages(self.find_packages(pkgSet = "installed", with_version = False))
+		packages = self.get_new_packages(self.find_packages(pkgSet = self.SET_INSTALLED, with_version = False))
 		packages = [x for x in packages if x is not None and not x.is_installed()]
 		return packages
 
-	def update_world (self, newuse = False, deep = False):
-		# read world file
-		world = open(portage.WORLD_FILE)
-		packages = []
-		for line in world:
-			line = line.strip()
-			if len(line) == 0: continue # empty line
-			if line[0] == "#": continue # comment
-			packages.append(line)
-		world.close()
+	def update_world (self, sets = ("world", "system"), newuse = False, deep = False):
+		packages = set()
+		map(packages.add, itt.chain(*(self.find_packages(pkgSet = s, with_version = False) for s in sets)))
 
-		# append system packages
-		packages.extend(unique_array([p.get_cp() for p in self.find_packages(pkgSet = "system")]))
-		
 		states = [(["RDEPEND", "PDEPEND"], True)]
 		if self.with_bdeps():
 			states.append((["DEPEND"], True))
@@ -401,11 +309,11 @@ class PortageSystem (SystemInterface):
 			tempDeep = False
 
 			if not p.is_installed():
-				oldList = self.find_packages(p.get_slot_cp(), "installed")
+				oldList = self.find_packages(p.get_slot_cp(), self.SET_INSTALLED)
 				if oldList: 
 					old = oldList[0] # we should only have one package here - else it is a bug
 				else:
-					oldList = self.sort_package_list(self.find_packages(p.get_cp(), "installed"))
+					oldList = self.sort_package_list(self.find_packages(p.get_cp(), self.SET_INSTALLED))
 					if not oldList:
 						info(_("Found a not installed dependency: %s.") % p.get_cpv())
 						oldList = [p]

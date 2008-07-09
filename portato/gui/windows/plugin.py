@@ -134,7 +134,7 @@ class PluginWindow (AbstractDialog):
 			if plugin.deps:
 
 				for dep in plugin.deps:
-					if system.find_packages(dep, pkgSet = "installed", with_version = False):
+					if system.find_packages(dep, pkgSet = system.SET_INSTALLED, with_version = False):
 						self.inst.append(dep)
 					else:
 						self.ninst.append(dep)

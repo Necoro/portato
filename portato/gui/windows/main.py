@@ -1313,7 +1313,7 @@ class MainWindow (Window):
 		if pkg.is_installed():
 			installed = set(pkg.get_iuse_flags()).intersection(pkg.get_installed_use_flags())
 		else:
-			inst = system.find_packages(pkg.get_slot_cp(), "installed")
+			inst = system.find_packages(pkg.get_slot_cp(), system.SET_INSTALLED)
 			if inst:
 				installed = set(inst[0].get_iuse_flags()).intersection(inst[0].get_installed_use_flags())
 			else:
@@ -1420,7 +1420,13 @@ class MainWindow (Window):
 			watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
 			self.window.window.set_cursor(watch)
 			try:
-				updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
+				sets = ("world", "system") # default
+				if system.has_set_support():
+					confsets = [x.strip() for x in self.cfg.get("updatesets").split(",")]
+					syssets = system.get_sets()
+					sets = [s for s in confsets if s in syssets]
+
+				updating = system.update_world(sets = sets, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
 				debug("updating list: %s --> length: %s", [(x.get_cpv(), y.get_cpv()) for x,y in updating], len(updating))
 				gobject.idle_add(cb_idle_append, updating)
 			finally:

@@ -150,7 +150,7 @@ class Plugin (object):
 		"""
 
 		for d in self.deps:
-			if not system.find_packages(d, pkgSet="installed", with_version = False):
+			if not system.find_packages(d, pkgSet=system.SET_INSTALLED, with_version = False):
 				self._unresolved_deps = True
 				break
 		

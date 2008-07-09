@@ -143,7 +143,7 @@ class EmergeQueue:
 		try:
 			pkg = self._get_pkg_from_cpv(cpv, unmask)
 			if not pkg.is_installed():
-				old = system.find_packages(pkg.get_slot_cp(), "installed")
+				old = system.find_packages(pkg.get_slot_cp(), system.SET_INSTALLED)
 				if old: 
 					old = old[0] # assume we have only one there
 					cmp = pkg.compare_version(old)
@@ -272,7 +272,7 @@ class EmergeQueue:
 				# get the blocks that block an installed package
 				inst = []
 				for block in self.blocks[type]:
-					pkgs = system.find_packages(block, "installed")
+					pkgs = system.find_packages(block, system.SET_INSTALLED)
 					if pkgs:
 						inst.append((pkgs, block))
 
