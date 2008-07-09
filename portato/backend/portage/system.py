@@ -319,6 +319,19 @@ class PortageSystem (SystemInterface):
 		"""
 
 		new_packages = []
+
+		def append(crit, best, inst):
+			if not best:
+				return
+
+			if not best.is_installed() and (best.is_masked() or best.is_testing(True)): # check to not update unnecessairily
+				for i in inst:
+					if i.matches(crit):
+						debug("The installed %s matches %s. Discarding upgrade to masked version.", i.get_cpv(), crit)
+						return
+			
+			new_packages.append(best)
+
 		for p in packages:
 			inst = self.find_packages(p, "installed")
 			
@@ -338,10 +351,10 @@ class PortageSystem (SystemInterface):
 
 				myslots.add(best_p.get_package_settings("SLOT")) # add the slot of the best package in portage
 				for slot in myslots:
-					new_packages.append(\
-							self.find_best(self.find_packages("%s:%s" % (i.get_cp(), slot), only_cpv = True)))
+					crit = "%s:%s" % (p, slot)
+					append(crit, self.find_best_match(crit), inst)
 			else:
-				new_packages.append(best_p)
+				append(p, best_p, inst)
 
 		return new_packages
 
@@ -440,15 +453,6 @@ class PortageSystem (SystemInterface):
 							else:
 								for pkg in bm:
 									if not pkg: continue
-									if not pkg.is_installed() and (pkg.is_masked() or pkg.is_testing(True)): # check to not update unnecessairily
-										cont = False
-										for inst in self.find_packages(pkg.get_cp(), "installed", only_cpv = True):
-											if self.cpv_matches(inst, i):
-												debug("The installed %s matches %s. Discarding upgrade to masked version.", inst, i)
-												cont = True
-												break
-										if cont: continue
-											
 									check(pkg, state[1], appended) # XXX: should be 'or'ed with prev_appended?
 
 		for p in self.get_new_packages(packages):
