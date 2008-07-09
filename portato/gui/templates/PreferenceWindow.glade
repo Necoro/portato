@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.4 on Sun Jun  8 01:45:17 2008 -->
+<!--Generated with glade3 3.4.4 on Wed Jul  9 21:08:44 2008 -->
 <glade-interface>
   <widget class="GtkWindow" id="PreferenceWindow">
     <property name="border_width">5</property>
@@ -119,6 +119,42 @@
                               <packing>
                                 <property name="fill">False</property>
                                 <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkFrame" id="setFrame">
+                                <property name="no_show_all">True</property>
+                                <property name="label_xalign">0</property>
+                                <property name="shadow_type">GTK_SHADOW_NONE</property>
+                                <child>
+                                  <widget class="GtkAlignment" id="alignment4">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">0</property>
+                                    <property name="yalign">0</property>
+                                    <property name="right_padding">10</property>
+                                    <child>
+                                      <widget class="GtkTreeView" id="setList">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="headers_visible">False</property>
+                                        <property name="rules_hint">True</property>
+                                      </widget>
+                                    </child>
+                                  </widget>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label12">
+                                    <property name="visible">True</property>
+                                    <property name="label" translatable="yes">&lt;b&gt;Package sets to update&lt;/b&gt;</property>
+                                    <property name="use_markup">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="type">label_item</property>
+                                  </packing>
+                                </child>
+                              </widget>
+                              <packing>
+                                <property name="position">2</property>
                               </packing>
                             </child>
                           </widget>
@@ -517,7 +553,7 @@
                                     <property name="can_focus">True</property>
                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip_markup" translatable="yes">Update the package list with the current search results while you are typing.
+                                    <property name="tooltip_markup">Update the package list with the current search results while you are typing.
 &lt;b&gt;Note&lt;/b&gt;: Will slow down the typing process.</property>
                                     <property name="label" translatable="yes">Search while typing</property>
                                     <property name="yalign">0.47999998927116394</property>
@@ -766,7 +802,7 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip_markup" translatable="yes">Organize the categories in a tree. Thereby collapse categories with the same prefix:
+                                    <property name="tooltip_markup">Organize the categories in a tree. Thereby collapse categories with the same prefix:
 As an example: &lt;i&gt;app-admin&lt;/i&gt;, &lt;i&gt;app-emacs&lt;/i&gt;, and &lt;i&gt;app-vim&lt;/i&gt; would be collapsed into &lt;i&gt;&lt;b&gt;app&lt;/b&gt;&lt;/i&gt; as root and &lt;i&gt;admin&lt;/i&gt;, &lt;i&gt;emacs&lt;/i&gt;, and &lt;i&gt;vim&lt;/i&gt; as children.</property>
                                     <property name="label" translatable="yes">Collapse categories with same prefix</property>
                                     <property name="response_id">0</property>

@@ -14,6 +14,8 @@ from __future__ import absolute_import
 
 import gtk
 
+from ...backend import system
+
 from .basic import AbstractDialog
 from ..dialogs import io_ex_dialog
 from ...helper import debug
@@ -106,6 +108,12 @@ class PreferenceWindow (AbstractDialog):
 				self.tree.get_widget(edit).\
 					set_text(self.cfg.get(val))
 
+		# the set list
+		self.setList = self.tree.get_widget("setList")
+		if system.has_set_support():
+			self.fill_setlist()
+			self.tree.get_widget("setFrame").show()
+
 		# the console font button
 		self.consoleFontBtn = self.tree.get_widget("consoleFontBtn")
 		self.consoleFontBtn.set_font_name(self.cfg.get("consolefont", section = "GUI"))
@@ -144,6 +152,8 @@ class PreferenceWindow (AbstractDialog):
 			else:
 				self.cfg.set(val,self.tree.get_widget(edit).get_text())
 
+		self.cfg.set("updatesets", ", ".join(sorted(name for enabled, markup, descr, name in self.setList.get_model() if enabled)))
+
 		font = self.consoleFontBtn.get_font_name()
 		self.cfg.set("consolefont", font, section = "GUI")
 		self.console_fn(font)
@@ -162,6 +172,29 @@ class PreferenceWindow (AbstractDialog):
 
 		self.catmodel_fn()
 
+	def fill_setlist (self):
+		store = gtk.ListStore(bool, str, str, str)
+
+		enabled = [x.strip() for x in self.cfg.get("updatesets").split(",")]
+		
+		for set, descr in system.get_sets():
+			store.append([set in enabled, "<i>%s</i>" % set, descr, set])
+
+		tCell = gtk.CellRendererToggle()
+		tCell.set_property("activatable", True)
+		tCell.connect("toggled", self.cb_check_toggled) # emulate the normal toggle behavior ...
+
+		sCell = gtk.CellRendererText()
+
+		col = gtk.TreeViewColumn(_("Package Set"), tCell, active = 0)
+		col.pack_start(sCell)
+		col.add_attribute(sCell, "markup",  1)
+		self.setList.append_column(col)
+
+		self.setList.append_column(gtk.TreeViewColumn(_("Description"), sCell, text = 2))
+
+		self.setList.set_model(store)
+
 	def cb_ok_clicked(self, button):
 		"""Saves, writes to config-file and closes the window."""
 		self._save()
@@ -175,3 +208,9 @@ class PreferenceWindow (AbstractDialog):
 	def cb_cancel_clicked (self, button):
 		"""Just closes - w/o saving."""
 		self.window.destroy()
+
+	def cb_check_toggled (self, cell, path):
+		# for whatever reason we have to define normal toggle behavior explicitly
+		store = self.setList.get_model()
+		store[path][0] = not store[path][0]
+		return True
