@@ -6,6 +6,8 @@ next:
 - now only use external "shm" package
 - allow to send bug report directly per mail
 - allowed to dismiss the warning dialogs for keywords/useflags
+- complete new plugin system rewrite
+- portage-2.2 support
 - bug fixes
 
 0.10:
