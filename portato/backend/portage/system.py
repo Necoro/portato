@@ -23,6 +23,7 @@ from collections import defaultdict
 import itertools as itt
 
 from . import VERSION
+from . import sets as syssets
 from .package import PortagePackage
 from .settings import PortageSettings
 from ..system_interface import SystemInterface
@@ -42,6 +43,15 @@ class PortageSystem (SystemInterface):
 
 		self.use_descs = {}
 		self.local_use_descs = defaultdict(dict)
+
+		self.setmap = {
+				self.SET_ALL : syssets.AllSet,
+				self.SET_INSTALLED : syssets.InstalledSet,
+				self.SET_UNINSTALLED : syssets.UninstalledSet,
+				self.SET_TREE : syssets.TreeSet,
+				"world" : syssets.WorldSet,
+				"system" : syssets.SystemSet
+				}
 
 	def has_set_support (self):
 		return False
@@ -157,6 +167,8 @@ class PortageSystem (SystemInterface):
 		
 		if not only_cpv:
 			return [self.new_package(x) for x in list_of_packages]
+		elif not isinstance(list_of_packages, list):
+			return list(list_of_packages)
 		else:
 			return list_of_packages
 
@@ -191,104 +203,14 @@ class PortageSystem (SystemInterface):
 
 		return None
 
-	def find_packages (self, key = "", pkgSet = SystemInterface.SET_ALL, masked = False, with_version = True, only_cpv = False):
-		if key is None: key = ""
-		
-		is_regexp = key == "" or ("*" in key and key[0] not in ("*","=","<",">","~","!"))
-		
-		def installed(key):
-			if is_regexp:
-				if with_version:
-					t = self.settings.vartree.dbapi.cpv_all()
-				else:
-					t = self.settings.vartree.dbapi.cp_all()
-
-				if key:
-					t = filter(lambda x: re.match(key, x, re.I), t)
-
-				return t
-			else:	
-				return self.settings.vartree.dbapi.match(key)
-
-		def tree(key):
-			if is_regexp:
-				if with_version:
-					t = self.settings.porttree.dbapi.cpv_all()
-				else:
-					t = self.settings.porttree.dbapi.cp_all()
-
-				if key:
-					t = filter(lambda x: re.match(key, x, re.I), t)
-			
-			elif masked:	
-				t = self.settings.porttree.dbapi.xmatch("match-all", key)
-			else:
-				t = self.settings.porttree.dbapi.match(key)
-			
-			return t
-		
-		def all(key):
-			return unique_array(installed(key)+tree(key))
-
-		def uninstalled (key):
-			alist = set(all(key))
-			inst = set(installed(key))
-			return list(alist - inst)
-
-		def world (key):
-			with open(portage.WORLD_FILE) as f:
-				for cp in f:
-					cp = cp.strip()
-					if cp and cp[0] != "#":
-						if is_regexp:
-							if not re.match(key, cp, re.I): continue
-
-						if not with_version:
-							yield portage_dep.dep_getkey(cp)
-						
-						yield self.find_best_match(cp, only_cpv = True)
-
-		def system (key):
-			for cp in self.settings.settings.packages:
-				if cp[0] != "*": continue
-				
-				if is_regexp:
-					if not re.match(key, cp, re.I): continue
-
-				if not with_version:
-					yield portage_dep.dep_getkey(cp)
-
-				yield self.find_best_match(cp, only_cpv = True)
-
-		funcmap = {
-				self.SET_ALL : all,
-				self.SET_INSTALLED : installed,
-				self.SET_UNINSTALLED : uninstalled,
-				self.SET_TREE : tree,
-				"world" : world,
-				"system" : system
-				}
-
+	def _get_set (self, pkgSet):
 		pkgSet = pkgSet.lower()
-		if pkgSet == "": pkgSet = "all"
+		if pkgSet == "": pkgSet = self.SET_ALL
 
-		func = funcmap[pkgSet]
-		
-		try:
-			t = func(key)
-		# catch the "ambigous package" Exception
-		except ValueError, e:
-			if isinstance(e[0], list):
-				t = []
-				for cp in e[0]:
-					t += func(cp)
-			else:
-				raise
+		return self.setmap[pkgSet]()
 
-		# Make the list of packages unique
-		t = unique_array(t)
-
-		return self.geneticize_list(t, only_cpv or not with_version)
+	def find_packages (self, key = "", pkgSet = SystemInterface.SET_ALL, masked = False, with_version = True, only_cpv = False):
+		return self.geneticize_list(self._get_set(pkgSet).find(key, masked, with_version, only_cpv), only_cpv or not with_version)
 
 	def list_categories (self, name = None):
 		categories = self.settings.settings.categories
