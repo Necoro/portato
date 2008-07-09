@@ -11,6 +11,11 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 class SystemInterface (object):
+	
+	SET_ALL = "__portato_all__"
+	SET_TREE = "__portato_tree__"
+	SET_INSTALLED = "__portato_installed__"
+	SET_UNINSTALLED = "__portato_uninstalled__"
 
 	def has_set_support (self):
 		"""Signals, whether this backend supports sets.
@@ -90,7 +95,7 @@ class SystemInterface (object):
 
 		raise NotImplementedError
 
-	def find_packages (self, key, pkgSet = "all", masked = False, with_version = True, only_cpv = False):
+	def find_packages (self, key, pkgSet = SET_ALL, masked = False, with_version = True, only_cpv = False):
 		"""This returns a list of packages matching the key.
 		As key, it is allowed to use basic regexps (".*") and the normal package specs. But not a combination
 		of them.

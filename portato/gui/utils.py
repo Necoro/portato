@@ -185,7 +185,7 @@ class Database (object):
 		
 		# get the lists
 		packages = system.find_packages(category, with_version = False)
-		installed = system.find_packages(category, "installed", with_version = False)
+		installed = system.find_packages(category, system.SET_INSTALLED, with_version = False)
 		
 		# cycle through packages
 		for p in packages:

@@ -1315,7 +1315,7 @@ class MainWindow (Window):
 		if pkg.is_installed():
 			installed = set(pkg.get_iuse_flags()).intersection(pkg.get_installed_use_flags())
 		else:
-			inst = system.find_packages(pkg.get_slot_cp(), "installed")
+			inst = system.find_packages(pkg.get_slot_cp(), system.SET_INSTALLED)
 			if inst:
 				installed = set(inst[0].get_iuse_flags()).intersection(inst[0].get_installed_use_flags())
 			else:

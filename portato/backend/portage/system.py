@@ -174,16 +174,16 @@ class PortageSystem (SystemInterface):
 		t = []
 		
 		if not only_installed:
-			pkgSet = "tree"
+			pkgSet = self.SET_TREE
 		else:
-			pkgSet = "installed"
+			pkgSet = self.SET_INSTALLED
 
 		t = self.find_packages(search_key, pkgSet = pkgSet, masked = masked, with_version = True, only_cpv = True)
 		
 		if VERSION >= (2,1,5):
-			t += [pkg.get_cpv() for pkg in self.find_packages(search_key, "installed") if not (pkg.is_testing(True) or pkg.is_masked())]
+			t += [pkg.get_cpv() for pkg in self.find_packages(search_key, self.SET_INSTALLED) if not (pkg.is_testing(True) or pkg.is_masked())]
 		else:
-			t = self.find_packages(search_key, "installed", only_cpv=True)
+			t = self.find_packages(search_key, self.SET_INSTALLED, only_cpv=True)
 
 		if t:
 			t = unique_array(t)
@@ -191,7 +191,7 @@ class PortageSystem (SystemInterface):
 
 		return None
 
-	def find_packages (self, key = "", pkgSet = "all", masked = False, with_version = True, only_cpv = False):
+	def find_packages (self, key = "", pkgSet = SystemInterface.SET_ALL, masked = False, with_version = True, only_cpv = False):
 		if key is None: key = ""
 		
 		is_regexp = key == "" or ("*" in key and key[0] not in ("*","=","<",">","~","!"))
@@ -261,12 +261,12 @@ class PortageSystem (SystemInterface):
 				yield self.find_best_match(cp, only_cpv = True)
 
 		funcmap = {
-				"all" : all,
-				"installed" : installed,
-				"uninstalled" : uninstalled,
+				self.SET_ALL : all,
+				self.SET_INSTALLED : installed,
+				self.SET_UNINSTALLED : uninstalled,
+				self.SET_TREE : tree,
 				"world" : world,
-				"system" : system,
-				"tree" : tree
+				"system" : system
 				}
 
 		pkgSet = pkgSet.lower()
@@ -316,7 +316,7 @@ class PortageSystem (SystemInterface):
 
 		new_packages = []
 		for p in packages:
-			inst = self.find_packages(p, "installed")
+			inst = self.find_packages(p, self.SET_INSTALLED)
 			
 			best_p = self.find_best_match(p)
 			if best_p is None:
@@ -342,7 +342,7 @@ class PortageSystem (SystemInterface):
 		return new_packages
 
 	def get_updated_packages (self):
-		packages = self.get_new_packages(self.find_packages(pkgSet = "installed", with_version = False))
+		packages = self.get_new_packages(self.find_packages(pkgSet = self.SET_INSTALLED, with_version = False))
 		packages = [x for x in packages if x is not None and not x.is_installed()]
 		return packages
 
@@ -374,11 +374,11 @@ class PortageSystem (SystemInterface):
 			tempDeep = False
 
 			if not p.is_installed():
-				oldList = self.find_packages(p.get_slot_cp(), "installed")
+				oldList = self.find_packages(p.get_slot_cp(), self.SET_INSTALLED)
 				if oldList: 
 					old = oldList[0] # we should only have one package here - else it is a bug
 				else:
-					oldList = self.sort_package_list(self.find_packages(p.get_cp(), "installed"))
+					oldList = self.sort_package_list(self.find_packages(p.get_cp(), self.SET_INSTALLED))
 					if not oldList:
 						info(_("Found a not installed dependency: %s.") % p.get_cpv())
 						oldList = [p]
@@ -428,7 +428,7 @@ class PortageSystem (SystemInterface):
 									if not pkg: continue
 									if not pkg.is_installed() and (pkg.is_masked() or pkg.is_testing(True)): # check to not update unnecessairily
 										cont = False
-										for inst in self.find_packages(pkg.get_cp(), "installed", only_cpv = True):
+										for inst in self.find_packages(pkg.get_cp(), self.SET_INSTALLED, only_cpv = True):
 											if self.cpv_matches(inst, i):
 												debug("The installed %s matches %s. Discarding upgrade to masked version.", inst, i)
 												cont = True
