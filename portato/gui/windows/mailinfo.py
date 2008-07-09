@@ -68,8 +68,8 @@ Subject: %s
 				try:
 					server.sendmail(self.addr, self.TO, self.message)
 				except smtplib.SMTPRecipientsRefused, e:
-					info(_("An error occurred while sending. I think we where greylisted. The error: %s") % e)
-					info(_("Wait 60 seconds and try again."))
+					info(_("An error occurred while sending. I think we were greylisted. The error: %s") % e)
+					info(_("Retrying after waiting 60 seconds."))
 					time.sleep(60)
 					server.sendmail(self.addr, self.TO, self.message)
 				debug("Sent")

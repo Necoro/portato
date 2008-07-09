@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-10 00:01+0200\n"
+"POT-Creation-Date: 2008-07-10 00:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -727,11 +727,11 @@ msgstr ""
 #: portato/gui/windows/mailinfo.py:71
 #, python-format
 msgid ""
-"An error occurred while sending. I think we where greylisted. The error: %s"
+"An error occurred while sending. I think we were greylisted. The error: %s"
 msgstr ""
 
 #: portato/gui/windows/mailinfo.py:72
-msgid "Wait 60 seconds and try again."
+msgid "Retrying after waiting 60 seconds."
 msgstr ""
 
 #: portato/gui/windows/update.py:48
@@ -743,27 +743,27 @@ msgstr ""
 msgid "... is starting up: %s"
 msgstr ""
 
-#: portato/gui/windows/preference.py:132
+#: portato/gui/windows/preference.py:133
 msgid "Top"
 msgstr ""
 
-#: portato/gui/windows/preference.py:132
+#: portato/gui/windows/preference.py:133
 msgid "Bottom"
 msgstr ""
 
-#: portato/gui/windows/preference.py:132
+#: portato/gui/windows/preference.py:133
 msgid "Left"
 msgstr ""
 
-#: portato/gui/windows/preference.py:132
+#: portato/gui/windows/preference.py:133
 msgid "Right"
 msgstr ""
 
-#: portato/gui/windows/preference.py:189
+#: portato/gui/windows/preference.py:190
 msgid "Package Set"
 msgstr ""
 
-#: portato/gui/windows/preference.py:194 portato/gui/windows/main.py:328
+#: portato/gui/windows/preference.py:195 portato/gui/windows/main.py:328
 msgid "Description"
 msgstr ""
 
@@ -899,18 +899,18 @@ msgstr ""
 msgid "Current session format is newer than this version supports."
 msgstr ""
 
-#: portato/gui/utils.py:154
+#: portato/gui/utils.py:159
 msgid "ALL"
 msgstr ""
 
-#: portato/gui/utils.py:241
+#: portato/gui/utils.py:246
 #, python-format
 msgid ""
 "Catched KeyError => %s seems not to be an available category. Have you "
 "played with rsync-excludes?"
 msgstr ""
 
-#: portato/gui/utils.py:302
+#: portato/gui/utils.py:307
 #, python-format
 msgid "Error while compiling search expression: '%s'."
 msgstr ""

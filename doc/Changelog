@@ -8,6 +8,7 @@ next:
 - allowed to dismiss the warning dialogs for keywords/useflags
 - complete new plugin system rewrite
 - portage-2.2 support
+- added color section
 - bug fixes
 
 0.10:
