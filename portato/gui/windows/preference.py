@@ -153,7 +153,8 @@ class PreferenceWindow (AbstractDialog):
 			else:
 				self.cfg.set(val,self.tree.get_widget(edit).get_text())
 
-		self.cfg.set("updatesets", ", ".join(sorted(name for enabled, markup, descr, name in self.setList.get_model() if enabled)))
+		if system.has_set_support():
+			self.cfg.set("updatesets", ", ".join(sorted(name for enabled, markup, descr, name in self.setList.get_model() if enabled)))
 
 		font = self.consoleFontBtn.get_font_name()
 		self.cfg.set("consolefont", font, section = "GUI")
