@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-04-09 00:53+0200\n"
-"PO-Revision-Date: 2008-04-10 22:08+0200\n"
+"POT-Creation-Date: 2008-07-10 00:48+0200\n"
+"PO-Revision-Date: 2008-07-11 02:23+0200\n"
 "Last-Translator: Gürkan gür <seqizz@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,183 +16,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: portato/gui/templates/popups.glade:12
-#: portato/gui/templates/MainWindow.glade:190
-#: portato/gui/templates/MainWindow.glade:282
+#: portato/gui/templates/MainWindow.glade:192
+#: portato/gui/templates/MainWindow.glade:284
 msgid "Emerge _Paused"
 msgstr "Son kesilen işleme de_vam et"
 
 #: portato/gui/templates/popups.glade:19
-#: portato/gui/templates/MainWindow.glade:198
-#: portato/gui/templates/MainWindow.glade:264
+#: portato/gui/templates/MainWindow.glade:200
+#: portato/gui/templates/MainWindow.glade:266
 msgid "_Kill Emerge"
 msgstr "İşlemi _Durdur"
 
 #: portato/gui/templates/popups.glade:37
-#: portato/gui/templates/MainWindow.glade:68
+#: portato/gui/templates/MainWindow.glade:70
 msgid "gtk-quit"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:7
-msgid "Preferences"
-msgstr "Ayarlar"
-
-#: portato/gui/templates/PreferenceWindow.glade:42
-msgid "Debug"
-msgstr "Hata Çıktısı"
-
-#: portato/gui/templates/PreferenceWindow.glade:55
-msgid "Browser command: "
-msgstr "İnternet Tarayıcısı:"
-
-#: portato/gui/templates/PreferenceWindow.glade:81
-#: portato/gui/templates/PreferenceWindow.glade:539
-msgid "<b>General Options</b>"
-msgstr "<b>Genel Ayarlar</b>"
-
-#: portato/gui/templates/PreferenceWindow.glade:131
-msgid "<b>Update World Options</b>"
-msgstr "<b>Sistem Güncelleme Seçenekleri</b>"
-
-#: portato/gui/templates/PreferenceWindow.glade:159
-msgid "Sync command: "
-msgstr "Eşleme komutu:"
-
-#: portato/gui/templates/PreferenceWindow.glade:180
-msgid "<b>Sync Options</b>"
-msgstr "<b>Eşleme seçenekleri</b>"
-
-#: portato/gui/templates/PreferenceWindow.glade:231
-msgid "File name to use, if package.use is a directory: "
-msgstr "package.use bir dizin ise, kullanılacak dosya adı:"
-
-#: portato/gui/templates/PreferenceWindow.glade:242
-msgid "Add only exact version to package.use"
-msgstr "package.use dosyasına tam paket sürümünü yaz"
-
-#: portato/gui/templates/PreferenceWindow.glade:255
-msgid "Add only exact version to package.keywords"
-msgstr "package.keywords dosyasına tam paket sürümünü yaz"
-
-#: portato/gui/templates/PreferenceWindow.glade:269
-msgid "File name to use, if package.keywords is a directory: "
-msgstr "package.keywords bir dizin ise, kullanılacak dosya adı:"
-
-#: portato/gui/templates/PreferenceWindow.glade:303
-msgid "File name to use, if package.mask/package.unmask is a directory: "
-msgstr "package.mask/package.unmask bir dizin ise, kullanılacak dosya adı:"
-
-#: portato/gui/templates/PreferenceWindow.glade:314
-msgid "Add only exact version to package.mask/package.unmask"
-msgstr "package.mask/package.unmask dosyasına tam paket sürümünü yaz"
-
-#: portato/gui/templates/PreferenceWindow.glade:336
-msgid ""
-"<u>You may use the following placeholders:</u>\n"
-"\n"
-"<i>$(cat)</i>: category\n"
-"<i>$(pkg)</i>: package name\n"
-"<i>$(cat-1)/$(cat-2)</i>: first/second part of the category"
-msgstr ""
-"<u>Şu değişkenleri kullanabilirsiniz:</u>\n"
-"\n"
-"<i>$(cat)</i>: kategori\n"
-"<i>$(pkg)</i>: paket adı\n"
-"<i>$(cat-1)/$(cat-2)</i>: kategorinin birinci-ikinci bölümü"
-
-#: portato/gui/templates/PreferenceWindow.glade:362
-msgid "<u><i>Use-Flags</i></u>"
-msgstr "<u><i>Use-Bayrakları</i></u>"
-
-#: portato/gui/templates/PreferenceWindow.glade:377
-msgid "<u><i>Testing Keywords</i></u>"
-msgstr "<u><i>Test Anahtarları</i></u>"
-
-#: portato/gui/templates/PreferenceWindow.glade:392
-msgid "<u><i>Masking Keywords</i></u>"
-msgstr "<u><i>Maskeleme Anahtarları</i></u>"
-
-#: portato/gui/templates/PreferenceWindow.glade:409
-msgid "<b>Use Flag and Keyword Options</b>"
-msgstr "<u><i>Use Bayrakları ve Anahtar Ayarları</i></u>"
-
-#: portato/gui/templates/PreferenceWindow.glade:427
-#: portato/gui/templates/MainWindow.glade:892
-msgid "General"
-msgstr "Genel"
-
-#: portato/gui/templates/PreferenceWindow.glade:464
-msgid "Enable systray"
-msgstr "Sistem çekmecesine yerleş"
-
-#: portato/gui/templates/PreferenceWindow.glade:477
-msgid "Show emerge progress in window title"
-msgstr "Emerge işlemini pencere başlığında göster"
-
-#: portato/gui/templates/PreferenceWindow.glade:491
-msgid "Show emerge progress in console title"
-msgstr "Emerge işlemini konsol başlığında göster"
-
-#: portato/gui/templates/PreferenceWindow.glade:505
-msgid "Hide on minimization (only if systray is enabled)"
-msgstr "Küçültünce çekmeceye gizle (sistem çekmecesi aktifse)"
-
-#: portato/gui/templates/PreferenceWindow.glade:522
-msgid "Search while typing"
-msgstr "Yazarken ara"
-
-#: portato/gui/templates/PreferenceWindow.glade:573
-msgid "Console Font"
-msgstr "Konsol yazı tipi"
-
-#: portato/gui/templates/PreferenceWindow.glade:583
-msgid "Chose a console font"
-msgstr "Konsol yazı tipi seç"
-
-#: portato/gui/templates/PreferenceWindow.glade:600
-msgid "<b>Console Options</b>"
-msgstr "<b>Konsol Seçenekleri</b>"
-
-#: portato/gui/templates/PreferenceWindow.glade:640
-msgid "Package Tabs"
-msgstr "Paket Sekmeleri"
-
-#: portato/gui/templates/PreferenceWindow.glade:665
-msgid "System Tabs"
-msgstr "Sistem Sekmeleri"
-
-#: portato/gui/templates/PreferenceWindow.glade:691
-msgid "<b>Tab Options</b>"
-msgstr "<b>Sekme Seçenekleri</b>"
-
-#: portato/gui/templates/PreferenceWindow.glade:721
-msgid "Show slots in the version list"
-msgstr "Sürüm listesinde depo numaralarını göster"
-
-#: portato/gui/templates/PreferenceWindow.glade:732
-msgid "<b>Package Options</b>"
-msgstr "<b>Paket Seçenekleri</b>"
-
-#: portato/gui/templates/PreferenceWindow.glade:756
-msgid "Visual"
-msgstr "Görünüm"
-
-#: portato/gui/templates/PreferenceWindow.glade:774
-#: portato/gui/templates/PluginWindow.glade:47
-#: portato/gui/templates/SearchWindow.glade:48
-msgid "gtk-cancel"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:783
-#: portato/gui/templates/PluginWindow.glade:59
-msgid "gtk-apply"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.glade:8
-msgid "Plugins"
-msgstr "Eklentiler"
-
 #: portato/gui/templates/UpdateWindow.glade:7
-msgid "Updateble Packages"
+msgid "Updatable Packages"
 msgstr "Güncellenebilir Paketler"
 
 #: portato/gui/templates/UpdateWindow.glade:49
@@ -214,10 +55,241 @@ msgstr "Portato Hakkında"
 #: portato/gui/templates/AboutWindow.glade:18
 msgid ""
 "This software is licensed under the terms of the GPLv2.\n"
-"Copyright (C) 2006-2007 René 'Necoro' Neumann <necoro@necoro.net>"
+"Copyright (C) 2006-2008 René 'Necoro' Neumann <necoro@necoro.net>"
 msgstr ""
 "Bu yazılım GPLv2 lisansı altında dağıtılmaktadır.\n"
 "Copyright (C) 2006-2007 René 'Necoro' Neumann <necoro@necoro.net>"
+
+#: portato/gui/templates/PreferenceWindow.glade:7
+msgid "Preferences"
+msgstr "Ayarlar"
+
+#: portato/gui/templates/PreferenceWindow.glade:42
+msgid "Debug"
+msgstr "Hata Çıktısı"
+
+#: portato/gui/templates/PreferenceWindow.glade:55
+msgid "Browser command: "
+msgstr "İnternet Tarayıcısı:"
+
+#: portato/gui/templates/PreferenceWindow.glade:81
+#: portato/gui/templates/PreferenceWindow.glade:575
+msgid "<b>General Options</b>"
+msgstr "<b>Genel Ayarlar</b>"
+
+#: portato/gui/templates/PreferenceWindow.glade:148
+msgid "<b>Package sets to update</b>"
+msgstr "<b>Güncellenecek paket setleri</b>"
+
+#: portato/gui/templates/PreferenceWindow.glade:167
+msgid "<b>Update World Options</b>"
+msgstr "<b>Sistem Güncelleme Seçenekleri</b>"
+
+#: portato/gui/templates/PreferenceWindow.glade:195
+msgid "Sync command: "
+msgstr "Eşleme komutu:"
+
+#: portato/gui/templates/PreferenceWindow.glade:216
+msgid "<b>Sync Options</b>"
+msgstr "<b>Eşleme seçenekleri</b>"
+
+#: portato/gui/templates/PreferenceWindow.glade:267
+msgid "File name to use, if package.use is a directory: "
+msgstr "package.use bir dizin ise, kullanılacak dosya adı:"
+
+#: portato/gui/templates/PreferenceWindow.glade:278
+msgid "Add only exact version to package.use"
+msgstr "package.use dosyasına tam paket sürümünü yaz"
+
+#: portato/gui/templates/PreferenceWindow.glade:291
+msgid "Add only exact version to package.keywords"
+msgstr "package.keywords dosyasına tam paket sürümünü yaz"
+
+#: portato/gui/templates/PreferenceWindow.glade:305
+msgid "File name to use, if package.keywords is a directory: "
+msgstr "package.keywords bir dizin ise, kullanılacak dosya adı:"
+
+#: portato/gui/templates/PreferenceWindow.glade:339
+msgid "File name to use, if package.mask/package.unmask is a directory: "
+msgstr "package.mask/package.unmask bir dizin ise, kullanılacak dosya adı:"
+
+#: portato/gui/templates/PreferenceWindow.glade:350
+msgid "Add only exact version to package.mask/package.unmask"
+msgstr "package.mask/package.unmask dosyasına tam paket sürümünü yaz"
+
+#: portato/gui/templates/PreferenceWindow.glade:372
+msgid ""
+"<u>You may use the following placeholders:</u>\n"
+"\n"
+"<i>$(cat)</i>: category\n"
+"<i>$(pkg)</i>: package name\n"
+"<i>$(cat-1)/$(cat-2)</i>: first/second part of the category"
+msgstr ""
+"<u>Şu değişkenleri kullanabilirsiniz:</u>\n"
+"\n"
+"<i>$(cat)</i>: kategori\n"
+"<i>$(pkg)</i>: paket adı\n"
+"<i>$(cat-1)/$(cat-2)</i>: kategorinin birinci-ikinci bölümü"
+
+#: portato/gui/templates/PreferenceWindow.glade:398
+msgid "<u><i>Use-Flags</i></u>"
+msgstr "<u><i>Use-Bayrakları</i></u>"
+
+#: portato/gui/templates/PreferenceWindow.glade:413
+msgid "<u><i>Testing Keywords</i></u>"
+msgstr "<u><i>Test Anahtarları</i></u>"
+
+#: portato/gui/templates/PreferenceWindow.glade:428
+msgid "<u><i>Masking Keywords</i></u>"
+msgstr "<u><i>Maskeleme Anahtarları</i></u>"
+
+#: portato/gui/templates/PreferenceWindow.glade:445
+msgid "<b>Use Flag and Keyword Options</b>"
+msgstr "<u><i>Use Bayrakları ve Anahtar Ayarları</i></u>"
+
+#: portato/gui/templates/PreferenceWindow.glade:463
+#: portato/gui/templates/MainWindow.glade:896
+msgid "General"
+msgstr "Genel"
+
+#: portato/gui/templates/PreferenceWindow.glade:500
+msgid "Enable systray"
+msgstr "Sistem çekmecesine yerleş"
+
+#: portato/gui/templates/PreferenceWindow.glade:513
+msgid "Show emerge progress in window title"
+msgstr "Emerge işlemini pencere başlığında göster"
+
+#: portato/gui/templates/PreferenceWindow.glade:527
+msgid "Show emerge progress in console title"
+msgstr "Emerge işlemini konsol başlığında göster"
+
+#: portato/gui/templates/PreferenceWindow.glade:541
+msgid "Hide on minimization (only if systray is enabled)"
+msgstr "Küçültünce çekmeceye gizle (sistem çekmecesi aktifse)"
+
+#: portato/gui/templates/PreferenceWindow.glade:556
+msgid ""
+"Update the package list with the current search results while you are typing.\n"
+"<b>Note</b>: Will slow down the typing process."
+msgstr ""
+"Siz yazarken aramayı başlatır ve bunu sonuçlara yansıtır.\n"
+"<b>Not</b>: Bu özellik yazma işleminizi yavaşlatacaktır."
+
+#: portato/gui/templates/PreferenceWindow.glade:558
+msgid "Search while typing"
+msgstr "Yazarken ara"
+
+#: portato/gui/templates/PreferenceWindow.glade:612
+msgid "Console Font"
+msgstr "Konsol yazı tipi"
+
+#: portato/gui/templates/PreferenceWindow.glade:623
+msgid "Chose a console font"
+msgstr "Konsol yazı tipi seç"
+
+#: portato/gui/templates/PreferenceWindow.glade:641
+msgid "Maximum length of the console title"
+msgstr "Konsol başlığının en fazla uzunluğu"
+
+#: portato/gui/templates/PreferenceWindow.glade:671
+msgid "<b>Console Options</b>"
+msgstr "<b>Konsol Seçenekleri</b>"
+
+#: portato/gui/templates/PreferenceWindow.glade:711
+msgid "Package Tabs"
+msgstr "Paket Sekmeleri"
+
+#: portato/gui/templates/PreferenceWindow.glade:736
+msgid "System Tabs"
+msgstr "Sistem Sekmeleri"
+
+#: portato/gui/templates/PreferenceWindow.glade:762
+msgid "<b>Tab Options</b>"
+msgstr "<b>Sekme Seçenekleri</b>"
+
+#: portato/gui/templates/PreferenceWindow.glade:795
+msgid "Show slots in the version list"
+msgstr "Sürüm listesinde depo numaralarını göster"
+
+#: portato/gui/templates/PreferenceWindow.glade:805
+msgid ""
+"Organize the categories in a tree. Thereby collapse categories with the same prefix:\n"
+"As an example: <i>app-admin</i>, <i>app-emacs</i>, and <i>app-vim</i> would be collapsed into <i><b>app</b></i> as root and <i>admin</i>, <i>emacs</i>, and <i>vim</i> as children."
+msgstr ""
+"Kategorileri ağaçlar halinde düzenle. Böylelikle aynı gruptaki kategoriler toparlanabilir:\n"
+"Örneğin: <i>app-admin</i>, <i>app-emacs</i>, ve <i>app-vim</i> kategorileri <i><b>app</b></i> altında <i>admin</i>, <i>emacs</i>, ve <i>vim</i> olarak katlanabilecek."
+
+#: portato/gui/templates/PreferenceWindow.glade:807
+msgid "Collapse categories with same prefix"
+msgstr "Aynı bölümdeki kategorileri toparla"
+
+#: portato/gui/templates/PreferenceWindow.glade:823
+msgid "<b>Package Options</b>"
+msgstr "<b>Paket Seçenekleri</b>"
+
+#: portato/gui/templates/PreferenceWindow.glade:847
+msgid "Visual"
+msgstr "Görünüm"
+
+#: portato/gui/templates/PreferenceWindow.glade:865
+#: portato/gui/templates/PluginWindow.glade:223
+#: portato/gui/templates/SearchWindow.glade:48
+#: portato/gui/templates/MailInfoWindow.glade:148
+msgid "gtk-cancel"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:874
+#: portato/gui/templates/PluginWindow.glade:235
+msgid "gtk-apply"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.glade:8
+msgid "Plugins"
+msgstr "Eklentiler"
+
+#: portato/gui/templates/PluginWindow.glade:52
+msgid "_Install dependencies"
+msgstr "Bağımlılıklar_ı Kur"
+
+#: portato/gui/templates/PluginWindow.glade:81
+msgid "Needed dependencies"
+msgstr "Gerekli bağımlılıklar"
+
+#: portato/gui/templates/PluginWindow.glade:98
+#: portato/gui/templates/PluginWindow.glade:123
+#: portato/gui/templates/MainWindow.glade:505
+#: portato/gui/templates/MainWindow.glade:748
+#: portato/gui/templates/MainWindow.glade:764
+#: portato/gui/templates/MainWindow.glade:876
+msgid "label"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.glade:109
+msgid "<b>Author:</b>"
+msgstr "<b>Sahibi:</b>"
+
+#: portato/gui/templates/PluginWindow.glade:144
+#: portato/gui/windows/update.py:47
+#: portato/gui/windows/main.py:325
+#: portato/gui/windows/plugin.py:27
+msgid "Enabled"
+msgstr "Etkin"
+
+#: portato/gui/templates/PluginWindow.glade:154
+#: portato/gui/windows/plugin.py:27
+msgid "Temporarily enabled"
+msgstr "Geçici olarak aktif"
+
+#: portato/gui/templates/PluginWindow.glade:166
+#: portato/gui/windows/plugin.py:27
+msgid "Temporarily disabled"
+msgstr "Geçici olarak pasif"
+
+#: portato/gui/templates/PluginWindow.glade:179
+#: portato/gui/windows/plugin.py:27
+msgid "Disabled"
+msgstr "Pasifleştirildi"
 
 #: portato/gui/templates/SearchWindow.glade:8
 msgid "Search Results"
@@ -231,6 +303,40 @@ msgstr ""
 msgid "gtk-ok"
 msgstr ""
 
+#: portato/gui/templates/MailInfoWindow.glade:6
+msgid "Send Bug Mail ..."
+msgstr "Hata Bildirisi Yolla ..."
+
+#: portato/gui/templates/MailInfoWindow.glade:50
+msgid ""
+"Comments /\n"
+"what did you do to hit the bug?"
+msgstr ""
+"Yorumlar /\n"
+"Hataya ulaşmak için ne yaptınız, nasıl oluştu?"
+
+#: portato/gui/templates/MailInfoWindow.glade:64
+msgid "Name:"
+msgstr "isim:"
+
+#: portato/gui/templates/MailInfoWindow.glade:79
+msgid "Email address:"
+msgstr "E-posta adresi:"
+
+#: portato/gui/templates/MailInfoWindow.glade:122
+msgid ""
+"<b><u>Additional Information</u></b>\n"
+"\n"
+"(all optional)"
+msgstr ""
+"<b><u>Diğer Bilgiler</u></b>\n"
+"\n"
+"(isteğe bağlı)"
+
+#: portato/gui/templates/MailInfoWindow.glade:176
+msgid "_Send"
+msgstr "Gönder"
+
 #: portato/gui/templates/MainWindow.glade:20
 msgid "_File"
 msgstr "_Dosya"
@@ -243,263 +349,203 @@ msgstr "_Ayarlar"
 msgid "Re_load Portage"
 msgstr "Portage'i T_ekrar Yükle"
 
-#: portato/gui/templates/MainWindow.glade:81
+#: portato/gui/templates/MainWindow.glade:83
 msgid "_Emerge"
 msgstr "_Emerge"
 
-#: portato/gui/templates/MainWindow.glade:89
+#: portato/gui/templates/MainWindow.glade:91
 msgid "_Install"
 msgstr "_Kur"
 
-#: portato/gui/templates/MainWindow.glade:105
+#: portato/gui/templates/MainWindow.glade:107
 msgid "_Uninstall"
 msgstr "Kal_dır"
 
-#: portato/gui/templates/MainWindow.glade:121
-#: portato/gui/templates/MainWindow.glade:1111
+#: portato/gui/templates/MainWindow.glade:123
+#: portato/gui/templates/MainWindow.glade:1115
 msgid "Update _World"
 msgstr "Siste_mi Güncelle"
 
-#: portato/gui/templates/MainWindow.glade:130
+#: portato/gui/templates/MainWindow.glade:132
 msgid "Show Updatable P_ackages"
 msgstr "Güncellene_bilecek Paketleri Göster"
 
-#: portato/gui/templates/MainWindow.glade:139
+#: portato/gui/templates/MainWindow.glade:141
 msgid "Show _Only Installed Packages"
 msgstr "_Sadece Kurulu Paketleri Göster"
 
-#: portato/gui/templates/MainWindow.glade:153
+#: portato/gui/templates/MainWindow.glade:155
 msgid "_Sync"
 msgstr "_Eşleme Yap"
 
-#: portato/gui/templates/MainWindow.glade:169
+#: portato/gui/templates/MainWindow.glade:171
 msgid "Save _Flags"
 msgstr "_Bayrakları Kaydet"
 
-#: portato/gui/templates/MainWindow.glade:221
-#: portato/gui/templates/MainWindow.glade:1167
-#: portato/gui/windows/main.py:852
+#: portato/gui/templates/MainWindow.glade:223
+#: portato/gui/templates/MainWindow.glade:1171
+#: portato/gui/windows/main.py:763
 msgid "Queue"
 msgstr "Kuyruk"
 
-#: portato/gui/templates/MainWindow.glade:228
+#: portato/gui/templates/MainWindow.glade:230
 msgid "Oneshot"
 msgstr "Oneshot"
 
-#: portato/gui/templates/MainWindow.glade:240
-#: portato/gui/templates/MainWindow.glade:1192
-#: portato/gui/windows/main.py:1165
-#: portato/gui/windows/main.py:1167
+#: portato/gui/templates/MainWindow.glade:242
+#: portato/gui/templates/MainWindow.glade:1196
+#: portato/gui/windows/main.py:1206
+#: portato/gui/windows/main.py:1208
 msgid "Console"
 msgstr "Konsol"
 
-#: portato/gui/templates/MainWindow.glade:247
+#: portato/gui/templates/MainWindow.glade:249
 msgid "_Copy"
 msgstr "K_opyala"
 
-#: portato/gui/templates/MainWindow.glade:293
+#: portato/gui/templates/MainWindow.glade:295
 msgid "Plu_gins"
 msgstr "Eklen_tiler"
 
-#: portato/gui/templates/MainWindow.glade:305
+#: portato/gui/templates/MainWindow.glade:307
 msgid "_?"
 msgstr "_?"
 
-#: portato/gui/templates/MainWindow.glade:313
+#: portato/gui/templates/MainWindow.glade:315
 msgid "_About"
 msgstr "H_akkında"
 
-#: portato/gui/templates/MainWindow.glade:331
+#: portato/gui/templates/MainWindow.glade:333
 msgid "_Plugins"
 msgstr "Eklen_tiler"
 
-#: portato/gui/templates/MainWindow.glade:373
+#: portato/gui/templates/MainWindow.glade:375
 msgid "gtk-delete"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:387
+#: portato/gui/templates/MainWindow.glade:389
 msgid "gtk-find"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:504
-#: portato/gui/templates/MainWindow.glade:744
-#: portato/gui/templates/MainWindow.glade:760
-#: portato/gui/templates/MainWindow.glade:872
-msgid "label"
-msgstr ""
-
-#: portato/gui/templates/MainWindow.glade:513
+#: portato/gui/templates/MainWindow.glade:516
 msgid "Install onto system"
 msgstr "Sisteme kur"
 
-#: portato/gui/templates/MainWindow.glade:536
+#: portato/gui/templates/MainWindow.glade:539
 msgid "Uninstall from system"
 msgstr "Sistemden kaldır"
 
-#: portato/gui/templates/MainWindow.glade:638
+#: portato/gui/templates/MainWindow.glade:562
+msgid "Revert changes"
+msgstr "Değişiklikleri geri al"
+
+#: portato/gui/templates/MainWindow.glade:642
 msgid "<b>Use Flags:</b>"
 msgstr "<b>Use Bayrakları:</b>"
 
-#: portato/gui/templates/MainWindow.glade:656
-#: portato/gui/windows/main.py:524
-#: portato/gui/windows/main.py:527
-#: portato/gui/windows/main.py:587
-#: portato/gui/windows/main.py:591
+#: portato/gui/templates/MainWindow.glade:660
+#: portato/gui/windows/main.py:418
+#: portato/gui/windows/main.py:421
+#: portato/gui/windows/main.py:479
+#: portato/gui/windows/main.py:483
 msgid "Testing"
 msgstr "Test Sürümü"
 
-#: portato/gui/templates/MainWindow.glade:689
-#: portato/gui/windows/main.py:507
+#: portato/gui/templates/MainWindow.glade:693
+#: portato/gui/windows/main.py:401
+#: portato/gui/windows/main.py:404
+#: portato/gui/windows/main.py:407
+#: portato/gui/windows/main.py:506
 #: portato/gui/windows/main.py:510
-#: portato/gui/windows/main.py:513
-#: portato/gui/windows/main.py:614
-#: portato/gui/windows/main.py:618
-#: portato/gui/windows/main.py:625
-#: portato/gui/windows/main.py:629
+#: portato/gui/windows/main.py:517
+#: portato/gui/windows/main.py:521
 msgid "Masked"
 msgstr "Maskelenmiş"
 
-#: portato/gui/templates/MainWindow.glade:708
-#: portato/gui/windows/main.py:344
+#: portato/gui/templates/MainWindow.glade:712
+#: portato/gui/windows/main.py:326
 msgid "Installed"
 msgstr "Sistemde kurulu"
 
-#: portato/gui/templates/MainWindow.glade:726
+#: portato/gui/templates/MainWindow.glade:730
 msgid "<b>Homepage:</b>"
 msgstr "<b>Anasayfa:</b>"
 
-#: portato/gui/templates/MainWindow.glade:775
+#: portato/gui/templates/MainWindow.glade:779
 msgid "<b>Overlay:</b>"
 msgstr "<b>Depo:</b>"
 
-#: portato/gui/templates/MainWindow.glade:792
+#: portato/gui/templates/MainWindow.glade:796
 msgid "<b>Description:</b>"
 msgstr "<b>Tanım:</b>"
 
-#: portato/gui/templates/MainWindow.glade:824
+#: portato/gui/templates/MainWindow.glade:828
 msgid "<span foreground='red'><b>MISSING KEYWORD</b></span>"
 msgstr "<span foreground='red'><b>packages.keyword'e eklenmeli</b></span>"
 
-#: portato/gui/templates/MainWindow.glade:839
+#: portato/gui/templates/MainWindow.glade:843
 msgid "<b>Installed, but not in portage anymore</b>"
 msgstr "<b>Kuruldu, ancak artık portage'da yok</b>"
 
-#: portato/gui/templates/MainWindow.glade:854
+#: portato/gui/templates/MainWindow.glade:858
 msgid "<b>License:</b>"
 msgstr "<b>Lisans:</b>"
 
-#: portato/gui/templates/MainWindow.glade:923
+#: portato/gui/templates/MainWindow.glade:927
 msgid "Use List"
 msgstr "Use Listesi"
 
-#: portato/gui/templates/MainWindow.glade:957
+#: portato/gui/templates/MainWindow.glade:961
 msgid "Dependencies"
 msgstr "Bağımlılıklar"
 
-#: portato/gui/templates/MainWindow.glade:984
+#: portato/gui/templates/MainWindow.glade:988
 msgid "Ebuild"
 msgstr "Ebuild"
 
-#: portato/gui/templates/MainWindow.glade:1011
+#: portato/gui/templates/MainWindow.glade:1015
 msgid "Changelog"
 msgstr "Değişiklikler"
 
-#: portato/gui/templates/MainWindow.glade:1038
+#: portato/gui/templates/MainWindow.glade:1042
 msgid "Files"
 msgstr "Dosyalar"
 
-#: portato/gui/templates/MainWindow.glade:1076
+#: portato/gui/templates/MainWindow.glade:1080
 msgid "Execute the current selected queue"
 msgstr "Geçerli kuyruğu uygula"
 
-#: portato/gui/templates/MainWindow.glade:1095
+#: portato/gui/templates/MainWindow.glade:1099
 msgid "E_xecute"
 msgstr "_Çalıştır"
 
-#: portato/gui/templates/MainWindow.glade:1110
+#: portato/gui/templates/MainWindow.glade:1114
 msgid "Calculate the packages which will be installed during an \"update world\""
 msgstr "\"Sistem güncellemesi\" sırasında yapılacak işlemleri hesapla"
 
-#: portato/gui/templates/MainWindow.glade:1123
+#: portato/gui/templates/MainWindow.glade:1127
 msgid "Remove the selected package from the queue"
 msgstr "Seçilen paketi kuyruktan çıkar"
 
-#: portato/gui/templates/MainWindow.glade:1124
+#: portato/gui/templates/MainWindow.glade:1128
 msgid "_Remove"
 msgstr "_Kaldır"
 
-#: portato/gui/templates/MainWindow.glade:1226
+#: portato/gui/templates/MainWindow.glade:1231
 msgid "Log"
 msgstr "Kayıtlar"
 
-#: portato/config_parser.py:271
-#, python-format
-msgid "Unrecognized line in configuration: %s"
-msgstr ""
+#: portato.py:40
+msgid "do not fork off as root"
+msgstr "root hakları olmadan başla"
 
-#: portato/plugins/notify.py:11
-msgid "Notify called while process is still running!"
-msgstr ""
+#: portato.py:40
+msgid "-L is deprecated"
+msgstr "-L kullanılmıyor"
 
-#: portato/plugins/notify.py:15
-msgid "Emerge finished!"
-msgstr "Emerge tamamlandı!"
-
-#: portato/plugins/notify.py:19
-msgid "Emerge failed!"
-msgstr "Emerge başarısız!"
-
-#: portato/plugins/notify.py:20
-#, python-format
-msgid "Error Code: %d"
-msgstr "Hata Kodu: %d"
-
-#: portato/plugins/resume_loop.py:30
-msgid "Resume-loop called while process is still running!"
-msgstr "Devam et çağrısı, işlem devam ederken geldi!"
-
-#: portato/plugins/etc_proposals.py:25
-msgid "Cannot start etc-proposals. Not root!"
-msgstr "etc-proposals başlatılamıyor. Root değilsiniz!"
-
-#: portato/plistener.py:89
-msgid "Listener has not been started."
-msgstr "Dinleyici başlatılmadı."
-
-#: portato/gui/exception_handling.py:45
-msgid "A programming error has been detected during the execution of this program."
-msgstr "Programın çalıştırılması sırasında bir programlama hatası tesbit edildi."
-
-#: portato/gui/exception_handling.py:46
-msgid "Bug Detected"
-msgstr "Hata Tespit Edildi"
-
-#: portato/gui/exception_handling.py:47
-msgid "It probably isn't fatal, but should be reported to the developers nonetheless."
-msgstr "Büyük ihtimalle ölümcül değil, ancak geliştiricilere bildirmekte fayda var."
-
-#: portato/gui/exception_handling.py:49
-msgid "Show Details"
-msgstr "Ayrıntıları Göster"
-
-#: portato/gui/exception_handling.py:72
-#: portato/gui/exception_handling.py:135
-#, python-format
-msgid ""
-"Exception in thread \"%(thread)s\":\n"
-"%(trace)s"
-msgstr ""
-
-#: portato/gui/exception_handling.py:88
-msgid "Save traceback..."
-msgstr "Geribeslemeyi kaydet..."
-
-#: portato/gui/exception_handling.py:137
-#, python-format
-msgid ""
-"Exception:\n"
-"%s"
-msgstr ""
+#: portato.py:48
+msgid "Starting Portato"
+msgstr "Portato başlatılıyor"
 
 #: portato/gui/wrapper.py:59
 msgid "oneshot"
@@ -543,55 +589,69 @@ msgstr "Kaldır"
 msgid "Update"
 msgstr "Güncelle"
 
-#: portato/gui/updater.py:95
-#, python-format
-msgid "Trying to remove package '%s' from queue which does not exist in system."
-msgstr "Sistemde olmayan '%s' pakedi kuyruktan kaldırılmaya çalışılıyor."
-
 #: portato/gui/dialogs.py:17
-msgid ""
-"There are some packages in the emerge queue and/or an emerge process is running.\n"
-"Do you really want to quit?"
-msgstr ""
-"Kuyrukta ya da işlemi devam eden dosyalar var.\n"
-"Gerçekten çıkmak istiyor musunuz?"
+msgid "Mail could not be sent"
+msgstr "E-posta gönderilemedi"
 
-#: portato/gui/dialogs.py:36
+#: portato/gui/dialogs.py:18
 #, python-format
-msgid ""
-"%(blocked)s is blocked by %(blocks)s.\n"
-"Please unmerge the blocking package."
-msgstr ""
-"%(blocked)s paketi %(blocks)s tarafından engelleniyor.\n"
-"Lütfen engelleyen paketi kaldırın."
+msgid "The error was: %s"
+msgstr "Hata: %s"
 
-#: portato/gui/dialogs.py:42
+#: portato/gui/dialogs.py:24
+msgid "Do you really want to quit?"
+msgstr "Gerçekten çıkmak istiyor musunuz?"
+
+#: portato/gui/dialogs.py:25
+msgid "There are some packages in the emerge queue and/or an emerge process is running."
+msgstr "Kuyrukta ya da işlemi devam eden dosyalar var ve/veya şu anda bir işlem devam ediyor."
+
+#: portato/gui/dialogs.py:43
+#, python-format
+msgid "%(blocked)s is blocked by %(blocks)s."
+msgstr "%(blocked)s paketi %(blocks)s tarafından engelleniyor."
+
+#: portato/gui/dialogs.py:44
+msgid "Please unmerge the blocking package."
+msgstr "Lütfen engelleyen paketi kaldırın."
+
+#: portato/gui/dialogs.py:50
 msgid "You are not root."
 msgstr "Yönetici haklarına sahip değilsiniz."
 
-#: portato/gui/dialogs.py:48
+#: portato/gui/dialogs.py:56
 #, python-format
-msgid ""
-"%s seems to be masked.\n"
-"Do you want to unmask it and its dependencies?"
-msgstr ""
-"%s maskelenmiş görünüyor.\n"
-"Bu paketin ve bağımlı paketlerin maskelerini kaldırmak ister misiniz?"
+msgid "%s seems to be masked."
+msgstr "%s maskelenmiş görünüyor."
 
-#: portato/gui/dialogs.py:54
+#: portato/gui/dialogs.py:57
+msgid "Do you want to unmask it and its dependencies?"
+msgstr "Bu paketin ve bağımlı paketlerin maskelerini kaldırmak ister misiniz?"
+
+#: portato/gui/dialogs.py:63
 msgid "Package not found!"
 msgstr "Paket bulunamadı!"
 
-#: portato/gui/dialogs.py:61
-#, python-format
-msgid "You have changed %s. Portato will write these changes into the appropriate files. Please backup them if you think it is necessairy."
-msgstr "%s 'i değiştirdiniz. Portato gereken dosyalarda değişiklik yapacak. Lütfen gerekli olduğunu düşünüyorsanız yedek alın."
+#: portato/gui/dialogs.py:69
+msgid "Do not show this dialog again."
+msgstr "Bu uyarıyı bir daha gösterme."
 
-#: portato/gui/dialogs.py:67
+#: portato/gui/dialogs.py:70
+#, python-format
+msgid "Changed %s"
+msgstr "%s değiştirildi"
+
+#: portato/gui/dialogs.py:71
+msgid ""
+"Portato will write these changes into the appropriate files.\n"
+"Please backup them if you think it is necessairy."
+msgstr "Portato gereken dosyalarda değişiklik yapacak. Lütfen gerekli olduğunu düşünüyorsanız yedek alın."
+
+#: portato/gui/dialogs.py:80
 msgid "You cannot remove dependencies. :)"
 msgstr "Bağımlılıkları kaldıramazsınız. :)"
 
-#: portato/gui/dialogs.py:73
+#: portato/gui/dialogs.py:86
 msgid ""
 "This is the updates queue. You cannot remove single elements.\n"
 "Do you want to clear the whole queue instead?"
@@ -599,192 +659,247 @@ msgstr ""
 "Bu güncelleştirme kuyruğu. Sadece bir öğeyi kaldıramazsınız.\n"
 "Bütün kuyruktakileri kaldırmak ister misiniz?"
 
-#: portato/gui/dialogs.py:79
+#: portato/gui/dialogs.py:92
 msgid "Do you really want to clear the whole queue?"
 msgstr "Geçerli kuyruğu temizlemek istiyor musunuz?"
 
-#: portato/gui/windows/update.py:47
-#: portato/gui/windows/main.py:343
-#: portato/gui/windows/plugin.py:24
-msgid "Enabled"
-msgstr "Etkin"
+#: portato/gui/views.py:70
+msgid "Package is not installed"
+msgstr "Paket kurulu değil"
 
-#: portato/gui/windows/update.py:48
-msgid "Package"
-msgstr "Paket"
-
-#: portato/gui/windows/splash.py:36
+#: portato/gui/views.py:87
 #, python-format
-msgid "... is starting up: %s"
-msgstr "... başlatılıyor: %s"
+msgid "No %(old)s language file installed. Falling back to %(new)s."
+msgstr "Hiç %(old)s dil dosyası yüklenmedi. %(new)s dosyasına geri dönülüyor."
 
-#: portato/gui/windows/main.py:172
-msgid "<no description>"
-msgstr "<tanım yok>"
-
-#: portato/gui/windows/main.py:198
-msgid "The first homepage part does not start with 'http' or 'ftp'."
-msgstr "Anasayfa 'http' veya 'ftp' ile başlamıyor."
-
-#: portato/gui/windows/main.py:202
-msgid "Blank inside homepage."
-msgstr ""
-
-#: portato/gui/windows/main.py:243
+#: portato/gui/views.py:96
 #, python-format
-msgid "If '%s' is disabled"
-msgstr "Eğer '%s' pasifse"
+msgid "No %(old)s language file installed. Disable highlighting."
+msgstr "Hiç %(old)s dil dosyası yüklenmedi. Vurguyu etkisizleştir."
 
-#: portato/gui/windows/main.py:245
-#, python-format
-msgid "If '%s' is enabled"
-msgstr "Eğer '%s' USE bayrağı etkinse"
-
-#: portato/gui/windows/main.py:253
-msgid "One of the following"
-msgstr "Ardındakilerden birisi"
-
-#: portato/gui/windows/main.py:257
-msgid "All of the following"
-msgstr "Ardındakilerin hepsi"
-
-#: portato/gui/windows/main.py:280
-msgid "Can't display dependencies: This package has an unsupported dependency string."
-msgstr "Bağımlılıklar gösterilemiyor: Bu paket desteklenmeyen bir bağımlılık listesine sahip."
-
-#: portato/gui/windows/main.py:304
-msgid "This is an expanded use flag and cannot be selected"
-msgstr "Bu genişletilmiş bir bayrak, seçilemez"
-
-#: portato/gui/windows/main.py:345
-msgid "Flag"
-msgstr "Bayrak"
-
-#: portato/gui/windows/main.py:346
-msgid "Description"
-msgstr "Tanım"
-
-#: portato/gui/windows/main.py:357
-msgid "Versions"
-msgstr "Sürümler"
-
-#: portato/gui/windows/main.py:360
-msgid "Slot"
-msgstr "Depo"
-
-#: portato/gui/windows/main.py:454
-#, python-format
-msgid "Package could not be found: %s"
-msgstr "Paket bulunamadı: %s"
-
-#: portato/gui/windows/main.py:516
-#: portato/gui/windows/main.py:616
-msgid "Masked by user"
-msgstr "Kullanıcı tarafından maskelendi"
-
-#: portato/gui/windows/main.py:699
-msgid "Loading Config"
-msgstr "Ayarlar Yükleniyor"
-
-#: portato/gui/windows/main.py:711
-msgid "Creating Database"
-msgstr "Veritabanı Oluşturuluyor"
-
-#: portato/gui/windows/main.py:716
-msgid "Loading Plugins"
-msgstr "Eklentiler Yükleniyor"
-
-#: portato/gui/windows/main.py:729
-msgid "Building frontend"
-msgstr "Arayüz oluşturuluyor"
-
-#: portato/gui/windows/main.py:772
 #: portato/gui/views.py:115
+#: portato/gui/windows/main.py:669
 #, python-format
 msgid "Error: %s"
 msgstr "Hata: %s"
 
-#: portato/gui/windows/main.py:811
-msgid "Restoring Session"
-msgstr "Oturum Başlatılıyor"
-
-#: portato/gui/windows/main.py:820
-msgid "Finishing startup"
-msgstr "Açılış tamamlanıyor"
-
-#: portato/gui/windows/main.py:855
-msgid "Options"
-msgstr "Seçenekler"
-
-#: portato/gui/windows/main.py:867
-msgid "Categories"
-msgstr "Kategoriler"
-
-#: portato/gui/windows/main.py:903
-msgid "Packages"
-msgstr "Paketler"
-
-#: portato/gui/windows/main.py:971
+#: portato/gui/updater.py:96
 #, python-format
-msgid "Translating session from version %d to %d."
-msgstr ""
+msgid "No unmasked version of package '%s' found. Trying masked ones. This normally should not happen..."
+msgstr "'%s' pakedinin maskelenmemiş bir sürümü bulunamadı. Maskelenmiş sürümleri deneniyor. Normalde bu olmamalı..."
 
-#: portato/gui/windows/main.py:974
+#: portato/gui/updater.py:100
 #, python-format
-msgid "Cannot translate session from version %d to %d."
+msgid "Trying to remove package '%s' from queue which does not exist in system."
+msgstr "Sistemde olmayan '%s' pakedi kuyruktan kaldırılmaya çalışılıyor."
+
+#: portato/gui/exception_handling.py:31
+msgid "A programming error has been detected during the execution of this program."
+msgstr "Programın çalıştırılması sırasında bir programlama hatası tespit edildi."
+
+#: portato/gui/exception_handling.py:32
+msgid "Bug Detected"
+msgstr "Hata Tespit Edildi"
+
+#: portato/gui/exception_handling.py:33
+msgid "It probably isn't fatal, but should be reported to the developers nonetheless."
+msgstr "Büyük ihtimalle ölümcül değil, ancak geliştiricilere bildirmekte fayda var."
+
+#: portato/gui/exception_handling.py:35
+msgid "Show Details"
+msgstr "Ayrıntıları Göster"
+
+#: portato/gui/exception_handling.py:36
+msgid "Send..."
+msgstr "Gönder..."
+
+#: portato/gui/exception_handling.py:59
+#: portato/gui/exception_handling.py:125
+#, python-format
+msgid ""
+"Exception in thread \"%(thread)s\":\n"
+"%(trace)s"
 msgstr ""
+"Beklenmeyen bir durum oluştu \"%(thread)s\":\n"
+"%(trace)s"
 
-#: portato/gui/windows/main.py:1296
-msgid "use flags"
-msgstr "use bayrakları"
+#: portato/gui/exception_handling.py:75
+msgid "Save traceback..."
+msgstr "Geribeslemeyi kaydet..."
 
-#: portato/gui/windows/main.py:1307
-msgid "masking keywords"
-msgstr "maskeleme anahtarları"
+#: portato/gui/exception_handling.py:127
+#, python-format
+msgid ""
+"Exception:\n"
+"%s"
+msgstr ""
+"istisna:\n"
+"%s"
 
-#: portato/gui/windows/plugin.py:24
-msgid "Disabled"
-msgstr "Pasifleştirildi"
-
-#: portato/gui/windows/plugin.py:24
-msgid "Temporarily enabled"
-msgstr "Geçici olarak aktif"
-
-#: portato/gui/windows/plugin.py:24
-msgid "Temporarily disabled"
-msgstr "Geçici olarak pasif"
-
-#: portato/gui/windows/plugin.py:43
-msgid "Plugin"
-msgstr "Eklenti"
-
-#: portato/gui/windows/plugin.py:46
-msgid "Authors"
-msgstr "Üreticiler"
-
-#: portato/gui/windows/plugin.py:55
-msgid "Status"
-msgstr "Durum"
+#: portato/gui/__init__.py:21
+msgid "Loading Backend"
+msgstr "Portato Yükleniyor"
 
 #: portato/gui/windows/search.py:57
 msgid "Results"
 msgstr "Sonuçlar"
 
-#: portato/gui/windows/preference.py:116
+#: portato/gui/windows/mailinfo.py:71
+#, python-format
+msgid "An error occurred while sending. I think we were greylisted. The error: %s"
+msgstr "Gönderirken bir hata oluştu. Hata: %s"
+
+#: portato/gui/windows/mailinfo.py:72
+msgid "Retrying after waiting 60 seconds."
+msgstr "60 saniye sonra tekrar denenecek."
+
+#: portato/gui/windows/update.py:48
+msgid "Package"
+msgstr "Paket"
+
+#: portato/gui/windows/splash.py:35
+#, python-format
+msgid "... is starting up: %s"
+msgstr "... başlatılıyor: %s"
+
+#: portato/gui/windows/preference.py:133
 msgid "Top"
 msgstr "Üst"
 
-#: portato/gui/windows/preference.py:116
+#: portato/gui/windows/preference.py:133
 msgid "Bottom"
 msgstr "Alt"
 
-#: portato/gui/windows/preference.py:116
+#: portato/gui/windows/preference.py:133
 msgid "Left"
 msgstr "Sol"
 
-#: portato/gui/windows/preference.py:116
+#: portato/gui/windows/preference.py:133
 msgid "Right"
 msgstr "Sağ"
+
+#: portato/gui/windows/preference.py:190
+msgid "Package Set"
+msgstr "Paket Seti"
+
+#: portato/gui/windows/preference.py:195
+#: portato/gui/windows/main.py:328
+msgid "Description"
+msgstr "Tanım"
+
+#: portato/gui/windows/main.py:154
+msgid "<no description>"
+msgstr "<tanım yok>"
+
+#: portato/gui/windows/main.py:180
+msgid "The first homepage part does not start with 'http' or 'ftp'."
+msgstr "Anasayfa 'http' veya 'ftp' ile başlamıyor."
+
+#: portato/gui/windows/main.py:184
+msgid "Blank inside homepage."
+msgstr ""
+
+#: portato/gui/windows/main.py:225
+#, python-format
+msgid "If '%s' is disabled"
+msgstr "Eğer '%s' pasifse"
+
+#: portato/gui/windows/main.py:227
+#, python-format
+msgid "If '%s' is enabled"
+msgstr "Eğer '%s' USE bayrağı etkinse"
+
+#: portato/gui/windows/main.py:235
+msgid "One of the following"
+msgstr "Ardındakilerden birisi"
+
+#: portato/gui/windows/main.py:239
+msgid "All of the following"
+msgstr "Ardındakilerin hepsi"
+
+#: portato/gui/windows/main.py:262
+msgid "Can't display dependencies: This package has an unsupported dependency string."
+msgstr "Bağımlılıklar gösterilemiyor: Bu paket desteklenmeyen bir bağımlılık listesine sahip."
+
+#: portato/gui/windows/main.py:286
+msgid "This is an expanded use flag and cannot be selected"
+msgstr "Bu genişletilmiş bir bayrak, seçilemez"
+
+#: portato/gui/windows/main.py:327
+msgid "Flag"
+msgstr "Bayrak"
+
+#: portato/gui/windows/main.py:348
+#, python-format
+msgid "Package could not be found: %s"
+msgstr "Paket bulunamadı: %s"
+
+#: portato/gui/windows/main.py:410
+#: portato/gui/windows/main.py:508
+msgid "Masked by user"
+msgstr "Kullanıcı tarafından maskelendi"
+
+#: portato/gui/windows/main.py:591
+msgid "Loading Config"
+msgstr "Ayarlar Yükleniyor"
+
+#: portato/gui/windows/main.py:603
+msgid "Creating Database"
+msgstr "Veritabanı Oluşturuluyor"
+
+#: portato/gui/windows/main.py:608
+msgid "Loading Plugins"
+msgstr "Eklentiler Yükleniyor"
+
+#: portato/gui/windows/main.py:621
+msgid "Building frontend"
+msgstr "Arayüz oluşturuluyor"
+
+#: portato/gui/windows/main.py:705
+msgid "Restoring Session"
+msgstr "Oturum Başlatılıyor"
+
+#: portato/gui/windows/main.py:714
+msgid "Finishing startup"
+msgstr "Açılış tamamlanıyor"
+
+#: portato/gui/windows/main.py:766
+msgid "Options"
+msgstr "Seçenekler"
+
+#: portato/gui/windows/main.py:780
+msgid "Categories"
+msgstr "Kategoriler"
+
+#: portato/gui/windows/main.py:839
+msgid "Packages"
+msgstr "Paketler"
+
+#: portato/gui/windows/main.py:887
+msgid "Versions"
+msgstr "Sürümler"
+
+#: portato/gui/windows/main.py:890
+msgid "Slot"
+msgstr "Depo"
+
+#: portato/gui/windows/main.py:988
+#, python-format
+msgid "Translating session from version %d to %d."
+msgstr "Oturum %d sürümünden %d sürümüne çeviriliyor."
+
+#: portato/gui/windows/main.py:991
+#, python-format
+msgid "Cannot translate session from version %d to %d."
+msgstr "Oturum %d sürümünden %d sürümüne çevirilemedi."
+
+#: portato/gui/windows/main.py:1359
+msgid "use flags"
+msgstr "use bayrakları"
+
+#: portato/gui/windows/main.py:1371
+msgid "masking keywords"
+msgstr "maskeleme anahtarları"
 
 #: portato/gui/session.py:21
 msgid "Version mismatch."
@@ -797,152 +912,149 @@ msgstr "'%d' alındı - '%d' bekleniyordu."
 
 #: portato/gui/session.py:30
 msgid "Current session format is too old."
-msgstr ""
+msgstr "Şimdiki oturum formatı çok eski."
 
 #: portato/gui/session.py:33
 msgid "Current session format is newer than this version supports."
-msgstr ""
+msgstr "Şimdiki oturum formatı, bu sürümün desteklediğinden daha yeni."
 
-#: portato/gui/utils.py:135
+#: portato/gui/utils.py:159
 msgid "ALL"
 msgstr "TÜMÜ"
 
-#: portato/gui/utils.py:222
+#: portato/gui/utils.py:246
 #, python-format
 msgid "Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?"
 msgstr "Catched KeyError => %s geçerli bir kategoride görünmüyor. rsync-excludes değerleri ile mi oynadınız?"
 
-#: portato/gui/utils.py:283
+#: portato/gui/utils.py:307
 #, python-format
 msgid "Error while compiling search expression: '%s'."
 msgstr ""
 
-#: portato/gui/views.py:70
-msgid "Package is not installed"
-msgstr "Paket kurulu değil"
-
-#: portato/gui/views.py:87
-#, python-format
-msgid "No %(old)s language file installed. Falling back to %(new)s."
-msgstr ""
-
-#: portato/gui/views.py:96
-#, python-format
-msgid "No %(old)s language file installed. Disable highlighting."
-msgstr ""
-
-#: portato/gui/__init__.py:22
-msgid "Loading Backend"
-msgstr "Portato Yükleniyor"
-
-#: portato/backend/catapult/package.py:99
-#: portato/backend/portage/package.py:132
-#, python-format
-msgid "BUG in flags.new_masking_status. It returns '%s'"
-msgstr ""
-
-#: portato/backend/flags.py:528
+#: portato/backend/flags.py:527
 #, python-format
 msgid "Conflicting values for masking status: %s"
 msgstr "Maskelemede çelişen değerler: %s"
 
-#: portato/backend/portage/system.py:333
+#: portato/backend/portage/system.py:260
 #, python-format
 msgid "No best match for %s. It seems not to be in the tree anymore."
 msgstr "%s için iyi bir eşleşme bulunamadı. Artık portage ağacında olmayacak gibi görünüyor."
 
-#: portato/backend/portage/system.py:403
+#: portato/backend/portage/system.py:318
 #, python-format
 msgid "Found a not installed dependency: %s."
 msgstr "Kurulmamış bir bağımlılık bulundu: %s."
 
-#: portato/backend/portage/system.py:445
+#: portato/backend/portage/system.py:360
 #, python-format
 msgid "Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
 msgstr "Hata? '%(package)s' için iyi bir eşlenme bulunamadı. Ancak pakede '%(cpv)s' tarafından ihtiyaç duyuluyor."
 
-#: portato/plugin.py:298
-#: portato/plugin.py:304
-#: portato/plugin.py:309
+#: portato/backend/portage/package.py:130
 #, python-format
-msgid "%s cannot be imported."
-msgstr "%s içe aktarılamadı."
+msgid "BUG in flags.new_masking_status. It returns '%s'"
+msgstr "Bayraklarda hata .new_masking_status. Çıktısı '%s'"
 
-#: portato/plugin.py:336
-#, python-format
-msgid "Accessing hook '%(hook)s' of plugin '%(plugin)s' (before)."
-msgstr ""
-
-#: portato/plugin.py:340
-#, python-format
-msgid "Overriding hook '%(hook)s' with plugin '%(plugin)s'."
-msgstr ""
-
-#: portato/plugin.py:347
-#, python-format
-msgid "Accessing hook '%(hook)s' of plugin '%(plugin)s' (after)."
-msgstr ""
-
-#: portato/plugin.py:367
-#, python-format
-msgid "Loading plugin '%s' failed. Invalid XML syntax."
-msgstr "'%s' eklentisi yüklenemedi. XML sözdizimi hatası."
-
-#: portato/plugin.py:370
-#, python-format
-msgid "Loading plugin '%s' failed. Plugin does not comply with schema."
-msgstr "'%s' eklentisi yüklenemedi. Eklenti şemaya uymuyor."
-
-#: portato/plugin.py:398
-#, python-format
-msgid "Plugin '%s' loaded."
-msgstr "'%s' eklentisi yüklendi."
-
-#: portato/plugin.py:401
-#, python-format
-msgid "Loading plugin '%(plugin)s' failed: Could not import %(import)s"
-msgstr "'%(plugin)s' eklentisi yüklenemedi. %(import)s içe aktarılamadı."
-
-#: portato/plugin.py:466
-#, python-format
-msgid "For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"
-msgstr ""
+#: portato/helper.py:76
+msgid "Invalid dependency string"
+msgstr "Geçersiz bağımlılık listesi"
 
 #: portato/session.py:47
 #, python-format
 msgid "Loading session from '%s'."
+msgstr "'%s' kaynağından oturum yükleniyor."
+
+#: portato/plistener.py:88
+msgid "Listener has not been started."
+msgstr "Dinleyici başlatılmadı."
+
+#: portato/config_parser.py:270
+#, python-format
+msgid "Unrecognized line in configuration: %s"
+msgstr "Yapılandırmada tanınmayan satır: %s"
+
+#: portato/plugin.py:330
+#: portato/plugin.py:333
+#, python-format
+msgid "Loading plugin '%(plugin)s' failed: %(error)s"
+msgstr "'%(plugin)s' eklentisi yüklenemedi: %(error)s"
+
+#: portato/plugin.py:366
+msgid "Plugin is disabled!"
+msgstr "Eklenti pasifleştirildi!"
+
+#: portato/plugin.py:368
+msgid "Plugin has unresolved dependencies - disabled!"
+msgstr "Eklenti sağlam bağımlılıklara sahip değil - etkisizleştirildi!"
+
+#: portato/plugin.py:372
+#, python-format
+msgid "Plugin '%s' loaded."
+msgstr "'%s' eklentisi yüklendi."
+
+#: portato/plugin.py:412
+#, python-format
+msgid "Overriding hook '%(hook)s' with plugin '%(plugin)s'."
+msgstr "'%(plugin)s' ile '%(hook)s' üzerine yazılıyor."
+
+#: portato/plugin.py:470
+#, python-format
+msgid "For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"
 msgstr ""
 
-#: portato/helper.py:77
-msgid "Invalid dependency string"
-msgstr "Geçersiz bağımlılık listesi"
-
-#: portato.py:42
-msgid "validates the given plugin xml instead of launching Portato"
-msgstr "Portato'yu başlatmaz, verilen eklenti xml dosyasını tanıtır"
-
-#: portato.py:45
-msgid "do not fork off as root"
-msgstr "root hakları olmadan başla"
-
-#: portato.py:45
-msgid "-L is deprecated"
-msgstr "-L kullanılmıyor"
-
-#: portato.py:55
+#: portato/plugin.py:471
 #, python-format
-msgid "Validation failed. XML syntax error: %s."
-msgstr "Geçerli değil. XML sözdizimi hatası: %s."
+msgid "It is now replaced by the one from plugin '%s'!"
+msgstr ""
 
-#: portato.py:58
-msgid "Validation failed. Does not comply with schema."
-msgstr "Geçerli değil. Şemaya uymuyor."
+#: portato/plugin.py:504
+#, python-format
+msgid "Command for hook '%(hook)s' in plugin '%(plugin)s' could not be added due to missing dependant: '%(dep)s'!"
+msgstr ""
 
-#: portato.py:61
-msgid "Validation succeeded."
-msgstr "Geçerli."
+#: plugins/etc_proposals.py:32
+msgid "Cannot start etc-proposals. Not root!"
+msgstr "etc-proposals başlatılamıyor. Root değilsiniz!"
 
-#: portato.py:67
-msgid "Starting Portato"
-msgstr "Portato başlatılıyor"
+#: plugins/notify.py:35
+msgid "Notify called while process is still running!"
+msgstr "işlem devam ederken çağrı yapıldı!"
+
+#: plugins/notify.py:39
+msgid "Emerge finished!"
+msgstr "Emerge tamamlandı!"
+
+#: plugins/notify.py:43
+msgid "Emerge failed!"
+msgstr "Emerge başarısız!"
+
+#: plugins/notify.py:44
+#, python-format
+msgid "Error Code: %d"
+msgstr "Hata Kodu: %d"
+
+#~ msgid "Resume-loop called while process is still running!"
+#~ msgstr "Devam et çağrısı, işlem devam ederken geldi!"
+#~ msgid "Plugin"
+#~ msgstr "Eklenti"
+#~ msgid "Authors"
+#~ msgstr "Üreticiler"
+#~ msgid "Status"
+#~ msgstr "Durum"
+#~ msgid "%s cannot be imported."
+#~ msgstr "%s içe aktarılamadı."
+#~ msgid "Loading plugin '%s' failed. Invalid XML syntax."
+#~ msgstr "'%s' eklentisi yüklenemedi. XML sözdizimi hatası."
+#~ msgid "Loading plugin '%s' failed. Plugin does not comply with schema."
+#~ msgstr "'%s' eklentisi yüklenemedi. Eklenti şemaya uymuyor."
+#~ msgid "validates the given plugin xml instead of launching Portato"
+#~ msgstr "Portato'yu başlatmaz, verilen eklenti xml dosyasını tanıtır"
+#~ msgid "Validation failed. XML syntax error: %s."
+#~ msgstr "Geçerli değil. XML sözdizimi hatası: %s."
+#~ msgid "Validation failed. Does not comply with schema."
+#~ msgstr "Geçerli değil. Şemaya uymuyor."
+#~ msgid "Validation succeeded."
+#~ msgstr "Geçerli."
 
