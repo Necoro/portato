@@ -29,6 +29,7 @@ class PortageSettings:
 	def __init__ (self):
 		"""Initializes the instance. Calls L{load()}."""
 		self.settingslock = Lock()
+		self.trees = None
 		self.load()
 		
 	def load(self):
@@ -37,7 +38,7 @@ class PortageSettings:
 		kwargs = {}
 		for k, envvar in (("config_root", "PORTAGE_CONFIGROOT"), ("target_root", "ROOT")):
 			kwargs[k] = os.environ.get(envvar, None)
-		self.trees = portage.create_trees(trees=None, **kwargs)
+		self.trees = portage.create_trees(trees=self.trees, **kwargs)
 
 		self.settings = self.trees["/"]["vartree"].settings
 
