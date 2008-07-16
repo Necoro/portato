@@ -14,12 +14,19 @@
 
 from __future__ import with_statement, absolute_import
 
+import signal
 import sys, os, subprocess
 import gettext, locale
 from optparse import OptionParser, SUPPRESS_HELP
 
 from portato import get_listener
+from portato.helper import debug, info
 from portato.constants import VERSION, LOCALE_DIR, APP, SU_COMMAND
+
+def sigchld_aborter (signal, frame):
+	"""Aborts the current process when the child dies."""
+	debug("Child process died. Trying to abort.")
+	raise KeyboardInterrupt
 
 def main ():
 	# set gettext stuff
@@ -44,7 +51,6 @@ def main ():
 
 	if options.nofork or os.getuid() == 0: # start GUI
 		from portato.gui import run
-		from portato.helper import info
 		info("%s v. %s", _("Starting Portato"), VERSION)
 		
 		if options.shm:
@@ -67,7 +73,11 @@ def main ():
 		env.update(DBUS_SESSION_BUS_ADDRESS="")
 		cmd = SU_COMMAND.split()
 		subprocess.Popen(cmd+["%s --no-fork --shm %ld %ld %ld" % (sys.argv[0], mem.key, sig.key, rw.key)], env = env)
+
+		# set handler to abort the listener if needed
+		signal.signal(signal.SIGCHLD, sigchld_aborter)
 		
+		# stast listener
 		get_listener().set_recv(mem, sig, rw)
 
 if __name__ == "__main__":

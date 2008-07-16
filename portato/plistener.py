@@ -56,6 +56,7 @@ class PListener (object):
 				elif data[0] == "close":
 					break
 			except KeyboardInterrupt:
+				debug("Got KeyboardInterrupt. Aborting.")
 				break
 
 		self._mem.remove()
