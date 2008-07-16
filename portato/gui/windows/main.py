@@ -1420,13 +1420,14 @@ class MainWindow (Window):
 			watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
 			self.window.window.set_cursor(watch)
 			try:
-				self.updateSets = ("world", "system") # default
 				if system.has_set_support():
 					confsets = [x.strip() for x in self.cfg.get("updatesets").split(",")]
-					syssets = system.get_sets()
-					self.updateSets = [s for s in confsets if s in syssets]
-
-				updating = system.update_world(sets = self.updateSets, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
+					self.updateSets = [s for s in confsets if s in system.get_sets()]
+					updating = system.update_world(sets = self.updateSets, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
+				else:
+					updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
+					self.updateSets = ("world",)
+				
 				debug("updating list: %s --> length: %s", [(x.get_cpv(), y.get_cpv()) for x,y in updating], len(updating))
 				gobject.idle_add(cb_idle_append, updating)
 			finally:

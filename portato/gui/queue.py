@@ -514,7 +514,7 @@ class EmergeQueue:
 		else:
 			it = {}
 
-		self.doEmerge(opts, sets, it, caller = self.update_world)
+		self.doEmerge(opts, list(sets), it, caller = self.update_world)
 
 	def sync (self, command = None):
 		"""Calls "emerge --sync".
