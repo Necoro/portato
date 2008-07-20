@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.4 on Wed Jul  9 21:08:44 2008 -->
+<!--Generated with glade3 3.4.5 on Sun Jul 20 18:28:00 2008 -->
 <glade-interface>
   <widget class="GtkWindow" id="PreferenceWindow">
     <property name="border_width">5</property>
@@ -250,159 +250,18 @@
                               <placeholder/>
                             </child>
                             <child>
-                              <widget class="GtkEntry" id="useFileEdit">
-                                <property name="visible">True</property>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="useEditLabel">
-                                <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="label" translatable="yes">File name to use, if package.use is a directory: </property>
-                                <property name="single_line_mode">True</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkCheckButton" id="usePerVersionCheck">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Add only exact version to package.use</property>
-                                <property name="response_id">0</property>
-                                <property name="draw_indicator">True</property>
-                              </widget>
-                              <packing>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">2</property>
-                                <property name="bottom_attach">3</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkCheckButton" id="testPerVersionCheck">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Add only exact version to package.keywords</property>
-                                <property name="response_id">0</property>
-                                <property name="draw_indicator">True</property>
-                              </widget>
-                              <packing>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">5</property>
-                                <property name="bottom_attach">6</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="testEditLabel">
-                                <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="label" translatable="yes">File name to use, if package.keywords is a directory: </property>
-                                <property name="single_line_mode">True</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">6</property>
-                                <property name="bottom_attach">7</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkEntry" id="testFileEdit">
-                                <property name="visible">True</property>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">6</property>
-                                <property name="bottom_attach">7</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkEntry" id="maskFileEdit">
-                                <property name="visible">True</property>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">9</property>
-                                <property name="bottom_attach">10</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="maskEditLabel">
-                                <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="label" translatable="yes">File name to use, if package.mask/package.unmask is a directory: </property>
-                                <property name="single_line_mode">True</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">9</property>
-                                <property name="bottom_attach">10</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkCheckButton" id="maskPerVersionCheck">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Add only exact version to package.mask/package.unmask</property>
-                                <property name="response_id">0</property>
-                                <property name="draw_indicator">True</property>
-                              </widget>
-                              <packing>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">8</property>
-                                <property name="bottom_attach">9</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkEventBox" id="hintEB">
-                                <property name="visible">True</property>
-                                <child>
-                                  <widget class="GtkFrame" id="hintFrame">
-                                    <property name="visible">True</property>
-                                    <property name="label_xalign">0</property>
-                                    <property name="shadow_type">GTK_SHADOW_OUT</property>
-                                    <child>
-                                      <widget class="GtkLabel" id="hintLabel">
-                                        <property name="visible">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="label" translatable="yes">&lt;u&gt;You may use the following placeholders:&lt;/u&gt;
-
-&lt;i&gt;$(cat)&lt;/i&gt;: category
-&lt;i&gt;$(pkg)&lt;/i&gt;: package name
-&lt;i&gt;$(cat-1)/$(cat-2)&lt;/i&gt;: first/second part of the category</property>
-                                        <property name="use_markup">True</property>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                      <packing>
-                                        <property name="type">label_item</property>
-                                      </packing>
-                                    </child>
-                                  </widget>
-                                </child>
-                              </widget>
-                              <packing>
-                                <property name="right_attach">2</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="useLabel">
+                              <widget class="GtkLabel" id="maskLabel">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
                                 <property name="xpad">5</property>
-                                <property name="label" translatable="yes">&lt;u&gt;&lt;i&gt;Use-Flags&lt;/i&gt;&lt;/u&gt;</property>
+                                <property name="label" translatable="yes">&lt;u&gt;&lt;i&gt;Masking Keywords&lt;/i&gt;&lt;/u&gt;</property>
                                 <property name="use_markup">True</property>
                                 <property name="single_line_mode">True</property>
                               </widget>
                               <packing>
-                                <property name="top_attach">1</property>
-                                <property name="bottom_attach">2</property>
-                                <property name="y_padding">6</property>
+                                <property name="top_attach">7</property>
+                                <property name="bottom_attach">8</property>
+                                <property name="y_padding">5</property>
                               </packing>
                             </child>
                             <child>
@@ -421,18 +280,160 @@
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="maskLabel">
+                              <widget class="GtkLabel" id="useLabel">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
                                 <property name="xpad">5</property>
-                                <property name="label" translatable="yes">&lt;u&gt;&lt;i&gt;Masking Keywords&lt;/i&gt;&lt;/u&gt;</property>
+                                <property name="label" translatable="yes">&lt;u&gt;&lt;i&gt;Use-Flags&lt;/i&gt;&lt;/u&gt;</property>
                                 <property name="use_markup">True</property>
                                 <property name="single_line_mode">True</property>
                               </widget>
                               <packing>
-                                <property name="top_attach">7</property>
-                                <property name="bottom_attach">8</property>
-                                <property name="y_padding">5</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="y_padding">6</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkEventBox" id="hintEB">
+                                <property name="visible">True</property>
+                                <child>
+                                  <widget class="GtkFrame" id="hintFrame">
+                                    <property name="visible">True</property>
+                                    <property name="label_xalign">0</property>
+                                    <property name="shadow_type">GTK_SHADOW_OUT</property>
+                                    <child>
+                                      <widget class="GtkLabel" id="hintLabel">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">&lt;u&gt;You may use the following placeholders:&lt;/u&gt;
+
+&lt;i&gt;$(pkg)&lt;/i&gt;: package name
+&lt;i&gt;$(cat)&lt;/i&gt;: category
+&lt;i&gt;$(cat-1)/$(cat-2)&lt;/i&gt;: first/second part of the category
+&lt;i&gt;$(version)&lt;/i&gt; : version of the package</property>
+                                        <property name="use_markup">True</property>
+                                      </widget>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                      <packing>
+                                        <property name="type">label_item</property>
+                                      </packing>
+                                    </child>
+                                  </widget>
+                                </child>
+                              </widget>
+                              <packing>
+                                <property name="right_attach">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkCheckButton" id="maskPerVersionCheck">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Add only exact version to package.mask/package.unmask</property>
+                                <property name="response_id">0</property>
+                                <property name="draw_indicator">True</property>
+                              </widget>
+                              <packing>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">8</property>
+                                <property name="bottom_attach">9</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="maskEditLabel">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="label" translatable="yes">File name to use, if package.mask/package.unmask is a directory: </property>
+                                <property name="single_line_mode">True</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">9</property>
+                                <property name="bottom_attach">10</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkEntry" id="maskFileEdit">
+                                <property name="visible">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">9</property>
+                                <property name="bottom_attach">10</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkEntry" id="testFileEdit">
+                                <property name="visible">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="testEditLabel">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="label" translatable="yes">File name to use, if package.keywords is a directory: </property>
+                                <property name="single_line_mode">True</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkCheckButton" id="testPerVersionCheck">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Add only exact version to package.keywords</property>
+                                <property name="response_id">0</property>
+                                <property name="draw_indicator">True</property>
+                              </widget>
+                              <packing>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkCheckButton" id="usePerVersionCheck">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Add only exact version to package.use</property>
+                                <property name="response_id">0</property>
+                                <property name="draw_indicator">True</property>
+                              </widget>
+                              <packing>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="useEditLabel">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="label" translatable="yes">File name to use, if package.use is a directory: </property>
+                                <property name="single_line_mode">True</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkEntry" id="useFileEdit">
+                                <property name="visible">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
                               </packing>
                             </child>
                           </widget>

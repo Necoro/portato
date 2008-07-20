@@ -151,6 +151,7 @@ def generate_path (cpv, exp):
 		- $(cat-1): first part of the category (e.g. "app")
 		- $(cat-2): second part of the category
 		- $(pkg) : name of the package
+		- $(version) : version of the package
 	
 	@param cpv: the cpv of the current package
 	@type cpv: string (cat/pkg-ver)
@@ -161,10 +162,13 @@ def generate_path (cpv, exp):
 
 	if exp.find("$(") != -1:
 		cat, pkg, ver, rev = system.split_cpv(cpv)
+		if rev != "r0":
+			ver = "%s-%s" % (ver, rev)
 		exp = exp.replace("$(cat)",cat).\
 				replace("$(pkg)",pkg).\
 				replace("$(cat-1)",cat.split("-")[0]).\
-				replace("$(cat-2)",cat.split("-")[1])
+				replace("$(cat-2)",cat.split("-")[1]).\
+				replace("$(version)",ver)
 	return exp
 
 ### USE FLAG PART ###
