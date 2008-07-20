@@ -492,7 +492,7 @@ def set_masked (pkg, masked = True):
 		path = CONST.unmask_path()
 
 	if is_dir:
-		file = os.path.join(path, generate_path(cpv, CONFIG["usefile"]))
+		file = os.path.join(path, generate_path(cpv, CONFIG["maskfile"]))
 	else:
 		file = path
 	
@@ -688,7 +688,7 @@ def set_testing (pkg, enable):
 				newTesting[cpv].append((file, line))
 	else:
 		if CONST.testing_path_is_dir():
-			file = os.path.join(CONST.testing_path(), CONFIG["testingfile"])
+			file = os.path.join(CONST.testing_path(), generate_path(cpv, CONFIG["testingfile"]))
 		else:
 			file = CONST.testing_path()
 		newTesting[cpv].append((file, "-1"))
