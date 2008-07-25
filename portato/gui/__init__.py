@@ -17,15 +17,12 @@ from .exception_handling import register_ex_handler
 
 def run ():
 	from .windows.splash import SplashScreen
-	try:
-		s = SplashScreen(_("Loading Backend"))
-		register_ex_handler()
-		s.show()
-		from .windows.main import MainWindow
-		m = MainWindow(s)
-		s.hide()
-		m.main()
-	except KeyboardInterrupt:
-		pass
+	s = SplashScreen(_("Loading Backend"))
 
-	get_listener().close()
+	register_ex_handler()
+	s.show()
+	
+	from .windows.main import MainWindow
+	m = MainWindow(s)
+	s.hide()
+	m.main()

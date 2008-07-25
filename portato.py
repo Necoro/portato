@@ -14,19 +14,15 @@
 
 from __future__ import with_statement, absolute_import
 
-import signal
-import sys, os, subprocess
+import sys, os
+import subprocess, threading
+import atexit
 import gettext, locale
 from optparse import OptionParser, SUPPRESS_HELP
 
 from portato import get_listener
 from portato.helper import debug, info
 from portato.constants import VERSION, LOCALE_DIR, APP, SU_COMMAND
-
-def sigchld_aborter (signal, frame):
-	"""Aborts the current process when the child dies."""
-	debug("Child process died. Trying to abort.")
-	raise KeyboardInterrupt
 
 def main ():
 	# set gettext stuff
@@ -49,6 +45,9 @@ def main ():
 	# run parser
 	(options, args) = parser.parse_args()
 
+	# close listener at exit
+	atexit.register(get_listener().close)
+
 	if options.nofork or os.getuid() == 0: # start GUI
 		from portato.gui import run
 		info("%s v. %s", _("Starting Portato"), VERSION)
@@ -58,7 +57,10 @@ def main ():
 		else:
 			get_listener().set_send()
 		
-		run()
+		try:
+			run()
+		except KeyboardInterrupt:
+			debug("Got KeyboardInterrupt.")
 		
 	else: # start us again in root modus and launch listener
 		
@@ -68,17 +70,28 @@ def main ():
 		sig = shm.create_semaphore(InitialValue = 0, permissions = 0600)
 		rw = shm.create_semaphore(InitialValue = 1, permissions = 0600)
 		
+		# start listener
+		lt = threading.Thread(target=get_listener().set_recv, args = (mem, sig, rw))
+		lt.setDaemon(False)
+		lt.start()
+		
 		# set DBUS_SESSION_BUS_ADDRESS to "" to make dbus work as root ;)
 		env = os.environ.copy()
 		env.update(DBUS_SESSION_BUS_ADDRESS="")
 		cmd = SU_COMMAND.split()
-		subprocess.Popen(cmd+["%s --no-fork --shm %ld %ld %ld" % (sys.argv[0], mem.key, sig.key, rw.key)], env = env)
-
-		# set handler to abort the listener if needed
-		signal.signal(signal.SIGCHLD, sigchld_aborter)
 		
-		# stast listener
-		get_listener().set_recv(mem, sig, rw)
+		sp = subprocess.Popen(cmd+["%s --no-fork --shm %ld %ld %ld" % (sys.argv[0], mem.key, sig.key, rw.key)], env = env)
+
+		# wait for process to finish
+		try:
+			sp.wait()
+			debug("Subprocess finished")
+		except KeyboardInterrupt:
+			debug("Got KeyboardInterrupt.")
+
+		if lt.isAlive():
+			debug("Listener is still running. Close it.")
+			get_listener().close()
 
 if __name__ == "__main__":
 	main()

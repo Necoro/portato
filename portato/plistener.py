@@ -48,6 +48,7 @@ class PListener (object):
 					self._rw.V()
 
 				data = string.split("\0")
+				debug("Listner received: %s", data)
 
 				if data[0] == "notify":
 					self.do_notify(*data[1:])
@@ -62,6 +63,10 @@ class PListener (object):
 		self._mem.remove()
 		self._sig.remove()
 		self._rw.remove()
+
+		self._mem = None
+		self._sig = None
+		self._rw = None
 
 	def do_cmd (self, cmdlist):
 		"""Starts a command as the user.
