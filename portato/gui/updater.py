@@ -27,8 +27,9 @@ class Updater (object):
 	SED_EXP = r"""
 /\*/{
 s/ \* //
-q
-}"""
+n
+}
+d"""
 	
 	def __init__ (self, queue, iterators, threadClass = threading.Thread):
 		"""
@@ -48,6 +49,7 @@ q
 		self.iterators = iterators
 		self.threadClass = threadClass
 		self.stopEvent = threading.Event()
+		self.removed = set()
 
 		t = threadClass(name = "Queue Updater Thread", target = self.run)
 		t.setDaemon(True)
@@ -59,19 +61,21 @@ q
 		Checks the packages until being stopped.
 		"""
 
-		curr = None
+		curr = set()
 		while not self.stopEvent.isSet():
 
 			# this = $(qlop -cCq | sed $SED_EXP)
 			p1 = subprocess.Popen(["qlop", "--current", "--nocolor", "--quiet"], stdout = subprocess.PIPE)
 			this = subprocess.Popen(["sed", self.SED_EXP], stdout = subprocess.PIPE, stdin = p1.stdout).communicate()[0]
 			
-			if this: this = this.strip()
-			if this != curr: # changed package
-				curr and self.remove(self.find(curr)) # remove the previous
-				curr = this
+			this = set(this.split()) if this else set()
+			for removed in curr - this:
+				self.remove(self.find(removed)) # remove the previous
+			curr = this
 			
 			time.sleep(2.0)
+
+		self.removed = set()
 				
 	def stop (self):
 		"""
@@ -110,6 +114,11 @@ q
 		if cpv is None:
 			debug("Nothing to remove.")
 			return
+
+		if cpv in self.removed:
+			return
+		
+		self.removed.add(cpv)
 
 		try:
 			self.queue.remove_with_children(self.iterators[cpv])
