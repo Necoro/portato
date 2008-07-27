@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-10 00:48+0200\n"
+"POT-Creation-Date: 2008-07-27 23:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,7 +72,7 @@ msgid "Browser command: "
 msgstr ""
 
 #: portato/gui/templates/PreferenceWindow.glade:81
-#: portato/gui/templates/PreferenceWindow.glade:575
+#: portato/gui/templates/PreferenceWindow.glade:576
 msgid "<b>General Options</b>"
 msgstr ""
 
@@ -92,120 +92,121 @@ msgstr ""
 msgid "<b>Sync Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:267
-msgid "File name to use, if package.use is a directory: "
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:278
-msgid "Add only exact version to package.use"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:291
-msgid "Add only exact version to package.keywords"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:305
-msgid "File name to use, if package.keywords is a directory: "
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:339
-msgid "File name to use, if package.mask/package.unmask is a directory: "
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:350
-msgid "Add only exact version to package.mask/package.unmask"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:372
-msgid ""
-"<u>You may use the following placeholders:</u>\n"
-"\n"
-"<i>$(cat)</i>: category\n"
-"<i>$(pkg)</i>: package name\n"
-"<i>$(cat-1)/$(cat-2)</i>: first/second part of the category"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:398
-msgid "<u><i>Use-Flags</i></u>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:413
-msgid "<u><i>Testing Keywords</i></u>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:428
+#: portato/gui/templates/PreferenceWindow.glade:257
 msgid "<u><i>Masking Keywords</i></u>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:445
+#: portato/gui/templates/PreferenceWindow.glade:272
+msgid "<u><i>Testing Keywords</i></u>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:287
+msgid "<u><i>Use-Flags</i></u>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:309
+msgid ""
+"<u>You may use the following placeholders:</u>\n"
+"\n"
+"<i>$(pkg)</i>: package name\n"
+"<i>$(cat)</i>: category\n"
+"<i>$(cat-1)/$(cat-2)</i>: first/second part of the category\n"
+"<i>$(version)</i> : version of the package"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:334
+msgid "Add only exact version to package.mask/package.unmask"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:348
+msgid "File name to use, if package.mask/package.unmask is a directory: "
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:382
+msgid "File name to use, if package.keywords is a directory: "
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:393
+msgid "Add only exact version to package.keywords"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:406
+msgid "Add only exact version to package.use"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:420
+msgid "File name to use, if package.use is a directory: "
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:446
 msgid "<b>Use Flag and Keyword Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:463
+#: portato/gui/templates/PreferenceWindow.glade:464
 #: portato/gui/templates/MainWindow.glade:896
 msgid "General"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:500
+#: portato/gui/templates/PreferenceWindow.glade:501
 msgid "Enable systray"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:513
+#: portato/gui/templates/PreferenceWindow.glade:514
 msgid "Show emerge progress in window title"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:527
+#: portato/gui/templates/PreferenceWindow.glade:528
 msgid "Show emerge progress in console title"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:541
+#: portato/gui/templates/PreferenceWindow.glade:542
 msgid "Hide on minimization (only if systray is enabled)"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:556
+#: portato/gui/templates/PreferenceWindow.glade:557
 msgid ""
 "Update the package list with the current search results while you are "
 "typing.\n"
 "<b>Note</b>: Will slow down the typing process."
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:558
+#: portato/gui/templates/PreferenceWindow.glade:559
 msgid "Search while typing"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:612
+#: portato/gui/templates/PreferenceWindow.glade:613
 msgid "Console Font"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:623
+#: portato/gui/templates/PreferenceWindow.glade:624
 msgid "Chose a console font"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:641
+#: portato/gui/templates/PreferenceWindow.glade:642
 msgid "Maximum length of the console title"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:671
+#: portato/gui/templates/PreferenceWindow.glade:672
 msgid "<b>Console Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:711
+#: portato/gui/templates/PreferenceWindow.glade:712
 msgid "Package Tabs"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:736
+#: portato/gui/templates/PreferenceWindow.glade:737
 msgid "System Tabs"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:762
+#: portato/gui/templates/PreferenceWindow.glade:763
 msgid "<b>Tab Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:795
+#: portato/gui/templates/PreferenceWindow.glade:796
 msgid "Show slots in the version list"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:805
+#: portato/gui/templates/PreferenceWindow.glade:806
 msgid ""
 "Organize the categories in a tree. Thereby collapse categories with the same "
 "prefix:\n"
@@ -214,26 +215,26 @@ msgid ""
 "and <i>vim</i> as children."
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:807
+#: portato/gui/templates/PreferenceWindow.glade:808
 msgid "Collapse categories with same prefix"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:823
+#: portato/gui/templates/PreferenceWindow.glade:824
 msgid "<b>Package Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:847
+#: portato/gui/templates/PreferenceWindow.glade:848
 msgid "Visual"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:865
+#: portato/gui/templates/PreferenceWindow.glade:866
 #: portato/gui/templates/PluginWindow.glade:223
 #: portato/gui/templates/SearchWindow.glade:48
-#: portato/gui/templates/MailInfoWindow.glade:148
+#: portato/gui/templates/MailInfoWindow.glade:150
 msgid "gtk-cancel"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.glade:874
+#: portato/gui/templates/PreferenceWindow.glade:875
 #: portato/gui/templates/PluginWindow.glade:235
 msgid "gtk-apply"
 msgstr ""
@@ -300,28 +301,28 @@ msgstr ""
 msgid "Send Bug Mail ..."
 msgstr ""
 
-#: portato/gui/templates/MailInfoWindow.glade:50
-msgid ""
-"Comments /\n"
-"what did you do to hit the bug?"
-msgstr ""
-
-#: portato/gui/templates/MailInfoWindow.glade:64
-msgid "Name:"
-msgstr ""
-
-#: portato/gui/templates/MailInfoWindow.glade:79
-msgid "Email address:"
-msgstr ""
-
-#: portato/gui/templates/MailInfoWindow.glade:122
+#: portato/gui/templates/MailInfoWindow.glade:28
 msgid ""
 "<b><u>Additional Information</u></b>\n"
 "\n"
 "(all optional)"
 msgstr ""
 
-#: portato/gui/templates/MailInfoWindow.glade:176
+#: portato/gui/templates/MailInfoWindow.glade:72
+msgid "Email address:"
+msgstr ""
+
+#: portato/gui/templates/MailInfoWindow.glade:87
+msgid "Name:"
+msgstr ""
+
+#: portato/gui/templates/MailInfoWindow.glade:102
+msgid ""
+"Comments /\n"
+"what did you do to hit the bug?"
+msgstr ""
+
+#: portato/gui/templates/MailInfoWindow.glade:178
 msgid "_Send"
 msgstr ""
 
@@ -515,15 +516,15 @@ msgstr ""
 msgid "Log"
 msgstr ""
 
-#: portato.py:40
+#: portato.py:43
 msgid "do not fork off as root"
 msgstr ""
 
-#: portato.py:40
+#: portato.py:43
 msgid "-L is deprecated"
 msgstr ""
 
-#: portato.py:48
+#: portato.py:53
 msgid "Starting Portato"
 msgstr ""
 
@@ -662,14 +663,14 @@ msgstr ""
 msgid "Error: %s"
 msgstr ""
 
-#: portato/gui/updater.py:96
+#: portato/gui/updater.py:100
 #, python-format
 msgid ""
 "No unmasked version of package '%s' found. Trying masked ones. This normally "
 "should not happen..."
 msgstr ""
 
-#: portato/gui/updater.py:100
+#: portato/gui/updater.py:104
 #, python-format
 msgid ""
 "Trying to remove package '%s' from queue which does not exist in system."
@@ -716,7 +717,7 @@ msgid ""
 "%s"
 msgstr ""
 
-#: portato/gui/__init__.py:21
+#: portato/gui/__init__.py:20
 msgid "Loading Backend"
 msgstr ""
 
@@ -759,11 +760,11 @@ msgstr ""
 msgid "Right"
 msgstr ""
 
-#: portato/gui/windows/preference.py:190
+#: portato/gui/windows/preference.py:191
 msgid "Package Set"
 msgstr ""
 
-#: portato/gui/windows/preference.py:195 portato/gui/windows/main.py:328
+#: portato/gui/windows/preference.py:196 portato/gui/windows/main.py:328
 msgid "Description"
 msgstr ""
 
@@ -915,7 +916,7 @@ msgstr ""
 msgid "Error while compiling search expression: '%s'."
 msgstr ""
 
-#: portato/backend/flags.py:527
+#: portato/backend/flags.py:531
 #, python-format
 msgid "Conflicting values for masking status: %s"
 msgstr ""
@@ -950,7 +951,7 @@ msgstr ""
 msgid "Loading session from '%s'."
 msgstr ""
 
-#: portato/plistener.py:88
+#: portato/plistener.py:94
 msgid "Listener has not been started."
 msgstr ""
 
@@ -993,11 +994,11 @@ msgstr ""
 msgid "It is now replaced by the one from plugin '%s'!"
 msgstr ""
 
-#: portato/plugin.py:504
+#: portato/plugin.py:505
 #, python-format
 msgid ""
-"Command for hook '%(hook)s' in plugin '%(plugin)s' could not be added due to "
-"missing dependant: '%(dep)s'!"
+"Dependant '%(dep)s' for '%(hook)s' in plugin '%(plugin)s' not found! Adding "
+"nevertheless."
 msgstr ""
 
 #: plugins/etc_proposals.py:32
