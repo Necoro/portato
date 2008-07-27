@@ -740,7 +740,7 @@ class MainWindow (Window):
 		Builds the terminal.
 		"""
 		
-		self.console.set_scrollback_lines(2**20)
+		self.console.set_scrollback_lines(int(self.cfg.get("scrollbacklines", "GUI")))
 		self.console.set_scroll_on_output(True)
 		self.console.set_font_from_string(self.cfg.get("consolefont", "GUI"))
 		self.console.connect("button-press-event", self.cb_right_click)
