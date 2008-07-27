@@ -13,6 +13,7 @@
 from __future__ import absolute_import, with_statement
 
 import re
+import itertools as itt
 
 import portage
 try:
@@ -71,7 +72,7 @@ class PortageSet (FilterSet):
 		self.portageSet = system.settings.setsconfig.getSets()[name]
 
 	def get_list(self):
-		return self.portageSet.getAtoms()
+		return itt.imap(str, self.portageSet.getAtoms())
 
 class SystemSet (FilterSet):
 
