@@ -283,7 +283,7 @@ class PortageSystem (SystemInterface):
 
 	def update_world (self, sets = ("world", "system"), newuse = False, deep = False):
 		packages = set()
-		map(packages.add, itt.chain(*(self.find_packages(pkgSet = s, with_version = False) for s in sets)))
+		map(packages.add, itt.chain(*[self.find_packages(pkgSet = s, with_version = False) for s in sets]))
 
 		states = [(["RDEPEND", "PDEPEND"], True)]
 		if self.with_bdeps():
