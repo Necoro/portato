@@ -501,7 +501,8 @@ class PluginQueue (object):
 				named = newNamed
 
 			for l in list:
-				warning(_("Command for hook '%(hook)s' in plugin '%(plugin)s' could not be added due to missing dependant: '%(dep)s'!"), {"hook": hook, "plugin": l.plugin.name, "dep": l.dep})
+				callList.append(l)
+				info(_("Dependant '%(dep)s' for '%(hook)s' in plugin '%(plugin)s' not found! Adding nevertheless."), {"hook": hook, "plugin": l.plugin.name, "dep": l.dep})
 
 		for hook in before:
 			resolve(hook, before[hook], "before", 0)
