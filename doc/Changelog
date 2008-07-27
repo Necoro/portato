@@ -2,13 +2,13 @@ next:
 - allowed collapsed categories -- similar to porthole
 - make max. title length of the console changeable by the user
 - added shortcut for "Reload Portage"
-- increased the maximum scrollback lines
 - now only use external "shm" package
 - allow to send bug report directly per mail
 - allowed to dismiss the warning dialogs for keywords/useflags
 - complete new plugin system rewrite
 - portage-2.2 support
-- added color section
+- added new configuration possibilites: colors; max num of scrollback lines
+- support for multiple emerge-jobs (see: parallel builds for portage-2.2)
 - bug fixes
 
 0.10:
