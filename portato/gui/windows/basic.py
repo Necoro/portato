@@ -21,9 +21,28 @@ from functools import wraps
 import os.path
 
 from ...constants import TEMPLATE_DIR, APP_ICON, APP, LOCALE_DIR
+from ...helper import error
 
 gtk.glade.bindtextdomain (APP, LOCALE_DIR)
 gtk.glade.textdomain (APP)
+
+class WrappedTree (object):
+	__slots__ = ("klass", "tree", "get_widget")
+	def __init__ (self, klass, tree):
+		self.tree = tree
+		self.klass = klass
+
+	def __getattribute__ (self, name):
+		if name in WrappedTree.__slots__:
+			return object.__getattribute__(self, name)
+		else:
+			return getattr(self.tree, name)
+
+	def get_widget(self, name):
+		w = self.tree.get_widget(name)
+		if w is None:
+			error("Widget '%s' could not be found in class '%s'.", name, self.klass)
+		return w
 
 class Window (object):
 	def __init__ (self):
@@ -65,7 +84,7 @@ class Window (object):
 		return wrapper
 
 	def get_tree (self, name):
-		return gtk.glade.XML(os.path.join(TEMPLATE_DIR, self.__file__+".glade"), name)
+		return WrappedTree(self.__class__.__name__, gtk.glade.XML(os.path.join(TEMPLATE_DIR, self.__file__+".glade"), name))
 
 class AbstractDialog (Window):
 	"""A class all our dialogs get derived from. It sets useful default vars and automatically handles the ESC-Button."""
