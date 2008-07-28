@@ -9,6 +9,7 @@ next:
 - portage-2.2 support
 - added new configuration possibilites: colors; max num of scrollback lines
 - support for multiple emerge-jobs (see: parallel builds for portage-2.2)
+- move --oneshot from menu to button
 - bug fixes
 
 0.10:

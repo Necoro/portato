@@ -1279,11 +1279,14 @@ class MainWindow (Window):
 
 		store, it = selection.get_selected()
 		if it:
-			if self.queueTree.is_in_emerge(it) and self.queueTree.iter_has_parent(it):
+			parent = self.queueTree.parent_iter(it)
+			if self.queueTree.is_in_emerge(it) and parent and not self.queueTree.iter_has_parent(parent):
 				package = store.get_value(it, 0)
+				self.queueOneshot.set_sensitive(True)
 				set_val(package in self.queue.oneshotmerge)
 				return True
 
+		self.queueOneshot.set_sensitive(False)
 		set_val(False)
 		return True
 
