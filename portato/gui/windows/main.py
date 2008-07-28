@@ -641,6 +641,7 @@ class MainWindow (Window):
 		self.searchEntry = self.tree.get_widget("searchEntry")
 
 		# queue list
+		self.queueOneshot = self.tree.get_widget("oneshotCB")
 		self.queueList = self.tree.get_widget("queueList")
 		self.build_queue_list()
 
@@ -765,6 +766,8 @@ class MainWindow (Window):
 		
 		col = gtk.TreeViewColumn(_("Options"), cell, markup = 1)
 		self.queueList.append_column(col)
+
+		self.queueList.get_selection().connect("changed", self.cb_queue_list_selection)
 
 	def build_cat_list (self):
 		"""
@@ -1267,6 +1270,17 @@ class MainWindow (Window):
 		
 		return True
 
+	def cb_queue_list_selection (self, selection):
+		store, it = selection.get_selected()
+		if it:
+			if self.queueTree.is_in_emerge(it) and self.queueTree.iter_has_parent(it):
+				package = store.get_value(it, 0)
+				self.queueOneshot.set_active(package in self.queue.oneshotmerge)
+				return True
+
+		self.queueOneshot.set_active(False)
+		return True
+
 	def cb_queue_row_activated (self, view, path, *args):
 		"""Callback for an activated row in the emergeQueue. Opens a package window."""
 		store = self.queueTree
@@ -1617,17 +1631,7 @@ class MainWindow (Window):
 			y = int(event.y)
 			time = event.time
 			
-			if object == self.queueList:
-				pthinfo = object.get_path_at_pos(x, y)
-				if pthinfo is not None:
-					path, col, cellx, celly = pthinfo
-					it = self.queueList.get_model().get_iter(path)
-					if self.queueTree.is_in_emerge(it) and self.queueTree.iter_has_parent(it):
-						object.grab_focus()
-						object.set_cursor(path, col, 0)
-						self.queuePopup.popup(None, None, None, event.button, time)
-					return True
-			elif object == self.console:
+			if object == self.console:
 				self.consolePopup.popup(None, None, None, event.button, time)
 			else:
 				return False
@@ -1641,10 +1645,11 @@ class MainWindow (Window):
 		sel = self.queueList.get_selection()
 		store, it = sel.get_selected()
 		if it:
-			package = store.get_value(it, 0)
-			set = (package not in self.queue.oneshotmerge)
-			
-			self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
+			if self.queueTree.is_in_emerge(it) and self.queueTree.iter_has_parent(it):
+				package = store.get_value(it, 0)
+				set = (package not in self.queue.oneshotmerge)
+				
+				self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
 
 	def cb_pause_emerge (self, curr):
 		"""
