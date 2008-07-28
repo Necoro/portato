@@ -642,6 +642,7 @@ class MainWindow (Window):
 
 		# queue list
 		self.queueOneshot = self.tree.get_widget("oneshotCB")
+		self.queueOneshotHandler = self.queueOneshot.connect("toggled", self.cb_oneshot_clicked)
 		self.queueList = self.tree.get_widget("queueList")
 		self.build_queue_list()
 
@@ -1271,14 +1272,20 @@ class MainWindow (Window):
 		return True
 
 	def cb_queue_list_selection (self, selection):
+
+		def set_val (val):
+			self.queueOneshot.handler_block(self.queueOneshotHandler)
+			self.queueOneshot.set_active(val)
+			self.queueOneshot.handler_unblock(self.queueOneshotHandler)
+
 		store, it = selection.get_selected()
 		if it:
 			if self.queueTree.is_in_emerge(it) and self.queueTree.iter_has_parent(it):
 				package = store.get_value(it, 0)
-				self.queueOneshot.set_active(package in self.queue.oneshotmerge)
+				set_val(package in self.queue.oneshotmerge)
 				return True
 
-		self.queueOneshot.set_active(False)
+		set_val(False)
 		return True
 
 	def cb_queue_row_activated (self, view, path, *args):
