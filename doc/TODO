@@ -29,7 +29,6 @@ Main Point: user preferences:
 - rotating systray icon
 - if a package has been merged, but there are still dependencies to be merged - move the dependencies up the tree (Updater)
 - move GUI prefs out of the system config
-- make oneshot better
 - show reverse dependencies
 - reload package table when emerge is finished
 - show which package has a dependency that causes a block

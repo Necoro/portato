@@ -1,4 +1,4 @@
-next:
+0.11:
 - allowed collapsed categories -- similar to porthole
 - make max. title length of the console changeable by the user
 - added shortcut for "Reload Portage"

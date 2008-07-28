@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-07-28 00:01+0100\n"
+"PO-Revision-Date: 2008-07-28 22:09+0100\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -14,13 +14,13 @@ msgstr ""
 
 #: portato/gui/templates/popups.glade:12
 #: portato/gui/templates/MainWindow.glade:192
-#: portato/gui/templates/MainWindow.glade:284
+#: portato/gui/templates/MainWindow.glade:265
 msgid "Emerge _Paused"
 msgstr "Emerge _angehalten"
 
 #: portato/gui/templates/popups.glade:19
 #: portato/gui/templates/MainWindow.glade:200
-#: portato/gui/templates/MainWindow.glade:266
+#: portato/gui/templates/MainWindow.glade:247
 msgid "_Kill Emerge"
 msgstr "_Kill Emerge"
 
@@ -146,7 +146,7 @@ msgid "<b>Use Flag and Keyword Options</b>"
 msgstr "<b>Use-Flag- und Keyword-Optionen</b>"
 
 #: portato/gui/templates/PreferenceWindow.glade:464
-#: portato/gui/templates/MainWindow.glade:896
+#: portato/gui/templates/MainWindow.glade:877
 msgid "General"
 msgstr "Allgemein"
 
@@ -256,10 +256,10 @@ msgstr "Abhängigkeiten"
 
 #: portato/gui/templates/PluginWindow.glade:98
 #: portato/gui/templates/PluginWindow.glade:123
-#: portato/gui/templates/MainWindow.glade:505
-#: portato/gui/templates/MainWindow.glade:748
-#: portato/gui/templates/MainWindow.glade:764
-#: portato/gui/templates/MainWindow.glade:876
+#: portato/gui/templates/MainWindow.glade:486
+#: portato/gui/templates/MainWindow.glade:729
+#: portato/gui/templates/MainWindow.glade:745
+#: portato/gui/templates/MainWindow.glade:857
 msgid "label"
 msgstr ""
 
@@ -360,7 +360,7 @@ msgid "_Uninstall"
 msgstr "_Deinstallieren"
 
 #: portato/gui/templates/MainWindow.glade:123
-#: portato/gui/templates/MainWindow.glade:1115
+#: portato/gui/templates/MainWindow.glade:1096
 msgid "Update _World"
 msgstr "Update _World"
 
@@ -381,67 +381,57 @@ msgid "Save _Flags"
 msgstr "Speichere _Flags"
 
 #: portato/gui/templates/MainWindow.glade:223
-#: portato/gui/templates/MainWindow.glade:1171
-#: portato/gui/windows/main.py:763
-msgid "Queue"
-msgstr "Queue"
-
-#: portato/gui/templates/MainWindow.glade:230
-msgid "Oneshot"
-msgstr "Oneshot"
-
-#: portato/gui/templates/MainWindow.glade:242
-#: portato/gui/templates/MainWindow.glade:1196
-#: portato/gui/windows/main.py:1206
-#: portato/gui/windows/main.py:1208
+#: portato/gui/templates/MainWindow.glade:1206
+#: portato/gui/windows/main.py:1209
+#: portato/gui/windows/main.py:1211
 msgid "Console"
 msgstr "Konsole"
 
-#: portato/gui/templates/MainWindow.glade:249
+#: portato/gui/templates/MainWindow.glade:230
 msgid "_Copy"
 msgstr "_Kopieren"
 
-#: portato/gui/templates/MainWindow.glade:295
+#: portato/gui/templates/MainWindow.glade:276
 msgid "Plu_gins"
 msgstr "Plu_gins"
 
-#: portato/gui/templates/MainWindow.glade:307
+#: portato/gui/templates/MainWindow.glade:288
 msgid "_?"
 msgstr "_?"
 
-#: portato/gui/templates/MainWindow.glade:315
+#: portato/gui/templates/MainWindow.glade:296
 msgid "_About"
 msgstr "_Über"
 
-#: portato/gui/templates/MainWindow.glade:333
+#: portato/gui/templates/MainWindow.glade:314
 msgid "_Plugins"
 msgstr "_Plugins"
 
-#: portato/gui/templates/MainWindow.glade:375
+#: portato/gui/templates/MainWindow.glade:356
 msgid "gtk-delete"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:389
+#: portato/gui/templates/MainWindow.glade:370
 msgid "gtk-find"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:516
+#: portato/gui/templates/MainWindow.glade:497
 msgid "Install onto system"
 msgstr "Füge zum System hinzu"
 
-#: portato/gui/templates/MainWindow.glade:539
+#: portato/gui/templates/MainWindow.glade:520
 msgid "Uninstall from system"
 msgstr "Lösche vom System"
 
-#: portato/gui/templates/MainWindow.glade:562
+#: portato/gui/templates/MainWindow.glade:543
 msgid "Revert changes"
 msgstr "Änderungen rückgängig machen"
 
-#: portato/gui/templates/MainWindow.glade:642
+#: portato/gui/templates/MainWindow.glade:623
 msgid "<b>Use Flags:</b>"
 msgstr "<b>Use Flags:</b>"
 
-#: portato/gui/templates/MainWindow.glade:660
+#: portato/gui/templates/MainWindow.glade:641
 #: portato/gui/windows/main.py:418
 #: portato/gui/windows/main.py:421
 #: portato/gui/windows/main.py:479
@@ -449,7 +439,7 @@ msgstr "<b>Use Flags:</b>"
 msgid "Testing"
 msgstr "Testing"
 
-#: portato/gui/templates/MainWindow.glade:693
+#: portato/gui/templates/MainWindow.glade:674
 #: portato/gui/windows/main.py:401
 #: portato/gui/windows/main.py:404
 #: portato/gui/windows/main.py:407
@@ -460,76 +450,81 @@ msgstr "Testing"
 msgid "Masked"
 msgstr "Masked"
 
-#: portato/gui/templates/MainWindow.glade:712
+#: portato/gui/templates/MainWindow.glade:693
 #: portato/gui/windows/main.py:326
 msgid "Installed"
 msgstr "Installiert"
 
-#: portato/gui/templates/MainWindow.glade:730
+#: portato/gui/templates/MainWindow.glade:711
 msgid "<b>Homepage:</b>"
 msgstr "<b>Homepage:</b>"
 
-#: portato/gui/templates/MainWindow.glade:779
+#: portato/gui/templates/MainWindow.glade:760
 msgid "<b>Overlay:</b>"
 msgstr "<b>Overlay:</b>"
 
-#: portato/gui/templates/MainWindow.glade:796
+#: portato/gui/templates/MainWindow.glade:777
 msgid "<b>Description:</b>"
 msgstr "<b>Beschreibung:</b>"
 
-#: portato/gui/templates/MainWindow.glade:828
+#: portato/gui/templates/MainWindow.glade:809
 msgid "<span foreground='red'><b>MISSING KEYWORD</b></span>"
 msgstr "<span foreground='red'><b>FEHLENDES KEYWORD</b></span>"
 
-#: portato/gui/templates/MainWindow.glade:843
+#: portato/gui/templates/MainWindow.glade:824
 msgid "<b>Installed, but not in portage anymore</b>"
 msgstr "<b>Installiert, aber nicht mehr im Portage-Tree vorhanden</b>"
 
-#: portato/gui/templates/MainWindow.glade:858
+#: portato/gui/templates/MainWindow.glade:839
 msgid "<b>License:</b>"
 msgstr "<b>Lizenz:</b>"
 
-#: portato/gui/templates/MainWindow.glade:927
+#: portato/gui/templates/MainWindow.glade:908
 msgid "Use List"
 msgstr "Use-Flag-Liste"
 
-#: portato/gui/templates/MainWindow.glade:961
+#: portato/gui/templates/MainWindow.glade:942
 msgid "Dependencies"
 msgstr "Abhängigkeiten"
 
-#: portato/gui/templates/MainWindow.glade:988
+#: portato/gui/templates/MainWindow.glade:969
 msgid "Ebuild"
 msgstr "Ebuild"
 
-#: portato/gui/templates/MainWindow.glade:1015
+#: portato/gui/templates/MainWindow.glade:996
 msgid "Changelog"
 msgstr "Changelog"
 
-#: portato/gui/templates/MainWindow.glade:1042
+#: portato/gui/templates/MainWindow.glade:1023
 msgid "Files"
 msgstr "Dateien"
 
-#: portato/gui/templates/MainWindow.glade:1080
+#: portato/gui/templates/MainWindow.glade:1061
 msgid "Execute the current selected queue"
 msgstr "Führe die aktuell gewählte Queue aus"
 
-#: portato/gui/templates/MainWindow.glade:1099
+#: portato/gui/templates/MainWindow.glade:1080
 msgid "E_xecute"
 msgstr "_Ausführen"
 
-#: portato/gui/templates/MainWindow.glade:1114
+#: portato/gui/templates/MainWindow.glade:1095
 msgid "Calculate the packages which will be installed during an \"update world\""
 msgstr "Berechnet die Pakete, welche während eines \"update world\" installiert werden würden"
 
-#: portato/gui/templates/MainWindow.glade:1127
+#: portato/gui/templates/MainWindow.glade:1108
 msgid "Remove the selected package from the queue"
 msgstr "Löscht das gewählte Paket aus der Queue"
 
-#: portato/gui/templates/MainWindow.glade:1128
+#: portato/gui/templates/MainWindow.glade:1109
 msgid "_Remove"
 msgstr "_Löschen"
 
-#: portato/gui/templates/MainWindow.glade:1231
+#: portato/gui/templates/MainWindow.glade:1181
+#: portato/gui/windows/main.py:764
+msgid "Queue"
+msgstr "Queue"
+
+#: portato/gui/templates/MainWindow.glade:1241
 msgid "Log"
 msgstr "Log"
 
@@ -678,7 +673,7 @@ msgid "No %(old)s language file installed. Disable highlighting."
 msgstr "Keine \"%(old)s\" Syntaxdatei gefunden. Deaktiviere Hervorhebung."
 
 #: portato/gui/views.py:115
-#: portato/gui/windows/main.py:669
+#: portato/gui/windows/main.py:671
 #, python-format
 msgid "Error: %s"
 msgstr "Fehler: %s"
@@ -855,49 +850,49 @@ msgstr "Lade Plugins"
 msgid "Building frontend"
 msgstr "Erstelle Oberfläche"
 
-#: portato/gui/windows/main.py:705
+#: portato/gui/windows/main.py:706
 msgid "Restoring Session"
 msgstr "Lade Session"
 
-#: portato/gui/windows/main.py:714
+#: portato/gui/windows/main.py:715
 msgid "Finishing startup"
 msgstr "Erledige letzte Handgriffe :)"
 
-#: portato/gui/windows/main.py:766
+#: portato/gui/windows/main.py:767
 msgid "Options"
 msgstr "Optionen"
 
-#: portato/gui/windows/main.py:780
+#: portato/gui/windows/main.py:783
 msgid "Categories"
 msgstr "Kategorien"
 
-#: portato/gui/windows/main.py:839
+#: portato/gui/windows/main.py:842
 msgid "Packages"
 msgstr "Pakete"
 
-#: portato/gui/windows/main.py:887
+#: portato/gui/windows/main.py:890
 msgid "Versions"
 msgstr "Versionen"
 
-#: portato/gui/windows/main.py:890
+#: portato/gui/windows/main.py:893
 msgid "Slot"
 msgstr "Slot"
 
-#: portato/gui/windows/main.py:988
+#: portato/gui/windows/main.py:991
 #, python-format
 msgid "Translating session from version %d to %d."
 msgstr "Upgrade Session von Version %d auf Version %d."
 
-#: portato/gui/windows/main.py:991
+#: portato/gui/windows/main.py:994
 #, python-format
 msgid "Cannot translate session from version %d to %d."
 msgstr "Kann Session nicht von Version %d nach %d upgraden."
 
-#: portato/gui/windows/main.py:1359
+#: portato/gui/windows/main.py:1382
 msgid "use flags"
 msgstr "Use Flags"
 
-#: portato/gui/windows/main.py:1371
+#: portato/gui/windows/main.py:1394
 msgid "masking keywords"
 msgstr "Masking Keywords"
 
