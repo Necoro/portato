@@ -143,9 +143,9 @@ class PreferenceWindow (AbstractDialog):
         
         for box, val in self.checkboxes.iteritems():
             if isinstance(val, tuple):
-                self.cfg.set_boolean(val[0], self.tree.get_widget(box).get_active(), section = val[1])
+                self.cfg.set(val[0], self.tree.get_widget(box).get_active(), section = val[1])
             else:
-                self.cfg.set_boolean(val, self.tree.get_widget(box).get_active())
+                self.cfg.set(val, self.tree.get_widget(box).get_active())
 
         for edit, val in self.edits.iteritems():
             if isinstance(val,tuple):

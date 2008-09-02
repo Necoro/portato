@@ -354,7 +354,7 @@ class ConfigParser:
 
         raise ValueError, "\"%s\" is not a boolean. (%s)" % (key, val.value)
 
-    def set (self, key, value = "", section = "MAIN"):
+    def set (self, key, value, section = "MAIN"):
         """
         Sets a new value of a given key in a section.
 
@@ -362,7 +362,7 @@ class ConfigParser:
 
             key : string
                 the key
-            value : string
+            value : string or boolean
                 the new value
             section : string
                 the section
@@ -371,47 +371,22 @@ class ConfigParser:
             
             - `KeyNotFoundException` : Raised if the specified key could not be found.
             - `SectionNotFoundException` : Raised if the specified section could not be found.
+            - `ValueError` : if a boolean value is passed and the old/new value is not a boolean
         """
         
         section = section.upper()
         key = key.lower()
 
-        self._access(key, section).value = value
-
-    def set_boolean (self, key, value, section = "MAIN"):
-        """
-        Sets a new boolean value of a given key in a section.
-        Therefore it invertes the string representation of the boolean (in lowercase).
-
-        :Parameters:
-
-            key : string
-                the key
-            value : boolean
-                the new value
-            section : string
-                the section
-
-        :Exceptions:
-            
-            - `KeyNotFoundException` : Raised if the specified key could not be found.
-            - `SectionNotFoundException` : Raised if the specified section could not be found.
-            - `ValueError` : if the old/new value is not a boolean
-        """
-        
-        section = section.upper()
-        key = key.lower()
-        
-        if not isinstance(value, bool):
-            raise ValueError, "Passed value must be a boolean."
-
-        val = self._access(key, section)
-        if val.is_bool():
-            if value is not val.boolean:
-                val.boolean = value
-                val.value = self._invert(val.value)
+        if not isinstance(value, bool): # str
+            self._access(key, section).value = value
         else:
-            raise ValueError, "\"%s\" is not a boolean." % key
+            val = self._access(key, section)
+            if val.is_bool():
+                if value is not val.boolean:
+                    val.boolean = value
+                    val.value = self._invert(val.value)
+            else:
+                raise ValueError, "\"%s\" is not a boolean." % key
 
     def add_section (self, section, comment = None, with_blankline = True):
         """
