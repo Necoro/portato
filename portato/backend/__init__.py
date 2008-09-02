@@ -20,52 +20,52 @@ SYSTEM = "portage" # the name of the current system
 _sys = None # the SystemInterface-instance
 
 class _Package (object):
-	"""Wrapping class from which L{portato.backend.Package} inherits. This is used by the flags module to check
-	whether an object is a package. It cannot use the normal Package class as this results in cyclic dependencies."""
+    """Wrapping class from which L{portato.backend.Package} inherits. This is used by the flags module to check
+    whether an object is a package. It cannot use the normal Package class as this results in cyclic dependencies."""
 
-	def __init__ (self):
-		raise TypeError, "Calling __init__ on portato.backend._Package objects is not allowed."
+    def __init__ (self):
+        raise TypeError, "Calling __init__ on portato.backend._Package objects is not allowed."
 
 class SystemWrapper (SystemInterface):
-	"""This is a wrapper to the different system interfaces, allowing the direct import via C{from portato.backend import system}.
-	With this wrapper a change of the system is propagated to all imports."""
-	
-	def __getattribute__ (self, name):
-		"""Just pass all attribute accesses directly to _sys."""
-		return getattr(_sys, name)
+    """This is a wrapper to the different system interfaces, allowing the direct import via C{from portato.backend import system}.
+    With this wrapper a change of the system is propagated to all imports."""
+    
+    def __getattribute__ (self, name):
+        """Just pass all attribute accesses directly to _sys."""
+        return getattr(_sys, name)
 
 def set_system (new_sys):
-	"""Sets the current system to a new one.
+    """Sets the current system to a new one.
 
-	@param new_sys: the name of the system to take
-	@type new_sys: string"""
+    @param new_sys: the name of the system to take
+    @type new_sys: string"""
 
-	global SYSTEM
-	if new_sys != SYSTEM:
-		SYSTEM = new_sys
-		load_system()
+    global SYSTEM
+    if new_sys != SYSTEM:
+        SYSTEM = new_sys
+        load_system()
 
 def load_system ():
-	"""Loads the current chosen system.
+    """Loads the current chosen system.
 
-	@raises InvalidSystemError: if an inappropriate system is set"""
-	
-	global _sys
+    @raises InvalidSystemError: if an inappropriate system is set"""
+    
+    global _sys
 
-	if SYSTEM == "portage":
-		debug("Setting Portage System")
-		from .portage import PortageSystem
-		_sys = PortageSystem ()
-	elif SYSTEM == "catapult":
-		debug("Setting Catapult System")
-		from .catapult import CatapultSystem
-		_sys = CatapultSystem()
-	else:
-		raise InvalidSystemError, SYSTEM
+    if SYSTEM == "portage":
+        debug("Setting Portage System")
+        from .portage import PortageSystem
+        _sys = PortageSystem ()
+    elif SYSTEM == "catapult":
+        debug("Setting Catapult System")
+        from .catapult import CatapultSystem
+        _sys = CatapultSystem()
+    else:
+        raise InvalidSystemError, SYSTEM
 
 system = SystemWrapper()
 
 def is_package(what):
-	return isinstance(what, _Package)
+    return isinstance(what, _Package)
 
 load_system()

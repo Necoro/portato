@@ -18,33 +18,33 @@ from .basic import Window
 from ...constants import VERSION, APP_ICON
 
 class SplashScreen (Window):
-	
-	def __init__ (self, startStr = ""):
-		Window.__init__(self)
+    
+    def __init__ (self, startStr = ""):
+        Window.__init__(self)
 
-		self.image = self.tree.get_widget("image")
-		self.genLabel = self.tree.get_widget("generalLabel")
-		self.descrLabel = self.tree.get_widget("descrLabel")
-		
-		self.image.set_from_file(APP_ICON)
-		self.genLabel.set_label("<b><big>Portato %s ...</big></b>" % VERSION)
-		
-		self.set_descr(startStr)
+        self.image = self.tree.get_widget("image")
+        self.genLabel = self.tree.get_widget("generalLabel")
+        self.descrLabel = self.tree.get_widget("descrLabel")
+        
+        self.image.set_from_file(APP_ICON)
+        self.genLabel.set_label("<b><big>Portato %s ...</big></b>" % VERSION)
+        
+        self.set_descr(startStr)
 
-	def set_descr (self, string):
-		self.descrLabel.set_label(_("... is starting up: %s") % string)
-		self.do_iteration()
+    def set_descr (self, string):
+        self.descrLabel.set_label(_("... is starting up: %s") % string)
+        self.do_iteration()
 
-	def do_iteration (self):
-		while gtk.events_pending():
-			gtk.main_iteration()
-	
-	def show (self):
-		self.window.show_all()
-		self.do_iteration()
+    def do_iteration (self):
+        while gtk.events_pending():
+            gtk.main_iteration()
+    
+    def show (self):
+        self.window.show_all()
+        self.do_iteration()
 
-	def hide (self):
-		self.window.hide()
-		self.do_iteration()
+    def hide (self):
+        self.window.hide()
+        self.do_iteration()
 
-	__call__ = set_descr
+    __call__ = set_descr

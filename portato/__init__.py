@@ -18,36 +18,36 @@ import os
 
 class OutputFormatter (logging.Formatter):
 
-	colors = { 
-			"blue"	: 34,
-			"green"	: 32,
-			"red"	: 31,
-			"yellow": 33
-			}
+    colors = { 
+            "blue"    : 34,
+            "green"    : 32,
+            "red"    : 31,
+            "yellow": 33
+            }
 
-	def __init__(self, *args, **kwargs):
-		logging.Formatter.__init__(self, *args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        logging.Formatter.__init__(self, *args, **kwargs)
 
-		for key, value in self.colors.iteritems():
-			self.colors[key] = "\x1b[01;%02dm*\x1b[39;49;00m" % value
+        for key, value in self.colors.iteritems():
+            self.colors[key] = "\x1b[01;%02dm*\x1b[39;49;00m" % value
 
-	def format (self, record):
-		string = logging.Formatter.format(self, record)
-		color = None
+    def format (self, record):
+        string = logging.Formatter.format(self, record)
+        color = None
 
-		if os.isatty(sys.stderr.fileno()):
-			if record.levelno <= logging.DEBUG:
-				color = self.colors["blue"]
-			elif record.levelno <= logging.INFO:
-				color = self.colors["green"]
-			elif record.levelno <= logging.WARNING:
-				color = self.colors["yellow"]
-			else:
-				color = self.colors["red"]
-		else:
-			color = "%s:" % record.levelname
+        if os.isatty(sys.stderr.fileno()):
+            if record.levelno <= logging.DEBUG:
+                color = self.colors["blue"]
+            elif record.levelno <= logging.INFO:
+                color = self.colors["green"]
+            elif record.levelno <= logging.WARNING:
+                color = self.colors["yellow"]
+            else:
+                color = self.colors["red"]
+        else:
+            color = "%s:" % record.levelname
 
-		return "%s %s" % (color, string)
+        return "%s %s" % (color, string)
 
 # set the whole logging stuff
 formatter = OutputFormatter("%(message)s (%(filename)s:%(lineno)s)")
@@ -61,9 +61,9 @@ logging.getLogger("portatoLogger").propagate = False
 __listener = None
 
 def get_listener():
-	global __listener
-	if __listener is None:
-		from .plistener import PListener
-		__listener = PListener()
-	
-	return __listener
+    global __listener
+    if __listener is None:
+        from .plistener import PListener
+        __listener = PListener()
+    
+    return __listener

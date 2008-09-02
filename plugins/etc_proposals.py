@@ -16,26 +16,26 @@ import os
 from subprocess import Popen
 
 class EtcProposals (Plugin):
-	__author__ = "René 'Necoro' Neumann"
-	__description__ = "Adds support for <b>etc-proposals</b>, a graphical etc-update replacement."
-	__dependency__ = ["app-portage/etc-proposals"]
+    __author__ = "René 'Necoro' Neumann"
+    __description__ = "Adds support for <b>etc-proposals</b>, a graphical etc-update replacement."
+    __dependency__ = ["app-portage/etc-proposals"]
 
-	def init (self):
-		self.prog = ["/usr/sbin/etc-proposals"]
-		self.add_call("after_emerge", self.hook, type = "after")
-		self.add_menu("Et_c-Proposals", self.menu)
+    def init (self):
+        self.prog = ["/usr/sbin/etc-proposals"]
+        self.add_call("after_emerge", self.hook, type = "after")
+        self.add_menu("Et_c-Proposals", self.menu)
 
-	def launch (self, options = []):
-		if os.getuid() == 0:
-			Popen(self.prog+options)
-		else:
-			error("ETC_PROPOSALS :: %s",_("Cannot start etc-proposals. Not root!"))
+    def launch (self, options = []):
+        if os.getuid() == 0:
+            Popen(self.prog+options)
+        else:
+            error("ETC_PROPOSALS :: %s",_("Cannot start etc-proposals. Not root!"))
 
-	def hook (self, *args, **kwargs):
-		"""Entry point for this plugin."""
-		self.launch(["--fastexit"])
+    def hook (self, *args, **kwargs):
+        """Entry point for this plugin."""
+        self.launch(["--fastexit"])
 
-	def menu (self, *args):
-		self.launch()
+    def menu (self, *args):
+        self.launch()
 
 register(EtcProposals)

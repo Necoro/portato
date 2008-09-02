@@ -25,73 +25,73 @@ from portato.helper import debug, info
 from portato.constants import VERSION, LOCALE_DIR, APP, SU_COMMAND
 
 def main ():
-	# set gettext stuff
-	locale.setlocale(locale.LC_ALL, '')
-	gettext.install(APP, LOCALE_DIR, unicode = True)
+    # set gettext stuff
+    locale.setlocale(locale.LC_ALL, '')
+    gettext.install(APP, LOCALE_DIR, unicode = True)
 
-	# build the parser
-	desc = "Portato - A Portage GUI."
-	usage = "%prog [options] [frontend]"
-	vers =  "%%prog v. %s" % VERSION
+    # build the parser
+    desc = "Portato - A Portage GUI."
+    usage = "%prog [options] [frontend]"
+    vers =  "%%prog v. %s" % VERSION
 
-	parser = OptionParser(version = vers, prog = "Portato", description = desc, usage = usage)
-	
-	parser.add_option("--shm", action = "store", nargs = 3, type="long", dest = "shm",
-			help = SUPPRESS_HELP)
+    parser = OptionParser(version = vers, prog = "Portato", description = desc, usage = usage)
+    
+    parser.add_option("--shm", action = "store", nargs = 3, type="long", dest = "shm",
+            help = SUPPRESS_HELP)
 
-	parser.add_option("-F", "--no-fork", "-L", action = "store_true", dest = "nofork", default = False, 
-			help = _("do not fork off as root") + (" (%s)" % _("-L is deprecated")))
+    parser.add_option("-F", "--no-fork", "-L", action = "store_true", dest = "nofork", default = False, 
+            help = _("do not fork off as root") + (" (%s)" % _("-L is deprecated")))
 
-	# run parser
-	(options, args) = parser.parse_args()
+    # run parser
+    (options, args) = parser.parse_args()
 
-	# close listener at exit
-	atexit.register(get_listener().close)
+    # close listener at exit
+    atexit.register(get_listener().close)
 
-	if options.nofork or os.getuid() == 0: # start GUI
-		from portato.gui import run
-		info("%s v. %s", _("Starting Portato"), VERSION)
-		
-		if options.shm:
-			get_listener().set_send(*options.shm)
-		else:
-			get_listener().set_send()
-		
-		try:
-			run()
-		except KeyboardInterrupt:
-			debug("Got KeyboardInterrupt.")
-		
-	else: # start us again in root modus and launch listener
-		
-		import shm_wrapper as shm
+    if options.nofork or os.getuid() == 0: # start GUI
+        from portato.gui import run
+        info("%s v. %s", _("Starting Portato"), VERSION)
+        
+        if options.shm:
+            get_listener().set_send(*options.shm)
+        else:
+            get_listener().set_send()
+        
+        try:
+            run()
+        except KeyboardInterrupt:
+            debug("Got KeyboardInterrupt.")
+        
+    else: # start us again in root modus and launch listener
+        
+        import shm_wrapper as shm
 
-		mem = shm.create_memory(1024, permissions=0600)
-		sig = shm.create_semaphore(InitialValue = 0, permissions = 0600)
-		rw = shm.create_semaphore(InitialValue = 1, permissions = 0600)
-		
-		# start listener
-		lt = threading.Thread(target=get_listener().set_recv, args = (mem, sig, rw))
-		lt.setDaemon(False)
-		lt.start()
-		
-		# set DBUS_SESSION_BUS_ADDRESS to "" to make dbus work as root ;)
-		env = os.environ.copy()
-		env.update(DBUS_SESSION_BUS_ADDRESS="")
-		cmd = SU_COMMAND.split()
-		
-		sp = subprocess.Popen(cmd+["%s --no-fork --shm %ld %ld %ld" % (sys.argv[0], mem.key, sig.key, rw.key)], env = env)
+        mem = shm.create_memory(1024, permissions=0600)
+        sig = shm.create_semaphore(InitialValue = 0, permissions = 0600)
+        rw = shm.create_semaphore(InitialValue = 1, permissions = 0600)
+        
+        # start listener
+        lt = threading.Thread(target=get_listener().set_recv, args = (mem, sig, rw))
+        lt.setDaemon(False)
+        lt.start()
+        
+        # set DBUS_SESSION_BUS_ADDRESS to "" to make dbus work as root ;)
+        env = os.environ.copy()
+        env.update(DBUS_SESSION_BUS_ADDRESS="")
+        cmd = SU_COMMAND.split()
+        
+        sp = subprocess.Popen(cmd+["%s --no-fork --shm %ld %ld %ld" % (sys.argv[0], mem.key, sig.key, rw.key)], env = env)
 
-		# wait for process to finish
-		try:
-			sp.wait()
-			debug("Subprocess finished")
-		except KeyboardInterrupt:
-			debug("Got KeyboardInterrupt.")
+        # wait for process to finish
+        try:
+            sp.wait()
+            debug("Subprocess finished")
+        except KeyboardInterrupt:
+            debug("Got KeyboardInterrupt.")
 
-		if lt.isAlive():
-			debug("Listener is still running. Close it.")
-			get_listener().close()
+        if lt.isAlive():
+            debug("Listener is still running. Close it.")
+            get_listener().close()
 
 if __name__ == "__main__":
-	main()
+    main()

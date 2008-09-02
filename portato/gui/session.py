@@ -18,16 +18,16 @@ SESSION_VERSION = 1
 
 class SessionException (Exception):
 
-	error = _("Version mismatch.")
-	def __init__ (self, got, expected):
-		self.got = got
-		self.expected = expected
+    error = _("Version mismatch.")
+    def __init__ (self, got, expected):
+        self.got = got
+        self.expected = expected
 
-	def __str__ (self):
-		return "%s %s" % (self.error, (_("Got '%d' - expected '%d'.") % (self.got, self.expected)))
+    def __str__ (self):
+        return "%s %s" % (self.error, (_("Got '%d' - expected '%d'.") % (self.got, self.expected)))
 
 class OldSessionException (SessionException):
-	error = _("Current session format is too old.")
+    error = _("Current session format is too old.")
 
 class NewSessionException (SessionException):
-	error = _("Current session format is newer than this version supports.")
+    error = _("Current session format is newer than this version supports.")

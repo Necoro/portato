@@ -18,17 +18,17 @@ from .basic import AbstractDialog
 from ...constants import VERSION, APP_ICON
 
 class AboutWindow (AbstractDialog):
-	"""A window showing the "about"-informations."""
+    """A window showing the "about"-informations."""
 
-	def __init__ (self, parent):
+    def __init__ (self, parent):
 
-		AbstractDialog.__init__(self, parent)
+        AbstractDialog.__init__(self, parent)
 
-		img = gtk.Image()
-		img.set_from_file(APP_ICON)
+        img = gtk.Image()
+        img.set_from_file(APP_ICON)
 
-		self.window.set_version(VERSION)
-		self.window.set_logo(img.get_pixbuf())
+        self.window.set_version(VERSION)
+        self.window.set_logo(img.get_pixbuf())
 
-		self.window.show_all()
+        self.window.show_all()
 

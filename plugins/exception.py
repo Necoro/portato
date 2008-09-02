@@ -11,7 +11,7 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 def throw (*args, **kwargs):
-	raise Exception, "As requested, Sir!"
+    raise Exception, "As requested, Sir!"
 
 p = Plugin()
 p.__name__ = "ExceptionThrower"

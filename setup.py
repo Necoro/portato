@@ -16,23 +16,23 @@ from distutils.core import setup, Extension
 from portato.constants import VERSION, DATA_DIR, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR
 
 def plugin_list (*args):
-	"""Creates a list of correct plugin pathes out of the arguments."""
-	return [("plugins/%s.py" % x) for x in args]
+    """Creates a list of correct plugin pathes out of the arguments."""
+    return [("plugins/%s.py" % x) for x in args]
 
 packages = ["portato", "portato.gui", "portato.gui.windows", "portato.plugins", "portato.backend", "portato.backend.portage"]
 data_files = [
-		(TEMPLATE_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if x.endswith(".glade")]),
-		(ICON_DIR, ["icons/portato-icon.png"]),
-		(PLUGIN_DIR, plugin_list("gpytage", "notify", "etc_proposals", "reload_portage"))]
+        (TEMPLATE_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if x.endswith(".glade")]),
+        (ICON_DIR, ["icons/portato-icon.png"]),
+        (PLUGIN_DIR, plugin_list("gpytage", "notify", "etc_proposals", "reload_portage"))]
 
 # do the distutils setup
 setup(name="Portato",
-		version = VERSION,
-		description = "GTK-Frontend to Portage",
-		license = "GPLv2",
-		url = "http://portato.origo.ethz.ch/",
-		author = "René 'Necoro' Neumann",
-		author_email = "necoro@necoro.net",
-		packages = packages,
-		data_files = data_files
-		)
+        version = VERSION,
+        description = "GTK-Frontend to Portage",
+        license = "GPLv2",
+        url = "http://portato.origo.ethz.ch/",
+        author = "René 'Necoro' Neumann",
+        author_email = "necoro@necoro.net",
+        packages = packages,
+        data_files = data_files
+        )

@@ -13,15 +13,15 @@
 from portato.backend import system
 
 class ReloadPortage (Plugin):
-	__author__ = "René 'Necoro' Neumann"
-	__description__ = """Reloads portage when an emerge process has finished.
+    __author__ = "René 'Necoro' Neumann"
+    __description__ = """Reloads portage when an emerge process has finished.
 This can take some time, but sometimes it is necessairy."""
-	
-	def init(self):
-		self.add_call("after_emerge", self.hook, type = "after", dep = "EtcProposals")
-		self.status = self.STAT_DISABLED # disable by default
-	
-	def hook (self, *args, **kwargs):
-		system.reload_settings()
+    
+    def init(self):
+        self.add_call("after_emerge", self.hook, type = "after", dep = "EtcProposals")
+        self.status = self.STAT_DISABLED # disable by default
+    
+    def hook (self, *args, **kwargs):
+        system.reload_settings()
 
 register(ReloadPortage)

@@ -13,9 +13,9 @@
 disable = False
 
 try:
-	import pynotify
+    import pynotify
 except ImportError:
-	disable = True
+    disable = True
 
 from portato import get_listener
 
@@ -23,27 +23,27 @@ from portato.helper import warning, error, debug
 from portato.constants import APP_ICON, APP
 
 class Notify (Plugin):
-	__author__ = "René 'Necoro' Neumann"
-	__description__ = "Show notifications when an emerge process finishes."
-	__dependency__ = ["dev-python/notify-python"]
+    __author__ = "René 'Necoro' Neumann"
+    __description__ = "Show notifications when an emerge process finishes."
+    __dependency__ = ["dev-python/notify-python"]
 
-	def init (self):
-		self.add_call("after_emerge", self.notify)
+    def init (self):
+        self.add_call("after_emerge", self.notify)
 
-	def notify (self, retcode, **kwargs):
-		if retcode is None:
-			warning("NOTIFY :: %s", _("Notify called while process is still running!"))
-		else:
-			icon = APP_ICON
-			if retcode == 0:
-				text = _("Emerge finished!")
-				descr = ""
-				urgency = pynotify.URGENCY_NORMAL
-			else:
-				text = _("Emerge failed!")
-				descr = _("Error Code: %d") % retcode
-				urgency = pynotify.URGENCY_CRITICAL
+    def notify (self, retcode, **kwargs):
+        if retcode is None:
+            warning("NOTIFY :: %s", _("Notify called while process is still running!"))
+        else:
+            icon = APP_ICON
+            if retcode == 0:
+                text = _("Emerge finished!")
+                descr = ""
+                urgency = pynotify.URGENCY_NORMAL
+            else:
+                text = _("Emerge failed!")
+                descr = _("Error Code: %d") % retcode
+                urgency = pynotify.URGENCY_CRITICAL
 
-			get_listener().send_notify(base = text, descr = descr, icon = icon, urgency = urgency)
+            get_listener().send_notify(base = text, descr = descr, icon = icon, urgency = urgency)
 
 register(Notify, disable)

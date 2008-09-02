@@ -16,12 +16,12 @@ import portage.sets
 from .settings import PortageSettings
 
 class PortageSettings_22 (PortageSettings):
-	"""Enhances the normal PortageSettings in ways, that it adds the setsconfig."""
+    """Enhances the normal PortageSettings in ways, that it adds the setsconfig."""
 
-	def __init__ (self):
-		PortageSettings.__init__(self)
+    def __init__ (self):
+        PortageSettings.__init__(self)
 
-	def load (self):
-		PortageSettings.load(self)
+    def load (self):
+        PortageSettings.load(self)
 
-		self.setsconfig = portage.sets.load_default_config(self.settings, self.trees[self.settings["ROOT"]])
+        self.setsconfig = portage.sets.load_default_config(self.settings, self.trees[self.settings["ROOT"]])

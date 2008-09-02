@@ -15,8 +15,8 @@ from __future__ import absolute_import, with_statement
 from .package import PortagePackage
 
 class PortagePackage_22 (PortagePackage):
-	"""
-	The 2.2 specialization of the portage package.
-	Currently this is identical to the normal one.
-	"""
-	pass
+    """
+    The 2.2 specialization of the portage package.
+    Currently this is identical to the normal one.
+    """
+    pass

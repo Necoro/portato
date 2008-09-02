@@ -13,14 +13,14 @@
 from subprocess import Popen
 
 class GPytage (Plugin):
-	__author__ = "René 'Necoro' Neumann"
-	__description__ = "Adds a menu entry to directly start <b>gpytage</b>, a config editor."
-	__dependency__ = ["app-portage/gpytage"]
+    __author__ = "René 'Necoro' Neumann"
+    __description__ = "Adds a menu entry to directly start <b>gpytage</b>, a config editor."
+    __dependency__ = ["app-portage/gpytage"]
 
-	def init (self):
-		self.add_menu("Config _Editor", self.menu)
+    def init (self):
+        self.add_menu("Config _Editor", self.menu)
 
-	def menu (self, *args):
-		Popen(["/usr/bin/gpytage"])
+    def menu (self, *args):
+        Popen(["/usr/bin/gpytage"])
 
 register(GPytage)

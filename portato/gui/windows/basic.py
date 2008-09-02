@@ -27,101 +27,101 @@ gtk.glade.bindtextdomain (APP, LOCALE_DIR)
 gtk.glade.textdomain (APP)
 
 class WrappedTree (object):
-	__slots__ = ("klass", "tree", "get_widget")
-	def __init__ (self, klass, tree):
-		self.tree = tree
-		self.klass = klass
+    __slots__ = ("klass", "tree", "get_widget")
+    def __init__ (self, klass, tree):
+        self.tree = tree
+        self.klass = klass
 
-	def __getattribute__ (self, name):
-		if name in WrappedTree.__slots__:
-			return object.__getattribute__(self, name)
-		else:
-			return getattr(self.tree, name)
+    def __getattribute__ (self, name):
+        if name in WrappedTree.__slots__:
+            return object.__getattribute__(self, name)
+        else:
+            return getattr(self.tree, name)
 
-	def get_widget(self, name):
-		w = self.tree.get_widget(name)
-		if w is None:
-			error("Widget '%s' could not be found in class '%s'.", name, self.klass)
-		return w
+    def get_widget(self, name):
+        w = self.tree.get_widget(name)
+        if w is None:
+            error("Widget '%s' could not be found in class '%s'.", name, self.klass)
+        return w
 
 class Window (object):
-	def __init__ (self):
+    def __init__ (self):
 
-		if not hasattr(self, "__tree__"):
-			self.__tree__ = self.__class__.__name__
+        if not hasattr(self, "__tree__"):
+            self.__tree__ = self.__class__.__name__
 
-		if not hasattr(self, "__window__"):
-			self.__window__ = self.__class__.__name__
+        if not hasattr(self, "__window__"):
+            self.__window__ = self.__class__.__name__
 
-		if not hasattr(self, "__file__"):
-			self.__file__ = self.__class__.__name__
+        if not hasattr(self, "__file__"):
+            self.__file__ = self.__class__.__name__
 
-		self.tree = self.get_tree(self.__tree__)
-		self.tree.signal_autoconnect(self)
-		self.window = self.tree.get_widget(self.__window__)
-		self.window.set_icon_from_file(APP_ICON)
+        self.tree = self.get_tree(self.__tree__)
+        self.tree.signal_autoconnect(self)
+        self.window = self.tree.get_widget(self.__window__)
+        self.window.set_icon_from_file(APP_ICON)
 
-	@staticmethod
-	def watch_cursor (func):
-		"""This is a decorator for functions being so time consuming, that it is appropriate to show the watch-cursor.
-		@attention: this function relies on the gtk.Window-Object being stored as self.window"""
-		
-		@wraps(func)
-		def wrapper (self, *args, **kwargs):
-			ret = None
-			def cb_idle():
-				try:
-					ret = func(self, *args, **kwargs)
-				finally:
-					self.window.window.set_cursor(None)
-				return False
-			
-			watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
-			self.window.window.set_cursor(watch)
-			gobject.idle_add(cb_idle)
-			return ret
+    @staticmethod
+    def watch_cursor (func):
+        """This is a decorator for functions being so time consuming, that it is appropriate to show the watch-cursor.
+        @attention: this function relies on the gtk.Window-Object being stored as self.window"""
+        
+        @wraps(func)
+        def wrapper (self, *args, **kwargs):
+            ret = None
+            def cb_idle():
+                try:
+                    ret = func(self, *args, **kwargs)
+                finally:
+                    self.window.window.set_cursor(None)
+                return False
+            
+            watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
+            self.window.window.set_cursor(watch)
+            gobject.idle_add(cb_idle)
+            return ret
 
-		return wrapper
+        return wrapper
 
-	def get_tree (self, name):
-		return WrappedTree(self.__class__.__name__, gtk.glade.XML(os.path.join(TEMPLATE_DIR, self.__file__+".glade"), name))
+    def get_tree (self, name):
+        return WrappedTree(self.__class__.__name__, gtk.glade.XML(os.path.join(TEMPLATE_DIR, self.__file__+".glade"), name))
 
 class AbstractDialog (Window):
-	"""A class all our dialogs get derived from. It sets useful default vars and automatically handles the ESC-Button."""
+    """A class all our dialogs get derived from. It sets useful default vars and automatically handles the ESC-Button."""
 
-	def __init__ (self, parent):
-		"""Constructor.
+    def __init__ (self, parent):
+        """Constructor.
 
-		@param parent: the parent window
-		@type parent: gtk.Window"""
-		
-		Window.__init__(self)
+        @param parent: the parent window
+        @type parent: gtk.Window"""
+        
+        Window.__init__(self)
 
-		# set parent
-		self.window.set_transient_for(parent)
-		self.parent = parent
-		
-		# catch the ESC-key
-		self.window.connect("key-press-event", self.cb_key_pressed)
+        # set parent
+        self.window.set_transient_for(parent)
+        self.parent = parent
+        
+        # catch the ESC-key
+        self.window.connect("key-press-event", self.cb_key_pressed)
 
-	def cb_key_pressed (self, widget, event):
-		"""Closes the window if ESC is pressed."""
-		keyname = gtk.gdk.keyval_name(event.keyval)
-		if keyname == "Escape":
-			self.close()
-			return True
-		else:
-			return False
+    def cb_key_pressed (self, widget, event):
+        """Closes the window if ESC is pressed."""
+        keyname = gtk.gdk.keyval_name(event.keyval)
+        if keyname == "Escape":
+            self.close()
+            return True
+        else:
+            return False
 
-	def close (self, *args):
-		self.window.destroy()
+    def close (self, *args):
+        self.window.destroy()
 
 class Popup (object):
 
-	def __init__ (self, name, parent, file = "popups"):
-		self.tree = gtk.glade.XML(os.path.join(TEMPLATE_DIR, file+".glade"), root = name)
-		self.tree.signal_autoconnect(parent)
-		self._popup = self.tree.get_widget(name)
+    def __init__ (self, name, parent, file = "popups"):
+        self.tree = gtk.glade.XML(os.path.join(TEMPLATE_DIR, file+".glade"), root = name)
+        self.tree.signal_autoconnect(parent)
+        self._popup = self.tree.get_widget(name)
 
-	def popup (self, *args):
-		self._popup.popup(*args)
+    def popup (self, *args):
+        self._popup.popup(*args)

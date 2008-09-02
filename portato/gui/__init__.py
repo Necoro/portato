@@ -16,13 +16,13 @@ from .. import get_listener
 from .exception_handling import register_ex_handler
 
 def run ():
-	from .windows.splash import SplashScreen
-	s = SplashScreen(_("Loading Backend"))
+    from .windows.splash import SplashScreen
+    s = SplashScreen(_("Loading Backend"))
 
-	register_ex_handler()
-	s.show()
-	
-	from .windows.main import MainWindow
-	m = MainWindow(s)
-	s.hide()
-	m.main()
+    register_ex_handler()
+    s.show()
+    
+    from .windows.main import MainWindow
+    m = MainWindow(s)
+    s.hide()
+    m.main()

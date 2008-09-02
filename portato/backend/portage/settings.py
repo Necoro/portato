@@ -17,42 +17,42 @@ import portage
 from threading import Lock
 
 class PortageSettings:
-	"""Encapsulation of the portage settings.
-	
-	@ivar settings: portage settings
-	@ivar settingslock: a simple Lock
-	@ivar trees: a dictionary of the trees
-	@ivar porttree: shortcut to C{trees[root]["porttree"]}
-	@ivar vartree: shortcut to C{trees[root]["vartree"]}
-	@ivar virtuals: shortcut to C{trees[root]["virtuals"]}"""
+    """Encapsulation of the portage settings.
+    
+    @ivar settings: portage settings
+    @ivar settingslock: a simple Lock
+    @ivar trees: a dictionary of the trees
+    @ivar porttree: shortcut to C{trees[root]["porttree"]}
+    @ivar vartree: shortcut to C{trees[root]["vartree"]}
+    @ivar virtuals: shortcut to C{trees[root]["virtuals"]}"""
 
-	def __init__ (self):
-		"""Initializes the instance. Calls L{load()}."""
-		self.settingslock = Lock()
-		self.trees = None
-		self.load()
-		
-	def load(self):
-		"""(Re)loads the portage settings and sets the variables."""
+    def __init__ (self):
+        """Initializes the instance. Calls L{load()}."""
+        self.settingslock = Lock()
+        self.trees = None
+        self.load()
+        
+    def load(self):
+        """(Re)loads the portage settings and sets the variables."""
 
-		kwargs = {}
-		for k, envvar in (("config_root", "PORTAGE_CONFIGROOT"), ("target_root", "ROOT")):
-			kwargs[k] = os.environ.get(envvar, None)
-		self.trees = portage.create_trees(trees=self.trees, **kwargs)
+        kwargs = {}
+        for k, envvar in (("config_root", "PORTAGE_CONFIGROOT"), ("target_root", "ROOT")):
+            kwargs[k] = os.environ.get(envvar, None)
+        self.trees = portage.create_trees(trees=self.trees, **kwargs)
 
-		self.settings = self.trees["/"]["vartree"].settings
+        self.settings = self.trees["/"]["vartree"].settings
 
-		for myroot in self.trees:
-			if myroot != "/":
-				self.settings = self.trees[myroot]["vartree"].settings
-				break
+        for myroot in self.trees:
+            if myroot != "/":
+                self.settings = self.trees[myroot]["vartree"].settings
+                break
 
-		self.settings.unlock()
+        self.settings.unlock()
 
-		root = self.settings["ROOT"]
+        root = self.settings["ROOT"]
 
-		self.porttree = self.trees[root]["porttree"]
-		self.vartree  = self.trees[root]["vartree"]
-		self.virtuals = self.trees[root]["virtuals"]
-		
-		portage.settings = None # we use our own one ...
+        self.porttree = self.trees[root]["porttree"]
+        self.vartree  = self.trees[root]["vartree"]
+        self.virtuals = self.trees[root]["virtuals"]
+        
+        portage.settings = None # we use our own one ...

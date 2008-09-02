@@ -11,17 +11,17 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 class BlockedException (Exception):
-	"""An exception marking, that some package is blocking another one."""
-	pass
+    """An exception marking, that some package is blocking another one."""
+    pass
 
 class PackageNotFoundException (Exception):
-	"""An exception marking that a package could not be found."""
-	pass
+    """An exception marking that a package could not be found."""
+    pass
 
 class DependencyCalcError (Exception):
-	"""An error occured during dependency calculation."""
-	pass
+    """An error occured during dependency calculation."""
+    pass
 
 class InvalidSystemError (Exception):
-	"""An invalid system is set."""
-	pass
+    """An invalid system is set."""
+    pass

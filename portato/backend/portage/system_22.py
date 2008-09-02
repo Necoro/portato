@@ -24,41 +24,41 @@ from . import sets as syssets
 
 class PortageSystem_22 (PortageSystem):
 
-	def __init__ (self):
-		self.settings = PortageSettings_22()
-		portage.WORLD_FILE = os.path.join(self.settings.settings["ROOT"],portage.WORLD_FILE)
+    def __init__ (self):
+        self.settings = PortageSettings_22()
+        portage.WORLD_FILE = os.path.join(self.settings.settings["ROOT"],portage.WORLD_FILE)
 
-		self.use_descs = {}
-		self.local_use_descs = defaultdict(dict)
+        self.use_descs = {}
+        self.local_use_descs = defaultdict(dict)
 
-		self.setmap = {
-				self.SET_ALL : syssets.AllSet,
-				self.SET_INSTALLED : syssets.InstalledSet,
-				self.SET_UNINSTALLED : syssets.UninstalledSet,
-				self.SET_TREE : syssets.TreeSet
-				}
+        self.setmap = {
+                self.SET_ALL : syssets.AllSet,
+                self.SET_INSTALLED : syssets.InstalledSet,
+                self.SET_UNINSTALLED : syssets.UninstalledSet,
+                self.SET_TREE : syssets.TreeSet
+                }
 
-	def get_update_option (self):
-		return ["--update", "--oneshot"] # --oneshot to not record the used sets in world file
+    def get_update_option (self):
+        return ["--update", "--oneshot"] # --oneshot to not record the used sets in world file
 
-	def has_set_support (self):
-		return True
+    def has_set_support (self):
+        return True
 
-	def get_sets (self, description = False):
-		if description:
-			return ((name, set.description) for name, set in self.settings.setsconfig.getSets().iteritems())
-		else:
-			return tuple(self.settings.setsconfig.getSets())
+    def get_sets (self, description = False):
+        if description:
+            return ((name, set.description) for name, set in self.settings.setsconfig.getSets().iteritems())
+        else:
+            return tuple(self.settings.setsconfig.getSets())
 
-	def _get_set (self, pkgSet):
-		pkgSet = pkgSet.lower()
-		if pkgSet == "": pkgSet = self.SET_ALL
+    def _get_set (self, pkgSet):
+        pkgSet = pkgSet.lower()
+        if pkgSet == "": pkgSet = self.SET_ALL
 
-		s = self.setmap.get(pkgSet, None)
-		if s is None:
-			return syssets.PortageSet(pkgSet)
-		else:
-			return s()
+        s = self.setmap.get(pkgSet, None)
+        if s is None:
+            return syssets.PortageSet(pkgSet)
+        else:
+            return s()
 
-	def new_package (self, cpv):
-		return PortagePackage_22(cpv)
+    def new_package (self, cpv):
+        return PortagePackage_22(cpv)
