@@ -279,7 +279,7 @@ class EmergeQueue:
                 # the slot-cp's of the packages in the queue
                 slots = {}
                 for c in self.iters[type]:
-                    slots[system.new_package(c).get_slot_cp()] = cpv
+                    slots[system.new_package(c).get_slot_cp()] = c
 
                 # check the installed blocks against the slot-cp's
                 for pkgs, block in inst[:]:
