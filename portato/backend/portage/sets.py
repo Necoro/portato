@@ -55,13 +55,13 @@ class FilterSet (Set):
     def get_pkgs (self, key, is_regexp, masked, with_version, only_cpv):
         t = set()
         for pkg in self.get_list():
-            if is_regexp:
+            if is_regexp and key:
                 if not re.match(key, pkg, re.I): continue
 
             if not with_version:
                 t.add(portage_dep.dep_getkey(pkg))
-                
-            t.add(system.find_best_match(pkg, only_cpv = True))
+            else:
+                t.add(system.find_best_match(pkg, only_cpv = True))
 
         return t
 
@@ -102,7 +102,7 @@ class InstalledSet (Set):
                 t = filter(lambda x: re.match(key, x, re.I), t)
 
             return set(t)
-        else:    
+        else:
             return set(system.settings.vartree.dbapi.match(key))
 
 class TreeSet (Set):
@@ -117,7 +117,7 @@ class TreeSet (Set):
             if key:
                 t = filter(lambda x: re.match(key, x, re.I), t)
 
-        elif masked:    
+        elif masked:
             t = system.settings.porttree.dbapi.xmatch("match-all", key)
         else:
             t = system.settings.porttree.dbapi.match(key)
