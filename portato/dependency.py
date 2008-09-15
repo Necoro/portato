@@ -17,6 +17,7 @@ Provides classes for the presentation of dependencies.
 from __future__ import absolute_import, with_statement
 __docformat__ = "restructuredtext"
 
+from collections import defaultdict
 
 from .helper import debug
 from .backend import system
@@ -69,66 +70,6 @@ class Dependency (object):
 
     satisfied = property(is_satisfied)
 
-class OrDependency (Dependency):
-    """
-    Dependency representing an "or".
-    
-    :note: Order is important. ``|| ( a b )`` != ``|| ( b a )``
-
-    :IVariables:
-
-        dep : tuple(`Dependency`,...)
-            The dependencies. The tuple and the dependencies are immutable.
-    """
-
-    def __init__ (self, deps):
-        """
-        Creates an or-dependency out of a list (or tuple) of deps.
-
-        :param deps: The or'ed dependencies.
-        :type deps: iter<string>
-        """
-
-        _dep = []
-        for dep in deps:
-            if not hasattr(dep, "__iter__"):
-                assert not dep.endswith("?")
-                _dep.append(Dependency(dep))
-            else:
-                _dep.append(AllOfDependency(dep))
-
-        self._dep = tuple(_dep)
-    
-    def __str__ (self):
-        return "<|| %s>" % str(self.dep)
-    
-    __repr__ = __str__
-
-class AllOfDependency (Dependency):
-    """
-    Dependency representing a set of packages inside "or".
-    If the or is: ``|| (a ( b c ) )`` the `AllOfDependency` would be the ``( b c )``.
-
-    :IVariables:
-
-        dep : tuple(`Dependency`,...)
-            The dependencies . The tuple and the deps are immutable.
-    """
-
-    def __init__ (self, deps):
-        """
-        Creates an or-dependency out of a list (or tuple) of deps.
-
-        :param deps: The dependencies.
-        :type deps: iter<string>
-        """
-
-        self._dep = tuple(Dependency(dep) for dep in deps)
-
-    def __str__ (self):
-        return "<ALL %s>" % str(self.dep)
-    
-    __repr__ = __str__
 
 class DependencyTree (object):
 
@@ -147,8 +88,15 @@ class DependencyTree (object):
     def __init__ (self):
 
         self.deps = set()
-        self.flags = {}
+        self.flags = defaultdict(UseDependency)
+        self._ors = []
+        self._subs = []
 
+    def is_empty (self):
+        return not (self.deps or self.flags or self._ors or self._subs)
+
+    empty = property(is_empty)
+    
     def add (self, dep, *moredeps):
         """
         Adds one or more normal dependencies to the tree.
@@ -166,14 +114,13 @@ class DependencyTree (object):
         for dep in moredeps:
             self.deps.add(Dependency(dep))
 
-    def add_or (self, orlist):
-        """
-        Adds a list of dependencies, which are or'ed.
+    def add_or (self):
+        o = OrDependency()
+        self._ors.append(o)
+        return o
 
-        :param orlist: the dependency list
-        :type orlist: iter<string>
-        """
-        self.deps.add(OrDependency(orlist))
+    def add_sub (self):
+        return self
 
     def add_flag (self, flag):
         """
@@ -183,16 +130,53 @@ class DependencyTree (object):
         :param flag: the new flag
         :rtype: `DependencyTree`
         """
-        if not flag in self.flags:
-            self.flags[flag] = DependencyTree()
 
-        return self.get_flag_tree(flag)
+        return self.flags[flag] # it's a defaultdict
 
-    def get_flag_tree (self, flag):
-        """
-        Returns the sub-tree of a specific tree.
+    def parse (self, deps):
+        it = iter(deps)
+        for dep in it:
+            if dep[-1] == "?":
+                ntree = self.add_flag(dep[:-1])
+                n = it.next()
+                if not hasattr(n, "__iter__"):
+                    n = [n]
+                ntree.parse(n)
+            
+            elif dep == "||":
+                n = it.next() # skip
+                if not hasattr(n, "__iter__"):
+                    n = [n]
+                
+                self.add_or().parse(n)
 
-        :raises KeyError: if the flag is not (yet) in this tree
-        :rtype: `DependencyTree`
-        """
-        return self.flags[flag]
+            elif isinstance(dep, list):
+                self.add_sub().parse(dep)
+            
+            else:
+                self.add(dep)
+
+    def get_list(self, l):
+        for d in l[:]:
+            if d.is_empty():
+                l.remove(d)
+            else:
+                yield d
+
+    def get_ors (self):
+        return self.get_list(self._ors)
+
+    def get_subs (self):
+        return self.get_list(self._subs)
+
+    ors = property(get_ors)
+    subs = property(get_subs)
+
+class OrDependency (DependencyTree):
+    def add_sub (self):
+        s = DependencyTree()
+        self._subs.append(s)
+        return s
+
+class UseDependency (DependencyTree):
+    pass

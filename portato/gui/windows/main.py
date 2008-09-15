@@ -23,7 +23,7 @@ from collections import defaultdict
 
 # our backend stuff
 from ...backend import flags, system # must be the first to avoid circular deps
-from ... import get_listener, plugin, dependency
+from ... import get_listener, plugin
 from ...helper import debug, warning, error, info, unique_array
 from ...session import Session
 from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, ICON_DIR
@@ -208,17 +208,24 @@ class PackageTable:
     def fill_dep_list(self):
 
         store = self.depList.get_model()
+        
+        def sort_key (x):
+            split = system.split_cpv(x.dep)
+
+            if split is None: # split_cpv returns None if this is only a CP; we assume there are only valid deps
+                return x.dep
+            else:
+                return "/".join(split[0:2])
+        
+        def get_icon (dep):
+            if dep.satisfied:
+                return self.icons["installed"]
+            elif dep.dep[0] == "!":
+                return self.icons["block"]
+            else:
+                return None
                 
         def add (tree, it):
-
-            def get_icon (dep):
-                if dep.satisfied:
-                    return self.icons["installed"]
-                elif dep.dep[0] == "!":
-                    return self.icons["block"]
-                else:
-                    return None
-
             # useflags
             for use, usetree in tree.flags.iteritems():
                 if use[0] == "!":
@@ -229,30 +236,17 @@ class PackageTable:
                 add(usetree, useit)
             
             # ORs
-            ordeps = (dep for dep in tree.deps if isinstance(dep, dependency.OrDependency))
-
-            for ordep in ordeps:
+            for ortree in tree.ors:
                 orit = store.append(it, [self.icons["or"], _("One of the following")])
+                add(ortree, orit)
 
-                for dep in ordep.dep:
-                    if isinstance(dep, dependency.AllOfDependency): # a list inside or
-                        allit = store.append(orit, [None, _("All of the following")])
-                        for adep in dep.dep:
-                            store.append(allit, [get_icon(adep), adep.dep])
-                    else:
-                        store.append(orit, [get_icon(dep), dep.dep])
-            
-            # normal
-            def sort_key (x):
-                split = system.split_cpv(x.dep)
+            # Sub (all of)
+            for subtree in tree.subs:
+                allit = store.append(it, [None, _("All of the following")])
+                add(subtree, allit)
 
-                if split is None: # split_cpv returns None if this is only a CP; we assume there are only valid deps
-                    return x.dep
-                else:
-                    return "/".join(split[0:2])
-            
-            ndeps = [dep for dep in tree.deps if not isinstance(dep, dependency.OrDependency)]
-            ndeps.sort(key = sort_key)
+            # normal    
+            ndeps = sorted(tree.deps, key = sort_key)
             for dep in ndeps:
                 store.append(it, [get_icon(dep), dep.dep])
         
