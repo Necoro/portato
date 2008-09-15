@@ -81,8 +81,17 @@ class DependencyTree (object):
         deps : set(`Dependency`)
             The list of dependencies which are not dependent on a useflag.
 
-        flags : string -> `DependencyTree`
+        flags : string -> `UseDependency`
             Holds the additional dependency trees per useflag.
+
+        ors : list(`OrDependency`)
+            A list of dependency trees, which are or'ed.
+
+        subs : list(`DependencyTree`)
+            A list of subtrees.
+
+        empty : boolean
+            Is this tree empty?
     """
 
     def __init__ (self):
@@ -115,17 +124,29 @@ class DependencyTree (object):
             self.deps.add(Dependency(dep))
 
     def add_or (self):
+        """
+        Adds an `OrDependency` and returns the created tree.
+
+        :rtype: `OrDependency`
+        """
         o = OrDependency()
         self._ors.append(o)
         return o
 
     def add_sub (self):
+        """
+        Adds and returns a subtree.
+
+        :rtype: `DependencyTree`
+        """
+
+        # a normal DepTree does not handle subtrees - so return self
+        # this is intended to be overwritten by subclasses
         return self
 
     def add_flag (self, flag):
         """
-        Adds a new useflag to this tree.
-        For convenience the newly created sub-tree is returned.
+        Adds a new useflag to this tree and returns the created sub-tree.
 
         :param flag: the new flag
         :rtype: `DependencyTree`
@@ -134,8 +155,14 @@ class DependencyTree (object):
         return self.flags[flag] # it's a defaultdict
 
     def parse (self, deps):
+        """
+        Parses the list of dependencies, as it is returned by paren_reduce, and fills the tree.
+        """
+
         it = iter(deps)
         for dep in it:
+            
+            # use
             if dep[-1] == "?":
                 ntree = self.add_flag(dep[:-1])
                 n = it.next()
@@ -143,6 +170,7 @@ class DependencyTree (object):
                     n = [n]
                 ntree.parse(n)
             
+            # or
             elif dep == "||":
                 n = it.next() # skip
                 if not hasattr(n, "__iter__"):
@@ -150,13 +178,22 @@ class DependencyTree (object):
                 
                 self.add_or().parse(n)
 
+            # sub
             elif isinstance(dep, list):
                 self.add_sub().parse(dep)
             
+            # normal
             else:
                 self.add(dep)
 
-    def get_list(self, l):
+    def get_non_empty(self, l):
+        """
+        Convenience accessor method. Returns these elements of a list, which are non-empty.
+        This also removes the empty ones from the list.
+
+        :param l: a list :)
+        :rtype: iter
+        """
         for d in l[:]:
             if d.is_empty():
                 l.remove(d)
@@ -164,19 +201,25 @@ class DependencyTree (object):
                 yield d
 
     def get_ors (self):
-        return self.get_list(self._ors)
+        return self.get_non_empty(self._ors)
 
     def get_subs (self):
-        return self.get_list(self._subs)
+        return self.get_non_empty(self._subs)
 
     ors = property(get_ors)
     subs = property(get_subs)
 
 class OrDependency (DependencyTree):
+    """
+    Models an or-dependency. This only overwrites `add_sub`, as sublists have a special meaning here.
+    """
     def add_sub (self):
         s = DependencyTree()
         self._subs.append(s)
         return s
 
 class UseDependency (DependencyTree):
+    """
+    Models an use-dependency. Nothing is overwritten.
+    """
     pass
