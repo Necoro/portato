@@ -133,7 +133,7 @@ class LogView (logging.Handler):
         for lvl, name, color in self.colors:
             self.buf.create_tag("log_%s" % name, foreground = color,weight = pango.WEIGHT_BOLD)
         
-        logging.getLogger("portatoLogger").addHandler(self)
+        logging.getLogger("portatoLogger.stream").addHandler(self)
 
     def emit (self, record):
         

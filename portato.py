@@ -20,7 +20,7 @@ import atexit
 import gettext, locale
 from optparse import OptionParser, SUPPRESS_HELP
 
-from portato import get_listener
+from portato import get_listener, log
 from portato.helper import debug, info
 from portato.constants import VERSION, LOCALE_DIR, APP, SU_COMMAND
 
@@ -49,6 +49,8 @@ def main ():
     atexit.register(get_listener().close)
 
     if options.nofork or os.getuid() == 0: # start GUI
+        log.start(file = True) # start logging to file
+
         from portato.gui import run
         info("%s v. %s", _("Starting Portato"), VERSION)
         

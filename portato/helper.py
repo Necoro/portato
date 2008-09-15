@@ -17,17 +17,17 @@ from __future__ import absolute_import
 
 import os, signal, logging, grp
 
-debug         = logging.getLogger("portatoLogger").debug
-info         = logging.getLogger("portatoLogger").info
-warning     = logging.getLogger("portatoLogger").warning
-error         = logging.getLogger("portatoLogger").error
-critical     = logging.getLogger("portatoLogger").critical
+debug         = logging.getLogger("portatoLogger.stream").debug
+info         = logging.getLogger("portatoLogger.stream").info
+warning     = logging.getLogger("portatoLogger.stream").warning
+error         = logging.getLogger("portatoLogger.stream").error
+critical     = logging.getLogger("portatoLogger.stream").critical
 
 def N_ (s):
     return s
 
 def set_log_level (lvl):
-    logging.getLogger("portatoLogger").setLevel(lvl)
+    logging.getLogger("portatoLogger.stream").setLevel(lvl)
 
 def send_signal_to_group (sig):
     """Sends a signal to all processes of our process group (w/o ourselves).
