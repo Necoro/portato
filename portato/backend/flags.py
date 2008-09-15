@@ -14,6 +14,7 @@ from __future__ import absolute_import, with_statement
 
 import os
 import os.path
+import itertools as itt
 from subprocess import Popen, PIPE # needed for grep
 
 from . import system, is_package
@@ -114,20 +115,15 @@ def get_data(pkg, path):
     
     flags = []
 
-    # do grep
-    list = grep(pkg, path)
-    
-    for i in range(len(list)):
-        file, line, fl = tuple(list[i].split(":")) # get file, line and flag-list
+    for line in grep(pkg, path):
+        file, line, fl = line.split(":") # get file, line and flag-list
         fl = fl.split()
         crit = fl[0]
         fl = fl[1:]
+        
         # stop after first comment
-        for j in range(len(fl)):
-            if fl[j][0] == "#": # comment - stop here
-                fl = fl[:j]
-                break
-        flags.append((file,line,crit,fl))
+        nc = itt.takewhile(lambda x: x[0] != "#", fl)
+        flags.append((file, line, crit, list(nc)))
 
     return flags
 
@@ -207,7 +203,7 @@ def sort_use_flag_list (flaglist):
     """
     
     def flag_key (flag):
-            if flag.startswith(("+","-")):
+            if flag[0] in "+-":
                 return flag[1:]
             else:
                 return flag
@@ -227,7 +223,7 @@ def filter_defaults (flaglist):
     """
 
     for flag in flaglist:
-        if flag.startswith(("+","-")):
+        if flag[0] in "+-":
             yield flag[1:]
         else:
             yield flag
@@ -274,7 +270,7 @@ def set_use_flag (pkg, flag):
                         newUseFlags[cpv].remove(t)
                         jumpOut = True
                         # break # don't break as both cases can be valid (see below)
-                if not jumpOut:    
+                if not jumpOut:
                     newUseFlags[cpv].append((file, line, invFlag, True))
                     
                     # we removed the inverted from package.use - but it is still enabled somewhere else
