@@ -27,6 +27,11 @@ class Package (_Package):
         @type cpv: string (cat/pkg-ver)"""
 
         self._cpv = cpv
+
+    def __repr__ (self):
+        return "<Package '%s' @0x%x>" % (self._cpv, id(self))
+
+    __str__ = __repr__
     
     #
     # implemented
