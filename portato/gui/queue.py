@@ -302,7 +302,7 @@ class EmergeQueue:
         else: # unmerge
             self.unmergequeue.append(cpv)
             if self.tree: # update tree
-                self.iters["uninstall"].update({cpv: self.tree.append(self.tree.get_unmerge_it(), self.tree.build_append_value(cpv))})
+                self.iters["uninstall"][cpv] = self.tree.append(self.tree.get_unmerge_it(), self.tree.build_append_value(cpv))
 
     def _queue_append (self, cpv, oneshot = False):
         """Convenience function appending a cpv either to self.mergequeue or to self.oneshotmerge.
@@ -362,7 +362,7 @@ class EmergeQueue:
                     os.dup2(self.pty[1], 2)
 
             # get all categories that are being touched during the emerge process
-            cats = set(map(lambda x: x.split("/")[0], it.iterkeys()))
+            cats = set(x.split("/")[0] for x in it.iterkeys())
 
             # start emerge
             self.process = Popen(command+options+packages, shell = False, env = system.get_environment(), preexec_fn = pre)
@@ -377,14 +377,14 @@ class EmergeQueue:
             if self.console:
                 old_title = self.console.get_window_title()
                 while self.process and self.process.poll() is None:
-                    if self.title_update : 
+                    if self.title_update:
                         title = self.console.get_window_title()
                         if title != old_title:
                             self.title_update(title)
                             old_title = title
                         time.sleep(0.5)
 
-            if self.up: 
+            if self.up:
                 self.up.stop()
                 if it:
                     self.tree.set_in_progress(top, False)
@@ -472,7 +472,7 @@ class EmergeQueue:
         @param options: Additional options to send to the emerge command
         @type options: string[]"""
         
-        if len(self.unmergequeue) == 0: return # nothing in queue
+        if not self.unmergequeue: return # nothing in queue
 
         list = self.unmergequeue[:] # copy the unmerge-queue
         
