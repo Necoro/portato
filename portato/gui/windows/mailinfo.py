@@ -10,16 +10,19 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 import smtplib, socket
 import time
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from .basic import AbstractDialog
 from ..utils import GtkThread
 from ..dialogs import mail_failure_dialog
 from ...helper import debug, info
 from ...constants import VERSION
+from ...log import LOGFILE
 
 class MailInfoWindow (AbstractDialog):
     TO = "bugs@portato.necoro.net"
@@ -32,17 +35,23 @@ class MailInfoWindow (AbstractDialog):
         self.window.show_all()
 
     def set_data (self):
+        self.message = MIMEMultipart()
+        self.message["Subject"] = "[Bug Report] Bug in Portato %s" % VERSION
+        self.message["To"] = self.TO
+        
+        # TO and FROM        
         name = self.tree.get_widget("nameEntry").get_text()
-        addr = self.tree.get_widget("mailEntry").get_text()
+        self.addr = self.tree.get_widget("mailEntry").get_text()
 
-        if not addr:
-            addr = self.TO
+        if not self.addr:
+            self.addr = self.TO
 
         if name:
-            fro = "%s <%s>" % (name, addr)
+            self.message["From"] = "%s <%s>" % (name, self.addr)
         else:
-            fro = addr
+            self.message["From"] = self.addr
 
+        # text
         commentBuffer = self.tree.get_widget("commentEntry").get_buffer()
         text = commentBuffer.get_text(*commentBuffer.get_bounds())
 
@@ -51,13 +60,16 @@ class MailInfoWindow (AbstractDialog):
 
         text += self.tb
 
-        message = """From: %s
-To: %s
-Subject: %s
-%s""" % ( fro, self.TO, ("[Bug Report] Bug in Portato %s" % VERSION), text)
+        txtmsg = MIMEText(text, "plain", "utf-8")
+        self.message.attach(txtmsg)
 
-        self.addr = addr
-        self.message = message
+        # log
+        if self.tree.get_widget("logCheck").get_active():
+            with open(LOGFILE, "r") as f:
+                log = MIMEText(f.read(), "plain", "utf-8")
+                log.add_header('Content-Disposition', 'attachment', filename='portato.log')
+
+            self.message.attach(log)
 
     def send (self):
         try:
@@ -66,12 +78,12 @@ Subject: %s
             debug("Sending mail")
             try:
                 try:
-                    server.sendmail(self.addr, self.TO, self.message)
+                    server.sendmail(self.addr, self.TO, self.message.as_string())
                 except smtplib.SMTPRecipientsRefused, e:
                     info(_("An error occurred while sending. I think we were greylisted. The error: %s") % e)
                     info(_("Retrying after waiting 60 seconds."))
                     time.sleep(60)
-                    server.sendmail(self.addr, self.TO, self.message)
+                    server.sendmail(self.addr, self.TO, self.message.as_string())
                 debug("Sent")
             finally:
                 server.quit()

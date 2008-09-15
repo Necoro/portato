@@ -22,6 +22,8 @@ from .constants import SESSION_DIR
 
 started = S_NOT
 
+LOGFILE = os.path.join(SESSION_DIR, "portato.log")
+
 class OutputFormatter (logging.Formatter):
 
     colors = {
@@ -66,7 +68,7 @@ def start(file = True):
             os.mkdir(SESSION_DIR)
 
         formatter = logging.Formatter("%(levelname)-8s: %(message)s (%(filename)s:%(lineno)s)")
-        handler = logging.FileHandler(os.path.join(SESSION_DIR, "portato.log"), "w")
+        handler = logging.FileHandler(LOGFILE, "w")
         handler.setFormatter(formatter)
         logging.getLogger("portatoLogger").addHandler(handler)
     
