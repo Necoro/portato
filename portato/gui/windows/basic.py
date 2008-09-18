@@ -119,7 +119,7 @@ class AbstractDialog (Window):
 class Popup (object):
 
     def __init__ (self, name, parent, file = "popups"):
-        self.tree = gtk.glade.XML(os.path.join(TEMPLATE_DIR, file+".glade"), root = name)
+        self.tree = WrappedTree(self.__class__.__name__, gtk.glade.XML(os.path.join(TEMPLATE_DIR, file+".glade"), root = name))
         self.tree.signal_autoconnect(parent)
         self._popup = self.tree.get_widget(name)
 
