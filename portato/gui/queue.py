@@ -144,7 +144,7 @@ class EmergeQueue:
             pkg = self._get_pkg_from_cpv(cpv, unmask)
             if not pkg.is_installed():
                 old = system.find_packages(pkg.get_slot_cp(), system.SET_INSTALLED)
-                if old: 
+                if old:
                     old = old[0] # assume we have only one there
                     cmp = pkg.compare_version(old)
                     if cmp > 0:
@@ -260,7 +260,7 @@ class EmergeQueue:
                 for block in self.blocks[type]:
                     for c in self.iters[type]:
                         if system.cpv_matches(c, block):
-                            blocked = ", ".join(self.blocks[type][block]) 
+                            blocked = ", ".join(self.blocks[type][block])
                             warning("'%s' is blocked by: %s", c, blocked)
                             self.remove_with_children(self.iters[type][c], False)
                             raise BlockedException(c, blocked)
@@ -428,7 +428,7 @@ class EmergeQueue:
             its = {}
             for k in queue:
                 list += ["="+k]
-                if self.tree: 
+                if self.tree:
                     its.update({k : self.iters["install"][k]})
 
             return list, its

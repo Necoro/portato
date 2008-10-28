@@ -252,7 +252,7 @@ class ConfigParser:
 
             # look for an expression
             match = EXPRESSION.search(line)
-            if match: 
+            if match:
                 val = match.group("value")
                 
                 # find the boolean value

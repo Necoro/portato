@@ -731,7 +731,7 @@ class OrderedDict(dict):
         if new_key in self:
             raise ValueError("New key already exists: %r" % new_key)
         # rename sequence entry
-        value = self[old_key] 
+        value = self[old_key]
         old_idx = self._sequence.index(old_key)
         self._sequence[old_idx] = new_key
         # rename internal dict entry

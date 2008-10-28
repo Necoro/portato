@@ -133,7 +133,7 @@ class PackageTable:
         self.instantChange = instantChange
         self.type = type
 
-        if not self.queue or not self.doEmerge: 
+        if not self.queue or not self.doEmerge:
             self.emergeBtn.set_sensitive(False)
             self.unmergeBtn.set_sensitive(False)
         
@@ -533,7 +533,7 @@ class PackageTable:
         if not store[path][0]:
             prefix = "-"
         
-        pkg.set_use_flag(prefix+flag)    
+        pkg.set_use_flag(prefix+flag)
         if self.instantChange:
             self._update_keywords(True, update = True)
     
@@ -551,7 +551,7 @@ class MainWindow (Window):
             LOG_PAGE
     ) = range(3)
 
-    def __init__ (self, splash = None):    
+    def __init__ (self, splash = None):
         """
         Build up window.
 
@@ -1199,9 +1199,9 @@ class MainWindow (Window):
                 self.tray.set_tooltip(title)
             
             window_title_update(title)
-            if title is None or not self.cfg.get_boolean("updateConsole", "GUI"): 
+            if title is None or not self.cfg.get_boolean("updateConsole", "GUI"):
                 title = _("Console")
-            else: 
+            else:
                 title = ("%s (%s)") % (_("Console"), title)
             
             tlength = int(self.cfg.get("titlelength", "GUI"))
@@ -1588,7 +1588,7 @@ class MainWindow (Window):
         Show the list of updateble packages.
         """
 
-        def __update():            
+        def __update():
             def cb_idle_show(packages):
                 """
                 Callback opening the menu when the calculation is finished.

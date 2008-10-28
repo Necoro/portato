@@ -94,7 +94,7 @@ class Package (_Package):
                 f = f[1:]
                 removed = True
 
-            invf = flags.invert_use_flag(f)    
+            invf = flags.invert_use_flag(f)
             
             if f[0] == '-':
                 if invf in i_flags and not (removed and invf in m_flags):

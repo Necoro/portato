@@ -39,7 +39,7 @@ def main ():
     parser.add_option("--shm", action = "store", nargs = 3, type="long", dest = "shm",
             help = SUPPRESS_HELP)
 
-    parser.add_option("-F", "--no-fork", "-L", action = "store_true", dest = "nofork", default = False, 
+    parser.add_option("-F", "--no-fork", "-L", action = "store_true", dest = "nofork", default = False,
             help = _("do not fork off as root") + (" (%s)" % _("-L is deprecated")))
 
     # run parser

@@ -109,9 +109,9 @@ class PListener (object):
             self._mem.write("%4d%s" % (len(string), string))
             self._sig.V()
         finally:
-            self._rw.V() 
+            self._rw.V()
 
-    def send_notify (self, base = "", descr = "", icon = "", urgency = None):    
+    def send_notify (self, base = "", descr = "", icon = "", urgency = None):
         if self._sig is None:
             self.do_notify(base, descr, icon, urgency)
         else:

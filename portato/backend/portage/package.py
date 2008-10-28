@@ -156,7 +156,7 @@ class PortagePackage (Package):
         else:
             return reason
 
-    def get_iuse_flags (self, installed = False, removeForced = True):        
+    def get_iuse_flags (self, installed = False, removeForced = True):
         if not self.is_in_system():
             installed = True
         
@@ -185,7 +185,7 @@ class PortagePackage (Package):
         deps = portage.dep_check(depstring, None, self._settings.settings, myuse = actual, trees = self._trees)
 
         if not deps: # FIXME: what is the difference to [1, []] ?
-            return [] 
+            return []
 
         if deps[0] == 0: # error
             raise DependencyCalcError, deps[1]
@@ -209,7 +209,7 @@ class PortagePackage (Package):
         deps = portage.dep_check (depstring, self._settings.vartree.dbapi, self._settings.settings, myuse = actual, trees = self._trees)
         
         if not deps: # FIXME: what is the difference to [1, []] ?
-            return [] 
+            return []
 
         if deps[0] == 0: # error
             raise DependencyCalcError, deps[1]
@@ -311,4 +311,4 @@ class PortagePackage (Package):
             return portage.pkgcmp(v1[1:],v2[1:])
 
     def matches (self, criterion):
-        return system.cpv_matches(self.get_cpv(), criterion)    
+        return system.cpv_matches(self.get_cpv(), criterion)

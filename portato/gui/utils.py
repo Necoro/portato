@@ -25,7 +25,7 @@ import gtk
 
 # some backend things
 from ..backend import flags, system, set_system
-from ..helper import debug, info, set_log_level 
+from ..helper import debug, info, set_log_level
 from ..constants import APP, LOCALE_DIR
 
 # parser
@@ -72,7 +72,7 @@ class Config (ConfigParser):
         @see: L{flags.set_config()}"""
 
         flagCfg = {
-                "usefile": self.get("useFile"), 
+                "usefile": self.get("useFile"),
                 "usePerVersion" : self.get_boolean("usePerVersion"),
                 "maskfile" : self.get("maskFile"),
                 "maskPerVersion" : self.get_boolean("maskPerVersion"),

@@ -484,7 +484,7 @@ class PluginQueue (object):
 
     def _resolve_unresolved (self, before, after):
         def resolve(hook, list, type, add):
-            if not list: 
+            if not list:
                 return
             
             callList = getattr(self.hooks[hook], type)

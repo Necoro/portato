@@ -297,7 +297,7 @@ class PortageSystem (SystemInterface):
             
             if p.get_slot_cp() in checked:
                 return
-            else: 
+            else:
                 if (not p.is_installed()) and (not add_not_installed):
                     # don't add these packages to checked as we may see them again
                     # - and then we might have add_not_installed being True
@@ -310,7 +310,7 @@ class PortageSystem (SystemInterface):
 
             if not p.is_installed():
                 oldList = self.find_packages(p.get_slot_cp(), self.SET_INSTALLED)
-                if oldList: 
+                if oldList:
                     old = oldList[0] # we should only have one package here - else it is a bug
                 else:
                     oldList = self.sort_package_list(self.find_packages(p.get_cp(), self.SET_INSTALLED))
@@ -356,7 +356,7 @@ class PortageSystem (SystemInterface):
                         if i not in raw_checked or raw_checked[i] == False:
                             raw_checked.update({i : state[1]})
                             bm = self.get_new_packages([i])
-                            if not bm: 
+                            if not bm:
                                 warning(_("Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."), {"package" : i, "cpv": p.get_cpv()})
                             else:
                                 for pkg in bm:
