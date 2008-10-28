@@ -1363,7 +1363,10 @@ class MainWindow (Window):
             string = string+"<i>- %s</i>" % ("\n- ".join(disabled),)
 
         if expanded:
-            string = string+"\n\n"+"\n".join(expanded)
+            if string:
+                string += "\n\n"
+
+            string += "\n".join(expanded)
         
         tooltip.set_markup(string)
         return string != ""
