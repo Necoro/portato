@@ -1025,7 +1025,7 @@ class MainWindow (Window):
 
             if name:
                 if oldVersion > 1: # newer one
-                    name, pos = map(str.strip, name.split(","))
+                    name, pos = name.split("@")
 
                 if model[pos][col] != name: # need to search :(
                     debug("Pkg path does not match. Searching...")
@@ -1046,7 +1046,7 @@ class MainWindow (Window):
 
             if name:
                 if oldVersion > 1: # newer one
-                    name, pos = map(str.strip, name.split(","))
+                    name, pos = name.split("@")
 
                 if self.cfg.get_boolean("collapseCats", "GUI"):
                     try:
@@ -1091,7 +1091,7 @@ class MainWindow (Window):
         def save_pkg_selection ():
             store, iter = self.pkgList.get_selection().get_selected()
             if iter:
-                return "%s, %s" % (store.get_value(iter, 1), store.get_string_from_iter(iter))
+                return "%s@%s" % (store.get_value(iter, 1), store.get_string_from_iter(iter))
             else:
                 return ""
 
@@ -1116,9 +1116,9 @@ class MainWindow (Window):
                     if catVal == pkgVal: # the info in the pkgList has higher precedence
                         pos = catStore.get_string_from_iter(catIter)
 
-                return "%s, %s" % (pkgVal, pos)
+                return "%s@%s" % (pkgVal, pos)
             else:
-                return "%s, 0" % self.selCatName
+                return "%s@0" % self.selCatName
 
         # PLUGIN
         def load_plugin (p):
@@ -1160,8 +1160,8 @@ class MainWindow (Window):
             ([("gtksessionversion", "session")], load_session_version, lambda: SESSION_VERSION),
             ([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
             ([("vpanedpos", "window"), ("hpanedpos", "window")], load_paned, save_paned),
-            ([("catsel", "window")], load_cat_selection, save_cat_selection, ["app-portage, 0"]),
-            ([("pkgsel", "window")], load_pkg_selection, save_pkg_selection, ["portato, 0"])
+            ([("catsel", "window")], load_cat_selection, save_cat_selection, ["app-portage@0"]),
+            ([("pkgsel", "window")], load_pkg_selection, save_pkg_selection, ["portato@0"])
             #([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue),
             ])
 
