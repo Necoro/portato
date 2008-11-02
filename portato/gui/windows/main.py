@@ -596,7 +596,6 @@ class MainWindow (Window):
         # package db
         splash(_("Creating Database"))
         self.db = Database()
-        self.db.populate()
         
         # set plugins and plugin-menu
         splash(_("Loading Plugins"))

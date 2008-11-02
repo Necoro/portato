@@ -22,6 +22,8 @@ These should be set during the installation.
 @type HOME: string
 @var SU_COMMAND: command to execute to "su"
 @type SU_COMMAND: string
+@var USE_SQL: whether to use the sqlite db
+@type USE_SQL: boolean
 
 @var CONFIG_DIR: The configuration directory.
 @type CONFIG_DIR: string
@@ -56,6 +58,7 @@ APP = "portato"
 VERSION = "9999"
 HOME = os.environ["HOME"]
 SU_COMMAND = "gksu -D 'Portato'"
+USE_SQL = True
 
 # config
 CONFIG_DIR = "/etc/portato/"
