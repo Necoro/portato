@@ -977,7 +977,7 @@ class MainWindow (Window):
             return
 
         oldVersion = SESSION_VERSION
-        allowedVersions = (0,1)
+        allowedVersions = (1,2)
 
         if sessionEx and isinstance(sessionEx, SessionException):
             if sessionEx.got in allowedVersions:
@@ -1017,44 +1017,80 @@ class MainWindow (Window):
             return [x.get_position() for x in (self.vpaned, self.hpaned)]
 
         # SELECTION
-        def load_selection (list, col):
-            def _load (name):
-                pos = "0" # default
-                
-                if name:
-                    for cname, path in ((x[col], x.path) for x in list.get_model()):
+        def load_pkg_selection (name):
+            pos = "0"
+            col = 1
+            model = self.pkgList.get_model()
+
+            if name:
+                if oldVersion > 1: # newer one
+                    name, pos = map(str.strip, name.split(","))
+
+                if model[pos][col] != name: # need to search :(
+                    debug("Pkg path does not match. Searching...")
+                    for cname, path in ((x[col], x.path) for x in model):
                         if cname == name:
                             pos = path
                             break
 
-                    if self.cfg.get_boolean("collapseCats", "GUI") and \
-                            pos == "0" and isinstance(list.get_model(), gtk.TreeStore): # try the new split up
 
-                        try:
-                            pre, post = name.split("-", 1)
-                        except ValueError: # nothing to split
-                            pass
-                        else:
-                            for row in list.get_model():
-                                if row[col] == pre: # found first part
-                                    pos = row.path
-                                    list.expand_row(pos, False)
-                                    for cname, path in ((x[col], x.path) for x in row.iterchildren()):
-                                        if cname == post: # found second
-                                            pos = ":".join(map(str,path))
-                                            break
-                                    break
+            debug("Selecting pkg path '%s'. Value: '%s'", pos, model[pos][col])
+            self.pkgList.get_selection().select_path(pos)
+            self.pkgList.scroll_to_cell(pos)
+
+        def load_cat_selection (name):
+            pos = "0"
+            col = 0
+            model = self.catList.get_model()
+
+            if name:
+                if oldVersion > 1: # newer one
+                    name, pos = map(str.strip, name.split(","))
+
+                if self.cfg.get_boolean("collapseCats", "GUI"):
+                    try:
+                            sname = name.split("-", 1)
+                    except ValueError: # nothing to split
+                            sname = None
+                else:
+                    sname = None
+
+                if sname is None and model[pos][col] != name: # need to search in normal list
+                    debug("Cat path does not match. Searching...")
+                    for cname, path in ((x[col], x.path) for x in model):
+                        if cname == name:
+                            pos = path
+                            break
                 
-                debug("Selecting path '%s'.", pos)
-                list.get_selection().select_path(pos)
-                list.scroll_to_cell(pos)
-            
-            return _load
+                elif sname: # the collapse case
+                    row = model[pos.split(":")[0]]
+                    no_match = False
+                    if row[col] != sname[0]: # first part does not match :(
+                        debug("First part of cat path does not match. Searching...")
+                        no_match = True
+                        for r in model:
+                            if r[col] == sname[0]:
+                                row = r
+                                break
+
+                    if no_match or model[pos][col] != sname[1]:
+                        debug("Second part of cat path does not match. Searching...")
+                        for cname, path in ((x[col], x.path) for x in row.iterchildren()):
+                            if cname == sname[1]: # found second
+                                pos = ":".join(map(str,path))
+                                break
+                    
+                    self.catList.expand_to_path(pos)
+
+
+            debug("Selecting cat path '%s'. Value: '%s'", pos, model[pos][col])
+            self.catList.get_selection().select_path(pos)
+            self.catList.scroll_to_cell(pos)
 
         def save_pkg_selection ():
             store, iter = self.pkgList.get_selection().get_selected()
             if iter:
-                return store.get_value(iter, 1)
+                return "%s, %s" % (store.get_value(iter, 1), store.get_string_from_iter(iter))
             else:
                 return ""
 
@@ -1062,11 +1098,26 @@ class MainWindow (Window):
             # try to find the correct category using the pkgList selection
             # so we do not select ALL =)
             # if no package has been selected - return selCatName
-            store, iter = self.pkgList.get_selection().get_selected()
-            if iter:
-                return store.get_value(iter, 2)
+
+            catStore, catIter = self.catList.get_selection().get_selected()
+            pkgStore, pkgIter = self.pkgList.get_selection().get_selected()
+            if pkgIter:
+                pkgVal = pkgStore.get_value(pkgIter, 2)
+                pos = "0"
+
+                if catIter: # check for the more exact category position if possible
+                    catVal = catStore.get_value(catIter, 0)
+                    catParent = self.catList.get_model().iter_parent(catIter)
+
+                    if catParent:
+                        catVal = "%s-%s" % (catStore.get_value(catParent, 0), catVal)
+                    
+                    if catVal == pkgVal: # the info in the pkgList has higher precedence
+                        pos = catStore.get_string_from_iter(catIter)
+
+                return "%s, %s" % (pkgVal, pos)
             else:
-                return self.selCatName
+                return "%s, 0" % self.selCatName
 
         # PLUGIN
         def load_plugin (p):
@@ -1108,8 +1159,8 @@ class MainWindow (Window):
             ([("gtksessionversion", "session")], load_session_version, lambda: SESSION_VERSION),
             ([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
             ([("vpanedpos", "window"), ("hpanedpos", "window")], load_paned, save_paned),
-            ([("catsel", "window")], load_selection(self.catList, 0), save_cat_selection, ["app-portage"]),
-            ([("pkgsel", "window")], load_selection(self.pkgList, 1), save_pkg_selection, ["portato"])
+            ([("catsel", "window")], load_cat_selection, save_cat_selection, ["app-portage, 0"]),
+            ([("pkgsel", "window")], load_pkg_selection, save_pkg_selection, ["portato, 0"])
             #([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue),
             ])
 

@@ -72,14 +72,12 @@ class Session (object):
                 loaded = [self._cfg.get(*x) for x in options]
             except KeyError: # does not exist -> ignore
                 debug("No values for %s.", options)
+                if default:
+                    debug("Loading %s with defaults %s.", options, default)
+                    lfn(*default)
             else:
                 debug("Loading %s with values %s.", options, loaded)
                 lfn(*loaded)
-                continue
-
-            if default:
-                debug("Loading %s with defaults %s.", options, default)
-                lfn(*default)
 
     def save (self):
         """
