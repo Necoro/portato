@@ -704,6 +704,7 @@ class MainWindow (Window):
                 self.load_session(e)
         except SessionException, e:
             warning(str(e))
+            self.load_session(defaults_only = True) # last ressort
         
         splash(_("Finishing startup"))
         
@@ -966,7 +967,7 @@ class MainWindow (Window):
         else: # no selCatName -> so no category selected --> ignore
             debug("No category selected --> should be no harm.")
 
-    def load_session(self, sessionEx = None):
+    def load_session(self, sessionEx = None, defaults_only = False):
         """
         Loads the session data.
         """
@@ -979,7 +980,7 @@ class MainWindow (Window):
         oldVersion = SESSION_VERSION
         allowedVersions = (1,2)
 
-        if sessionEx and isinstance(sessionEx, SessionException):
+        if not defaults_only and sessionEx and isinstance(sessionEx, SessionException):
             if sessionEx.got in allowedVersions:
                 info(_("Translating session from version %d to %d.") % (sessionEx.got, sessionEx.expected))
                 oldVersion = sessionEx.got
@@ -1171,7 +1172,7 @@ class MainWindow (Window):
                 self.session.add_handler(([(p.name.replace(" ","_"), "plugins")], load_plugin(p), save_plugin(p)))
 
         # now we have the handlers -> load
-        self.session.load()
+        self.session.load(defaults_only)
     
     def jump_to (self, cp, version = None):
         """

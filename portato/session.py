@@ -63,21 +63,28 @@ class Session (object):
         """
         self._handlers.append((options, load_fn, save_fn, default))
 
-    def load (self):
+    def load (self, defaults_only = False):
         """
         Loads and applies all values of the session.
         """
+        
+        def ldefault (options, lfn, default):
+            if not default: return
+            debug("Loading %s with defaults %s.", options, default)
+            lfn(*default)
+
         for options, lfn, sfn, default in self._handlers:
-            try:
-                loaded = [self._cfg.get(*x) for x in options]
-            except KeyError: # does not exist -> ignore
-                debug("No values for %s.", options)
-                if default:
-                    debug("Loading %s with defaults %s.", options, default)
-                    lfn(*default)
+            if defaults_only:
+                ldefault(options, lfn, default)
             else:
-                debug("Loading %s with values %s.", options, loaded)
-                lfn(*loaded)
+                try:
+                    loaded = [self._cfg.get(*x) for x in options]
+                except KeyError: # does not exist -> ignore
+                    debug("No values for %s.", options)
+                    ldefault(options, lfn, default)
+                else:
+                    debug("Loading %s with values %s.", options, loaded)
+                    lfn(*loaded)
 
     def save (self):
         """
