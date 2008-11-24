@@ -1171,6 +1171,22 @@ class MainWindow (Window):
             for p in queue.get_plugins():
                 self.session.add_handler(([(p.name.replace(" ","_"), "plugins")], load_plugin(p), save_plugin(p)))
 
+        # the other things
+        def load_cfg ((name, cat)):
+            def load (v):
+                self.cfg.set_session(name, cat, v)
+
+            def save ():
+                v = self.cfg.get_session(name, cat)
+                if v is None:
+                    return ""
+                else:
+                    return v
+
+            self.session.add_handler(([(name, cat)], load, save))
+
+        map(load_cfg, [("prefheight", "window"), ("prefwidth", "window")])
+
         # now we have the handlers -> load
         self.session.load(defaults_only)
     

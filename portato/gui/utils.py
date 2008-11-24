@@ -76,6 +76,9 @@ class Config (ConfigParser):
         # local configs
         self.local = {}
 
+        # session configs
+        self.session = {}
+
     def modify_flags_config (self):
         """Sets the internal config of the L{flags}-module.
         @see: L{flags.set_config()}"""
@@ -139,6 +142,15 @@ class Config (ConfigParser):
             return None
 
         return self.local[cpv][name]
+
+    def set_session (self, name, cat, val):
+        self.session[(cat, name)] = val
+
+    def get_session (self, name, cat):
+        v = self.session.get((cat, name), None)
+
+        if v == "": v = None
+        return v
 
     def write(self):
         """Writes to the config file and modify any external configs."""
