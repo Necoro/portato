@@ -978,7 +978,7 @@ class MainWindow (Window):
             return
 
         oldVersion = SESSION_VERSION
-        allowedVersions = (1,2)
+        allowedVersions = (1,3)
 
         if not defaults_only and sessionEx and isinstance(sessionEx, SessionException):
             if sessionEx.got in allowedVersions:

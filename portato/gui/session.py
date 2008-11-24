@@ -14,7 +14,7 @@ from ..helper import debug
 
 # the current version for saved sessions
 # change this, whenever the change is incompatible with previous versions
-SESSION_VERSION = 2
+SESSION_VERSION = 3
 
 class SessionException (Exception):
 
