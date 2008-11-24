@@ -81,6 +81,21 @@ class PreferenceWindow (AbstractDialog):
         # our config
         self.cfg = cfg
 
+        # the size
+        height = self.cfg.get_session("prefheight", "window")
+        if height is None:
+            height = int(gtk.gdk.screen_height() * 0.8) # see 4/5 * screen_height as maximum
+        else:
+            height = int(height)
+
+        width = self.cfg.get_session("prefwidth", "window")
+        if width is None:
+            width = -1 # default
+        else:
+            width = int(width)
+
+        self.window.resize(width, height)
+
         # the setter functions
         self.console_fn = console_fn
         self.linkbtn_fn = linkbtn_fn
@@ -216,3 +231,7 @@ class PreferenceWindow (AbstractDialog):
         store = self.setList.get_model()
         store[path][0] = not store[path][0]
         return True
+
+    def cb_size_changed (self, widget, event, *args):
+        self.cfg.set_session("prefheight", "window", event.height)
+        self.cfg.set_session("prefwidth", "window", event.width)
