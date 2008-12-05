@@ -1,3 +1,9 @@
+next:
+- add (experimental) support for sqlite db
+- improvements in session handling
+- sort by useflags in dependency list
+- make uselist and deplist lazy - i.e. load only if needed
+
 0.11.1:
 - bugfixes
 - log to file
