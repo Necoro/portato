@@ -93,15 +93,14 @@ class PackageTable:
         self.unmergeBtn = self.tree.get_widget("pkgUnmergeBtn")
         self.revertBtn = self.tree.get_widget("pkgRevertBtn")
         
-        # useList
-        self.useList = self.tree.get_widget("useList")
-        self.build_use_list()
-
         # views
-        self.ebuildView = self.tree.get_widget("ebuildScroll").get_child()
-        self.changelogView = self.tree.get_widget("changelogScroll").get_child()
-        self.filesView = self.tree.get_widget("filesScroll").get_child()
-        self.depView = self.tree.get_widget("dependencyScroll").get_child()
+        self.views = map (lambda x: self.tree.get_widget(x).get_child(),
+                [
+                    "ebuildScroll", "changelogScroll", "filesScroll",
+                    "dependencyScroll", "useListScroll"
+                ])
+
+        self.useList = self.tree.get_widget("useListScroll").get_child()
 
 
     def update (self, pkg, queue = None, doEmerge = True, instantChange = False, type = None):
@@ -196,54 +195,6 @@ class PackageTable:
             self.useFlagsLL.hide()
             self.useFlagsLabel.hide()
 
-    def fill_use_list(self):
-
-        pkg = self.pkg
-        pkg_flags = pkg.get_iuse_flags()
-        pkg_flags.sort()
-    
-        actual_exp = None
-        actual_exp_it = None
-
-        euse = pkg.get_actual_use_flags()
-        instuse = pkg.get_installed_use_flags()
-
-        store = self.useList.get_model()
-
-        for use in pkg_flags:
-            exp = pkg.use_expanded(use, suggest = actual_exp)
-            if exp is not None:
-                if exp != actual_exp:
-                    actual_exp_it = store.append(None, [None, None, exp, "<i>%s</i>" % _("This is an expanded use flag and cannot be selected")])
-                    actual_exp = exp
-            else:
-                actual_exp_it = None
-                actual_exp = None
-
-            enabled = use in euse
-            installed = use in instuse
-            store.append(actual_exp_it, [enabled, installed, use, system.get_use_desc(use, self.pkg.get_cp())])
-        
-    def build_use_list (self):
-        """Builds the useList."""
-        store = gtk.TreeStore(bool, bool, str, str)
-        self.useList.set_model(store)
-
-        # build view
-        cell = gtk.CellRendererText()
-        iCell = gtk.CellRendererToggle()
-        iCell.set_property("activatable", False)
-        tCell = gtk.CellRendererToggle()
-        tCell.set_property("activatable", True)
-        tCell.connect("toggled", self.cb_use_flag_toggled, store)
-        self.useList.append_column(gtk.TreeViewColumn(_("Enabled"), tCell, active = 0))
-        self.useList.append_column(gtk.TreeViewColumn(_("Installed"), iCell, active = 1))
-        self.useList.append_column(gtk.TreeViewColumn(_("Flag"), cell, text = 2))
-        self.useList.append_column(gtk.TreeViewColumn(_("Description"), cell, markup = 3))
-
-        self.useList.set_search_column(2)
-        self.useList.set_enable_tree_lines(True)
-
     def _update_keywords (self, emerge, update = False):
         if emerge:
             type = "install" if not self.type else self.type
@@ -267,16 +218,12 @@ class PackageTable:
         pkg = self.pkg
 
         # set the views
-        for v in (self.ebuildView, self.changelogView, self.filesView, self.depView):
-            v.update(pkg, force = self.notebook.get_nth_page(self.notebook.get_current_page()) == v.get_parent())
+        nb_page = self.notebook.get_nth_page(self.notebook.get_current_page())
+        for v in self.views:
+            v.update(pkg, force = nb_page == v.get_parent())
 
         # set the labels
         self.set_labels()
-
-        # set use list
-        self.useList.get_model().clear()
-        self.useList.columns_autosize()
-        self.fill_use_list()
 
         #
         # rebuild the buttons and checkboxes in all the different manners which are possible
@@ -435,8 +382,11 @@ class PackageTable:
         
         return True
 
-    def cb_use_flag_toggled (self, cell, path, store):
+    def cb_use_flag_toggled (self, cell, path):
         """Callback for a toggled use-flag button."""
+
+        store = self.useList.get_model()
+
         flag = store[path][2]
         pkg = self.pkg
         
@@ -586,10 +536,10 @@ class MainWindow (Window):
         filesScroll.add(InstalledOnlyView(show_files))
 
         depScroll = self.tree.get_widget("dependencyScroll")
-        self.depList = LazyStoreView(self.fill_dep_list)
-        self.build_dep_list()
-        depScroll.add(self.depList)
-
+        depScroll.add(self.build_dep_list())
+        
+        useScroll = self.tree.get_widget("useListScroll")
+        useScroll.add(self.build_use_list())
         
         # table
         self.packageTable = PackageTable(self)
@@ -883,6 +833,8 @@ class MainWindow (Window):
 
     def build_dep_list (self):
 
+        listView = LazyStoreView(self.fill_dep_list)
+
         col = gtk.TreeViewColumn()
 
         cell = gtk.CellRendererPixbuf()
@@ -893,7 +845,10 @@ class MainWindow (Window):
         col.pack_start(cell, True)
         col.add_attribute(cell, "text", 1)
 
-        self.depList.append_column(col)
+        listView.append_column(col)
+        listView.set_headers_visible(False)
+
+        return listView
 
     def fill_dep_list(self, pkg):
 
@@ -966,6 +921,56 @@ class MainWindow (Window):
             store.append(None, [None, w])
         else:
             add(deptree, None)
+
+        return store
+
+    def build_use_list (self):
+        """Builds the useList."""
+
+        useList = LazyStoreView(self.fill_use_list)
+
+        # build view
+        cell = gtk.CellRendererText()
+        iCell = gtk.CellRendererToggle()
+        iCell.set_property("activatable", False)
+        tCell = gtk.CellRendererToggle()
+        tCell.set_property("activatable", True)
+        tCell.connect("toggled", self.cb_use_flag_toggled)
+        useList.append_column(gtk.TreeViewColumn(_("Enabled"), tCell, active = 0))
+        useList.append_column(gtk.TreeViewColumn(_("Installed"), iCell, active = 1))
+        useList.append_column(gtk.TreeViewColumn(_("Flag"), cell, text = 2))
+        useList.append_column(gtk.TreeViewColumn(_("Description"), cell, markup = 3))
+
+        useList.set_search_column(2)
+        useList.set_enable_tree_lines(True)
+
+        return useList
+    
+    def fill_use_list(self, pkg):
+        store = gtk.TreeStore(bool, bool, str, str)
+
+        pkg_flags = pkg.get_iuse_flags()
+        pkg_flags.sort()
+    
+        actual_exp = None
+        actual_exp_it = None
+
+        euse = pkg.get_actual_use_flags()
+        instuse = pkg.get_installed_use_flags()
+
+        for use in pkg_flags:
+            exp = pkg.use_expanded(use, suggest = actual_exp)
+            if exp is not None:
+                if exp != actual_exp:
+                    actual_exp_it = store.append(None, [None, None, exp, "<i>%s</i>" % _("This is an expanded use flag and cannot be selected")])
+                    actual_exp = exp
+            else:
+                actual_exp_it = None
+                actual_exp = None
+
+            enabled = use in euse
+            installed = use in instuse
+            store.append(actual_exp_it, [enabled, installed, use, system.get_use_desc(use, pkg.get_cp())])
 
         return store
 
@@ -1843,6 +1848,9 @@ class MainWindow (Window):
             self.window.window.show()
         else:
             self.window.iconify()
+    
+    def cb_use_flag_toggled (self, *args):
+        return self.packageTable.cb_use_flag_toggled(*args)
 
     def cb_close (self, *args):
         """
