@@ -216,6 +216,23 @@ class PackageTable:
                 return x.dep
             else:
                 return "/".join(split[0:2])
+
+        def cmp_flag (x, y):
+            # get strings - as tuples are passed
+            x = x[0]
+            y = y[0]
+
+            # remove "!"
+            ret = 0
+            if x[0] == "!":
+                ret = 1
+                x = x[1:]
+            if y[0] == "!":
+                ret = ret - 1 # if it is already 1, it is 0 now :)
+                y = y[1:]
+
+            # cmp -- if two flags are equal, the negated one is greater
+            return cmp(x,y) or ret
         
         def get_icon (dep):
             if dep.satisfied:
@@ -227,7 +244,8 @@ class PackageTable:
                 
         def add (tree, it):
             # useflags
-            for use, usetree in tree.flags.iteritems():
+            flags = sorted(tree.flags.iteritems(), cmp = cmp_flag)
+            for use, usetree in flags:
                 if use[0] == "!":
                     usestring = _("If '%s' is disabled") % use[1:]
                 else:
