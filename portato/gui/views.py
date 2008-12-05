@@ -46,6 +46,20 @@ class LazyView (object):
     def _get_content (self):
         raise NotImplementedError
 
+class LazyStoreView (gtk.TreeView, LazyView):
+    def __init__ (self, update_fn):
+        gtk.TreeView.__init__(self)
+        LazyView.__init__(self)
+
+        self.update_fn = update_fn
+
+    def cb_mapped (self, *args):
+        if self.updated and self.pkg:
+            self.set_model(self.update_fn(self.pkg))
+            self.updated = False
+
+        return False
+
 class ListView (gtk.TextView, LazyView):
 
     def __init__ (self, content_fn):
