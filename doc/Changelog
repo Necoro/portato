@@ -3,6 +3,8 @@ next:
 - improvements in session handling
 - sort by useflags in dependency list
 - make uselist and deplist lazy - i.e. load only if needed
+- remembers the height and width of the preference window
+- bugs fixed: #44, #41
 
 0.11.1:
 - bugfixes
