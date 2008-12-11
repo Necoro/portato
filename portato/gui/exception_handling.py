@@ -56,7 +56,7 @@ class UncaughtExceptionDialog(gtk.MessageDialog):
         textbuffer = self.textview.get_buffer()
         self.text = get_trace(type, value, tb)
         if thread:
-            self.text = _("Exception in thread \"%(thread)s\":\n%(trace)s") % {"thread": thread, "trace": self.text}
+            self.text = "Exception in thread \"%(thread)s\":\n%(trace)s" % {"thread": thread, "trace": self.text}
         textbuffer.set_text(self.text)
         self.textview.set_size_request(gtk.gdk.screen_width()/2, gtk.gdk.screen_height()/3)
 
@@ -122,9 +122,9 @@ def register_ex_handler():
             UncaughtExceptionDialog(type, val, tb, thread).run()
         
         if thread:
-            error(_("Exception in thread \"%(thread)s\":\n%(trace)s"), {"thread": thread, "trace": get_trace(type, val, tb)})
+            error("Exception in thread \"%(thread)s\":\n%(trace)s", {"thread": thread, "trace": get_trace(type, val, tb)})
         else:
-            error(_("Exception:\n%s"), get_trace(type, val, tb))
+            error("Exception:\n%s", get_trace(type, val, tb))
         
         gobject.idle_add(run_dialog)
 
