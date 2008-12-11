@@ -8,46 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-28 22:08+0200\n"
+"POT-Creation-Date: 2008-12-11 14:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: portato/gui/templates/popups.glade:12
-#: portato/gui/templates/MainWindow.glade:192
-#: portato/gui/templates/MainWindow.glade:265
-msgid "Emerge _Paused"
-msgstr ""
-
-#: portato/gui/templates/popups.glade:19
-#: portato/gui/templates/MainWindow.glade:200
-#: portato/gui/templates/MainWindow.glade:247
-msgid "_Kill Emerge"
-msgstr ""
-
-#: portato/gui/templates/popups.glade:37
-#: portato/gui/templates/MainWindow.glade:70
-msgid "gtk-quit"
-msgstr ""
-
-#: portato/gui/templates/UpdateWindow.glade:7
-msgid "Updatable Packages"
-msgstr ""
-
-#: portato/gui/templates/UpdateWindow.glade:49
-msgid "_Close"
-msgstr ""
-
-#: portato/gui/templates/UpdateWindow.glade:61
-msgid "Select _All"
-msgstr ""
-
-#: portato/gui/templates/UpdateWindow.glade:76
-msgid "_Install Selected"
-msgstr ""
 
 #: portato/gui/templates/AboutWindow.glade:8
 msgid "About Portato"
@@ -57,273 +24,6 @@ msgstr ""
 msgid ""
 "This software is licensed under the terms of the GPLv2.\n"
 "Copyright (C) 2006-2008 René 'Necoro' Neumann <necoro@necoro.net>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:7
-msgid "Preferences"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:42
-msgid "Debug"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:55
-msgid "Browser command: "
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:81
-#: portato/gui/templates/PreferenceWindow.glade:576
-msgid "<b>General Options</b>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:148
-msgid "<b>Package sets to update</b>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:167
-msgid "<b>Update World Options</b>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:195
-msgid "Sync command: "
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:216
-msgid "<b>Sync Options</b>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:257
-msgid "<u><i>Masking Keywords</i></u>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:272
-msgid "<u><i>Testing Keywords</i></u>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:287
-msgid "<u><i>Use-Flags</i></u>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:309
-msgid ""
-"<u>You may use the following placeholders:</u>\n"
-"\n"
-"<i>$(pkg)</i>: package name\n"
-"<i>$(cat)</i>: category\n"
-"<i>$(cat-1)/$(cat-2)</i>: first/second part of the category\n"
-"<i>$(version)</i> : version of the package"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:334
-msgid "Add only exact version to package.mask/package.unmask"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:348
-msgid "File name to use, if package.mask/package.unmask is a directory: "
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:382
-msgid "File name to use, if package.keywords is a directory: "
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:393
-msgid "Add only exact version to package.keywords"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:406
-msgid "Add only exact version to package.use"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:420
-msgid "File name to use, if package.use is a directory: "
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:446
-msgid "<b>Use Flag and Keyword Options</b>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:464
-#: portato/gui/templates/MainWindow.glade:877
-msgid "General"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:501
-msgid "Enable systray"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:514
-msgid "Show emerge progress in window title"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:528
-msgid "Show emerge progress in console title"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:542
-msgid "Hide on minimization (only if systray is enabled)"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:557
-msgid ""
-"Update the package list with the current search results while you are "
-"typing.\n"
-"<b>Note</b>: Will slow down the typing process."
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:559
-msgid "Search while typing"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:613
-msgid "Console Font"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:624
-msgid "Chose a console font"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:642
-msgid "Maximum length of the console title"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:672
-msgid "<b>Console Options</b>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:712
-msgid "Package Tabs"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:737
-msgid "System Tabs"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:763
-msgid "<b>Tab Options</b>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:796
-msgid "Show slots in the version list"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:806
-msgid ""
-"Organize the categories in a tree. Thereby collapse categories with the same "
-"prefix:\n"
-"As an example: <i>app-admin</i>, <i>app-emacs</i>, and <i>app-vim</i> would "
-"be collapsed into <i><b>app</b></i> as root and <i>admin</i>, <i>emacs</i>, "
-"and <i>vim</i> as children."
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:808
-msgid "Collapse categories with same prefix"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:824
-msgid "<b>Package Options</b>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:848
-msgid "Visual"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:866
-#: portato/gui/templates/PluginWindow.glade:223
-#: portato/gui/templates/SearchWindow.glade:48
-#: portato/gui/templates/MailInfoWindow.glade:150
-msgid "gtk-cancel"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.glade:875
-#: portato/gui/templates/PluginWindow.glade:235
-msgid "gtk-apply"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.glade:8
-msgid "Plugins"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.glade:52
-msgid "_Install dependencies"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.glade:81
-msgid "Needed dependencies"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.glade:98
-#: portato/gui/templates/PluginWindow.glade:123
-#: portato/gui/templates/MainWindow.glade:486
-#: portato/gui/templates/MainWindow.glade:729
-#: portato/gui/templates/MainWindow.glade:745
-#: portato/gui/templates/MainWindow.glade:857
-msgid "label"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.glade:109
-msgid "<b>Author:</b>"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.glade:144
-#: portato/gui/windows/update.py:47 portato/gui/windows/main.py:325
-#: portato/gui/windows/plugin.py:27
-msgid "Enabled"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.glade:154
-#: portato/gui/windows/plugin.py:27
-msgid "Temporarily enabled"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.glade:166
-#: portato/gui/windows/plugin.py:27
-msgid "Temporarily disabled"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.glade:179
-#: portato/gui/windows/plugin.py:27
-msgid "Disabled"
-msgstr ""
-
-#: portato/gui/templates/SearchWindow.glade:8
-msgid "Search Results"
-msgstr ""
-
-#: portato/gui/templates/SearchWindow.glade:60
-msgid "gtk-jump-to"
-msgstr ""
-
-#: portato/gui/templates/SearchWindow.glade:75
-msgid "gtk-ok"
-msgstr ""
-
-#: portato/gui/templates/MailInfoWindow.glade:6
-msgid "Send Bug Mail ..."
-msgstr ""
-
-#: portato/gui/templates/MailInfoWindow.glade:28
-msgid ""
-"<b><u>Additional Information</u></b>\n"
-"\n"
-"(all optional)"
-msgstr ""
-
-#: portato/gui/templates/MailInfoWindow.glade:72
-msgid "Email address:"
-msgstr ""
-
-#: portato/gui/templates/MailInfoWindow.glade:87
-msgid "Name:"
-msgstr ""
-
-#: portato/gui/templates/MailInfoWindow.glade:102
-msgid ""
-"Comments /\n"
-"what did you do to hit the bug?"
-msgstr ""
-
-#: portato/gui/templates/MailInfoWindow.glade:178
-msgid "_Send"
 msgstr ""
 
 #: portato/gui/templates/MainWindow.glade:20
@@ -336,6 +36,11 @@ msgstr ""
 
 #: portato/gui/templates/MainWindow.glade:46
 msgid "Re_load Portage"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:70
+#: portato/gui/templates/popups.glade:37
+msgid "gtk-quit"
 msgstr ""
 
 #: portato/gui/templates/MainWindow.glade:83
@@ -351,7 +56,7 @@ msgid "_Uninstall"
 msgstr ""
 
 #: portato/gui/templates/MainWindow.glade:123
-#: portato/gui/templates/MainWindow.glade:1096
+#: portato/gui/templates/MainWindow.glade:1082
 msgid "Update _World"
 msgstr ""
 
@@ -371,9 +76,21 @@ msgstr ""
 msgid "Save _Flags"
 msgstr ""
 
+#: portato/gui/templates/MainWindow.glade:192
+#: portato/gui/templates/MainWindow.glade:265
+#: portato/gui/templates/popups.glade:12
+msgid "Emerge _Paused"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:200
+#: portato/gui/templates/MainWindow.glade:247
+#: portato/gui/templates/popups.glade:19
+msgid "_Kill Emerge"
+msgstr ""
+
 #: portato/gui/templates/MainWindow.glade:223
-#: portato/gui/templates/MainWindow.glade:1206
-#: portato/gui/windows/main.py:1209 portato/gui/windows/main.py:1211
+#: portato/gui/templates/MainWindow.glade:1192
+#: portato/gui/windows/main.py:1288 portato/gui/windows/main.py:1290
 msgid "Console"
 msgstr ""
 
@@ -405,110 +122,386 @@ msgstr ""
 msgid "gtk-find"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:497
+#: portato/gui/templates/MainWindow.glade:484
+#: portato/gui/templates/MainWindow.glade:603
+#: portato/gui/templates/MainWindow.glade:716
+#: portato/gui/templates/MainWindow.glade:731
+#: portato/gui/templates/PluginWindow.glade:98
+#: portato/gui/templates/PluginWindow.glade:123
+msgid "label"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:495
 msgid "Install onto system"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:520
+#: portato/gui/templates/MainWindow.glade:518
 msgid "Uninstall from system"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:543
+#: portato/gui/templates/MainWindow.glade:541
 msgid "Revert changes"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:623
-msgid "<b>Use Flags:</b>"
-msgstr ""
-
-#: portato/gui/templates/MainWindow.glade:641 portato/gui/windows/main.py:418
-#: portato/gui/windows/main.py:421 portato/gui/windows/main.py:479
-#: portato/gui/windows/main.py:483
-msgid "Testing"
-msgstr ""
-
-#: portato/gui/templates/MainWindow.glade:674 portato/gui/windows/main.py:401
-#: portato/gui/windows/main.py:404 portato/gui/windows/main.py:407
-#: portato/gui/windows/main.py:506 portato/gui/windows/main.py:510
-#: portato/gui/windows/main.py:517 portato/gui/windows/main.py:521
-msgid "Masked"
-msgstr ""
-
-#: portato/gui/templates/MainWindow.glade:693 portato/gui/windows/main.py:326
-msgid "Installed"
-msgstr ""
-
-#: portato/gui/templates/MainWindow.glade:711
-msgid "<b>Homepage:</b>"
-msgstr ""
-
-#: portato/gui/templates/MainWindow.glade:760
-msgid "<b>Overlay:</b>"
-msgstr ""
-
-#: portato/gui/templates/MainWindow.glade:777
-msgid "<b>Description:</b>"
-msgstr ""
-
-#: portato/gui/templates/MainWindow.glade:809
-msgid "<span foreground='red'><b>MISSING KEYWORD</b></span>"
-msgstr ""
-
-#: portato/gui/templates/MainWindow.glade:824
-msgid "<b>Installed, but not in portage anymore</b>"
-msgstr ""
-
-#: portato/gui/templates/MainWindow.glade:839
+#: portato/gui/templates/MainWindow.glade:619
 msgid "<b>License:</b>"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:908
+#: portato/gui/templates/MainWindow.glade:636
+msgid "<b>Installed, but not in portage anymore</b>"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:651
+msgid "<span foreground='red'><b>MISSING KEYWORD</b></span>"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:683
+msgid "<b>Description:</b>"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:699
+msgid "<b>Overlay:</b>"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:747
+msgid "<b>Homepage:</b>"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:765 portato/gui/windows/main.py:940
+msgid "Installed"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:784 portato/gui/windows/main.py:257
+#: portato/gui/windows/main.py:260 portato/gui/windows/main.py:263
+#: portato/gui/windows/main.py:362 portato/gui/windows/main.py:366
+#: portato/gui/windows/main.py:373 portato/gui/windows/main.py:377
+msgid "Masked"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:817 portato/gui/windows/main.py:274
+#: portato/gui/windows/main.py:277 portato/gui/windows/main.py:335
+#: portato/gui/windows/main.py:339
+msgid "Testing"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:836
+msgid "<b>Use Flags:</b>"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:875
+#: portato/gui/templates/PreferenceWindow.glade:488
+msgid "General"
+msgstr ""
+
+#: portato/gui/templates/MainWindow.glade:901
 msgid "Use List"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:942
+#: portato/gui/templates/MainWindow.glade:928
 msgid "Dependencies"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:969
+#: portato/gui/templates/MainWindow.glade:955
 msgid "Ebuild"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:996
+#: portato/gui/templates/MainWindow.glade:982
 msgid "Changelog"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:1023
+#: portato/gui/templates/MainWindow.glade:1009
 msgid "Files"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:1061
+#: portato/gui/templates/MainWindow.glade:1047
 msgid "Execute the current selected queue"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:1080
+#: portato/gui/templates/MainWindow.glade:1066
 msgid "E_xecute"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:1095
+#: portato/gui/templates/MainWindow.glade:1081
 msgid ""
 "Calculate the packages which will be installed during an \"update world\""
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:1108
+#: portato/gui/templates/MainWindow.glade:1094
 msgid "Remove the selected package from the queue"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:1109
+#: portato/gui/templates/MainWindow.glade:1095
 msgid "_Remove"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:1181 portato/gui/windows/main.py:764
+#: portato/gui/templates/MainWindow.glade:1167 portato/gui/windows/main.py:633
 msgid "Queue"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.glade:1241
+#: portato/gui/templates/MainWindow.glade:1227
 msgid "Log"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.glade:8
+msgid "Plugins"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.glade:52
+msgid "_Install dependencies"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.glade:81
+msgid "Needed dependencies"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.glade:109
+msgid "<b>Author:</b>"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.glade:144
+#: portato/gui/windows/main.py:939 portato/gui/windows/plugin.py:27
+#: portato/gui/windows/update.py:47
+msgid "Enabled"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.glade:154
+#: portato/gui/windows/plugin.py:27
+msgid "Temporarily enabled"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.glade:166
+#: portato/gui/windows/plugin.py:27
+msgid "Temporarily disabled"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.glade:179
+#: portato/gui/windows/plugin.py:27
+msgid "Disabled"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.glade:223
+#: portato/gui/templates/SearchWindow.glade:48
+#: portato/gui/templates/MailInfoWindow.glade:170
+#: portato/gui/templates/PreferenceWindow.glade:895
+msgid "gtk-cancel"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.glade:235
+#: portato/gui/templates/PreferenceWindow.glade:904
+msgid "gtk-apply"
+msgstr ""
+
+#: portato/gui/templates/UpdateWindow.glade:7
+msgid "Updatable Packages"
+msgstr ""
+
+#: portato/gui/templates/UpdateWindow.glade:49
+msgid "_Close"
+msgstr ""
+
+#: portato/gui/templates/UpdateWindow.glade:61
+msgid "Select _All"
+msgstr ""
+
+#: portato/gui/templates/UpdateWindow.glade:76
+msgid "_Install Selected"
+msgstr ""
+
+#: portato/gui/templates/SearchWindow.glade:8
+msgid "Search Results"
+msgstr ""
+
+#: portato/gui/templates/SearchWindow.glade:60
+msgid "gtk-jump-to"
+msgstr ""
+
+#: portato/gui/templates/SearchWindow.glade:75
+msgid "gtk-ok"
+msgstr ""
+
+#: portato/gui/templates/MailInfoWindow.glade:6
+msgid "Send Bug Mail ..."
+msgstr ""
+
+#: portato/gui/templates/MailInfoWindow.glade:31
+msgid ""
+"<b><u>Additional Information</u></b>\n"
+"\n"
+"(all optional)"
+msgstr ""
+
+#: portato/gui/templates/MailInfoWindow.glade:75
+msgid "Email address:"
+msgstr ""
+
+#: portato/gui/templates/MailInfoWindow.glade:90
+msgid "Name:"
+msgstr ""
+
+#: portato/gui/templates/MailInfoWindow.glade:105
+msgid ""
+"Comments /\n"
+"what did you do to hit the bug?"
+msgstr ""
+
+#: portato/gui/templates/MailInfoWindow.glade:142
+msgid ""
+"Attaches the logfile to the mail. This log only contains debug information."
+msgstr ""
+
+#: portato/gui/templates/MailInfoWindow.glade:143
+msgid "Attach _Logfile"
+msgstr ""
+
+#: portato/gui/templates/MailInfoWindow.glade:198
+msgid "_Send"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:7
+msgid "Preferences"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:44
+msgid "Debug"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:60
+msgid "Browser command: "
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:86
+#: portato/gui/templates/PreferenceWindow.glade:602
+msgid "<b>General Options</b>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:168
+msgid "<b>Package sets to update</b>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:187
+msgid "<b>Update World Options</b>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:216
+msgid "Sync command: "
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:237
+msgid "<b>Sync Options</b>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:290
+msgid "File name to use, if package.use is a directory: "
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:301
+msgid "Add only exact version to package.use"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:314
+msgid "Add only exact version to package.keywords"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:328
+msgid "File name to use, if package.keywords is a directory: "
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:362
+msgid "File name to use, if package.mask/package.unmask is a directory: "
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:373
+msgid "Add only exact version to package.mask/package.unmask"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:395
+msgid ""
+"<u>You may use the following placeholders:</u>\n"
+"\n"
+"<i>$(pkg)</i>: package name\n"
+"<i>$(cat)</i>: category\n"
+"<i>$(cat-1)/$(cat-2)</i>: first/second part of the category\n"
+"<i>$(version)</i> : version of the package"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:422
+msgid "<u><i>Use-Flags</i></u>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:437
+msgid "<u><i>Testing Keywords</i></u>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:452
+msgid "<u><i>Masking Keywords</i></u>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:469
+msgid "<b>Use Flag and Keyword Options</b>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:527
+msgid "Enable systray"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:540
+msgid "Show emerge progress in window title"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:554
+msgid "Show emerge progress in console title"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:568
+msgid "Hide on minimization (only if systray is enabled)"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:585
+msgid "Search while typing"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:640
+msgid "Console Font"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:651
+msgid "Chose a console font"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:669
+msgid "Maximum length of the console title"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:699
+msgid "<b>Console Options</b>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:740
+msgid "Package Tabs"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:765
+msgid "System Tabs"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:791
+msgid "<b>Tab Options</b>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:825
+msgid "Show slots in the version list"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:837
+msgid "Collapse categories with same prefix"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:853
+msgid "<b>Package Options</b>"
+msgstr ""
+
+#: portato/gui/templates/PreferenceWindow.glade:877
+msgid "Visual"
 msgstr ""
 
 #: portato.py:43
@@ -519,50 +512,226 @@ msgstr ""
 msgid "-L is deprecated"
 msgstr ""
 
-#: portato.py:53
+#: portato.py:55
 msgid "Starting Portato"
 msgstr ""
 
-#: portato/gui/wrapper.py:59
-msgid "oneshot"
+#: plugins/etc_proposals.py:32
+msgid "Cannot start etc-proposals. Not root!"
 msgstr ""
 
-#: portato/gui/wrapper.py:64
+#: plugins/notify.py:35
+msgid "Notify called while process is still running!"
+msgstr ""
+
+#: plugins/notify.py:39
+msgid "Emerge finished!"
+msgstr ""
+
+#: plugins/notify.py:43
+msgid "Emerge failed!"
+msgstr ""
+
+#: plugins/notify.py:44
 #, python-format
-msgid "updating from version %s"
+msgid "Error Code: %d"
 msgstr ""
 
-#: portato/gui/wrapper.py:66
-msgid "updating"
-msgstr ""
-
-#: portato/gui/wrapper.py:71
+#: portato/backend/flags.py:527
 #, python-format
-msgid "downgrading from version %s"
+msgid "Conflicting values for masking status: %s"
 msgstr ""
 
-#: portato/gui/wrapper.py:73
-msgid "downgrading"
+#: portato/backend/portage/package.py:130
+#, python-format
+msgid "BUG in flags.new_masking_status. It returns '%s'"
 msgstr ""
 
-#: portato/gui/wrapper.py:77
-msgid "IUSE changes:"
+#: portato/backend/portage/system.py:259
+#, python-format
+msgid "No best match for %s. It seems not to be in the tree anymore."
 msgstr ""
 
-#: portato/gui/wrapper.py:95
-msgid "(In Progress)"
+#: portato/backend/portage/system.py:317
+#, python-format
+msgid "Found a not installed dependency: %s."
 msgstr ""
 
-#: portato/gui/wrapper.py:120
-msgid "Install"
+#: portato/backend/portage/system.py:359
+#, python-format
+msgid ""
+"Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
 msgstr ""
 
-#: portato/gui/wrapper.py:131
-msgid "Uninstall"
+#: portato/gui/windows/mailinfo.py:83
+#, python-format
+msgid ""
+"An error occurred while sending. I think we were greylisted. The error: %s"
 msgstr ""
 
-#: portato/gui/wrapper.py:143
-msgid "Update"
+#: portato/gui/windows/mailinfo.py:84
+msgid "Retrying after waiting 60 seconds."
+msgstr ""
+
+#: portato/gui/windows/main.py:144
+msgid "<no description>"
+msgstr ""
+
+#: portato/gui/windows/main.py:170
+msgid "The first homepage part does not start with 'http' or 'ftp'."
+msgstr ""
+
+#: portato/gui/windows/main.py:174
+msgid "Blank inside homepage."
+msgstr ""
+
+#: portato/gui/windows/main.py:213
+#, python-format
+msgid "Package could not be found: %s"
+msgstr ""
+
+#: portato/gui/windows/main.py:266 portato/gui/windows/main.py:364
+msgid "Masked by user"
+msgstr ""
+
+#: portato/gui/windows/main.py:454
+msgid "Loading Config"
+msgstr ""
+
+#: portato/gui/windows/main.py:466
+msgid "Creating Database"
+msgstr ""
+
+#: portato/gui/windows/main.py:470
+msgid "Loading Plugins"
+msgstr ""
+
+#: portato/gui/windows/main.py:483
+msgid "Building frontend"
+msgstr ""
+
+#: portato/gui/windows/main.py:533 portato/gui/views.py:129
+#, python-format
+msgid "Error: %s"
+msgstr ""
+
+#: portato/gui/windows/main.py:574
+msgid "Restoring Session"
+msgstr ""
+
+#: portato/gui/windows/main.py:584
+msgid "Finishing startup"
+msgstr ""
+
+#: portato/gui/windows/main.py:636
+msgid "Options"
+msgstr ""
+
+#: portato/gui/windows/main.py:652
+msgid "Categories"
+msgstr ""
+
+#: portato/gui/windows/main.py:711
+msgid "Packages"
+msgstr ""
+
+#: portato/gui/windows/main.py:759
+msgid "Versions"
+msgstr ""
+
+#: portato/gui/windows/main.py:762
+msgid "Slot"
+msgstr ""
+
+#: portato/gui/windows/main.py:895
+#, python-format
+msgid "If '%s' is disabled"
+msgstr ""
+
+#: portato/gui/windows/main.py:897
+#, python-format
+msgid "If '%s' is enabled"
+msgstr ""
+
+#: portato/gui/windows/main.py:903
+msgid "One of the following"
+msgstr ""
+
+#: portato/gui/windows/main.py:908
+msgid "All of the following"
+msgstr ""
+
+#: portato/gui/windows/main.py:919
+msgid ""
+"Can't display dependencies: This package has an unsupported dependency "
+"string."
+msgstr ""
+
+#: portato/gui/windows/main.py:941
+msgid "Flag"
+msgstr ""
+
+#: portato/gui/windows/main.py:942 portato/gui/windows/preference.py:211
+msgid "Description"
+msgstr ""
+
+#: portato/gui/windows/main.py:965
+msgid "This is an expanded use flag and cannot be selected"
+msgstr ""
+
+#: portato/gui/windows/main.py:1003
+#, python-format
+msgid "Translating session from version %d to %d."
+msgstr ""
+
+#: portato/gui/windows/main.py:1006
+#, python-format
+msgid "Cannot translate session from version %d to %d."
+msgstr ""
+
+#: portato/gui/windows/main.py:1464
+msgid "use flags"
+msgstr ""
+
+#: portato/gui/windows/main.py:1476
+msgid "masking keywords"
+msgstr ""
+
+#: portato/gui/windows/preference.py:148
+msgid "Top"
+msgstr ""
+
+#: portato/gui/windows/preference.py:148
+msgid "Bottom"
+msgstr ""
+
+#: portato/gui/windows/preference.py:148
+msgid "Left"
+msgstr ""
+
+#: portato/gui/windows/preference.py:148
+msgid "Right"
+msgstr ""
+
+#: portato/gui/windows/preference.py:206
+msgid "Package Set"
+msgstr ""
+
+#: portato/gui/windows/search.py:57
+msgid "Results"
+msgstr ""
+
+#: portato/gui/windows/splash.py:35
+#, python-format
+msgid "... is starting up: %s"
+msgstr ""
+
+#: portato/gui/windows/update.py:48
+msgid "Package"
+msgstr ""
+
+#: portato/gui/__init__.py:20
+msgid "Loading Backend"
 msgstr ""
 
 #: portato/gui/dialogs.py:17
@@ -639,38 +808,6 @@ msgstr ""
 msgid "Do you really want to clear the whole queue?"
 msgstr ""
 
-#: portato/gui/views.py:70
-msgid "Package is not installed"
-msgstr ""
-
-#: portato/gui/views.py:87
-#, python-format
-msgid "No %(old)s language file installed. Falling back to %(new)s."
-msgstr ""
-
-#: portato/gui/views.py:96
-#, python-format
-msgid "No %(old)s language file installed. Disable highlighting."
-msgstr ""
-
-#: portato/gui/views.py:115 portato/gui/windows/main.py:671
-#, python-format
-msgid "Error: %s"
-msgstr ""
-
-#: portato/gui/updater.py:100
-#, python-format
-msgid ""
-"No unmasked version of package '%s' found. Trying masked ones. This normally "
-"should not happen..."
-msgstr ""
-
-#: portato/gui/updater.py:104
-#, python-format
-msgid ""
-"Trying to remove package '%s' from queue which does not exist in system."
-msgstr ""
-
 #: portato/gui/exception_handling.py:31
 msgid ""
 "A programming error has been detected during the execution of this program."
@@ -694,188 +831,8 @@ msgstr ""
 msgid "Send..."
 msgstr ""
 
-#: portato/gui/exception_handling.py:59 portato/gui/exception_handling.py:125
-#, python-format
-msgid ""
-"Exception in thread \"%(thread)s\":\n"
-"%(trace)s"
-msgstr ""
-
 #: portato/gui/exception_handling.py:75
 msgid "Save traceback..."
-msgstr ""
-
-#: portato/gui/exception_handling.py:127
-#, python-format
-msgid ""
-"Exception:\n"
-"%s"
-msgstr ""
-
-#: portato/gui/__init__.py:20
-msgid "Loading Backend"
-msgstr ""
-
-#: portato/gui/windows/search.py:57
-msgid "Results"
-msgstr ""
-
-#: portato/gui/windows/mailinfo.py:71
-#, python-format
-msgid ""
-"An error occurred while sending. I think we were greylisted. The error: %s"
-msgstr ""
-
-#: portato/gui/windows/mailinfo.py:72
-msgid "Retrying after waiting 60 seconds."
-msgstr ""
-
-#: portato/gui/windows/update.py:48
-msgid "Package"
-msgstr ""
-
-#: portato/gui/windows/splash.py:35
-#, python-format
-msgid "... is starting up: %s"
-msgstr ""
-
-#: portato/gui/windows/preference.py:133
-msgid "Top"
-msgstr ""
-
-#: portato/gui/windows/preference.py:133
-msgid "Bottom"
-msgstr ""
-
-#: portato/gui/windows/preference.py:133
-msgid "Left"
-msgstr ""
-
-#: portato/gui/windows/preference.py:133
-msgid "Right"
-msgstr ""
-
-#: portato/gui/windows/preference.py:191
-msgid "Package Set"
-msgstr ""
-
-#: portato/gui/windows/preference.py:196 portato/gui/windows/main.py:328
-msgid "Description"
-msgstr ""
-
-#: portato/gui/windows/main.py:154
-msgid "<no description>"
-msgstr ""
-
-#: portato/gui/windows/main.py:180
-msgid "The first homepage part does not start with 'http' or 'ftp'."
-msgstr ""
-
-#: portato/gui/windows/main.py:184
-msgid "Blank inside homepage."
-msgstr ""
-
-#: portato/gui/windows/main.py:225
-#, python-format
-msgid "If '%s' is disabled"
-msgstr ""
-
-#: portato/gui/windows/main.py:227
-#, python-format
-msgid "If '%s' is enabled"
-msgstr ""
-
-#: portato/gui/windows/main.py:235
-msgid "One of the following"
-msgstr ""
-
-#: portato/gui/windows/main.py:239
-msgid "All of the following"
-msgstr ""
-
-#: portato/gui/windows/main.py:262
-msgid ""
-"Can't display dependencies: This package has an unsupported dependency "
-"string."
-msgstr ""
-
-#: portato/gui/windows/main.py:286
-msgid "This is an expanded use flag and cannot be selected"
-msgstr ""
-
-#: portato/gui/windows/main.py:327
-msgid "Flag"
-msgstr ""
-
-#: portato/gui/windows/main.py:348
-#, python-format
-msgid "Package could not be found: %s"
-msgstr ""
-
-#: portato/gui/windows/main.py:410 portato/gui/windows/main.py:508
-msgid "Masked by user"
-msgstr ""
-
-#: portato/gui/windows/main.py:591
-msgid "Loading Config"
-msgstr ""
-
-#: portato/gui/windows/main.py:603
-msgid "Creating Database"
-msgstr ""
-
-#: portato/gui/windows/main.py:608
-msgid "Loading Plugins"
-msgstr ""
-
-#: portato/gui/windows/main.py:621
-msgid "Building frontend"
-msgstr ""
-
-#: portato/gui/windows/main.py:706
-msgid "Restoring Session"
-msgstr ""
-
-#: portato/gui/windows/main.py:715
-msgid "Finishing startup"
-msgstr ""
-
-#: portato/gui/windows/main.py:767
-msgid "Options"
-msgstr ""
-
-#: portato/gui/windows/main.py:783
-msgid "Categories"
-msgstr ""
-
-#: portato/gui/windows/main.py:842
-msgid "Packages"
-msgstr ""
-
-#: portato/gui/windows/main.py:890
-msgid "Versions"
-msgstr ""
-
-#: portato/gui/windows/main.py:893
-msgid "Slot"
-msgstr ""
-
-#: portato/gui/windows/main.py:991
-#, python-format
-msgid "Translating session from version %d to %d."
-msgstr ""
-
-#: portato/gui/windows/main.py:994
-#, python-format
-msgid "Cannot translate session from version %d to %d."
-msgstr ""
-
-#: portato/gui/windows/main.py:1382
-msgid "use flags"
-msgstr ""
-
-#: portato/gui/windows/main.py:1394
-msgid "masking keywords"
 msgstr ""
 
 #: portato/gui/session.py:21
@@ -895,64 +852,110 @@ msgstr ""
 msgid "Current session format is newer than this version supports."
 msgstr ""
 
-#: portato/gui/utils.py:159
+#: portato/gui/updater.py:100
+#, python-format
+msgid ""
+"No unmasked version of package '%s' found. Trying masked ones. This normally "
+"should not happen..."
+msgstr ""
+
+#: portato/gui/updater.py:104
+#, python-format
+msgid ""
+"Trying to remove package '%s' from queue which does not exist in system."
+msgstr ""
+
+#: portato/gui/utils.py:180 portato/gui/utils.py:337
 msgid "ALL"
 msgstr ""
 
-#: portato/gui/utils.py:246
+#: portato/gui/utils.py:268
 #, python-format
 msgid ""
 "Catched KeyError => %s seems not to be an available category. Have you "
 "played with rsync-excludes?"
 msgstr ""
 
-#: portato/gui/utils.py:307
+#: portato/gui/utils.py:329
 #, python-format
 msgid "Error while compiling search expression: '%s'."
 msgstr ""
 
-#: portato/backend/flags.py:531
-#, python-format
-msgid "Conflicting values for masking status: %s"
+#: portato/gui/utils.py:367
+msgid "Cleaning database..."
 msgstr ""
 
-#: portato/backend/portage/system.py:260
-#, python-format
-msgid "No best match for %s. It seems not to be in the tree anymore."
+#: portato/gui/utils.py:369
+msgid "Populating database..."
 msgstr ""
 
-#: portato/backend/portage/system.py:318
-#, python-format
-msgid "Found a not installed dependency: %s."
+#: portato/gui/views.py:84
+msgid "Package is not installed"
 msgstr ""
 
-#: portato/backend/portage/system.py:360
+#: portato/gui/views.py:101
 #, python-format
-msgid ""
-"Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
+msgid "No %(old)s language file installed. Falling back to %(new)s."
 msgstr ""
 
-#: portato/backend/portage/package.py:130
+#: portato/gui/views.py:110
 #, python-format
-msgid "BUG in flags.new_masking_status. It returns '%s'"
+msgid "No %(old)s language file installed. Disable highlighting."
+msgstr ""
+
+#: portato/gui/wrapper.py:59
+msgid "oneshot"
+msgstr ""
+
+#: portato/gui/wrapper.py:64
+#, python-format
+msgid "updating from version %s"
+msgstr ""
+
+#: portato/gui/wrapper.py:66
+msgid "updating"
+msgstr ""
+
+#: portato/gui/wrapper.py:71
+#, python-format
+msgid "downgrading from version %s"
+msgstr ""
+
+#: portato/gui/wrapper.py:73
+msgid "downgrading"
+msgstr ""
+
+#: portato/gui/wrapper.py:77
+msgid "IUSE changes:"
+msgstr ""
+
+#: portato/gui/wrapper.py:95
+msgid "(In Progress)"
+msgstr ""
+
+#: portato/gui/wrapper.py:120
+msgid "Install"
+msgstr ""
+
+#: portato/gui/wrapper.py:131
+msgid "Uninstall"
+msgstr ""
+
+#: portato/gui/wrapper.py:143
+msgid "Update"
+msgstr ""
+
+#: portato/config_parser.py:270
+#, python-format
+msgid "Unrecognized line in configuration: %s"
 msgstr ""
 
 #: portato/helper.py:76
 msgid "Invalid dependency string"
 msgstr ""
 
-#: portato/session.py:47
-#, python-format
-msgid "Loading session from '%s'."
-msgstr ""
-
 #: portato/plistener.py:94
 msgid "Listener has not been started."
-msgstr ""
-
-#: portato/config_parser.py:270
-#, python-format
-msgid "Unrecognized line in configuration: %s"
 msgstr ""
 
 #: portato/plugin.py:330 portato/plugin.py:333
@@ -996,23 +999,7 @@ msgid ""
 "nevertheless."
 msgstr ""
 
-#: plugins/etc_proposals.py:32
-msgid "Cannot start etc-proposals. Not root!"
-msgstr ""
-
-#: plugins/notify.py:35
-msgid "Notify called while process is still running!"
-msgstr ""
-
-#: plugins/notify.py:39
-msgid "Emerge finished!"
-msgstr ""
-
-#: plugins/notify.py:43
-msgid "Emerge failed!"
-msgstr ""
-
-#: plugins/notify.py:44
+#: portato/session.py:47
 #, python-format
-msgid "Error Code: %d"
+msgid "Loading session from '%s'."
 msgstr ""
