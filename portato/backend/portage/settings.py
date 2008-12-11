@@ -60,7 +60,7 @@ class PortageSettings:
         portage.settings = None # we use our own one ...
 
     def setcpv (self, cpv, **kwargs):
-        if self._cpv is not None and cpv != self._cpv:
+        if cpv != self._cpv:
             self.settings.setcpv(cpv, **kwargs)
             self._cpv = cpv
 
