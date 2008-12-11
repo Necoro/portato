@@ -77,7 +77,7 @@ class PortageSet (FilterSet):
 class SystemSet (FilterSet):
 
     def get_list(self):
-        for cp in system.settings.settings.packages:
+        for cp in system.settings.global_settings.packages:
             if cp[0] == "*": yield cp[1:]
 
 class WorldSet (FilterSet):

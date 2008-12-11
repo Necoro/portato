@@ -26,7 +26,7 @@ class PortageSystem_22 (PortageSystem):
 
     def __init__ (self):
         self.settings = PortageSettings_22()
-        portage.WORLD_FILE = os.path.join(self.settings.settings["ROOT"],portage.WORLD_FILE)
+        portage.WORLD_FILE = os.path.join(self.settings.global_settings["ROOT"],portage.WORLD_FILE)
 
         self.use_descs = {}
         self.local_use_descs = defaultdict(dict)

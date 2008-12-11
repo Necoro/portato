@@ -67,7 +67,7 @@ class PortagePackage (Package):
         inst = (installed and self.is_installed()) or (self.is_installed() and not self.is_in_system())
 
         if self._settings_installed is not None and self._settings_installed != inst:
-            self._settings.settings.reset()
+            self._settings.reset()
 
         self._settings_installed = inst
 
@@ -76,7 +76,7 @@ class PortagePackage (Package):
         else:
             dbapi = self._settings.porttree.dbapi
 
-        self._settings.settings.setcpv(self.get_cpv(), mydb = dbapi)
+        self._settings.setcpv(self.get_cpv(), mydb = dbapi)
 
     def get_name(self):
         return self._scpv[1]

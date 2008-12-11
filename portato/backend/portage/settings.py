@@ -54,5 +54,16 @@ class PortageSettings:
         self.porttree = self.trees[root]["porttree"]
         self.vartree  = self.trees[root]["vartree"]
         self.virtuals = self.trees[root]["virtuals"]
+        self.global_settings = portage.config(clone=self.settings)
+        self._cpv = None
         
         portage.settings = None # we use our own one ...
+
+    def setcpv (self, cpv, **kwargs):
+        if self._cpv is not None and cpv != self._cpv:
+            self.settings.setcpv(cpv, **kwargs)
+            self._cpv = cpv
+
+    def reset (self):
+        self.settings.reset()
+        self._cpv = None

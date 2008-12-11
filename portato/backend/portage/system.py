@@ -39,7 +39,7 @@ class PortageSystem (SystemInterface):
     def __init__ (self):
         """Constructor."""
         self.settings = PortageSettings()
-        portage.WORLD_FILE = os.path.join(self.settings.settings["ROOT"],portage.WORLD_FILE)
+        portage.WORLD_FILE = os.path.join(self.settings.global_settings["ROOT"],portage.WORLD_FILE)
 
         self.use_descs = {}
         self.local_use_descs = defaultdict(dict)
@@ -173,8 +173,7 @@ class PortageSystem (SystemInterface):
             return list_of_packages
 
     def get_global_settings (self, key):
-        self.settings.settings.reset()
-        return self.settings.settings[key]
+        return self.settings.global_settings[key]
 
     def find_best (self, list, only_cpv = False):
         if only_cpv:
@@ -213,7 +212,7 @@ class PortageSystem (SystemInterface):
         return self.geneticize_list(self._get_set(pkgSet).find(key, masked, with_version, only_cpv), only_cpv or not with_version)
 
     def list_categories (self, name = None):
-        categories = self.settings.settings.categories
+        categories = self.settings.global_settings.categories
         return filter(self.find_lambda(name), categories)
 
     def split_cpv (self, cpv):
@@ -374,7 +373,7 @@ class PortageSystem (SystemInterface):
         
         # fill cache if needed
         if not self.use_descs and not self.local_use_descs:
-            for dir in [self.settings.settings["PORTDIR"]] + self.settings.settings["PORTDIR_OVERLAY"].split():
+            for dir in [self.settings.global_settings["PORTDIR"]] + self.settings.global_settings["PORTDIR_OVERLAY"].split():
                 
                 # read use.desc
                 try:
