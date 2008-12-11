@@ -319,25 +319,25 @@ class EmergeQueue:
             if cpv not in self.oneshotmerge:
                 self.oneshotmerge.append(cpv)
 
-    def doEmerge (self, options, packages, it, *args, **kwargs):
+    def doEmerge (self, options, packages, its, *args, **kwargs):
         top = None
-        if self.tree and it:
-            for v in it.itervalues():
+        if self.tree and its:
+            for v in its.itervalues():
                 self.tree.set_in_progress(v)
                 top = self.tree.first_iter(v)
                 break
 
         self.threadQueue.put(self.__emerge, options, packages, it, top, *args, **kwargs)
     
-    def __emerge (self, options, packages, it, top, command = None):
+    def __emerge (self, options, packages, its, top, command = None):
         """Calls emerge and updates the terminal.
         
         @param options: options to send to emerge
         @type options: string[]
         @param packages: packages to emerge
         @type packages: string[]
-        @param it: Iterators which point to these entries whose children will be removed after completion.
-        @type it: dict(string -> Iterator)
+        @param its: Iterators which point to these entries whose children will be removed after completion.
+        @type its: dict(string -> Iterator)
         @param top: The top iterator
         @type top: Iterator
         @param command: the command to execute - default is "/usr/bin/python /usr/bin/emerge"
@@ -362,14 +362,14 @@ class EmergeQueue:
                     os.dup2(self.pty[1], 2)
 
             # get all categories that are being touched during the emerge process
-            cats = set(x.split("/")[0] for x in it.iterkeys())
+            cats = set(x.split("/")[0] for x in its.iterkeys())
 
             # start emerge
             self.process = Popen(command+options+packages, shell = False, env = system.get_environment(), preexec_fn = pre)
 
             # remove packages from queue
-            if self.tree and it and not self.tree.is_in_unmerge(top):
-                self.up = Updater(self, it, self.threadClass)
+            if self.tree and its and not self.tree.is_in_unmerge(top):
+                self.up = Updater(self, its, self.threadClass)
             else:
                 self.up = None
             
@@ -386,11 +386,11 @@ class EmergeQueue:
 
             if self.up:
                 self.up.stop()
-                if it:
+                if its:
                     self.tree.set_in_progress(top, False)
                 else:
                     self.remove(top)
-            elif self.tree and it:
+            elif self.tree and its:
                 self.remove_with_children(top)
 
             if self.title_update: self.title_update(None)
@@ -474,7 +474,7 @@ class EmergeQueue:
         
         if not self.unmergequeue: return # nothing in queue
 
-        list = self.unmergequeue[:] # copy the unmerge-queue
+        queue = self.unmergequeue[:] # copy the unmerge-queue
         
         # set options
         s = system.get_unmerge_option()
@@ -482,11 +482,11 @@ class EmergeQueue:
         if options is not None: s += options
         
         if self.tree:
-            it = self.iters["uninstall"]
+            its = self.iters["uninstall"]
         else:
-            it = {}
+            its = {}
 
-        self.doEmerge(s,list, it, caller = self.unmerge)
+        self.doEmerge(s, queue, its, caller = self.unmerge)
 
     def update_world(self, sets = ("world",), force = False, newuse = False, deep = False, options = None):
         """Does an update world. newuse and deep are the arguments handed to emerge.
@@ -631,13 +631,18 @@ class EmergeQueue:
                         debug("Catched ValueError => %s seems not to be in merge-queue. Should be no harm.", cpv)
             
             elif self.tree.is_in_unmerge(it): # in Unmerge
-                del self.iters["uninstall"][cpv]
+                try:
+                    del self.iters["uninstall"][cpv]
+                except KeyError, e: # this is just for debugging
+                    error("'%s' not in self.iters[\"uninstall\"] for some reason", cpv)
+                    debug("self.iters: %s", self.iters)
+                    raise
+
                 self.unmergequeue.remove(cpv)
             
             elif self.tree.is_in_update(it):
                 __remove("update", cpv)
 
-            
         self.tree.remove(it)
 
     def is_empty (self):
