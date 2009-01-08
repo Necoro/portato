@@ -327,7 +327,7 @@ class EmergeQueue:
                 top = self.tree.first_iter(v)
                 break
 
-        self.threadQueue.put(self.__emerge, options, packages, it, top, *args, **kwargs)
+        self.threadQueue.put(self.__emerge, options, packages, its, top, *args, **kwargs)
     
     def __emerge (self, options, packages, its, top, command = None):
         """Calls emerge and updates the terminal.
