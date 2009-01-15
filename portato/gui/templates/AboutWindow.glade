@@ -16,7 +16,7 @@
     <property name="has_separator">False</property>
     <property name="program_name">Portato</property>
     <property name="copyright" translatable="yes">This software is licensed under the terms of the GPLv2.
-Copyright (C) 2006-2008 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;</property>
+Copyright (C) 2006-2009 René 'Necoro' Neumann &lt;necoro@necoro.net&gt;</property>
     <property name="comments">A Portage GUI</property>
     <property name="website">http://portato.necoro.net</property>
     <property name="authors">René 'Necoro' Neumann

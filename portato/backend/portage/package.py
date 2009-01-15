@@ -3,7 +3,7 @@
 # File: portato/backend/portage/package.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006-2008 René 'Necoro' Neumann
+# Copyright (C) 2006-2009 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -195,9 +195,7 @@ class PortagePackage (Package):
         # change the useflags, because we have internally changed some, but not made them visible for portage
         actual = self.get_actual_use_flags()
 
-        depstring = ""
-        for d in depvar:
-            depstring += self.get_package_settings(d, installed = False)+" "
+        depstring = " ".join(self.get_package_settings(d, installed = False) for d in depvar)
 
         # let portage do the main stuff ;)
         # pay attention to any changes here
