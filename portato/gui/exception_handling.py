@@ -3,7 +3,7 @@
 # File: portato/gui/exception_handling.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2007-2008 René 'Necoro' Neumann
+# Copyright (C) 2007-2009 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -14,7 +14,7 @@
 from __future__ import absolute_import, with_statement
 
 import gtk, pango, gobject
-import sys, traceback
+import sys, traceback, os
 
 from StringIO import StringIO
 
@@ -101,8 +101,20 @@ def get_version_infos():
     from ..constants import VERSION
     from ..backend import system
     
+    runsystem="Unknown"
+    if os.path.exists("/etc/gentoo-release"):
+        runsystem = "Gentoo"
+    else:
+        for sp in ("/etc/sabayon-release", "/etc/sabayon-edition"):
+            if os.path.exists(sp):
+                with open(sp) as r:
+                    runsystem = "Sabayon: %s" % r.readline().strip()
+                break
+
+
     return "\n".join((
         "Portato version: %s" % VERSION,
+        "System: %s" % runsystem,
         "Python version: %s" % sys.version,
         "Used backend: %s" % system.get_version(),
         "pygtk: %s (using GTK+: %s)" % (convert(gtk.pygtk_version), convert(gtk.gtk_version)),
