@@ -170,12 +170,9 @@ class PortagePackage (Package):
         
         depstring = ""
         try:
-            for d in depvar:
-                depstring += self.get_package_settings(d, installed = False)+" "
+            depstring = " ".join(self.get_package_settings(d, installed = False) for d in depvar)
         except KeyError: # not found in porttree - use vartree
-            depstring = ""
-            for d in depvar:
-                depstring += self.get_package_settings(d, installed = True)+" "
+            depstring = " ".join(self.get_package_settings(d, installed = True) for d in depvar)
 
         deps = portage.dep_check(depstring, None, self._settings.settings, myuse = actual, trees = self._trees)
 
