@@ -14,10 +14,6 @@ from __future__ import absolute_import, with_statement
 
 import re, os, os.path
 import portage
-try:
-    import portage.dep as portage_dep
-except ImportError:
-    import portage_dep
 
 from collections import defaultdict
 import itertools as itt

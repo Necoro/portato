@@ -20,11 +20,6 @@ from ...helper import debug, error, unique_array
 
 import portage
 
-try:
-    import portage.dep as portage_dep
-except ImportError:
-    import portage_dep
-
 import os.path
 
 class PortagePackage (Package):

@@ -16,10 +16,6 @@ import re
 import itertools as itt
 
 import portage
-try:
-    import portage.dep as portage_dep
-except ImportError:
-    import portage_dep
 
 from .. import system
 from ...helper import debug
@@ -59,7 +55,7 @@ class FilterSet (Set):
                 if not re.match(key, pkg, re.I): continue
 
             if not with_version:
-                t.add(portage_dep.dep_getkey(pkg))
+                t.add(portage.dep.dep_getkey(pkg))
             else:
                 t.add(system.find_best_match(pkg, only_cpv = True))
 
