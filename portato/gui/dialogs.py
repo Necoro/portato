@@ -3,7 +3,7 @@
 # File: portato/gui/dialogs.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006-2008 René 'Necoro' Neumann
+# Copyright (C) 2006-2009 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -105,4 +105,11 @@ def file_chooser_dialog (title, parent):
         ret = None
 
     fc.destroy()
+    return ret
+
+def prereq_error_dialog (e):
+    dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, _("A prerequisite for starting Portato was not matched."))
+    dialog.format_secondary_text(e.message)
+    ret = dialog.run()
+    dialog.destroy()
     return ret

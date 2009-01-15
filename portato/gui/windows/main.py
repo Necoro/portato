@@ -3,7 +3,7 @@
 # File: portato/gui/windows/main.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006-2008 René 'Necoro' Neumann
+# Copyright (C) 2006-2009 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -38,6 +38,7 @@ from ..views import LogView, HighlightView, InstalledOnlyView, LazyStoreView
 from ..dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
         nothing_found_dialog, queue_not_empty_dialog, remove_deps_dialog,
         remove_queue_dialog, remove_updates_dialog, unmask_dialog)
+from ..exceptions import PreReqError
 
 # even more GUI stuff
 from .basic import Window, Popup
@@ -423,6 +424,8 @@ class MainWindow (Window):
         @param splash: the splash screen =)
         @type splash: SplashScreen
         """
+
+        self.check_prereqs()
 
         if splash is None:
             splash = lambda x: True
@@ -1865,7 +1868,24 @@ class MainWindow (Window):
         Calls main_quit().
         """
         gtk.main_quit()
-    
+
+    def check_prereqs (self):
+
+        def fail (m):
+            error("PreReqError: %s", m)
+            raise PreReqError(m)
+
+        pdir = system.get_global_settings("PORTDIR")
+
+        if not os.path.exists(pdir):
+            fail(_("The portage tree is not existing."))
+
+        ls = os.listdir(system.get_global_settings("PORTDIR"))
+        if not "eclass" in ls:
+            fail(_("The portage tree seems to be empty."))
+
+        debug("All prereqs matched. Fine :)")
+
     def main (self):
         """
         Main.
