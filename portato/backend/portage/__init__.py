@@ -12,13 +12,16 @@
 
 from __future__ import absolute_import
 
+from ...helper import debug
 from portage import VERSION as PV
 
 VERSION = tuple(map(int, (x.split("_")[0] for x in PV.split("."))))
 
 if VERSION >= (2, 2):
+    debug("Using portage-2.2")
     from .system_22 import PortageSystem_22 as PortageSystem
     from .package_22 import PortagePackage_22 as PortagePackage
 else:
+    debug("Using portage-2.1")
     from .system import PortageSystem
     from .package import PortagePackage

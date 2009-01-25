@@ -56,10 +56,6 @@ def load_system ():
         debug("Setting Portage System")
         from .portage import PortageSystem
         _sys = PortageSystem ()
-    elif SYSTEM == "catapult":
-        debug("Setting Catapult System")
-        from .catapult import CatapultSystem
-        _sys = CatapultSystem()
     else:
         raise InvalidSystemError, SYSTEM
 
