@@ -150,5 +150,18 @@ class Session (object):
         except KeyError:
             return None
 
+    def remove (self, key, section = ""):
+        if not section: section = self._name
+
+        section = section.upper()
+        key = key.lower()
+
+        val = self._cfg._access(key, section)
+        for l in range(len(self._cfg.cache))[val.line:-1]:
+            self._cfg.cache[l] = self._cfg.cache[l+1]
+
+        del self._cfg.cache[-1]
+        self._cfg.write()
+
     def check_version (self, vers):
         pass # do nothing atm
