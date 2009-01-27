@@ -42,6 +42,7 @@ class Session (object):
 
         self._cfg = None
         self._handlers = []
+        self._name = name
 
         if not (os.path.exists(SESSION_DIR) and os.path.isdir(SESSION_DIR)):
             os.mkdir(SESSION_DIR)
@@ -124,20 +125,26 @@ class Session (object):
         
         self._cfg.write()
 
-    def set (self, key, value, section):
+    def set (self, key, value, section = ""):
+        if not section: section = self._name
+
         try:
             self._cfg.add(key, value, section, with_blankline = False)
         except SectionNotFoundException:
             self._cfg.add_section(section)
             self._cfg.add(key, value, section, with_blankline = False)
     
-    def get (self, key, section):
+    def get (self, key, section = ""):
+        if not section: section = self._name
+
         try:
             return self._cfg.get(key, section)
         except KeyError:
             return None
     
-    def get_boolean (self, key, section):
+    def get_boolean (self, key, section = ""):
+        if not section: section = self._name
+
         try:
             return self._cfg.get_boolean(key, section)
         except KeyError:
