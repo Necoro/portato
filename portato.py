@@ -5,7 +5,7 @@
 # File: portato.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2006-2008 René 'Necoro' Neumann
+# Copyright (C) 2006-2009 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -17,18 +17,13 @@ from __future__ import with_statement, absolute_import
 import sys, os
 import subprocess, threading
 import atexit
-import gettext, locale
 from optparse import OptionParser, SUPPRESS_HELP
 
 from portato import get_listener, log
 from portato.helper import debug, info
-from portato.constants import VERSION, LOCALE_DIR, APP, SU_COMMAND
+from portato.constants import VERSION, SU_COMMAND
 
 def main ():
-    # set gettext stuff
-    locale.setlocale(locale.LC_ALL, '')
-    gettext.install(APP, LOCALE_DIR, unicode = True)
-
     # build the parser
     desc = "Portato - A Portage GUI."
     usage = "%prog [options] [frontend]"

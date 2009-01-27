@@ -483,8 +483,8 @@ class ConfigParser:
             return
 
         with self.writelock:
-            for sec in self.vars:
-                for val in self.vars[sec].itervalues():
+            for sec in self.vars.itervalues():
+                for val in sec.itervalues():
                     if val.changed:
                         part1 = self.cache[val.line][:self.pos[val.line][0]]     # key+DELIMITER
                         part2 = val.value                                        # value

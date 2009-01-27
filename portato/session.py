@@ -42,6 +42,7 @@ class Session (object):
 
         self._cfg = None
         self._handlers = []
+        self._name = name if name else "MAIN"
 
         if not (os.path.exists(SESSION_DIR) and os.path.isdir(SESSION_DIR)):
             os.mkdir(SESSION_DIR)
@@ -81,6 +82,8 @@ class Session (object):
             - a function getting number of option arguments and applying them to the program
             - a function returning the number of option return values - getting them out of the program
         """
+
+        options = map(lambda x: (x, self._name) if not hasattr(x, "__iter__") else x, options)
         self._handlers.append((options, load_fn, save_fn, default))
 
     def load (self, defaults_only = False):
@@ -124,24 +127,69 @@ class Session (object):
         
         self._cfg.write()
 
-    def set (self, key, value, section):
+    def set (self, key, value, section = ""):
+        if not section: section = self._name
+
         try:
             self._cfg.add(key, value, section, with_blankline = False)
         except SectionNotFoundException:
             self._cfg.add_section(section)
             self._cfg.add(key, value, section, with_blankline = False)
     
-    def get (self, key, section):
+    def get (self, key, section = ""):
+        if not section: section = self._name
+
         try:
             return self._cfg.get(key, section)
         except KeyError:
             return None
     
-    def get_boolean (self, key, section):
+    def get_boolean (self, key, section = ""):
+        if not section: section = self._name
+
         try:
             return self._cfg.get_boolean(key, section)
         except KeyError:
             return None
+
+    def remove (self, key, section = ""):
+        if not section: section = self._name
+
+        section = section.upper()
+        key = key.lower()
+
+        val = self._cfg._access(key, section)
+        del self._cfg.cache[val.line]
+
+        self._cfg.write()
+
+    def remove_section (self, section):
+        section = section.upper()
+
+        sline = self._cfg.sections[section]
+
+        try:
+            mline = max(v.line for v in self._cfg.vars[section].itervalues())
+        except ValueError: # nothing in the section
+            mline = sline
+        
+        sline = max(sline - 1, 0) # remove blank line too - but only if there is one ;)
+
+        del self._cfg.cache[sline:mline+1]
+        self._cfg.write()
+
+    def rename (self, old, new, section = ""):
+        if not section: section = self._name
+        
+        val = self.get(old, section)
+        self.remove(old, section)
+        self._cfg.add(new, val, section, with_blankline = False)
+
+    def rename_section (self, old, new):
+        old = old.upper()
+        line = self._cfg.sections[old]
+        self._cfg.cache[line] = "[%s]\n" % new.upper()
+        self._cfg.write()
 
     def check_version (self, vers):
         pass # do nothing atm

@@ -82,13 +82,13 @@ class PreferenceWindow (AbstractDialog):
         self.cfg = cfg
 
         # the size
-        height = self.cfg.get_session("prefheight", "window")
+        height = self.cfg.get_session("prefheight", "GUI")
         if height is None:
             height = int(gtk.gdk.screen_height() * 0.8) # see 4/5 * screen_height as maximum
         else:
             height = int(height)
 
-        width = self.cfg.get_session("prefwidth", "window")
+        width = self.cfg.get_session("prefwidth", "GUI")
         if width is None:
             width = -1 # default
         else:
@@ -233,5 +233,5 @@ class PreferenceWindow (AbstractDialog):
         return True
 
     def cb_size_changed (self, widget, event, *args):
-        self.cfg.set_session("prefheight", "window", event.height)
-        self.cfg.set_session("prefwidth", "window", event.width)
+        self.cfg.set_session("prefheight", "GUI", event.height)
+        self.cfg.set_session("prefwidth", "GUI", event.width)

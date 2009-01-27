@@ -999,7 +999,7 @@ class MainWindow (Window):
             return
 
         oldVersion = SESSION_VERSION
-        allowedVersions = (1,3)
+        allowedVersions = (1,3,4)
 
         if not defaults_only and sessionEx and isinstance(sessionEx, SessionException):
             if sessionEx.got in allowedVersions:
@@ -1160,6 +1160,10 @@ class MainWindow (Window):
 
         # SESSION VERSION
         def load_session_version (version):
+
+            if oldVersion < 4:
+                self.session.rename_section("window", "GUI")
+
             if oldVersion != SESSION_VERSION: # we are trying to convert
                 return
             
@@ -1179,10 +1183,10 @@ class MainWindow (Window):
         # set the simple ones :)
         map(_add,[
             ([("gtksessionversion", "session")], load_session_version, lambda: SESSION_VERSION),
-            ([("width", "window"), ("height", "window")], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
-            ([("vpanedpos", "window"), ("hpanedpos", "window")], load_paned, save_paned),
-            ([("catsel", "window")], load_cat_selection, save_cat_selection, ["app-portage@0"]),
-            ([("pkgsel", "window")], load_pkg_selection, save_pkg_selection, ["portato@0"])
+            (["width", "height"], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
+            (["vpanedpos", "hpanedpos"], load_paned, save_paned),
+            (["catsel"], load_cat_selection, save_cat_selection, ["app-portage@0"]),
+            (["pkgsel"], load_pkg_selection, save_pkg_selection, ["portato@0"])
             #([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue),
             ])
 
@@ -1206,7 +1210,7 @@ class MainWindow (Window):
 
             self.session.add_handler(([(name, cat)], load, save))
 
-        map(load_cfg, [("prefheight", "window"), ("prefwidth", "window")])
+        map(load_cfg, [("prefheight", "GUI"), ("prefwidth", "GUI")])
 
         # now we have the handlers -> load
         self.session.load(defaults_only)
