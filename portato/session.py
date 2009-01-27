@@ -42,7 +42,7 @@ class Session (object):
 
         self._cfg = None
         self._handlers = []
-        self._name = name
+        self._name = name if name else "MAIN"
 
         if not (os.path.exists(SESSION_DIR) and os.path.isdir(SESSION_DIR)):
             os.mkdir(SESSION_DIR)
