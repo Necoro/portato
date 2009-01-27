@@ -157,10 +157,23 @@ class Session (object):
         key = key.lower()
 
         val = self._cfg._access(key, section)
-        for l in range(len(self._cfg.cache))[val.line:-1]:
-            self._cfg.cache[l] = self._cfg.cache[l+1]
+        del self._cfg.cache[val.line]
 
-        del self._cfg.cache[-1]
+        self._cfg.write()
+
+    def remove_section (self, section):
+        section = section.upper()
+
+        sline = self._cfg.sections[section]
+
+        try:
+            mline = max(v.line for v in self._cfg.vars[section].itervalues())
+        except ValueError: # nothing in the section
+            mline = sline
+        
+        sline = max(sline - 1, 0) # remove blank line too - but only if there is one ;)
+
+        del self._cfg.cache[sline:mline+1]
         self._cfg.write()
 
     def check_version (self, vers):
