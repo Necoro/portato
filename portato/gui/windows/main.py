@@ -993,7 +993,7 @@ class MainWindow (Window):
         Loads the session data.
         """
         try:
-            self.session = Session("gtk_session.cfg")
+            self.session = Session("gui.cfg", name="GUI", oldfiles=["gtk_session.cfg"])
         except (OSError, IOError), e:
             io_ex_dialog(e)
             return

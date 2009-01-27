@@ -52,7 +52,7 @@ class Session (object):
         if not os.path.exists(file):
             for o in oldfiles:
                 if os.path.exists(o):
-                    debug("Moving old session file '%s' to '%s'.")
+                    debug("Moving old session file '%s' to '%s'." % (o, file))
                     os.rename(o,file)
                     break
 
