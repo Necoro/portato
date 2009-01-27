@@ -39,11 +39,16 @@ class OutputFormatter (logging.Formatter):
         for key, value in self.colors.iteritems():
             self.colors[key] = "\x1b[01;%02dm*\x1b[39;49;00m" % value
 
+        if hasattr(sys.stderr, "fileno"):
+            self.istty = os.isatty(sys.stderr.fileno())
+        else:
+            self.istty = False # no fileno -> save default
+
     def format (self, record):
         string = logging.Formatter.format(self, record)
         color = None
 
-        if os.isatty(sys.stderr.fileno()):
+        if self.istty:
             if record.levelno <= logging.DEBUG:
                 color = self.colors["blue"]
             elif record.levelno <= logging.INFO:
