@@ -176,5 +176,18 @@ class Session (object):
         del self._cfg.cache[sline:mline+1]
         self._cfg.write()
 
+    def rename (self, old, new, section = ""):
+        if not section: section = self._name
+        
+        val = self.get(old, section)
+        self.remove(old, section)
+        self._cfg.add(new, val, section, with_blankline = False)
+
+    def rename_section (self, old, new):
+        old = old.upper()
+        line = self._cfg.sections[old]
+        self._cfg.cache[line] = "[%s]\n" % new.upper()
+        self._cfg.write()
+
     def check_version (self, vers):
         pass # do nothing atm
