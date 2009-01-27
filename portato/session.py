@@ -82,6 +82,8 @@ class Session (object):
             - a function getting number of option arguments and applying them to the program
             - a function returning the number of option return values - getting them out of the program
         """
+
+        options = map(lambda x: (x, self._name) if not hasattr(x, "__iter__") else x, options)
         self._handlers.append((options, load_fn, save_fn, default))
 
     def load (self, defaults_only = False):
