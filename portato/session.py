@@ -3,7 +3,7 @@
 # File: portato/session.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
-# Copyright (C) 2007 René 'Necoro' Neumann
+# Copyright (C) 2007-2009 René 'Necoro' Neumann
 # This is free software.  You may redistribute copies of it under the terms of
 # the GNU General Public License version 2.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -31,11 +31,13 @@ class Session (object):
     # the current session format version
     VERSION = 1
 
-    def __init__ (self, file):
+    def __init__ (self, file, name="", oldfiles = []):
         """
         Initialize a session with a certain file inside L{SESSION_DIR}.
 
         @param file: the file in L{SESSION_DIR}, where the options will be saved.
+        @param oldfiles: old file names for the same file
+        @param name: short name describing the type of session
         """
 
         self._cfg = None
@@ -43,8 +45,26 @@ class Session (object):
 
         if not (os.path.exists(SESSION_DIR) and os.path.isdir(SESSION_DIR)):
             os.mkdir(SESSION_DIR)
-        self._cfg = ConfigParser(os.path.join(SESSION_DIR, file))
-        info(_("Loading session from '%s'.") % self._cfg.file)
+
+        file = os.path.join(SESSION_DIR, file)
+        oldfiles = [os.path.join(SESSION_DIR, x) for x in oldfiles]
+
+        if not os.path.exists(file):
+            for o in oldfiles:
+                if os.path.exists(o):
+                    debug("Moving old session file '%s' to '%s'.")
+                    os.rename(o,file)
+                    break
+
+        self._cfg = ConfigParser(file)
+
+        if name:
+            i = _("Loading '%s' session from '%s'.") % (name, self._cfg.file)
+        else:
+            i = _("Loading session from '%s'.") % self._cfg.file
+
+        info(i)
+
         try:
             self._cfg.parse()
         except IOError, e:
