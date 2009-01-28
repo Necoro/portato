@@ -10,6 +10,8 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+from __future__ import absolute_import, with_statement
+
 class PkgData (object):
     __slots__ = ("cat", "pkg", "inst")
 
