@@ -18,6 +18,8 @@ from .config_parser import ConfigParser, SectionNotFoundException
 from .constants import SESSION_DIR
 from .helper import debug, info
 
+sessionlist = []
+
 class Session (object):
     """
     A small class allowing to save certain states of a program.
@@ -31,13 +33,14 @@ class Session (object):
     # the current session format version
     VERSION = 1
 
-    def __init__ (self, file, name="", oldfiles = []):
+    def __init__ (self, file, name="", oldfiles = [], register = True):
         """
         Initialize a session with a certain file inside L{SESSION_DIR}.
 
         @param file: the file in L{SESSION_DIR}, where the options will be saved.
         @param oldfiles: old file names for the same file
         @param name: short name describing the type of session
+        @param register: register in the global sessionlist, which is closed at the end
         """
 
         self._cfg = None
@@ -60,9 +63,9 @@ class Session (object):
         self._cfg = ConfigParser(file)
 
         if name:
-            i = _("Loading '%s' session from '%s'.") % (name, self._cfg.file)
+            i = _("Loading '%s' session from %s.") % (name, self._cfg.file)
         else:
-            i = _("Loading session from '%s'.") % self._cfg.file
+            i = _("Loading session from %s.") % self._cfg.file
 
         info(i)
 
@@ -71,6 +74,9 @@ class Session (object):
         except IOError, e:
             if e.errno == 2: pass
             else: raise
+
+        # register
+        if register: sessionlist.append(self)
 
         # add version check
         self.add_handler(([("version", "session")], self.check_version, lambda: self.VERSION))
@@ -126,6 +132,15 @@ class Session (object):
                 self.set(option, str(value), section)
         
         self._cfg.write()
+
+    @classmethod
+    def close (cls):
+        for s in sessionlist:
+            if s._name != "MAIN":
+                info(_("Saving '%s' session to %s.") % (s._name, s._cfg.file))
+            else:
+                info(_("Saving session to %s.") % s._cfg.file)
+            s.save()
 
     def set (self, key, value, section = ""):
         if not section: section = self._name

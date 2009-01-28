@@ -1826,8 +1826,8 @@ class MainWindow (Window):
                 self.__save_queue = (ret == gtk.RESPONSE_YES)
                 self.queue.kill_emerge()
 
-        # write session
-        self.session.save()
+        # write sessions
+        Session.close()
         
         return False
 
