@@ -22,8 +22,8 @@ import hashlib
 import os
 
 from functools import wraps
-from threading import RLock
 
+from ..constants import SESSION_DIR
 from ..helper import info, error, debug
 from ..backend import system
 from .database import Database, PkgData
@@ -31,11 +31,13 @@ from .database import Database, PkgData
 class SQLDatabase (Database):
     
     FORBIDDEN = (".bzr", ".svn", ".git", "CVS", ".hg", "_darcs")
+    lock = Database.lock
 
     def __init__ (self):
         """Constructor."""
+        Database.__init__(self)
+
         self._restrict = ""
-        self._lock = RLock()
         
         pkgdb = os.path.join(SESSION_DIR, "package.db")
         pkgdb_existed = os.path.exists(pkgdb)
@@ -129,16 +131,6 @@ class SQLDatabase (Database):
             db.close()
 
         return changed
-
-    def lock (f):
-        @wraps(f)
-        def wrapper (self, *args, **kwargs):
-            with self._lock:
-                r = f(self, *args, **kwargs)
-                
-            return r
-        
-        return wrapper
 
     def con (f):
         @wraps(f)

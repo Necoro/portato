@@ -12,6 +12,9 @@
 
 from __future__ import absolute_import, with_statement
 
+from threading import RLock
+from functools import wraps
+
 class PkgData (object):
     __slots__ = ("cat", "pkg", "inst")
 
@@ -32,6 +35,20 @@ class PkgData (object):
 class Database (object):
 
     ALL = _("ALL")
+
+    def __init__ (self):
+        self._lock = RLock()
+
+    @staticmethod
+    def lock (f):
+        @wraps(f)
+        def wrapper (self, *args, **kwargs):
+            with self._lock:
+                r = f(self, *args, **kwargs)
+                
+            return r
+        
+        return wrapper
 
     def populate (self, category = None):
         """Populates the database.

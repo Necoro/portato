@@ -26,11 +26,12 @@ from ...backend import flags, system # must be the first to avoid circular deps
 from ... import get_listener, plugin
 from ...helper import debug, warning, error, info, unique_array
 from ...session import Session
+from ...db import Database
 from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, ICON_DIR
 from ...backend.exceptions import PackageNotFoundException, BlockedException
 
 # more GUI stuff
-from ..utils import Database, Config, GtkThread, get_color
+from ..utils import Config, GtkThread, get_color
 from ..queue import EmergeQueue
 from ..session import SESSION_VERSION, SessionException, OldSessionException, NewSessionException
 from ..wrapper import GtkTree, GtkConsole

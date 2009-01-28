@@ -9,3 +9,17 @@
 # There is NO WARRANTY, to the extent permitted by law.
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
+
+from __future__ import absolute_import
+
+from ..constants import USE_SQL
+from ..helper import debug
+
+if USE_SQL:
+    debug("Using SQLDatabase")
+    from .sql import SQLDatabase
+    Database = SQLDatabase
+else:
+    debug("Using DictDatabase")
+    from .dict import DictDatabase
+    Database = DictDatabase

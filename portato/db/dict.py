@@ -14,7 +14,7 @@ from __future__ import absolute_import, with_statement
 
 import re
 from collections import defaultdict
-from functools import wraps
+from threading import RLock
 
 from ..backend import system
 from .database import Database, PkgData
@@ -22,20 +22,14 @@ from .database import Database, PkgData
 class DictDatabase (Database):
     """An internal database which holds a simple dictionary cat -> [package_list]."""
 
+    lock = Database.lock
+
     def __init__ (self):
         """Constructor."""
-        self.__initialize()
-        self._lock = RLock()
-        self.populate()
+        Database.__init__(self)
 
-    def lock (f):
-        @wraps(f)
-        def wrapper (self, *args, **kwargs):
-            with self._lock:
-                r = f(self, *args, **kwargs)
-            return r
-        
-        return wrapper
+        self.__initialize()
+        self.populate()
 
     def __initialize (self):
         self._db = defaultdict(list)
