@@ -24,9 +24,10 @@ class DictDatabase (Database):
 
     lock = Database.lock
 
-    def __init__ (self):
+    def __init__ (self, session):
         """Constructor."""
         Database.__init__(self)
+        self.session = session
 
         self.__initialize()
         self.populate()

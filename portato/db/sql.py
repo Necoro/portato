@@ -30,15 +30,22 @@ from .database import Database, PkgData
 
 class SQLDatabase (Database):
     
+    FORMAT = "1"
     FORBIDDEN = (".bzr", ".svn", ".git", "CVS", ".hg", "_darcs")
     lock = Database.lock
 
-    def __init__ (self):
+    def __init__ (self, session):
         """Constructor."""
         Database.__init__(self)
 
         self._restrict = ""
+        self.session = session
         
+        updateFormat = False
+        if "format" not in session or session["format"] != self.FORMAT:
+            session["format"] = self.FORMAT
+            updateFormat = True
+
         pkgdb = os.path.join(SESSION_DIR, "package.db")
         pkgdb_existed = os.path.exists(pkgdb)
 
@@ -49,18 +56,22 @@ class SQLDatabase (Database):
 
         pkg_conn = sql.connect(os.path.join(SESSION_DIR, "package.db"))
         pkg_conn.row_factory = sql.Row
+        if pkgdb_existed and updateFormat:
+            pkg_conn.execute("DROP TABLE packages")
+
         pkg_conn.execute("""
         CREATE TABLE IF NOT EXISTS packages
         (
             name TEXT,
             cat TEXT,
-            inst INTEGER
+            inst INTEGER,
+            disabled INTEGER
         )""")
 
         pkg_conn.commit()
         
         self.was_updated = self.updated()
-        if self.was_updated or not pkgdb_existed:
+        if self.was_updated or not pkgdb_existed or updateFormat:
             info(_("Cleaning database..."))
             pkg_conn.execute("DELETE FROM packages") # empty db at beginning
             info(_("Populating database..."))
@@ -153,9 +164,9 @@ class SQLDatabase (Database):
             for p in system.find_packages(key = category, with_version = False):
                 cat, pkg = p.split("/")
 
-                yield (cat, pkg, p in inst)
+                yield (cat, pkg, p in inst, False)
 
-        connection.executemany("INSERT INTO packages (cat, name, inst) VALUES (?, ?, ?)", _get())
+        connection.executemany("INSERT INTO packages (cat, name, inst, disabled) VALUES (?, ?, ?, ?)", _get())
         connection.commit()
 
     @lock

@@ -12,14 +12,23 @@
 
 from __future__ import absolute_import
 
+from ..session import Session, SectionDict
 from ..constants import USE_SQL
 from ..helper import debug
 
-if USE_SQL:
-    debug("Using SQLDatabase")
-    from .sql import SQLDatabase
-    Database = SQLDatabase
-else:
-    debug("Using DictDatabase")
-    from .dict import DictDatabase
-    Database = DictDatabase
+_SESSION = None
+
+def Database():
+    global _SESSION
+
+    if _SESSION is None:
+        _SESSION = Session("db.cfg", name = "DB")
+
+    if USE_SQL:
+        debug("Using SQLDatabase")
+        from .sql import SQLDatabase
+        return SQLDatabase(SectionDict(_SESSION, "SQL"))
+    else:
+        debug("Using DictDatabase")
+        from .dict import DictDatabase
+        return DictDatabase(SectionDict(_SESSION, "dict"))
