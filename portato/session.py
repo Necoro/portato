@@ -13,6 +13,7 @@
 from __future__ import absolute_import, with_statement
 
 import os, os.path
+from UserDict import DictMixin
 
 from .config_parser import ConfigParser, SectionNotFoundException
 from .constants import SESSION_DIR
@@ -208,3 +209,29 @@ class Session (object):
 
     def check_version (self, vers):
         pass # do nothing atm
+
+class SectionDict (DictMixin):
+    """A class, which maps a specific section of a session to a dictionary."""
+
+    def __init__ (self, session, section):
+        self._section = section.upper()
+        self._session = session
+
+    def __getitem__ (self, name):
+        item = self._session.get(name, section = self._section)
+
+        if item is None:
+            raise KeyError, "%s not in section %s" % (name, self._section)
+        return item
+
+    def __setitem__ (self, name, value):
+        self._session.set(name, value, section = self._section)
+
+    def __delitem__ (self, name):
+        self._session.remove(name, self._section)
+
+    def keys (self):
+        return self._session._cfg.vars[self._section].keys()
+
+    def __contains__ (self, name):
+        return self._session.get(name, self._section) is not None
