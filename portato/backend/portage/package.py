@@ -222,11 +222,14 @@ class PortagePackage (Package):
                         continue
 
                 if return_blocks:
+                    if not blocked:
+                        if not system.find_packages(dep, masked = True): continue # well - no packages affected - ignore
+
                     if with_criterions:
                         dep_pkgs.append((dep, dep))
                     else:
                         dep_pkgs.append(dep)
-                else:
+                elif blocked:
                     raise BlockedException, (self.get_cpv(), blocked[0].get_cpv())
                 
                 continue # finished with the blocking one -> next
