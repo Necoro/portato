@@ -29,14 +29,42 @@ class PkgData (object):
 
 class Database (object):
 
+    ALL = _("ALL")
+
     def populate (self, category = None):
+        """Populates the database.
+        
+        @param category: An optional category - so only packages of this category are inserted.
+        @type category: string
+        """
         raise NotImplentedError
 
     def get_cat (self, cat = None, byName = True):
+        """Returns the packages in the category.
+        
+        @param cat: category to return the packages from; if None it defaults to C{ALL}
+        @type cat: string
+        @param byName: selects whether to return the list sorted by name or by installation
+        @type byName: boolean
+        @return: an iterator over the packages
+        @rtype: L{PkgData}<iterator>
+        """
         raise NotImplentedError
 
     def get_categories (self, installed = False):
+        """Returns all categories.
+        
+        @param installed: Only return these with at least one installed package.
+        @type installed: boolean
+        @returns: the list of categories
+        @rtype: string<iterator>
+        """
         raise NotImplentedError
 
     def reload (self, cat = None):
+        """Reloads the given category.
+        
+        @param cat: category
+        @type cat: string
+        """
         raise NotImplentedError
