@@ -129,7 +129,7 @@ class DictDatabase (Database):
         cat, pkg = cpv.split("/")
 
         c = self._db[cat]
-        p = c[c.find(PkgData(cat, pkg))]
+        p = c[c.index(PkgData(cat, pkg))]
         p.disabled = True
 
     def get_restrict (self):
