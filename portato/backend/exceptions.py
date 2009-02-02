@@ -18,6 +18,10 @@ class PackageNotFoundException (Exception):
     """An exception marking that a package could not be found."""
     pass
 
+class VersionsNotFoundException (Exception):
+    """An exception marking that there could be no versions found for a specific CP."""
+    pass
+
 class DependencyCalcError (Exception):
     """An error occured during dependency calculation."""
     pass
