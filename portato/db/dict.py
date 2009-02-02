@@ -62,17 +62,20 @@ class DictDatabase (Database):
             self._db[key].sort(key = self.__sort_key)
 
     @lock
-    def get_cat (self, cat = None, byName = True):
+    def get_cat (self, cat = None, byName = True, showDisabled = False):
         if not cat:
             cat = self.ALL
 
         def get_pkgs():
             if byName:
                 for pkg in self._db[cat]:
-                    yield pkg
+                    if showDisabled or not pkg.disabled:
+                        yield pkg
             else:
                 ninst = []
                 for pkg in self._db[cat]:
+                    if not showDisabled and pkg.disabled: continue
+
                     if pkg.inst:
                         yield pkg
                     else:

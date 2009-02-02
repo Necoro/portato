@@ -59,13 +59,15 @@ class Database (object):
         """
         raise NotImplentedError
 
-    def get_cat (self, cat = None, byName = True):
+    def get_cat (self, cat = None, byName = True, showDisabled = False):
         """Returns the packages in the category.
         
         @param cat: category to return the packages from; if None it defaults to C{ALL}
         @type cat: string
         @param byName: selects whether to return the list sorted by name or by installation
         @type byName: boolean
+        @param showDisabled: should disabled packages be returned
+        @type showDisabled: boolean
         @return: an iterator over the packages
         @rtype: L{PkgData}<iterator>
         """

@@ -169,15 +169,19 @@ class SQLDatabase (Database):
         connection.commit()
 
     @con
-    def get_cat (self, category = None, byName = True, connection = None):
+    def get_cat (self, category = None, byName = True, showDisabled = False, connection = None):
         sort = "ORDER BY name"
         if not byName:
             sort = "ORDER BY inst DESC, name"
 
+        disabled = "1=1"
+        if not showDisabled:
+            disabled = "disabled = 0"
+
         if not category or category == self.ALL:
-            c = connection.execute("SELECT cat, name, inst, disabled FROM packages WHERE 1=1 %s %s" % (self.restrict, sort))
+            c = connection.execute("SELECT cat, name, inst, disabled FROM packages WHERE %s %s %s" % (disabled, self.restrict, sort))
         else:
-            c = connection.execute("SELECT cat, name, inst, disabled FROM packages WHERE cat = ? %s %s" % (self.restrict ,sort), (category,))
+            c = connection.execute("SELECT cat, name, inst, disabled FROM packages WHERE cat = ? AND %s %s %s" % (disabled, self.restrict ,sort), (category,))
         
         for pkg in c:
             yield PkgData(pkg["cat"], pkg["name"], pkg["inst"], pkg["disabled"])
@@ -191,7 +195,7 @@ class SQLDatabase (Database):
         else:
             where = "1 = 1"
 
-        c = connection.execute("SELECT cat FROM packages WHERE %s %s GROUP BY cat" % (where, self.restrict))
+        c = connection.execute("SELECT cat FROM packages WHERE disabled = 0 AND %s %s GROUP BY cat" % (where, self.restrict))
 
         l = c.fetchall()
         c.close()

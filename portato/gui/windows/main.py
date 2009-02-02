@@ -746,18 +746,18 @@ class MainWindow (Window):
         store.clear()
 
         if name:
-            for cat, pkg, is_inst, disabled in self.db.get_cat(name, self.sortPkgListByName):
-                if disabled:
-                    warning(_("Package '%s/%s' is disabled."), cat, pkg)
+            for pkg in self.db.get_cat(name, self.sortPkgListByName):
+                if pkg.disabled:
+                    warning(_("Package '%s/%s' is disabled."), pkg.cat, pkg.pkg)
                     continue
 
-                if is_inst:
+                if pkg.inst:
                     icon = self.icons["installed"]
                 elif not self.showAll:
                     continue # ignore not installed packages
                 else:
                     icon = None
-                store.append([icon, pkg, cat])
+                store.append([icon, pkg.pkg, pkg.cat])
 
     def build_version_list (self):
         store = gtk.ListStore(gtk.gdk.Pixbuf, str, str)
