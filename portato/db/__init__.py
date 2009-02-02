@@ -13,7 +13,7 @@
 from __future__ import absolute_import
 
 from ..session import Session, SectionDict
-from ..helper import debug
+from ..helper import debug, warning
 
 _SESSION = None
 _TYPE = None
@@ -35,7 +35,7 @@ def Database():
         try:
             from .sql import SQLDatabase
         except ImportError:
-            debug("Cannot load SQLDatabase.")
+            warning(_("Cannot load SQLDatabase."))
             _TYPE = "dict"
             return Database()
         else:
