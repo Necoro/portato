@@ -13,22 +13,35 @@
 from __future__ import absolute_import
 
 from ..session import Session, SectionDict
-from ..constants import USE_SQL
 from ..helper import debug
 
 _SESSION = None
+_TYPE = None
+
+def _set_type(t):
+    global _TYPE
+    _TYPE = t
 
 def Database():
-    global _SESSION
+    global _SESSION, _TYPE
 
     if _SESSION is None:
         _SESSION = Session("db.cfg", name = "DB")
+        _SESSION.add_handler((["type"], _set_type, lambda: _TYPE), default = ["sql"])
+        _SESSION.load()
 
-    if USE_SQL:
+    if _TYPE == "sql":
         debug("Using SQLDatabase")
-        from .sql import SQLDatabase
-        return SQLDatabase(SectionDict(_SESSION, "SQL"))
-    else:
+        try:
+            from .sql import SQLDatabase
+        except ImportError:
+            debug("Cannot load SQLDatabase.")
+            _TYPE = "dict"
+            return Database()
+        else:
+            return SQLDatabase(SectionDict(_SESSION, "SQL"))
+
+    elif _TYPE == "dict":
         debug("Using DictDatabase")
         from .dict import DictDatabase
         return DictDatabase(SectionDict(_SESSION, "dict"))
