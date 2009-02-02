@@ -153,9 +153,8 @@ class SQLDatabase (Database):
 
             return f(*args, **kwargs)
         
-        return wrapper
+        return Database.lock(wrapper)
 
-    @lock
     @con
     def populate (self, category = None, connection = None):
         def _get():
@@ -169,7 +168,6 @@ class SQLDatabase (Database):
         connection.executemany("INSERT INTO packages (cat, name, inst, disabled) VALUES (?, ?, ?, ?)", _get())
         connection.commit()
 
-    @lock
     @con
     def get_cat (self, category = None, byName = True, connection = None):
         sort = "ORDER BY name"
@@ -177,15 +175,14 @@ class SQLDatabase (Database):
             sort = "ORDER BY inst DESC, name"
 
         if not category or category == self.ALL:
-            c = connection.execute("SELECT cat, name, inst FROM packages WHERE 1=1 %s %s" % (self.restrict, sort))
+            c = connection.execute("SELECT cat, name, inst, disabled FROM packages WHERE 1=1 %s %s" % (self.restrict, sort))
         else:
-            c = connection.execute("SELECT cat, name, inst FROM packages WHERE cat = ? %s %s" % (self.restrict ,sort), (category,))
+            c = connection.execute("SELECT cat, name, inst, disabled FROM packages WHERE cat = ? %s %s" % (self.restrict ,sort), (category,))
         
         for pkg in c:
-            yield PkgData(pkg["cat"], pkg["name"], pkg["inst"])
+            yield PkgData(pkg["cat"], pkg["name"], pkg["inst"], pkg["disabled"])
         c.close()
 
-    @lock
     @con
     def get_categories (self, installed = False, connection = None):
 
@@ -205,7 +202,6 @@ class SQLDatabase (Database):
         for cat in l:
             yield cat["cat"]
 
-    @lock
     @con
     def reload (self, cat = None, connection = None):
         if cat:
@@ -216,6 +212,12 @@ class SQLDatabase (Database):
             connection.execute("DELETE FROM packages")
             connection.commit()
             self.populate(connection = connection)
+
+    @con
+    def disable (self, cpv, connection = None):
+        cat, pkg = cpv.split("/")
+        connection.execute("UPDATE packages SET disabled = 1 WHERE cat = ? AND name = ?", (cat, pkg))
+        connection.commit()
 
     def get_restrict (self):
         return self._restrict

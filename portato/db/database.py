@@ -16,15 +16,16 @@ from threading import RLock
 from functools import wraps
 
 class PkgData (object):
-    __slots__ = ("cat", "pkg", "inst")
+    __slots__ = ("cat", "pkg", "inst", "disabled")
 
-    def __init__ (self, cat, pkg, inst):
+    def __init__ (self, cat, pkg, inst = False, disabled = False):
         self.cat = cat
         self.pkg = pkg
         self.inst = inst
+        self.disabled = disabled
 
     def __iter__ (self):
-        return iter((self.cat, self.pkg, self.inst))
+        return iter((self.cat, self.pkg, self.inst, self.disabled))
 
     def __cmp__ (self, other):
         return cmp(self.pkg.lower(), other.pkg.lower())
@@ -77,6 +78,13 @@ class Database (object):
         @type installed: boolean
         @returns: the list of categories
         @rtype: string<iterator>
+        """
+        raise NotImplentedError
+
+    def disable (self, cpv):
+        """Marks the CPV as disabled.
+
+        @param cpv: the cpv to mark
         """
         raise NotImplentedError
 

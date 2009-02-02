@@ -51,7 +51,7 @@ class DictDatabase (Database):
         for p in packages:
             cat, pkg = p.split("/")
             inst = p in installed
-            t = PkgData(cat, pkg, inst)
+            t = PkgData(cat, pkg, inst, False)
             self._db[cat].append(t)
             self._db[self.ALL].append(t)
 
@@ -123,6 +123,14 @@ class DictDatabase (Database):
         else:
             self.__initialize()
             self.populate()
+
+    @lock
+    def disable (self, cpv):
+        cat, pkg = cpv.split("/")
+
+        c = self._db[cat]
+        p = c[c.find(PkgData(cat, pkg))]
+        p.disabled = True
 
     def get_restrict (self):
         return self._restrict
