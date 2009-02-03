@@ -1,9 +1,11 @@
 next:
-- add (experimental) support for sqlite db
+- add support for sqlite db
 - improvements in session handling
 - sort by useflags in dependency list
 - make uselist and deplist lazy - i.e. load only if needed
 - remembers the height and width of the preference window
+- debug improvements
+- check prerequisites before starting
 - bugs fixed: #44, #41
 
 0.11.1:
