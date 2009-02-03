@@ -102,14 +102,16 @@ def get_version_infos():
     from ..backend import system
     
     runsystem="Unknown"
-    if os.path.exists("/etc/gentoo-release"):
-        runsystem = "Gentoo"
+
+    # check for sabayon first, as sabayon also has the gentoo release
+    for sp in ("/etc/sabayon-release", "/etc/sabayon-edition"):
+        if os.path.exists(sp):
+            with open(sp) as r:
+                runsystem = "Sabayon: %s" % r.readline().strip()
+            break
     else:
-        for sp in ("/etc/sabayon-release", "/etc/sabayon-edition"):
-            if os.path.exists(sp):
-                with open(sp) as r:
-                    runsystem = "Sabayon: %s" % r.readline().strip()
-                break
+        if os.path.exists("/etc/gentoo-release"):
+            runsystem = "Gentoo"
 
 
     return "\n".join((
