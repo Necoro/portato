@@ -21,6 +21,11 @@ from .constants import SESSION_DIR
 (S_NOT, S_STREAM_ONLY, S_BOTH) = range(3)
 
 started = S_NOT
+streamhandlers = [] # the handler printing visibile to the user
+
+def add_handler (h):
+    logging.getLogger("portatoLogger").addHandler(h)
+    streamhandlers.append(h)
 
 LOGFILE = os.path.join(SESSION_DIR, "portato.log")
 
@@ -42,7 +47,7 @@ class OutputFormatter (logging.Formatter):
         if hasattr(sys.stderr, "fileno"):
             self.istty = os.isatty(sys.stderr.fileno())
         else:
-            self.istty = False # no fileno -> save default
+            self.istty = False # no fileno -> safe default
 
     def format (self, record):
         string = logging.Formatter.format(self, record)
@@ -67,7 +72,7 @@ def start(file = True):
 
     if started == S_BOTH: return
 
-    # logging: root (file)
+    # logging: file
     if file:
         if not (os.path.exists(SESSION_DIR) and os.path.isdir(SESSION_DIR)):
             os.mkdir(SESSION_DIR)
@@ -87,7 +92,11 @@ def start(file = True):
         formatter = OutputFormatter("%(message)s (%(filename)s:%(lineno)s)")
         handler = logging.StreamHandler()
         handler.setFormatter(formatter)
-        logging.getLogger("portatoLogger.stream").addHandler(handler)
-        logging.getLogger("portatoLogger.stream").setLevel(logging.DEBUG)
+        add_handler(handler)
 
     started = S_BOTH if file else S_STREAM_ONLY
+
+
+def set_log_level (lvl):
+    for h in streamhandlers:
+        h.setLevel(lvl)

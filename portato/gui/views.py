@@ -18,6 +18,7 @@ import gtksourceview2
 import logging
 
 from ..helper import warning
+from ..log import add_handler
 
 class LazyView (object):
     def __init__ (self):
@@ -147,7 +148,7 @@ class LogView (logging.Handler):
         for lvl, name, color in self.colors:
             self.buf.create_tag("log_%s" % name, foreground = color,weight = pango.WEIGHT_BOLD)
         
-        logging.getLogger("portatoLogger.stream").addHandler(self)
+        add_handler(self)
 
     def emit (self, record):
         
