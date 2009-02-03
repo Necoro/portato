@@ -203,10 +203,10 @@ def sort_use_flag_list (flaglist):
     """
     
     def flag_key (flag):
-            if flag[0] in "+-":
-                return flag[1:]
-            else:
-                return flag
+        if flag[0] in "+-":
+            return flag[1:]
+        else:
+            return flag
     
     flaglist.sort(key = flag_key)
     return flaglist
