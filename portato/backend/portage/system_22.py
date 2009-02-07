@@ -32,10 +32,10 @@ class PortageSystem_22 (PortageSystem):
         self.local_use_descs = defaultdict(dict)
 
         self.setmap = {
-                self.SET_ALL : syssets.AllSet,
-                self.SET_INSTALLED : syssets.InstalledSet,
-                self.SET_UNINSTALLED : syssets.UninstalledSet,
-                self.SET_TREE : syssets.TreeSet
+                self.SET_ALL : syssets.AllSet(),
+                self.SET_INSTALLED : syssets.InstalledSet(),
+                self.SET_UNINSTALLED : syssets.UninstalledSet(),
+                self.SET_TREE : syssets.TreeSet()
                 }
 
     def get_update_option (self):
@@ -56,9 +56,10 @@ class PortageSystem_22 (PortageSystem):
 
         s = self.setmap.get(pkgSet, None)
         if s is None:
-            return syssets.PortageSet(pkgSet)
-        else:
-            return s()
+            s = syssets.PortageSet(pkgSet)
+            self.setmap[pkgSet] = s
+
+        return s
 
     def new_package (self, cpv):
         return PortagePackage_22(cpv)

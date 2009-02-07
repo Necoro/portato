@@ -63,12 +63,11 @@ class FilterSet (Set):
 
 class PortageSet (FilterSet):
     def __init__ (self, name):
-        FilterSet.__init__(self)
         debug("Loading portage set '%s'", name)
-        self.portageSet = system.settings.setsconfig.getSets()[name]
+        self.name = name
 
     def get_list(self):
-        return itt.imap(str, self.portageSet.getAtoms())
+        return itt.imap(str, system.settings.setsconfig.getSetAtoms(self.name))
 
 class SystemSet (FilterSet):
 
@@ -86,6 +85,9 @@ class WorldSet (FilterSet):
                     yield cp
 
 class InstalledSet (Set):
+    """For the moment do not use the portage-2.2 @installed set.
+    It only contains the current slot-cps - and to get the cpvs
+    via the PortageSet results in an infinite recursion :(."""
 
     def get_pkgs (self, key, is_regexp, masked, with_version, only_cpv):
         if is_regexp:
