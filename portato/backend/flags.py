@@ -381,7 +381,7 @@ def write_use_flags ():
                         while i < line: # stop at the given line
                             lines.append(f.readline())
                             i += 1
-                        l = f.readline().split(" ")
+                        l = f.readline().split()
                         
                         # delete or insert
                         if delete:
@@ -396,7 +396,7 @@ def write_use_flags ():
                         file_cache[file] = lines
 
                 else: # in cache
-                    l = file_cache[file][line-1].split(" ")
+                    l = file_cache[file][line-1].split()
                     if delete:
                         remove(flag, l)
                     else:

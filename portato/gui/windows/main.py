@@ -162,7 +162,7 @@ class PackageTable:
             self.linkBox.remove(c)
         
         text = pkg.get_package_settings("HOMEPAGE")
-        texts = text.split(" ")
+        texts = text.split()
         ftexts = []
 
         for count, t in enumerate(texts):
