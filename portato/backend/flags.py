@@ -343,22 +343,22 @@ def write_use_flags ():
     """This writes our changed useflags into the file."""
     global newUseFlags, useFlags
 
+    def combine (list):
+        """Shortcut for reverting the list into a string."""
+        return " ".join(list)+"\n"
+
     def insert (flag, list):
         """Shortcut for inserting a new flag right after the package-name."""
         list.insert(1,flag)
     
     def remove (flag, list):
         """Removes a flag."""
-        try:
-            list.remove(flag)
-        except ValueError: # flag is given as flag\n
-            list.remove(flag+"\n")
-            list.append("\n") #re-insert the newline
+        list.remove(flag)
 
         # no more flags there - comment it out
-        if len(list) == 1 or list[1][0] in ("#","\n"):
+        if len(list) == 1 or list[1][0] == "#":
             list[0] = "#"+list[0]
-            insert("#removed by portato#",list)
+            list.append("#removed by portato#")
 
     file_cache = {} # cache for having to read the file only once: name->[lines]
     for cpv in newUseFlags:
@@ -388,7 +388,7 @@ def write_use_flags ():
                             remove(flag,l)
                         else:
                             insert(flag,l)
-                        lines.append(" ".join(l))
+                        lines.append(combine(l))
                         
                         # read the rest
                         lines.extend(f.readlines())
@@ -400,29 +400,30 @@ def write_use_flags ():
                     if delete:
                         remove(flag, l)
                     else:
-                        insert(flag,l)
-                    file_cache[file][line-1] = " ".join(l)
+                        insert(flag, l)
+                    file_cache[file][line-1] = combine(l)
 
         if flagsToAdd:
         # write new lines
             msg = "\n#portato update#\n"
+            comb = combine(flagsToAdd)
             if CONFIG["usePerVersion"]: # add on a per-version-base
-                msg += "=%s %s\n" % (cpv, ' '.join(flagsToAdd))
+                msg += "=%s %s" % (cpv, comb)
             else: # add on a per-package-base
                 list = system.split_cpv(cpv)
-                msg += "%s/%s %s\n" % (list[0], list[1], ' '.join(flagsToAdd))
+                msg += "%s/%s %s" % (list[0], list[1], combine)
+
             if not file in file_cache:
-                f = open(file, "a")
-                f.write(msg)
-                f.close()
+                with open(file, "a") as f:
+                    f.write(msg)
             else:
                 file_cache[file].append(msg)
     
     # write to disk
-    for file in file_cache.keys():
-        f = open(file, "w")
-        f.writelines(file_cache[file])
-        f.close()
+    for file in file_cache:
+        with open(file, "w") as f:
+            f.writelines(file_cache[file])
+
     # reset
     useFlags = {}
     newUseFlags = {}
