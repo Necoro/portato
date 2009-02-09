@@ -211,7 +211,7 @@ class SQLDatabase (Database):
         if cat:
             connection.execute("DELETE FROM packages WHERE cat = ?", (cat,))
             connection.commit()
-            self.populate(cat+"/", connection = connection)
+            self.populate(cat+"/*", connection = connection)
         else:
             connection.execute("DELETE FROM packages")
             connection.commit()
