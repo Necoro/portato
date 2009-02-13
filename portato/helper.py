@@ -13,7 +13,7 @@
 """
 Some nice functions used in the program.
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 import os, signal, logging, grp
 
@@ -42,6 +42,18 @@ def send_signal_to_group (sig):
     
     pgid = os.getpgrp()
     os.killpg(pgid, sig)
+
+def get_runsystem ():
+     # check for sabayon first, as sabayon also has the gentoo release
+    for sp in ("/etc/sabayon-release", "/etc/sabayon-edition"):
+        if os.path.exists(sp):
+            with open(sp) as r:
+                return ("Sabayon", r.readline().strip())
+    
+    if os.path.exists("/etc/gentoo-release"):
+            return ("Gentoo", "")
+
+    else: return ("Unknown", "")
 
 def paren_reduce(mystr):
     """

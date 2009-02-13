@@ -11,7 +11,7 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 import gtk
-from ..helper import error
+from ..helper import error, get_runsystem
 
 def mail_failure_dialog(e):
     dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, _("Mail could not be sent"))
@@ -109,7 +109,12 @@ def file_chooser_dialog (title, parent):
 
 def prereq_error_dialog (e):
     dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, _("A prerequisite for starting Portato was not matched."))
-    dialog.format_secondary_text(e.message)
+    
+    msg = e.message
+    if get_runsystem()[0] == "Sabayon":
+        msg.append("\n"+_("Note that on fresh Sabayon installs or its LiveDVD/-CD, there is no portage tree existing per default. Please run 'emerge --sync'."))
+
+    dialog.format_secondary_text(msg)
     ret = dialog.run()
     dialog.destroy()
     return ret

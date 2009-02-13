@@ -18,7 +18,7 @@ import sys, traceback, os
 
 from StringIO import StringIO
 
-from ..helper import debug, error
+from ..helper import debug, error, get_runsystem
 from .dialogs import file_chooser_dialog, io_ex_dialog
 from .windows.mailinfo import MailInfoWindow
 from .utils import GtkThread
@@ -101,22 +101,9 @@ def get_version_infos():
     from ..constants import VERSION
     from ..backend import system
     
-    runsystem="Unknown"
-
-    # check for sabayon first, as sabayon also has the gentoo release
-    for sp in ("/etc/sabayon-release", "/etc/sabayon-edition"):
-        if os.path.exists(sp):
-            with open(sp) as r:
-                runsystem = "Sabayon: %s" % r.readline().strip()
-            break
-    else:
-        if os.path.exists("/etc/gentoo-release"):
-            runsystem = "Gentoo"
-
-
     return "\n".join((
         "Portato version: %s" % VERSION,
-        "System: %s" % runsystem,
+        "System: %s" % " ".join(get_runsystem()),
         "Python version: %s" % sys.version,
         "Used backend: %s" % system.get_version(),
         "pygtk: %s (using GTK+: %s)" % (convert(gtk.pygtk_version), convert(gtk.gtk_version)),
