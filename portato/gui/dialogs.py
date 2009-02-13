@@ -112,9 +112,9 @@ def prereq_error_dialog (e):
     
     msg = e.message
     if get_runsystem()[0] == "Sabayon":
-        msg.append("\n"+_("Note that on fresh Sabayon installs or its LiveDVD/-CD, there is no portage tree existing per default. Please run 'emerge --sync'."))
+        msg += "\n\n"+_("<b>Note</b>: On fresh Sabayon installs or its LiveDVD/-CD, there is no portage tree existing per default.\nPlease run <i>emerge --sync &amp;&amp; layman -S</i>.")
 
-    dialog.format_secondary_text(msg)
+    dialog.format_secondary_markup(msg)
     ret = dialog.run()
     dialog.destroy()
     return ret
