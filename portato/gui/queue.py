@@ -191,13 +191,13 @@ class EmergeQueue:
                     self.remove(top)
             raise
 
-        # add iter
-        subIt = self.tree.append(it, self.tree.build_append_value(cpv, oneshot = oneshot, update = update, downgrade = downgrade, version = uVersion, useChange = changedUse))
-        self.iters[type][cpv] = subIt
-        
         # get dependencies
         deps = pkg.get_dep_packages(return_blocks = True)
         self.deps[type][cpv] = deps
+        
+        # add iter
+        subIt = self.tree.append(it, self.tree.build_append_value(cpv, oneshot = oneshot, update = update, downgrade = downgrade, version = uVersion, useChange = changedUse))
+        self.iters[type][cpv] = subIt
         
         for d in deps:
             if d[0] == "!": # block
