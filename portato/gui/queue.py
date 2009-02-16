@@ -22,7 +22,7 @@ from subprocess import Popen
 from .. import backend, plugin
 from ..backend import flags, system
 from ..backend.exceptions import BlockedException
-from ..helper import debug, info, warning, send_signal_to_group, unique_array, flatten
+from ..helper import debug, info, warning, error, send_signal_to_group, unique_array, flatten
 from ..waiting_queue import WaitingQueue
 from ..odict import OrderedDict
 from .updater import Updater
@@ -300,9 +300,10 @@ class EmergeQueue:
                         raise BlockedException(blocked, pkgs[0].get_cpv())
             
         else: # unmerge
-            self.unmergequeue.append(cpv)
-            if self.tree: # update tree
-                self.iters["uninstall"][cpv] = self.tree.append(self.tree.get_unmerge_it(), self.tree.build_append_value(cpv))
+            if cpv not in self.unmergequeue:
+                self.unmergequeue.append(cpv)
+                if self.tree: # update tree
+                    self.iters["uninstall"][cpv] = self.tree.append(self.tree.get_unmerge_it(), self.tree.build_append_value(cpv))
 
     def _queue_append (self, cpv, oneshot = False):
         """Convenience function appending a cpv either to self.mergequeue or to self.oneshotmerge.
