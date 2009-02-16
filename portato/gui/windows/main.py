@@ -438,6 +438,10 @@ class MainWindow (Window):
         self.window.set_title(self.main_title)
         self.window.set_geometry_hints (self.window, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
         
+        # app icon
+        self.window.set_icon_from_file(APP_ICON)
+        gtk.window_set_default_icon(self.window.get_icon())
+        
         # booleans
         self.doUpdate = False
         self.showAll = True # show only installed or all packages?

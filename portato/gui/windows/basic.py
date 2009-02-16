@@ -20,7 +20,7 @@ import gobject
 from functools import wraps
 import os.path
 
-from ...constants import TEMPLATE_DIR, APP_ICON, APP, LOCALE_DIR
+from ...constants import TEMPLATE_DIR, APP, LOCALE_DIR
 from ...helper import error
 
 gtk.glade.bindtextdomain (APP, LOCALE_DIR)
@@ -59,7 +59,6 @@ class Window (object):
         self.tree = self.get_tree(self.__tree__)
         self.tree.signal_autoconnect(self)
         self.window = self.tree.get_widget(self.__window__)
-        self.window.set_icon_from_file(APP_ICON)
 
     @staticmethod
     def watch_cursor (func):
