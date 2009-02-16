@@ -1045,73 +1045,19 @@ class MainWindow (Window):
         # SELECTION
         def load_pkg_selection (name):
             pos = "0"
-            col = 1
-            model = self.pkgList.get_model()
 
-            if name:
-                if oldVersion > 1: # newer one
-                    name, pos = name.split("@")
+            if name and oldVersion > 1: # newer one
+                name, pos = name.split("@")
 
-                if model[pos][col] != name: # need to search :(
-                    debug("Pkg path does not match. Searching...")
-                    for cname, path in ((x[col], x.path) for x in model):
-                        if cname == name:
-                            pos = path
-                            break
-
-
-            debug("Selecting pkg path '%s'. Value: '%s'", pos, model[pos][col])
-            self.pkgList.get_selection().select_path(pos)
-            self.pkgList.scroll_to_cell(pos)
+            self.jump_to_pkg(name, pos)
 
         def load_cat_selection (name):
             pos = "0"
-            col = 0
-            model = self.catList.get_model()
 
-            if name:
-                if oldVersion > 1: # newer one
-                    name, pos = name.split("@")
+            if name and oldVersion > 1: # newer one
+                name, pos = name.split("@")
 
-                if self.cfg.get_boolean("collapseCats", "GUI"):
-                    try:
-                            sname = name.split("-", 1)
-                    except ValueError: # nothing to split
-                            sname = None
-                else:
-                    sname = None
-
-                if sname is None and model[pos][col] != name: # need to search in normal list
-                    debug("Cat path does not match. Searching...")
-                    for cname, path in ((x[col], x.path) for x in model):
-                        if cname == name:
-                            pos = path
-                            break
-                
-                elif sname: # the collapse case
-                    row = model[pos.split(":")[0]]
-                    no_match = False
-                    if row[col] != sname[0]: # first part does not match :(
-                        debug("First part of cat path does not match. Searching...")
-                        no_match = True
-                        for r in model:
-                            if r[col] == sname[0]:
-                                row = r
-                                break
-
-                    if no_match or model[pos][col] != sname[1]:
-                        debug("Second part of cat path does not match. Searching...")
-                        for cname, path in ((x[col], x.path) for x in row.iterchildren()):
-                            if cname == sname[1]: # found second
-                                pos = ":".join(map(str,path))
-                                break
-                    
-                    self.catList.expand_to_path(pos)
-
-
-            debug("Selecting cat path '%s'. Value: '%s'", pos, model[pos][col])
-            self.catList.get_selection().select_path(pos)
-            self.catList.scroll_to_cell(pos)
+            self.jump_to_cat(name, pos)
 
         def save_pkg_selection ():
             store, iter = self.pkgList.get_selection().get_selected()
@@ -1231,17 +1177,76 @@ class MainWindow (Window):
 
         cat, pkg = cp.split("/")
 
-        for list, idx, what, expr in ((self.catList, 0, "categories", cat), (self.pkgList, 1, "packages", pkg)):
-            pathes = [row.path for row in list.get_model() if row[idx] == expr]
-
-            if len(pathes) == 1:
-                list.get_selection().select_path(pathes[0])
-                list.scroll_to_cell(pathes[0])
-            else:
-                debug("Unexpected number of %s returned after search: %d", what, len(pathes))
-                break
-
+        self.jump_to_cat(cat)
+        self.jump_to_pkg(pkg)
+        
         self.show_package(cp = cp, version = version, queue = self.queue)
+
+    def jump_to_pkg (self, name = None, pos = "0"):
+        if isinstance(pos, int):
+            pos = str(pos)
+        
+        col = 1
+        model = self.pkgList.get_model()
+
+        if name:
+            if model[pos][col] != name: # need to search :(
+                debug("Pkg path does not match. Searching...")
+                for cname, path in ((x[col], x.path) for x in model):
+                    if cname == name:
+                        pos = path
+                        break
+
+        debug("Selecting pkg path '%s'. Value: '%s'", pos, model[pos][col])
+        self.pkgList.get_selection().select_path(pos)
+        self.pkgList.scroll_to_cell(pos)
+
+    def jump_to_cat (self, name = None, pos = "0"):
+        if isinstance(pos, int):
+            pos = str(pos)
+        
+        col = 0
+        model = self.catList.get_model()
+
+        if name:
+            if self.cfg.get_boolean("collapseCats", "GUI"):
+                try:
+                        sname = name.split("-", 1)
+                except ValueError: # nothing to split
+                        sname = None
+            else:
+                sname = None
+
+            if sname is None and model[pos][col] != name: # need to search in normal list
+                debug("Cat path does not match. Searching...")
+                for cname, path in ((x[col], x.path) for x in model):
+                    if cname == name:
+                        pos = path
+                        break
+            
+            elif sname: # the collapse case
+                row = model[pos.split(":")[0]]
+                no_match = False
+                if row[col] != sname[0]: # first part does not match :(
+                    debug("First part of cat path does not match. Searching...")
+                    no_match = True
+                    for r in model:
+                        if r[col] == sname[0]:
+                            row = r
+                            break
+
+                if no_match or model[pos][col] != sname[1]:
+                    debug("Second part of cat path does not match. Searching...")
+                    for cname, path in ((x[col], x.path) for x in row.iterchildren()):
+                        if cname == sname[1]: # found second
+                            pos = ":".join(map(str,path))
+                            break
+                
+                self.catList.expand_to_path(pos)
+
+        debug("Selecting cat path '%s'. Value: '%s'", pos, model[pos][col])
+        self.catList.get_selection().select_path(pos)
+        self.catList.scroll_to_cell(pos)
 
     def set_uri_hook (self, browser):
         """
