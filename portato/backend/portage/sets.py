@@ -52,7 +52,7 @@ class FilterSet (Set):
         t = set()
         for pkg in self.get_list():
             if is_regexp and key:
-                if not re.match(key, pkg, re.I): continue
+                if not re.search(key, pkg, re.I): continue
 
             if not with_version:
                 t.add(portage.dep.dep_getkey(pkg))
@@ -97,7 +97,7 @@ class InstalledSet (Set):
                 t = system.settings.vartree.dbapi.cp_all()
 
             if key:
-                t = filter(lambda x: re.match(key, x, re.I), t)
+                t = filter(lambda x: re.search(key, x, re.I), t)
 
             return set(t)
         else:
@@ -113,7 +113,7 @@ class TreeSet (Set):
                 t = system.settings.porttree.dbapi.cp_all()
 
             if key:
-                t = filter(lambda x: re.match(key, x, re.I), t)
+                t = filter(lambda x: re.search(key, x, re.I), t)
 
         elif masked:
             t = system.settings.porttree.dbapi.xmatch("match-all", key)
