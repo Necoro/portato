@@ -610,7 +610,7 @@ class MainWindow (Window):
                 if best:
                     p = best
                 else:
-                    p = system.find_packages(cp)[0]
+                    p = system.find_packages(cp, masked = True)[0]
         
         self.packageTable.update(p, **kwargs)
 
