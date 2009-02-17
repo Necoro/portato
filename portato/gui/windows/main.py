@@ -26,18 +26,20 @@ from ...backend import flags, system # must be the first to avoid circular deps
 from ... import get_listener, plugin
 from ...helper import debug, warning, error, info, unique_array
 from ...session import Session
+from ...db import Database
 from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, ICON_DIR
-from ...backend.exceptions import PackageNotFoundException, BlockedException
+from ...backend.exceptions import PackageNotFoundException, BlockedException, VersionsNotFoundException
 
 # more GUI stuff
-from ..utils import Database, Config, GtkThread, get_color
+from ..utils import Config, GtkThread, get_color
 from ..queue import EmergeQueue
 from ..session import SESSION_VERSION, SessionException, OldSessionException, NewSessionException
 from ..wrapper import GtkTree, GtkConsole
 from ..views import LogView, HighlightView, InstalledOnlyView, LazyStoreView
 from ..dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
         nothing_found_dialog, queue_not_empty_dialog, remove_deps_dialog,
-        remove_queue_dialog, remove_updates_dialog, unmask_dialog)
+        remove_queue_dialog, remove_updates_dialog, unmask_dialog,
+        no_versions_dialog)
 from ..exceptions import PreReqError
 
 # even more GUI stuff
@@ -748,14 +750,18 @@ class MainWindow (Window):
         store.clear()
 
         if name:
-            for cat, pkg, is_inst in self.db.get_cat(name, self.sortPkgListByName):
-                if is_inst:
+            for pkg in self.db.get_cat(name, self.sortPkgListByName):
+                if pkg.disabled:
+                    warning(_("Package '%s/%s' is disabled."), pkg.cat, pkg.pkg)
+                    continue
+
+                if pkg.inst:
                     icon = self.icons["installed"]
                 elif not self.showAll:
                     continue # ignore not installed packages
                 else:
                     icon = None
-                store.append([icon, pkg, cat])
+                store.append([icon, pkg.pkg, pkg.cat])
 
     def build_version_list (self):
         store = gtk.ListStore(gtk.gdk.Pixbuf, str, str)
@@ -809,6 +815,8 @@ class MainWindow (Window):
             self.slotcol.set_visible(False)
 
         packages = system.sort_package_list(system.find_packages(cp, masked=True))
+        if not packages:
+            raise VersionsNotFoundException(cp)
         
         # append versions
         for vers, inst, slot in ((x.get_version(), x.is_installed(), get_slot(x)) for x in packages):
@@ -1344,8 +1352,17 @@ class MainWindow (Window):
         """
         store, it = selection.get_selected()
         if it:
+            oldcp = self.selCP
+
             self.selCP = "%s/%s" % (store.get_value(it, 2), store.get_value(it, 1))
-            self.fill_version_list(self.selCP)
+            try:
+                self.fill_version_list(self.selCP)
+            except VersionsNotFoundException, e:
+                warning(_("No versions of package '%s' found!.") % self.selCP)
+                no_versions_dialog(self.selCP)
+                self.db.disable(self.selCP)
+                self.selCP = oldcp
+
         return True
 
     def cb_pkg_list_header_clicked(self, col):
@@ -1832,8 +1849,8 @@ class MainWindow (Window):
                 self.__save_queue = (ret == gtk.RESPONSE_YES)
                 self.queue.kill_emerge()
 
-        # write session
-        self.session.save()
+        # write sessions
+        Session.close()
         
         return False
 

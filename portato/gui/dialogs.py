@@ -118,3 +118,10 @@ def prereq_error_dialog (e):
     ret = dialog.run()
     dialog.destroy()
     return ret
+
+def no_versions_dialog (cp):
+    dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, _("No versions of package '%s' found!") % cp)
+    ret = dialog.run()
+    dialog.destroy()
+    return ret
+
