@@ -231,6 +231,7 @@ class SQLDatabase (Database):
         if not restrict:
             self._restrict = ""
         else:
+            restrict = restrict.replace(".*","%").replace(".","_")
             self._restrict = "AND name LIKE '%%%s%%'" % restrict
 
     restrict = property(get_restrict, set_restrict)
