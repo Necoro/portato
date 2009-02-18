@@ -3,7 +3,7 @@
 <interface>
   <object class="GtkUIManager" id="uimanager">
     <child>
-      <object class="GtkActionGroup" id="actiongroup1">
+      <object class="GtkActionGroup" id="generalActionGroup">
         <child>
           <object class="GtkAction" id="fileMenuAction">
             <property name="name">fileMenuAction</property>
@@ -116,13 +116,6 @@
           <accelerator key="K" modifiers="GDK_CONTROL_MASK"/>
         </child>
         <child>
-          <object class="GtkAction" id="hiddenConsoleMenu">
-            <property name="visible">False</property>
-            <property name="name">hiddenConsoleMenu</property>
-            <property name="label" translatable="yes">Console</property>
-          </object>
-        </child>
-        <child>
           <object class="GtkAction" id="copyAction">
             <property name="stock_id">gtk-copy</property>
             <property name="name">copyAction</property>
@@ -181,18 +174,31 @@
           <menuitem name="pauseMenuItem" action="pauseAction"/>
           <menuitem name="killMenuItem" action="killAction"/>
         </menu>
-        <menu name="hiddenConsoleMenu" action="hiddenConsoleMenu">
-          <menuitem name="copyMenuItem" action="copyAction"/>
-          <menuitem name="killMenuItem" action="killAction"/>
-          <menuitem name="pauseMenuItem" action="pauseAction"/>
-        </menu>
         <menu name="pluginMenu" action="pluginMenuAction"/>
         <menu name="helpMenu" action="helpMenuAction">
           <menuitem name="aboutMenuItem" action="aboutAction"/>
           <menuitem name="pluginsMenuItem" action="pluginsAction"/>
         </menu>
       </menubar>
+      <popup name="systrayPopup">
+        <menuitem action="pauseAction"/>
+        <menuitem action="killAction"/>
+        <menuitem action="closeAction"/>
+      </popup>
+      <popup name="consolePopup">
+        <menuitem name="copyMenuItem" action="copyAction"/>
+        <menuitem name="killMenuItem" action="killAction"/>
+        <menuitem name="pauseMenuItem" action="pauseAction"/>
+      </popup>
     </ui>
+  </object>
+  <object class="GtkMenu" constructor="uimanager" id="systrayPopup">
+    <property name="visible">True</property>
+    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+  </object>
+  <object class="GtkMenu" constructor="uimanager" id="consolePopup">
+    <property name="visible">True</property>
+    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
   </object>
   <object class="GtkWindow" id="MainWindow">
     <property name="border_width">2</property>

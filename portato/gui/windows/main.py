@@ -553,8 +553,8 @@ class MainWindow (Window):
         self.packageTable = PackageTable(self)
 
         # popups
- #       self.consolePopup = Popup("consolePopup", self, self.__file__)
-  #      self.trayPopup = Popup("systrayPopup", self)
+        self.consolePopup = self.tree.get_widget("uimanager").get_widget("ui/consolePopup")
+        self.trayPopup = self.tree.get_widget("uimanager").get_widget("ui/systrayPopup")
 
         # pause menu items
         self.emergePaused = False
