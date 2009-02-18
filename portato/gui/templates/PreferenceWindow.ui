@@ -1,22 +1,32 @@
 <?xml version="1.0"?>
-<!--Generated with glade3 3.4.5 on Wed Feb 18 16:04:06 2009 -->
 <interface>
+  <requires lib="gtk+" version="2.14"/>
+  <!-- interface-naming-policy toplevel-contextual -->
   <object class="GtkAdjustment" id="adjustment1">
     <property name="upper">300</property>
-    <property name="lower">0</property>
-    <property name="page_increment">10</property>
     <property name="step_increment">1</property>
-    <property name="page_size">0</property>
-    <property name="value">0</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkListStore" id="systemComboStore">
+    <columns>
+      <!-- column-name gchararray1 -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="pkgComboStore">
+    <columns>
+      <!-- column-name gchararray1 -->
+      <column type="gchararray"/>
+    </columns>
   </object>
   <object class="GtkWindow" id="PreferenceWindow">
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Preferences</property>
     <property name="modal">True</property>
-    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="window_position">center-on-parent</property>
     <property name="destroy_with_parent">True</property>
     <property name="skip_taskbar_hint">True</property>
-    <signal handler="cb_size_changed" name="configure_event"/>
+    <signal name="configure_event" handler="cb_size_changed"/>
     <child>
       <object class="GtkVBox" id="mainVB">
         <property name="visible">True</property>
@@ -47,12 +57,15 @@
                             <property name="visible">True</property>
                             <child>
                               <object class="GtkCheckButton" id="debugCheck">
-                                <property name="visible">True</property>
                                 <property name="label" translatable="yes">Debug</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="receives_default">False</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
+                                <property name="position">0</property>
                               </packing>
                             </child>
                             <child>
@@ -67,6 +80,7 @@
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
+                                    <property name="position">0</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -96,6 +110,7 @@
                   </object>
                   <packing>
                     <property name="expand">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -124,6 +139,9 @@
                                     <property name="xalign">0</property>
                                     <property name="label" translatable="yes">Used database type</property>
                                   </object>
+                                  <packing>
+                                    <property name="position">0</property>
+                                  </packing>
                                 </child>
                                 <child>
                                   <object class="GtkComboBox" id="databaseCombo">
@@ -135,6 +153,9 @@
                                   </packing>
                                 </child>
                               </object>
+                              <packing>
+                                <property name="position">0</property>
+                              </packing>
                             </child>
                           </object>
                         </child>
@@ -189,19 +210,24 @@
                             <property name="visible">True</property>
                             <child>
                               <object class="GtkCheckButton" id="deepCheck">
-                                <property name="visible">True</property>
                                 <property name="label">--deep</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="receives_default">False</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">False</property>
+                                <property name="position">0</property>
                               </packing>
                             </child>
                             <child>
                               <object class="GtkCheckButton" id="newUseCheck">
-                                <property name="visible">True</property>
                                 <property name="label">--newuse</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="receives_default">False</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -214,7 +240,7 @@
                               <object class="GtkFrame" id="setFrame">
                                 <property name="no_show_all">True</property>
                                 <property name="label_xalign">0</property>
-                                <property name="shadow_type">GTK_SHADOW_NONE</property>
+                                <property name="shadow_type">none</property>
                                 <child>
                                   <object class="GtkAlignment" id="alignment4">
                                     <property name="visible">True</property>
@@ -225,8 +251,8 @@
                                       <object class="GtkScrolledWindow" id="scrolledwindow1">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
-                                        <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                                        <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                                        <property name="hscrollbar_policy">automatic</property>
+                                        <property name="vscrollbar_policy">automatic</property>
                                         <child>
                                           <object class="GtkTreeView" id="setList">
                                             <property name="visible">True</property>
@@ -263,6 +289,9 @@
                       </object>
                     </child>
                   </object>
+                  <packing>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <object class="GtkFrame" id="syncFrame">
@@ -285,6 +314,7 @@
                               </object>
                               <packing>
                                 <property name="expand">False</property>
+                                <property name="position">0</property>
                               </packing>
                             </child>
                             <child>
@@ -329,15 +359,6 @@
                             <property name="n_rows">10</property>
                             <property name="n_columns">2</property>
                             <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
                               <object class="GtkEntry" id="useFileEdit">
                                 <property name="visible">True</property>
                               </object>
@@ -362,8 +383,10 @@
                             </child>
                             <child>
                               <object class="GtkCheckButton" id="usePerVersionCheck">
-                                <property name="visible">True</property>
                                 <property name="label" translatable="yes">Add only exact version to package.use</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="receives_default">False</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -374,8 +397,10 @@
                             </child>
                             <child>
                               <object class="GtkCheckButton" id="testPerVersionCheck">
-                                <property name="visible">True</property>
                                 <property name="label" translatable="yes">Add only exact version to package.keywords</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="receives_default">False</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -432,8 +457,10 @@
                             </child>
                             <child>
                               <object class="GtkCheckButton" id="maskPerVersionCheck">
-                                <property name="visible">True</property>
                                 <property name="label" translatable="yes">Add only exact version to package.mask/package.unmask</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="receives_default">False</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -449,7 +476,7 @@
                                   <object class="GtkFrame" id="hintFrame">
                                     <property name="visible">True</property>
                                     <property name="label_xalign">0</property>
-                                    <property name="shadow_type">GTK_SHADOW_OUT</property>
+                                    <property name="shadow_type">out</property>
                                     <child>
                                       <object class="GtkLabel" id="hintLabel">
                                         <property name="visible">True</property>
@@ -463,7 +490,7 @@
                                         <property name="use_markup">True</property>
                                       </object>
                                     </child>
-                                    <child type="label">
+                                    <child type="label_item">
                                       <placeholder/>
                                     </child>
                                   </object>
@@ -518,6 +545,15 @@
                                 <property name="y_padding">5</property>
                               </packing>
                             </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
                           </object>
                         </child>
                       </object>
@@ -536,6 +572,9 @@
                   </packing>
                 </child>
               </object>
+              <packing>
+                <property name="position">1</property>
+              </packing>
             </child>
             <child type="tab">
               <object class="GtkLabel" id="label13">
@@ -576,22 +615,25 @@
                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                 <child>
                                   <object class="GtkCheckButton" id="systrayCheck">
+                                    <property name="label" translatable="yes">Enable systray</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                    <property name="label" translatable="yes">Enable systray</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
+                                    <property name="position">0</property>
                                   </packing>
                                 </child>
                                 <child>
                                   <object class="GtkCheckButton" id="titleUpdateCheck">
+                                    <property name="label" translatable="yes">Show emerge progress in window title</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                    <property name="label" translatable="yes">Show emerge progress in window title</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
                                   <packing>
@@ -601,10 +643,11 @@
                                 </child>
                                 <child>
                                   <object class="GtkCheckButton" id="consoleUpdateCheck">
+                                    <property name="label" translatable="yes">Show emerge progress in console title</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                    <property name="label" translatable="yes">Show emerge progress in console title</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
                                   <packing>
@@ -614,10 +657,11 @@
                                 </child>
                                 <child>
                                   <object class="GtkCheckButton" id="minimizeCheck">
+                                    <property name="label" translatable="yes">Hide on minimization (only if systray is enabled)</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                    <property name="label" translatable="yes">Hide on minimization (only if systray is enabled)</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
                                   <packing>
@@ -627,13 +671,14 @@
                                 </child>
                                 <child>
                                   <object class="GtkCheckButton" id="searchOnTypeCheck">
+                                    <property name="label" translatable="yes">Search while typing</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                     <property name="has_tooltip">True</property>
                                     <property name="tooltip_markup">Update the package list with the current search results while you are typing.
 &lt;b&gt;Note&lt;/b&gt;: Will slow down the typing process.</property>
-                                    <property name="label" translatable="yes">Search while typing</property>
                                     <property name="yalign">0.47999998927116394</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
@@ -656,6 +701,7 @@
                       </object>
                       <packing>
                         <property name="expand">False</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -687,6 +733,9 @@
                                         <property name="label" translatable="yes">Console Font</property>
                                         <property name="single_line_mode">True</property>
                                       </object>
+                                      <packing>
+                                        <property name="position">0</property>
+                                      </packing>
                                     </child>
                                     <child>
                                       <object class="GtkFontButton" id="consoleFontBtn">
@@ -704,6 +753,9 @@
                                       </packing>
                                     </child>
                                   </object>
+                                  <packing>
+                                    <property name="position">0</property>
+                                  </packing>
                                 </child>
                                 <child>
                                   <object class="GtkHBox" id="hbox">
@@ -715,6 +767,9 @@
                                         <property name="label" translatable="yes">Maximum length of the console title</property>
                                         <property name="single_line_mode">True</property>
                                       </object>
+                                      <packing>
+                                        <property name="position">0</property>
+                                      </packing>
                                     </child>
                                     <child>
                                       <object class="GtkSpinButton" id="titleLengthSpinBtn">
@@ -782,17 +837,24 @@
                                         <property name="xalign">0</property>
                                         <property name="label" translatable="yes">Package Tabs</property>
                                       </object>
+                                      <packing>
+                                        <property name="position">0</property>
+                                      </packing>
                                     </child>
                                     <child>
                                       <object class="GtkComboBox" id="packageTabCombo">
                                         <property name="visible">True</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                        <property name="model">pkgComboStore</property>
                                       </object>
                                       <packing>
                                         <property name="position">1</property>
                                       </packing>
                                     </child>
                                   </object>
+                                  <packing>
+                                    <property name="position">0</property>
+                                  </packing>
                                 </child>
                                 <child>
                                   <object class="GtkHBox" id="hbox4">
@@ -806,11 +868,15 @@
                                         <property name="xalign">0</property>
                                         <property name="label" translatable="yes">System Tabs</property>
                                       </object>
+                                      <packing>
+                                        <property name="position">0</property>
+                                      </packing>
                                     </child>
                                     <child>
                                       <object class="GtkComboBox" id="systemTabCombo">
                                         <property name="visible">True</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                        <property name="model">systemComboStore</property>
                                       </object>
                                       <packing>
                                         <property name="position">1</property>
@@ -857,21 +923,26 @@
                                 <property name="visible">True</property>
                                 <child>
                                   <object class="GtkCheckButton" id="showSlotsCheck">
+                                    <property name="label" translatable="yes">Show slots in the version list</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                    <property name="label" translatable="yes">Show slots in the version list</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
+                                  <packing>
+                                    <property name="position">0</property>
+                                  </packing>
                                 </child>
                                 <child>
                                   <object class="GtkCheckButton" id="collapseCatCheck">
+                                    <property name="label" translatable="yes">Collapse categories with same prefix</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
                                     <property name="has_tooltip">True</property>
                                     <property name="tooltip_markup">Organize the categories in a tree. Thereby collapse categories with the same prefix:
 As an example: &lt;i&gt;app-admin&lt;/i&gt;, &lt;i&gt;app-emacs&lt;/i&gt;, and &lt;i&gt;app-vim&lt;/i&gt; would be collapsed into &lt;i&gt;&lt;b&gt;app&lt;/b&gt;&lt;/i&gt; as root and &lt;i&gt;admin&lt;/i&gt;, &lt;i&gt;emacs&lt;/i&gt;, and &lt;i&gt;vim&lt;/i&gt; as children.</property>
-                                    <property name="label" translatable="yes">Collapse categories with same prefix</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
                                   <packing>
@@ -899,6 +970,9 @@ As an example: &lt;i&gt;app-admin&lt;/i&gt;, &lt;i&gt;app-emacs&lt;/i&gt;, and &
                   </object>
                 </child>
               </object>
+              <packing>
+                <property name="position">2</property>
+              </packing>
             </child>
             <child type="tab">
               <object class="GtkLabel" id="label10">
@@ -912,27 +986,37 @@ As an example: &lt;i&gt;app-admin&lt;/i&gt;, &lt;i&gt;app-emacs&lt;/i&gt;, and &
               </packing>
             </child>
           </object>
+          <packing>
+            <property name="position">0</property>
+          </packing>
         </child>
         <child>
           <object class="GtkHButtonBox" id="buttonBox">
             <property name="visible">True</property>
             <property name="homogeneous">True</property>
-            <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
+            <property name="layout_style">spread</property>
             <child>
               <object class="GtkButton" id="cancelBtn">
-                <property name="visible">True</property>
                 <property name="label" translatable="yes">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
-                <signal handler="cb_cancel_clicked" name="clicked"/>
+                <signal name="clicked" handler="cb_cancel_clicked"/>
               </object>
+              <packing>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <object class="GtkButton" id="okBtn">
-                <property name="visible">True</property>
                 <property name="label" translatable="yes">gtk-apply</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
                 <property name="yalign">0.51999998092651367</property>
-                <signal handler="cb_ok_clicked" name="clicked"/>
+                <signal name="clicked" handler="cb_ok_clicked"/>
               </object>
               <packing>
                 <property name="position">1</property>

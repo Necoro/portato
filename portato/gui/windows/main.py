@@ -1361,7 +1361,7 @@ class MainWindow (Window):
             try:
                 self.fill_version_list(self.selCP)
             except VersionsNotFoundException, e:
-                warning(_("No versions of package '%s' found!.") % self.selCP)
+                warning(_("No versions of package '%s' found!") % self.selCP)
                 no_versions_dialog(self.selCP)
                 self.db.disable(self.selCP)
                 self.selCP = oldcp

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-18 23:17+0100\n"
+"POT-Creation-Date: 2009-02-18 23:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,77 +32,77 @@ msgstr ""
 msgid "_Install Selected"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:14
+#: portato/gui/templates/PreferenceWindow.ui:24
 msgid "Preferences"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:51
+#: portato/gui/templates/PreferenceWindow.ui:60
 msgid "Debug"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:66
+#: portato/gui/templates/PreferenceWindow.ui:79
 msgid "Browser command: "
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:92
-#: portato/gui/templates/PreferenceWindow.ui:652
+#: portato/gui/templates/PreferenceWindow.ui:106
+#: portato/gui/templates/PreferenceWindow.ui:697
 msgid "<b>General Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:125
+#: portato/gui/templates/PreferenceWindow.ui:140
 msgid "Used database type"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:146
+#: portato/gui/templates/PreferenceWindow.ui:167
 msgid "<b>Database Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:168
+#: portato/gui/templates/PreferenceWindow.ui:189
 #: portato/gui/templates/MainWindow.ui:754
 msgid "General"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:245
+#: portato/gui/templates/PreferenceWindow.ui:271
 msgid "<b>Package sets to update</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:261
+#: portato/gui/templates/PreferenceWindow.ui:287
 msgid "<b>Update World Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:284
+#: portato/gui/templates/PreferenceWindow.ui:313
 msgid "Sync command: "
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:305
+#: portato/gui/templates/PreferenceWindow.ui:335
 msgid "<b>Sync Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:355
+#: portato/gui/templates/PreferenceWindow.ui:376
 msgid "File name to use, if package.use is a directory: "
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:366
+#: portato/gui/templates/PreferenceWindow.ui:386
 msgid "Add only exact version to package.use"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:378
+#: portato/gui/templates/PreferenceWindow.ui:400
 msgid "Add only exact version to package.keywords"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:391
+#: portato/gui/templates/PreferenceWindow.ui:416
 msgid "File name to use, if package.keywords is a directory: "
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:425
+#: portato/gui/templates/PreferenceWindow.ui:450
 msgid "File name to use, if package.mask/package.unmask is a directory: "
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:436
+#: portato/gui/templates/PreferenceWindow.ui:460
 msgid "Add only exact version to package.mask/package.unmask"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:457
+#: portato/gui/templates/PreferenceWindow.ui:484
 msgid ""
 "<u>You may use the following placeholders:</u>\n"
 "\n"
@@ -112,98 +112,98 @@ msgid ""
 "<i>$(version)</i> : version of the package"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:481
+#: portato/gui/templates/PreferenceWindow.ui:508
 msgid "<u><i>Use-Flags</i></u>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:496
+#: portato/gui/templates/PreferenceWindow.ui:523
 msgid "<u><i>Testing Keywords</i></u>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:511
+#: portato/gui/templates/PreferenceWindow.ui:538
 msgid "<u><i>Masking Keywords</i></u>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:528
+#: portato/gui/templates/PreferenceWindow.ui:564
 msgid "<b>Use Flag and Keyword Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:543
+#: portato/gui/templates/PreferenceWindow.ui:582
 msgid "Portage"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:582
+#: portato/gui/templates/PreferenceWindow.ui:618
 msgid "Enable systray"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:594
+#: portato/gui/templates/PreferenceWindow.ui:632
 msgid "Show emerge progress in window title"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:607
+#: portato/gui/templates/PreferenceWindow.ui:646
 msgid "Show emerge progress in console title"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:620
+#: portato/gui/templates/PreferenceWindow.ui:660
 msgid "Hide on minimization (only if systray is enabled)"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:636
+#: portato/gui/templates/PreferenceWindow.ui:674
 msgid "Search while typing"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:687
+#: portato/gui/templates/PreferenceWindow.ui:733
 msgid "Console Font"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:697
+#: portato/gui/templates/PreferenceWindow.ui:746
 msgid "Chose a console font"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:715
+#: portato/gui/templates/PreferenceWindow.ui:767
 msgid "Maximum length of the console title"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:745
+#: portato/gui/templates/PreferenceWindow.ui:800
 msgid "<b>Console Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:783
+#: portato/gui/templates/PreferenceWindow.ui:838
 msgid "Package Tabs"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:807
+#: portato/gui/templates/PreferenceWindow.ui:869
 msgid "System Tabs"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:832
+#: portato/gui/templates/PreferenceWindow.ui:898
 msgid "<b>Tab Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:863
+#: portato/gui/templates/PreferenceWindow.ui:926
 msgid "Show slots in the version list"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:874
+#: portato/gui/templates/PreferenceWindow.ui:939
 msgid "Collapse categories with same prefix"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:889
+#: portato/gui/templates/PreferenceWindow.ui:960
 msgid "<b>Package Options</b>"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:907
+#: portato/gui/templates/PreferenceWindow.ui:981
 msgid "Visual"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:924
+#: portato/gui/templates/PreferenceWindow.ui:1000
 #: portato/gui/templates/PluginWindow.ui:211
 #: portato/gui/templates/MailInfoWindow.ui:168
 #: portato/gui/templates/SearchWindow.ui:47
 msgid "gtk-cancel"
 msgstr ""
 
-#: portato/gui/templates/PreferenceWindow.ui:932
+#: portato/gui/templates/PreferenceWindow.ui:1013
 #: portato/gui/templates/PluginWindow.ui:222
 msgid "gtk-apply"
 msgstr ""
@@ -639,7 +639,7 @@ msgid ""
 "Please run <i>emerge --sync &amp;&amp; layman -S</i>."
 msgstr ""
 
-#: portato/gui/dialogs.py:123
+#: portato/gui/dialogs.py:123 portato/gui/windows/main.py:1364
 #, python-format
 msgid "No versions of package '%s' found!"
 msgstr ""
@@ -864,11 +864,6 @@ msgstr ""
 #: portato/gui/windows/main.py:1024
 #, python-format
 msgid "Cannot translate session from version %d to %d."
-msgstr ""
-
-#: portato/gui/windows/main.py:1364
-#, python-format
-msgid "No versions of package '%s' found!."
 msgstr ""
 
 #: portato/gui/windows/main.py:1500
