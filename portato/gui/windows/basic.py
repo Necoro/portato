@@ -52,7 +52,11 @@ class UIBuilder (object):
 
         if connector is None: connector = self
 
-        self._builder.connect_signals(connector)
+        unconnected = self._builder.connect_signals(connector)
+
+        if unconnected is not None:
+            for uc in set(unconnected):
+                error("Signal '%s' not connected in class '%s'.", uc, self.__class__.__name__)
 
         self.tree = WrappedTree(self.__class__.__name__, self._builder)
 

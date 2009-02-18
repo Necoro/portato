@@ -62,7 +62,6 @@ class PackageTable:
         self.main = main
         self.tree = main.tree
         self.window = main.window
-        self.main._builder.connect_signals(self)
         
         # all the package data is in this one VB
         self.vb = self.tree.get_widget("packageVB")
@@ -1834,6 +1833,18 @@ class MainWindow (Window):
         else:
             self.window.iconify()
     
+    def cb_testing_toggled (self, *args):
+        return self.packageTable.cb_testing_toggled(*args)
+    def cb_masked_toggled (self, *args):
+        return self.packageTable.cb_masked_toggled(*args)
+    def cb_button_pressed (self, *args):
+        return self.packageTable.cb_button_pressed(*args)
+    def cb_package_revert_clicked (self, *args):
+        return self.packageTable.cb_package_revert_clicked(*args)
+    def cb_package_unmerge_clicked (self, *args):
+        return self.packageTable.cb_package_unmerge_clicked(*args)
+    def cb_package_emerge_clicked (self, *args):
+        return self.packageTable.cb_package_emerge_clicked(*args)
     def cb_use_flag_toggled (self, *args):
         return self.packageTable.cb_use_flag_toggled(*args)
 
