@@ -479,8 +479,8 @@ class MainWindow (Window):
 
         plugin.load_plugins()
         menus = [p.menus for p in plugin.get_plugin_queue().get_plugins()]
-        #if menus:
-        #    pluginMenu = self.tree.get_widget("pluginMenu")
+       # if menus:
+      #      pluginMenu = self.tree.get_ui("pluginMenu")
 
          #   for m in itt.chain(*menus):
           #      item = gtk.MenuItem(m.label)
@@ -552,8 +552,8 @@ class MainWindow (Window):
         self.packageTable = PackageTable(self)
 
         # popups
-        self.consolePopup = self.tree.get_widget("uimanager").get_widget("ui/consolePopup")
-        self.trayPopup = self.tree.get_widget("uimanager").get_widget("ui/systrayPopup")
+        self.consolePopup = self.tree.get_ui("consolePopup")
+        self.trayPopup = self.tree.get_ui("systrayPopup")
 
         # pause menu items
         self.emergePaused = False

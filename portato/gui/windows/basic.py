@@ -23,7 +23,7 @@ from ...constants import TEMPLATE_DIR, APP, LOCALE_DIR
 from ...helper import error
 
 class WrappedTree (object):
-    __slots__ = ("klass", "tree", "get_widget")
+    __slots__ = ("klass", "tree", "get_widget", "get_ui")
     def __init__ (self, klass, tree):
         self.tree = tree
         self.klass = klass
@@ -38,6 +38,19 @@ class WrappedTree (object):
         w = self.tree.get_object(name)
         if w is None:
             error("Widget '%s' could not be found in class '%s'.", name, self.klass)
+        return w
+
+    def get_ui (self, name, ui = "uimanager"):
+        uiw = self.get_widget(ui)
+        if uiw is None:
+            return None
+
+        if not name.startswith("ui/"):
+            name = "ui/%s" % name
+
+        w = uiw.get_widget(name)
+        if w is None:
+            error("UIItem '%s' of UIManager '%s' could not be found in class '%s'.", name, ui, self.klass)
         return w
 
 class UIBuilder (object):
