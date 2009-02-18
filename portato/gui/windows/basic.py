@@ -121,15 +121,3 @@ class AbstractDialog (Window):
 
     def close (self, *args):
         self.window.destroy()
-
-class Popup (UIBuilder):
-
-    __file__ = "popups"
-
-    def __init__ (self, name, parent):
-
-        UIBuilder.__init__(self, connector = parent)
-        self._popup = self.tree.get_widget(name)
-
-    def popup (self, *args):
-        self._popup.popup(*args)
