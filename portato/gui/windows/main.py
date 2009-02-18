@@ -558,13 +558,6 @@ class MainWindow (Window):
 
         # pause menu items
         self.emergePaused = False
-        self.pauseItems = {}
- #       self.pauseItems["tray"] = self.trayPopup.tree.get_widget("pauseItemTray")
- #       self.pauseItems["popup"] = self.consolePopup.tree.get_widget("pauseItemPopup")
- #       self.pauseItems["menu"] = self.tree.get_widget("pauseItemMenu")
-
-        for k,v in self.pauseItems.iteritems():
-            self.pauseItems[k] = (v, v.connect_after("activate", self.cb_pause_emerge(k)))
 
         # systray
         if self.cfg.get_boolean("showSystray", "GUI"):
@@ -1771,50 +1764,13 @@ class MainWindow (Window):
                 
                 self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
 
-    def cb_pause_emerge (self, curr):
-        """
-        This method returns a callback for a "pause emerge" toggle button.
-        It is needed as there are different toggle buttons of this type and if one is clicked,
-        the others should be marked too.
-
-        @param curr: The button to return the callback for.
-        @type curr: gtk.ToggleButton
-        """
-        def pause (cb):
-            """
-            The actual callback.
-
-            Mark all other buttons too.
-
-            @param cb: The button which got toggled.
-            @type cb: gtk.ToggleButton
-            """
-
-            # pause or continue
-            self.emergePaused = cb.get_active()
-            if not self.emergePaused:
-                self.queue.continue_emerge()
-                #self.tray.set_from_file(APP_ICON)
-            else:
-                self.queue.stop_emerge()
-                #self.tray.set_from_file(os.path.join(ICON_DIR, "pausing.png"))
-
-            # block the handlers of the other buttons
-            # so that calling "set_active" does not call this callback recursivly
-            for v in self.pauseItems.itervalues():
-                v[0].handler_block(v[1])
-
-            # mark the others
-            for k, v in self.pauseItems.iteritems():
-                if k != curr:
-                    v[0].set_active(self.emergePaused)
-
-            # unblock
-            for v in self.pauseItems.itervalues():
-                v[0].handler_unblock(v[1])
-            
-            return False
-        return pause
+    def cb_pause_emerge (self, action):
+        # pause or continue
+        self.emergePaused = action.get_active()
+        if not self.emergePaused:
+            self.queue.continue_emerge()
+        else:
+            self.queue.stop_emerge()
 
     def cb_kill_clicked (self, *args):
         """
@@ -1822,7 +1778,7 @@ class MainWindow (Window):
         """
         self.queue.kill_emerge()
         if self.emergePaused: # unmark the "pause emerge" buttons
-            self.pauseItems["menu"][0].set_active(False) # calling one button is enough (see: cb_pause_emerge)
+            self.tree.get_widget("generalActionGroup").get_action("pauseAction").set_active(False)
 
     def cb_copy_clicked (self, *args):
         """

@@ -103,6 +103,7 @@
           <object class="GtkToggleAction" id="pauseAction">
             <property name="name">pauseActionMenu</property>
             <property name="label" translatable="yes">Emerge _Paused</property>
+            <signal handler="cb_pause_emerge" name="activate"/>
           </object>
           <accelerator key="Z" modifiers="GDK_CONTROL_MASK"/>
         </child>
