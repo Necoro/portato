@@ -62,7 +62,7 @@ class PackageTable:
         self.main = main
         self.tree = main.tree
         self.window = main.window
-        self.tree.signal_autoconnect(self)
+        self.main._builder.connect_signals(self)
         
         # all the package data is in this one VB
         self.vb = self.tree.get_widget("packageVB")
@@ -480,14 +480,13 @@ class MainWindow (Window):
 
         plugin.load_plugins()
         menus = [p.menus for p in plugin.get_plugin_queue().get_plugins()]
-        if menus:
-            self.tree.get_widget("pluginMenuItem").set_no_show_all(False)
-            pluginMenu = self.tree.get_widget("pluginMenu")
+        #if menus:
+        #    pluginMenu = self.tree.get_widget("pluginMenu")
 
-            for m in itt.chain(*menus):
-                item = gtk.MenuItem(m.label)
-                item.connect("activate", m.call)
-                pluginMenu.append(item)
+         #   for m in itt.chain(*menus):
+          #      item = gtk.MenuItem(m.label)
+           #     item.connect("activate", m.call)
+            #    pluginMenu.append(item)
 
         splash(_("Building frontend"))
         # set paned position
@@ -554,15 +553,15 @@ class MainWindow (Window):
         self.packageTable = PackageTable(self)
 
         # popups
-        self.consolePopup = Popup("consolePopup", self, self.__file__)
-        self.trayPopup = Popup("systrayPopup", self)
+ #       self.consolePopup = Popup("consolePopup", self, self.__file__)
+  #      self.trayPopup = Popup("systrayPopup", self)
 
         # pause menu items
         self.emergePaused = False
         self.pauseItems = {}
-        self.pauseItems["tray"] = self.trayPopup.tree.get_widget("pauseItemTray")
-        self.pauseItems["popup"] = self.consolePopup.tree.get_widget("pauseItemPopup")
-        self.pauseItems["menu"] = self.tree.get_widget("pauseItemMenu")
+ #       self.pauseItems["tray"] = self.trayPopup.tree.get_widget("pauseItemTray")
+ #       self.pauseItems["popup"] = self.consolePopup.tree.get_widget("pauseItemPopup")
+ #       self.pauseItems["menu"] = self.tree.get_widget("pauseItemMenu")
 
         for k,v in self.pauseItems.iteritems():
             self.pauseItems[k] = (v, v.connect_after("activate", self.cb_pause_emerge(k)))

@@ -1,28 +1,28 @@
 <?xml version="1.0"?>
 <!--Generated with glade3 3.4.5 on Fri Dec  5 12:57:49 2008 -->
 <interface>
-  <object class="GtkUIManager" id="uimanager1">
+  <object class="GtkUIManager" id="uimanager">
     <child>
       <object class="GtkActionGroup" id="actiongroup1">
         <child>
-          <object class="GtkAction" id="fileMenuItem">
-            <property name="name">fileMenuItem</property>
+          <object class="GtkAction" id="fileMenuAction">
+            <property name="name">fileMenuAction</property>
             <property name="label" translatable="yes">_File</property>
           </object>
         </child>
         <child>
-          <object class="GtkAction" id="prefItem">
+          <object class="GtkAction" id="prefAction">
             <property name="stock_id">gtk-preferences</property>
-            <property name="name">prefItem</property>
+            <property name="name">prefAction</property>
             <property name="label" translatable="yes">_Preferences</property>
             <signal handler="cb_preferences_clicked" name="activate"/>
           </object>
           <accelerator key="P" modifiers="GDK_CONTROL_MASK"/>
         </child>
         <child>
-          <object class="GtkAction" id="reloadItem">
+          <object class="GtkAction" id="reloadAction">
             <property name="stock_id">gtk-refresh</property>
-            <property name="name">reloadItem</property>
+            <property name="name">reloadAction</property>
             <property name="label" translatable="yes">Re_load Portage</property>
             <signal handler="cb_reload_clicked" name="activate"/>
           </object>
@@ -30,86 +30,86 @@
           <accelerator key="R" modifiers="GDK_CONTROL_MASK"/>
         </child>
         <child>
-          <object class="GtkAction" id="closeItem">
+          <object class="GtkAction" id="closeAction">
             <property name="stock_id" translatable="yes">gtk-quit</property>
-            <property name="name">closeItem</property>
+            <property name="name">closeAction</property>
             <signal handler="cb_close" name="activate"/>
           </object>
         </child>
         <child>
-          <object class="GtkAction" id="emergeMenuItem">
-            <property name="name">emergeMenuItem</property>
+          <object class="GtkAction" id="emergeMenuAction">
+            <property name="name">emergeMenuAction</property>
             <property name="label" translatable="yes">_Emerge</property>
           </object>
         </child>
         <child>
-          <object class="GtkAction" id="emergeItem">
+          <object class="GtkAction" id="emergeAction">
             <property name="stock_id">gtk-add</property>
-            <property name="name">emergeItem</property>
+            <property name="name">emergeAction</property>
             <property name="label" translatable="yes">_Install</property>
             <signal handler="cb_package_emerge_clicked" name="activate"/>
           </object>
           <accelerator key="plus" modifiers="GDK_CONTROL_MASK"/>
         </child>
         <child>
-          <object class="GtkAction" id="unmergeItem">
+          <object class="GtkAction" id="unmergeAction">
             <property name="stock_id">gtk-remove</property>
-            <property name="name">unmergeItem</property>
+            <property name="name">unmergeAction</property>
             <property name="label" translatable="yes">_Uninstall</property>
             <signal handler="cb_package_unmerge_clicked" name="activate"/>
           </object>
           <accelerator key="minus" modifiers="GDK_CONTROL_MASK"/>
         </child>
         <child>
-          <object class="GtkAction" id="updateItem">
-            <property name="name">updateItem</property>
+          <object class="GtkAction" id="updateAction">
+            <property name="name">updateAction</property>
             <property name="label" translatable="yes">Update _World</property>
             <signal handler="cb_update_clicked" name="activate"/>
           </object>
         </child>
         <child>
-          <object class="GtkAction" id="showUpdatesItem">
-            <property name="name">showUpdatesItem</property>
+          <object class="GtkAction" id="showUpdatesAction">
+            <property name="name">showUpdatesAction</property>
             <property name="label" translatable="yes">Show Updatable P_ackages</property>
             <signal handler="cb_show_updates_clicked" name="activate"/>
           </object>
         </child>
         <child>
-          <object class="GtkToggleAction" id="showInstalledItem">
-            <property name="name">showInstalledItem</property>
+          <object class="GtkToggleAction" id="showInstalledAction">
+            <property name="name">showInstalledAction</property>
             <property name="label" translatable="yes">Show _Only Installed Packages</property>
             <signal handler="cb_show_installed_toggled" name="toggled"/>
           </object>
           <accelerator key="i" modifiers="GDK_CONTROL_MASK"/>
         </child>
         <child>
-          <object class="GtkAction" id="syncItem">
+          <object class="GtkAction" id="syncAction">
             <property name="stock_id">gtk-refresh</property>
-            <property name="name">syncItem</property>
+            <property name="name">syncAction</property>
             <property name="label" translatable="yes">_Sync</property>
             <signal handler="cb_sync_clicked" name="activate"/>
           </object>
           <accelerator key="S" modifiers="GDK_CONTROL_MASK"/>
         </child>
         <child>
-          <object class="GtkAction" id="saveFlagsItem">
+          <object class="GtkAction" id="saveFlagsAction">
             <property name="stock_id">gtk-save</property>
-            <property name="name">saveFlagsItem</property>
+            <property name="name">saveFlagsAction</property>
             <property name="label" translatable="yes">Save _Flags</property>
             <signal handler="cb_save_flags_clicked" name="activate"/>
           </object>
         </child>
         <child>
-          <object class="GtkToggleAction" id="pauseItemMenu">
-            <property name="name">pauseItemMenu</property>
+          <object class="GtkToggleAction" id="pauseAction">
+            <property name="name">pauseActionMenu</property>
             <property name="label" translatable="yes">Emerge _Paused</property>
           </object>
           <accelerator key="Z" modifiers="GDK_CONTROL_MASK"/>
         </child>
         <child>
-          <object class="GtkAction" id="killItem">
+          <object class="GtkAction" id="killAction">
             <property name="stock_id">gtk-stop</property>
-            <property name="name">killItem</property>
+            <property name="name">killAction</property>
             <property name="label" translatable="yes">_Kill Emerge</property>
             <signal handler="cb_kill_clicked" name="activate"/>
           </object>
@@ -122,51 +122,37 @@
           </object>
         </child>
         <child>
-          <object class="GtkAction" id="copyItem">
+          <object class="GtkAction" id="copyAction">
             <property name="stock_id">gtk-copy</property>
-            <property name="name">copyItem</property>
+            <property name="name">copyAction</property>
             <property name="label" translatable="yes">_Copy</property>
             <signal handler="cb_copy_clicked" name="activate"/>
           </object>
         </child>
         <child>
-          <object class="GtkAction" id="killItemPopup">
-            <property name="stock_id">gtk-stop</property>
-            <property name="name">killItemPopup</property>
-            <property name="label" translatable="yes">_Kill Emerge</property>
-            <signal handler="cb_kill_clicked" name="activate"/>
-          </object>
-        </child>
-        <child>
-          <object class="GtkToggleAction" id="pauseItemPopup">
-            <property name="name">pauseItemPopup</property>
-            <property name="label" translatable="yes">Emerge _Paused</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkAction" id="pluginMenuItem">
-            <property name="name">pluginMenuItem</property>
+          <object class="GtkAction" id="pluginMenuAction">
+            <property name="name">pluginMenuAction</property>
             <property name="label" translatable="yes">Plu_gins</property>
           </object>
         </child>
         <child>
-          <object class="GtkAction" id="helpMenuItem">
-            <property name="name">helpMenuItem</property>
+          <object class="GtkAction" id="helpMenuAction">
+            <property name="name">helpMenuAction</property>
             <property name="label" translatable="yes">_?</property>
           </object>
         </child>
         <child>
-          <object class="GtkAction" id="aboutItem">
+          <object class="GtkAction" id="aboutAction">
             <property name="stock_id">gtk-about</property>
-            <property name="name">aboutItem</property>
+            <property name="name">aboutAction</property>
             <property name="label" translatable="yes">_About</property>
             <signal handler="cb_about_clicked" name="activate"/>
           </object>
         </child>
         <child>
-          <object class="GtkAction" id="pluginsItem">
+          <object class="GtkAction" id="pluginsAction">
             <property name="stock_id">gtk-connect</property>
-            <property name="name">pluginsItem</property>
+            <property name="name">pluginsAction</property>
             <property name="label" translatable="yes">_Plugins</property>
             <signal handler="cb_plugins_clicked" name="activate"/>
           </object>
@@ -175,34 +161,34 @@
     </child>
     <ui>
       <menubar name="menubar">
-        <menu action="fileMenuItem">
-          <menuitem action="prefItem"/>
-          <menuitem action="reloadItem"/>
+        <menu name="fileMenu" action="fileMenuAction">
+          <menuitem name="prefMenuItem" action="prefAction"/>
+          <menuitem name="reloadMenuItem" action="reloadAction"/>
           <separator/>
-          <menuitem action="closeItem"/>
+          <menuitem name="closeMenuItem" action="closeAction"/>
         </menu>
-        <menu action="emergeMenuItem">
-          <menuitem action="emergeItem"/>
-          <menuitem action="unmergeItem"/>
-          <menuitem action="updateItem"/>
-          <menuitem action="showUpdatesItem"/>
-          <menuitem action="showInstalledItem"/>
+        <menu name="emergeMenu" action="emergeMenuAction">
+          <menuitem name="emergeMenuItem" action="emergeAction"/>
+          <menuitem name="unmergeMenuItem" action="unmergeAction"/>
+          <menuitem name="updateMenuItem" action="updateAction"/>
+          <menuitem name="showUpdatesMenuItem" action="showUpdatesAction"/>
+          <menuitem name="showInstalledMenuItem" action="showInstalledAction"/>
           <separator/>
-          <menuitem action="syncItem"/>
-          <menuitem action="saveFlagsItem"/>
+          <menuitem name="syncMenuItem" action="syncAction"/>
+          <menuitem name="saveFlagsMenuItem" action="saveFlagsAction"/>
           <separator/>
-          <menuitem action="pauseItemMenu"/>
-          <menuitem action="killItem"/>
+          <menuitem name="pauseMenuItem" action="pauseAction"/>
+          <menuitem name="killMenuItem" action="killAction"/>
         </menu>
-        <menu action="hiddenConsoleMenu">
-          <menuitem action="copyItem"/>
-          <menuitem action="killItemPopup"/>
-          <menuitem action="pauseItemPopup"/>
+        <menu name="hiddenConsoleMenu" action="hiddenConsoleMenu">
+          <menuitem name="copyMenuItem" action="copyAction"/>
+          <menuitem name="killMenuItem" action="killAction"/>
+          <menuitem name="pauseMenuItem" action="pauseAction"/>
         </menu>
-        <menu action="pluginMenuItem"/>
-        <menu action="helpMenuItem">
-          <menuitem action="aboutItem"/>
-          <menuitem action="pluginsItem"/>
+        <menu name="pluginMenu" action="pluginMenuAction"/>
+        <menu name="helpMenu" action="helpMenuAction">
+          <menuitem name="aboutMenuItem" action="aboutAction"/>
+          <menuitem name="pluginsMenuItem" action="pluginsAction"/>
         </menu>
       </menubar>
     </ui>
@@ -217,7 +203,7 @@
       <object class="GtkVBox" id="mainVB">
         <property name="visible">True</property>
         <child>
-          <object class="GtkMenuBar" constructor="uimanager1" id="menubar">
+          <object class="GtkMenuBar" constructor="uimanager" id="menubar">
             <property name="visible">True</property>
           </object>
           <packing>
