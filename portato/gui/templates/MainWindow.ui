@@ -117,6 +117,7 @@
         </child>
         <child>
           <object class="GtkAction" id="hiddenConsoleMenu">
+            <property name="visible">False</property>
             <property name="name">hiddenConsoleMenu</property>
             <property name="label" translatable="yes">Console</property>
           </object>
