@@ -479,13 +479,25 @@ class MainWindow (Window):
 
         plugin.load_plugins()
         menus = [p.menus for p in plugin.get_plugin_queue().get_plugins()]
-       # if menus:
-      #      pluginMenu = self.tree.get_ui("pluginMenu")
+        if menus:
+            uim = self.tree.get_widget("uimanager")
+            ag = self.tree.get_widget("pluginActionGroup")
 
-         #   for m in itt.chain(*menus):
-          #      item = gtk.MenuItem(m.label)
-           #     item.connect("activate", m.call)
-            #    pluginMenu.append(item)
+            ctr = 0
+            for m in itt.chain(*menus):
+
+                # create action
+                aname = "plugin%d" % ctr
+                a = gtk.Action(aname, m.label, None, None)
+                a.connect("activate", m.call)
+                ag.add_action(a)
+
+                # add to UI
+                mid = uim.new_merge_id()
+                uim.add_ui(mid, "ui/menubar/pluginMenu", aname, aname, gtk.UI_MANAGER_MENUITEM, False)
+
+                ctr += 1
+                
 
         splash(_("Building frontend"))
         # set paned position
