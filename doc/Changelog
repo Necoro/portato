@@ -7,6 +7,7 @@ next:
 - debug improvements
 - check prerequisites before starting
 - reorganize preferences
+- change from libglade to GtkBuilder
 - bugs fixed: #44, #41, #15, #47
 
 0.11.1:
