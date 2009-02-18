@@ -18,6 +18,11 @@ from ..helper import debug, warning
 _SESSION = None
 _TYPE = None
 
+types = {
+        "sql": (_("SQLite"), _("Uses an SQLite-database to store package information.\nMay take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data.")),
+        "dict": (_("Hashmap"), _("Uses an in-memory hashmap to store package information.\nHas been used since at least version 0.3.3, but all information has to be regenerated on each startup."))
+        }
+
 def _set_type(t):
     global _TYPE
     _TYPE = t

@@ -20,6 +20,7 @@ from .basic import AbstractDialog
 from ..dialogs import io_ex_dialog
 from ..utils import get_color
 from ...helper import debug
+from ... import db
 
 class PreferenceWindow (AbstractDialog):
     """Window displaying some preferences."""
@@ -150,6 +151,16 @@ class PreferenceWindow (AbstractDialog):
 
         self.systemTabCombo.set_active(int(self.cfg.get("systemTabPos", section = "GUI"))-1)
         self.pkgTabCombo.set_active(int(self.cfg.get("packageTabPos", section = "GUI"))-1)
+
+        # the database combo
+        self.databaseCombo = self.tree.get_widget("databaseCombo")
+        model = gtk.ListStore(str, str, str)
+
+        for k, (name, desc) in db.types.iteritems():
+            model.append([name, desc, k])
+
+        self.databaseCombo.set_model(model)
+        self.databaseCombo.set_active(0) # XXX: just set one thing active - no meaning yet
 
         self.window.show_all()
 
