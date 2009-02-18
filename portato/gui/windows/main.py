@@ -43,7 +43,7 @@ from ..dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
 from ..exceptions import PreReqError
 
 # even more GUI stuff
-from .basic import Window, Popup
+from .basic import Window
 from .about import AboutWindow
 from .plugin import PluginWindow
 from .preference import PreferenceWindow
