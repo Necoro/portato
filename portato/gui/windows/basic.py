@@ -25,7 +25,7 @@ from ...helper import error
 # for the GtkBuilder to translate correctly :)
 import ctypes
 try:
-    getlib = ctypes.cdll.LoadLibrary("libgettextlib.s")
+    getlib = ctypes.cdll.LoadLibrary("libgettextlib.so")
 except OSError:
     error("'libgettextlib.so' cannot be loaded. Might be, that there are no translations available in the GUI.")
 else:
