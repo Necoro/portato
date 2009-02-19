@@ -7,18 +7,6 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkListStore" id="systemComboStore">
-    <columns>
-      <!-- column-name gchararray1 -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="pkgComboStore">
-    <columns>
-      <!-- column-name gchararray1 -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
   <object class="GtkWindow" id="PreferenceWindow">
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Preferences</property>
@@ -845,7 +833,6 @@
                                       <object class="GtkComboBox" id="packageTabCombo">
                                         <property name="visible">True</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                        <property name="model">pkgComboStore</property>
                                       </object>
                                       <packing>
                                         <property name="position">1</property>
@@ -876,7 +863,6 @@
                                       <object class="GtkComboBox" id="systemTabCombo">
                                         <property name="visible">True</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                        <property name="model">systemComboStore</property>
                                       </object>
                                       <packing>
                                         <property name="position">1</property>

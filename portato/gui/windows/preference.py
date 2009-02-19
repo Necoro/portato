@@ -144,10 +144,15 @@ class PreferenceWindow (AbstractDialog):
         self.pkgTabCombo = self.tree.get_widget("packageTabCombo")
 
         for c in (self.systemTabCombo, self.pkgTabCombo):
-            m = c.get_model()
-            m.clear()
+            model = gtk.ListStore(str)
             for i in (_("Top"), _("Bottom"), _("Left"), _("Right")):
-                m.append((i,))
+                model.append((i,))
+
+            c.set_model(model)
+            
+            cell = gtk.CellRendererText()
+            c.pack_start(cell)
+            c.set_attributes(cell, text = 0)
 
         self.systemTabCombo.set_active(int(self.cfg.get("systemTabPos", section = "GUI"))-1)
         self.pkgTabCombo.set_active(int(self.cfg.get("packageTabPos", section = "GUI"))-1)
@@ -161,6 +166,10 @@ class PreferenceWindow (AbstractDialog):
 
         self.databaseCombo.set_model(model)
         self.databaseCombo.set_active(0) # XXX: just set one thing active - no meaning yet
+        
+        cell = gtk.CellRendererText()
+        self.databaseCombo.pack_start(cell)
+        self.databaseCombo.set_attributes(cell, text = 0)
 
         self.window.show_all()
 
