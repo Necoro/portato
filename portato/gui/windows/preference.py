@@ -164,18 +164,27 @@ class PreferenceWindow (AbstractDialog):
         self.pkgTabCombo.set_active(int(self.cfg.get("packageTabPos", section = "GUI"))-1)
 
         # the database combo
+        dbtype = self.cfg.get("type", section = "DATABASE")
         self.databaseCombo = self.tree.get_widget("databaseCombo")
         model = gtk.ListStore(str, str, str)
 
+        ctr = 0
+        active = 0
         for k, (name, desc) in db.types.iteritems():
+            if k == dbtype:
+                active = ctr
+
             model.append([name, desc, k])
+            ctr += 1
 
         self.databaseCombo.set_model(model)
-        self.databaseCombo.set_active(0) # XXX: just set one thing active - no meaning yet
+        self.databaseCombo.set_active(active)
         
         cell = gtk.CellRendererText()
         self.databaseCombo.pack_start(cell)
         self.databaseCombo.set_attributes(cell, text = 0)
+
+        self.cb_db_combo_changed()
 
         self.window.show_all()
 
@@ -246,6 +255,13 @@ class PreferenceWindow (AbstractDialog):
 
         self.setList.set_model(store)
 
+    def cb_db_combo_changed (self, *args):
+        model = self.databaseCombo.get_model()
+        active = self.databaseCombo.get_active()
+
+        descr = self.tree.get_widget("dbDescriptionLabel")
+        descr.set_markup("<i>%s</i>" % model[active][1])
+    
     def cb_ok_clicked(self, button):
         """Saves, writes to config-file and closes the window."""
         self._save()
