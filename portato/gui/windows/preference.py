@@ -61,7 +61,7 @@ class PreferenceWindow (AbstractDialog):
             4 : gtk.POS_RIGHT
             }
 
-    def __init__ (self, parent, cfg, console_fn, linkbtn_fn, tabpos_fn, catmodel_fn):
+    def __init__ (self, parent, cfg, console_fn, linkbtn_fn, tabpos_fn, catmodel_fn, labelcolor_fn):
         """Constructor.
 
         @param parent: parent window
@@ -75,7 +75,9 @@ class PreferenceWindow (AbstractDialog):
         @param tabpos_fn: function to call to set the tabposition of the notebooks
         @type tabpos_fn: function(gtk.ComboBox,int)
         @param catmodel_fn: function to call to set the model of the cat list (collapsed/not collapsed)
-        @type catmodel_fn: function()"""
+        @type catmodel_fn: function()
+        @param labelcolor_fn: function to call to set the color of the label
+        @type labelcolor_fn: function(gtk.gdk.Color)"""
         
         AbstractDialog.__init__(self, parent)
 
@@ -102,6 +104,7 @@ class PreferenceWindow (AbstractDialog):
         self.linkbtn_fn = linkbtn_fn
         self.tabpos_fn = tabpos_fn
         self.catmodel_fn = catmodel_fn
+        self.labelcolor_fn = labelcolor_fn
         
         # set the bg-color of the hint
         hintEB = self.tree.get_widget("hintEB")
@@ -110,20 +113,16 @@ class PreferenceWindow (AbstractDialog):
         # the checkboxes
         for box, val in self.checkboxes.iteritems():
             if isinstance(val, tuple):
-                self.tree.get_widget(box).\
-                        set_active(self.cfg.get_boolean(val[0], section = val[1]))
+                self.tree.get_widget(box).set_active(self.cfg.get_boolean(val[0], section = val[1]))
             else:
-                self.tree.get_widget(box).\
-                        set_active(self.cfg.get_boolean(val))
+                self.tree.get_widget(box).set_active(self.cfg.get_boolean(val))
 
         # the edits
         for edit, val in self.edits.iteritems():
             if isinstance(val,tuple):
-                self.tree.get_widget(edit).\
-                        set_text(self.cfg.get(val[0], section = val[1]))
+                self.tree.get_widget(edit).set_text(self.cfg.get(val[0], section = val[1]))
             else:
-                self.tree.get_widget(edit).\
-                    set_text(self.cfg.get(val))
+                self.tree.get_widget(edit).set_text(self.cfg.get(val))
 
         # the set list
         self.setList = self.tree.get_widget("setList")
@@ -138,6 +137,13 @@ class PreferenceWindow (AbstractDialog):
         # the console title length spin button
         self.titleLengthSpinBtn = self.tree.get_widget("titleLengthSpinBtn")
         self.titleLengthSpinBtn.set_value(int(self.cfg.get("titlelength", section = "GUI")))
+
+        # the color buttons
+        self.pkgTableColorBtn = self.tree.get_widget("pkgTableColorBtn")
+        self.pkgTableColorBtn.set_color(get_color(self.cfg, "packagetable"))
+
+        self.prefColorBtn = self.tree.get_widget("prefColorBtn")
+        self.prefColorBtn.set_color(get_color(self.cfg, "prefhint"))
 
         # the comboboxes
         self.systemTabCombo = self.tree.get_widget("systemTabCombo")
@@ -208,6 +214,14 @@ class PreferenceWindow (AbstractDialog):
         self.linkbtn_fn(self.cfg.get("browserCmd", section="GUI"))
 
         self.catmodel_fn()
+
+        # colors
+        c = self.pkgTableColorBtn.get_color()
+        self.cfg.set("packagetable", str(c)[1:], section = "COLORS")
+        self.labelcolor_fn(c)
+
+        c = self.prefColorBtn.get_color()
+        self.cfg.set("prefhint", str(c)[1:], section = "COLORS")
 
     def fill_setlist (self):
         store = gtk.ListStore(bool, str, str, str)

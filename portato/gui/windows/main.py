@@ -76,8 +76,7 @@ class PackageTable:
         self.maskedLabel = self.tree.get_widget("maskedLabel")
 
         # labels
-        generalVB = self.tree.get_widget("generalVB")
-        generalVB.modify_bg(gtk.STATE_NORMAL, get_color(self.main.cfg, "packagetable"))
+        self.main.set_color(get_color(self.main.cfg, "packagetable"))
         
         self.nameLabel = self.tree.get_widget("nameLabel")
         self.descLabel = self.tree.get_widget("descLabel")
@@ -1259,6 +1258,17 @@ class MainWindow (Window):
         self.catList.get_selection().select_path(pos)
         self.catList.scroll_to_cell(pos)
 
+    def set_color (self, color):
+        """
+        Sets the color of the general VB (i.e. the thing that displays the package details)
+
+        @param color: color to set it to
+        @type color: gtk.gdk.Color
+        """
+
+        generalVB = self.tree.get_widget("generalVB")
+        generalVB.modify_bg(gtk.STATE_NORMAL, color)
+
     def set_uri_hook (self, browser):
         """
         Sets the browser command which is called when a URL is going to be opened.
@@ -1678,7 +1688,7 @@ class MainWindow (Window):
         """
         User wants to open preferences.
         """
-        PreferenceWindow(self.window, self.cfg, self.console.set_font_from_string, self.set_uri_hook, self.set_notebook_tabpos, self.fill_cat_store)
+        PreferenceWindow(self.window, self.cfg, self.console.set_font_from_string, self.set_uri_hook, self.set_notebook_tabpos, self.fill_cat_store, self.set_color)
         return True
 
     def cb_about_clicked (self, *args):
