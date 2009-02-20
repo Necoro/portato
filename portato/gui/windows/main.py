@@ -1220,10 +1220,10 @@ class MainWindow (Window):
 
         if name:
             if self.cfg.get_boolean("collapseCats", "GUI"):
-                try:
-                        sname = name.split("-", 1)
-                except ValueError: # nothing to split
-                        sname = None
+                sname = name.split("-", 1)
+
+                if len(sname) < 2:
+                    sname = None
             else:
                 sname = None
 
