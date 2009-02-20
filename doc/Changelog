@@ -6,6 +6,9 @@ next:
 - remembers the height and width of the preference window
 - debug improvements
 - check prerequisites before starting
+- reorganize preferences
+- change from libglade to GtkBuilder
+- add color buttns to the preferences, so the colors can be changed
 - bugs fixed: #44, #41, #15, #47
 
 0.11.1:

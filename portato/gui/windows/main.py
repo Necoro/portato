@@ -43,7 +43,7 @@ from ..dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
 from ..exceptions import PreReqError
 
 # even more GUI stuff
-from .basic import Window, Popup
+from .basic import Window
 from .about import AboutWindow
 from .plugin import PluginWindow
 from .preference import PreferenceWindow
@@ -62,7 +62,6 @@ class PackageTable:
         self.main = main
         self.tree = main.tree
         self.window = main.window
-        self.tree.signal_autoconnect(self)
         
         # all the package data is in this one VB
         self.vb = self.tree.get_widget("packageVB")
@@ -77,8 +76,7 @@ class PackageTable:
         self.maskedLabel = self.tree.get_widget("maskedLabel")
 
         # labels
-        generalVB = self.tree.get_widget("generalVB")
-        generalVB.modify_bg(gtk.STATE_NORMAL, get_color(self.main.cfg, "packagetable"))
+        self.main.set_color(get_color(self.main.cfg, "packagetable"))
         
         self.nameLabel = self.tree.get_widget("nameLabel")
         self.descLabel = self.tree.get_widget("descLabel")
@@ -473,7 +471,7 @@ class MainWindow (Window):
 
         # package db
         splash(_("Creating Database"))
-        self.db = Database()
+        self.db = Database(self.cfg.get("type", section = "DATABASE"))
         
         # set plugins and plugin-menu
         splash(_("Loading Plugins"))
@@ -481,13 +479,24 @@ class MainWindow (Window):
         plugin.load_plugins()
         menus = [p.menus for p in plugin.get_plugin_queue().get_plugins()]
         if menus:
-            self.tree.get_widget("pluginMenuItem").set_no_show_all(False)
-            pluginMenu = self.tree.get_widget("pluginMenu")
+            uim = self.tree.get_widget("uimanager")
+            ag = self.tree.get_widget("pluginActionGroup")
 
+            ctr = 0
             for m in itt.chain(*menus):
-                item = gtk.MenuItem(m.label)
-                item.connect("activate", m.call)
-                pluginMenu.append(item)
+
+                # create action
+                aname = "plugin%d" % ctr
+                a = gtk.Action(aname, m.label, None, None)
+                a.connect("activate", m.call)
+                ag.add_action(a)
+
+                # add to UI
+                mid = uim.new_merge_id()
+                uim.add_ui(mid, "ui/menubar/pluginMenu", aname, aname, gtk.UI_MANAGER_MENUITEM, False)
+
+                ctr += 1
+                
 
         splash(_("Building frontend"))
         # set paned position
@@ -554,18 +563,11 @@ class MainWindow (Window):
         self.packageTable = PackageTable(self)
 
         # popups
-        self.consolePopup = Popup("consolePopup", self, self.__file__)
-        self.trayPopup = Popup("systrayPopup", self)
+        self.consolePopup = self.tree.get_ui("consolePopup")
+        self.trayPopup = self.tree.get_ui("systrayPopup")
 
         # pause menu items
         self.emergePaused = False
-        self.pauseItems = {}
-        self.pauseItems["tray"] = self.trayPopup.tree.get_widget("pauseItemTray")
-        self.pauseItems["popup"] = self.consolePopup.tree.get_widget("pauseItemPopup")
-        self.pauseItems["menu"] = self.tree.get_widget("pauseItemMenu")
-
-        for k,v in self.pauseItems.iteritems():
-            self.pauseItems[k] = (v, v.connect_after("activate", self.cb_pause_emerge(k)))
 
         # systray
         if self.cfg.get_boolean("showSystray", "GUI"):
@@ -1256,6 +1258,17 @@ class MainWindow (Window):
         self.catList.get_selection().select_path(pos)
         self.catList.scroll_to_cell(pos)
 
+    def set_color (self, color):
+        """
+        Sets the color of the general VB (i.e. the thing that displays the package details)
+
+        @param color: color to set it to
+        @type color: gtk.gdk.Color
+        """
+
+        generalVB = self.tree.get_widget("generalVB")
+        generalVB.modify_bg(gtk.STATE_NORMAL, color)
+
     def set_uri_hook (self, browser):
         """
         Sets the browser command which is called when a URL is going to be opened.
@@ -1358,7 +1371,7 @@ class MainWindow (Window):
             try:
                 self.fill_version_list(self.selCP)
             except VersionsNotFoundException, e:
-                warning(_("No versions of package '%s' found!.") % self.selCP)
+                warning(_("No versions of package '%s' found!") % self.selCP)
                 no_versions_dialog(self.selCP)
                 self.db.disable(self.selCP)
                 self.selCP = oldcp
@@ -1675,7 +1688,7 @@ class MainWindow (Window):
         """
         User wants to open preferences.
         """
-        PreferenceWindow(self.window, self.cfg, self.console.set_font_from_string, self.set_uri_hook, self.set_notebook_tabpos, self.fill_cat_store)
+        PreferenceWindow(self.window, self.cfg, self.console.set_font_from_string, self.set_uri_hook, self.set_notebook_tabpos, self.fill_cat_store, self.set_color)
         return True
 
     def cb_about_clicked (self, *args):
@@ -1772,50 +1785,13 @@ class MainWindow (Window):
                 
                 self.queue.append(package, update = True, oneshot = set, forceUpdate = True)
 
-    def cb_pause_emerge (self, curr):
-        """
-        This method returns a callback for a "pause emerge" toggle button.
-        It is needed as there are different toggle buttons of this type and if one is clicked,
-        the others should be marked too.
-
-        @param curr: The button to return the callback for.
-        @type curr: gtk.ToggleButton
-        """
-        def pause (cb):
-            """
-            The actual callback.
-
-            Mark all other buttons too.
-
-            @param cb: The button which got toggled.
-            @type cb: gtk.ToggleButton
-            """
-
-            # pause or continue
-            self.emergePaused = cb.get_active()
-            if not self.emergePaused:
-                self.queue.continue_emerge()
-                #self.tray.set_from_file(APP_ICON)
-            else:
-                self.queue.stop_emerge()
-                #self.tray.set_from_file(os.path.join(ICON_DIR, "pausing.png"))
-
-            # block the handlers of the other buttons
-            # so that calling "set_active" does not call this callback recursivly
-            for v in self.pauseItems.itervalues():
-                v[0].handler_block(v[1])
-
-            # mark the others
-            for k, v in self.pauseItems.iteritems():
-                if k != curr:
-                    v[0].set_active(self.emergePaused)
-
-            # unblock
-            for v in self.pauseItems.itervalues():
-                v[0].handler_unblock(v[1])
-            
-            return False
-        return pause
+    def cb_pause_emerge (self, action):
+        # pause or continue
+        self.emergePaused = action.get_active()
+        if not self.emergePaused:
+            self.queue.continue_emerge()
+        else:
+            self.queue.stop_emerge()
 
     def cb_kill_clicked (self, *args):
         """
@@ -1823,7 +1799,7 @@ class MainWindow (Window):
         """
         self.queue.kill_emerge()
         if self.emergePaused: # unmark the "pause emerge" buttons
-            self.pauseItems["menu"][0].set_active(False) # calling one button is enough (see: cb_pause_emerge)
+            self.tree.get_widget("generalActionGroup").get_action("pauseAction").set_active(False)
 
     def cb_copy_clicked (self, *args):
         """
@@ -1879,6 +1855,18 @@ class MainWindow (Window):
         else:
             self.window.iconify()
     
+    def cb_testing_toggled (self, *args):
+        return self.packageTable.cb_testing_toggled(*args)
+    def cb_masked_toggled (self, *args):
+        return self.packageTable.cb_masked_toggled(*args)
+    def cb_button_pressed (self, *args):
+        return self.packageTable.cb_button_pressed(*args)
+    def cb_package_revert_clicked (self, *args):
+        return self.packageTable.cb_package_revert_clicked(*args)
+    def cb_package_unmerge_clicked (self, *args):
+        return self.packageTable.cb_package_unmerge_clicked(*args)
+    def cb_package_emerge_clicked (self, *args):
+        return self.packageTable.cb_package_emerge_clicked(*args)
     def cb_use_flag_toggled (self, *args):
         return self.packageTable.cb_use_flag_toggled(*args)
 

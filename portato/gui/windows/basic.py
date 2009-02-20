@@ -14,7 +14,6 @@ from __future__ import absolute_import
 
 # gtk stuff
 import gtk
-import gtk.glade
 import gobject
 
 from functools import wraps
@@ -23,11 +22,18 @@ import os.path
 from ...constants import TEMPLATE_DIR, APP, LOCALE_DIR
 from ...helper import error
 
-gtk.glade.bindtextdomain (APP, LOCALE_DIR)
-gtk.glade.textdomain (APP)
+# for the GtkBuilder to translate correctly :)
+import ctypes
+try:
+    getlib = ctypes.cdll.LoadLibrary("libgettextlib.so")
+except OSError:
+    error("'libgettextlib.so' cannot be loaded. Might be, that there are no translations available in the GUI.")
+else:
+    getlib.textdomain(APP)
+    getlib.bindtextdomain(APP, LOCALE_DIR)
 
 class WrappedTree (object):
-    __slots__ = ("klass", "tree", "get_widget")
+    __slots__ = ("klass", "tree", "get_widget", "get_ui")
     def __init__ (self, klass, tree):
         self.tree = tree
         self.klass = klass
@@ -39,25 +45,52 @@ class WrappedTree (object):
             return getattr(self.tree, name)
 
     def get_widget(self, name):
-        w = self.tree.get_widget(name)
+        w = self.tree.get_object(name)
         if w is None:
             error("Widget '%s' could not be found in class '%s'.", name, self.klass)
         return w
 
-class Window (object):
+    def get_ui (self, name, ui = "uimanager"):
+        uiw = self.get_widget(ui)
+        if uiw is None:
+            return None
+
+        if not name.startswith("ui/"):
+            name = "ui/%s" % name
+
+        w = uiw.get_widget(name)
+        if w is None:
+            error("UIItem '%s' of UIManager '%s' could not be found in class '%s'.", name, ui, self.klass)
+        return w
+
+class UIBuilder (object):
+
+    def __init__ (self, connector = None):
+        if not hasattr(self, "__file__"):
+            self.__file__ = self.__class__.__name__
+
+        self._builder = gtk.Builder()
+        self._builder.add_from_file(os.path.join(TEMPLATE_DIR, self.__file__+".ui"))
+        self._builder.set_translation_domain(APP)
+
+        if connector is None: connector = self
+
+        unconnected = self._builder.connect_signals(connector)
+
+        if unconnected is not None:
+            for uc in set(unconnected):
+                error("Signal '%s' not connected in class '%s'.", uc, self.__class__.__name__)
+
+        self.tree = WrappedTree(self.__class__.__name__, self._builder)
+
+class Window (UIBuilder):
     def __init__ (self):
 
-        if not hasattr(self, "__tree__"):
-            self.__tree__ = self.__class__.__name__
+        UIBuilder.__init__(self)
 
         if not hasattr(self, "__window__"):
             self.__window__ = self.__class__.__name__
 
-        if not hasattr(self, "__file__"):
-            self.__file__ = self.__class__.__name__
-
-        self.tree = self.get_tree(self.__tree__)
-        self.tree.signal_autoconnect(self)
         self.window = self.tree.get_widget(self.__window__)
 
     @staticmethod
@@ -81,9 +114,6 @@ class Window (object):
             return ret
 
         return wrapper
-
-    def get_tree (self, name):
-        return WrappedTree(self.__class__.__name__, gtk.glade.XML(os.path.join(TEMPLATE_DIR, self.__file__+".glade"), name))
 
 class AbstractDialog (Window):
     """A class all our dialogs get derived from. It sets useful default vars and automatically handles the ESC-Button."""
@@ -114,13 +144,3 @@ class AbstractDialog (Window):
 
     def close (self, *args):
         self.window.destroy()
-
-class Popup (object):
-
-    def __init__ (self, name, parent, file = "popups"):
-        self.tree = WrappedTree(self.__class__.__name__, gtk.glade.XML(os.path.join(TEMPLATE_DIR, file+".glade"), root = name))
-        self.tree.signal_autoconnect(parent)
-        self._popup = self.tree.get_widget(name)
-
-    def popup (self, *args):
-        self._popup.popup(*args)
