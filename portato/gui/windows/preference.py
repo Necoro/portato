@@ -232,6 +232,11 @@ class PreferenceWindow (AbstractDialog):
         c = self.prefColorBtn.get_color()
         self.cfg.set("prefhint", str(c)[1:], section = "COLORS")
 
+        # DB type
+        m = self.databaseCombo.get_model()
+        a = self.databaseCombo.get_active()
+        self.cfg.set("type", m[a][2], section = "DATABASE")
+
     def fill_setlist (self):
         store = gtk.ListStore(bool, str, str, str)
 
