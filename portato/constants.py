@@ -43,6 +43,9 @@ These should be set during the installation.
 @type SETTINGS_DIR: string
 @var TEMPLATE_DIR: Directory containing the UI template files.
 @type TEMPLATE_DIR: string
+
+@var REPOURI: the URI of the bzr repository -- only used in live versions
+@type REPOURI: string
 """
 import os
 from os.path import join as pjoin
@@ -68,3 +71,6 @@ LOCALE_DIR = "i18n/"
 PLUGIN_DIR = pjoin(DATA_DIR, "plugins/")
 SETTINGS_DIR = pjoin(HOME, "."+APP)
 TEMPLATE_DIR = "portato/gui/templates/"
+
+# live versions only
+REPOURI = "lp:portato"

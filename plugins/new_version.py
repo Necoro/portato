@@ -18,7 +18,7 @@ import gobject
 
 from portato.helper import debug, warning
 from portato import get_listener
-from portato.constants import VERSION, APP_ICON, APP
+from portato.constants import REPOURI, VERSION, APP_ICON, APP
 from portato.gui.utils import GtkThread
 
 class NewVersionFinder(Plugin):
@@ -34,7 +34,7 @@ class NewVersionFinder(Plugin):
 
     def find_version (self, rev):
         try:
-            b = branch.Branch.open("lp:portato")
+            b = branch.Branch.open(REPOURI)
         except Exception, e:
             warning("NEW_VERSION :: Exception occured while accessing the remote branch: %s", str(e))
             return
@@ -58,7 +58,7 @@ class NewVersionFinder(Plugin):
         Run the thread once.
         """
         v = VERSION.split()
-        if len(v) != 3 or v[0] != "9999":
+        if len(v) != 3:
             return None
 
         rev = v[-1]
