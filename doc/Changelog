@@ -1,4 +1,4 @@
-next:
+0.12:
 - add support for sqlite db
 - improvements in session handling
 - sort by useflags in dependency list
