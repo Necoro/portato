@@ -50,4 +50,4 @@ def Database(type):
     
     else:
         error(_("Unknown database type: %s"), type)
-        raise UnknownDatabaseTypeError, "type"
+        raise UnknownDatabaseTypeError, type
