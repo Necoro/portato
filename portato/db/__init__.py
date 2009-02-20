@@ -39,7 +39,7 @@ def Database(type):
         except ImportError:
             warning(_("Cannot load SQLDatabase."))
             _TYPE = "dict"
-            return Database()
+            return Database(type)
         else:
             return SQLDatabase(SectionDict(_SESSION, "SQL"))
 
