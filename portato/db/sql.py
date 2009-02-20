@@ -135,6 +135,7 @@ class SQLDatabase (Database):
                     db[key] = hashes[key]
             else:
                 debug("portdirs.db not existant")
+                changed = True
                 for key in hashes.iterkeys():
                     db[key] = hashes[key]
 
