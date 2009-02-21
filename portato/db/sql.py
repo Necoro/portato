@@ -17,7 +17,11 @@ try:
 except ImportError:
     from pysqlite2 import dbapi2 as sql
 
-import anydbm
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
 import hashlib
 import os
 
@@ -113,34 +117,45 @@ class SQLDatabase (Database):
     
         dbpath = os.path.join(SESSION_DIR, "portdirs.db")
         db_existed = os.path.exists(dbpath)
-        db = anydbm.open(dbpath, "c")
-        try:
-            if db_existed:
-                debug("portdirs.db already existant")
-                for key in set(db.keys())- set(hashes.keys()):
-                    debug("Overlay '%s' has been removed", key)
-                    del db[key]
-                    changed = True
-                
-                for key in hashes.iterkeys():
 
-                    if key not in db.keys():
-                        debug("Overlay '%s' has been added.", key)
-                        changed = True
+        if db_existed and "pickle" not in self.session:
+            debug("Removing old portdirs.db, as this looks like old DBM format. If it is not - well - no real harm ;)")
+            os.remove(dbpath)
+            db_existed = False
 
-                    elif db[key] != hashes[key]:
-                        debug("Overlay '%s' has been changed.", key)
-                        changed = True
-                
-                    db[key] = hashes[key]
-            else:
-                debug("portdirs.db not existant")
+        self.session["pickle"] = True # no need for a certain value
+
+        if db_existed:
+            debug("portdirs.db already existant")
+            with open(dbpath, "rb") as dbfile:
+                db = pickle.load(dbfile)
+
+            # the following could be simplified - losing the debug possibilities
+            # so we keep it as is :)
+            # there shouldn't be so much overlays, that this would result
+            # in performance loss
+
+            for key in set(db.keys()) - set(hashes.keys()):
+                debug("Overlay '%s' has been removed", key)
                 changed = True
-                for key in hashes.iterkeys():
-                    db[key] = hashes[key]
+            
+            for key in hashes.iterkeys():
 
-        finally:
-            db.close()
+                if key not in db:
+                    debug("Overlay '%s' has been added.", key)
+                    changed = True
+
+                elif db[key] != hashes[key]:
+                    debug("Overlay '%s' has been changed.", key)
+                    changed = True
+            
+        else:
+            debug("portdirs.db not existant")
+            changed = True
+        
+        if changed:
+            with open(dbpath, "wb") as dbfile:
+                db = pickle.dump(hashes, dbfile, protocol = -1)
 
         return changed
 
