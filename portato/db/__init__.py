@@ -38,8 +38,7 @@ def Database(type):
             from .sql import SQLDatabase
         except ImportError:
             warning(_("Cannot load SQLDatabase."))
-            _TYPE = "dict"
-            return Database(type)
+            return Database("dict")
         else:
             return SQLDatabase(SectionDict(_SESSION, "SQL"))
 

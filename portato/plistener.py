@@ -48,7 +48,7 @@ class PListener (object):
                     self._rw.V()
 
                 data = string.split("\0")
-                debug("Listner received: %s", data)
+                debug("Listener received: %s", data)
 
                 if data[0] == "notify":
                     self.do_notify(*data[1:])
