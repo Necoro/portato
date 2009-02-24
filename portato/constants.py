@@ -61,7 +61,7 @@ HOME = os.environ["HOME"]
 SU_COMMAND = "gksu -D 'Portato'"
 
 # config
-CONFIG_DIR = "/etc/portato/"
+CONFIG_DIR = "etc/"
 CONFIG_LOCATION = pjoin(CONFIG_DIR, "portato.cfg")
 SESSION_DIR = pjoin(os.environ["HOME"], ".portato")
 
