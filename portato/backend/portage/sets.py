@@ -28,7 +28,7 @@ class Set(object):
     def find (self, key, masked = False, with_version = True, only_cpv = False):
         if key is None: key = ""
         
-        is_regexp = key == "" or ("*" in key and key[0] not in ("*","=","<",">","~","!"))
+        is_regexp = key == "" or ("*" in key[1:] and key[0] not in ("=","<",">","~","!"))
 
         try:
             t = self.get_pkgs(key, is_regexp, masked, with_version, only_cpv)
@@ -99,9 +99,12 @@ class InstalledSet (Set):
             if key:
                 t = filter(lambda x: re.search(key, x, re.I), t)
 
-            return set(t)
         else:
-            return set(system.settings.vartree.dbapi.match(key))
+            t = system.settings.vartree.dbapi.match(key)
+            if not with_version:
+                t = itt.imap(portage.dep.dep_getkey, t)
+
+        return set(t)
 
 class TreeSet (Set):
 
@@ -115,10 +118,15 @@ class TreeSet (Set):
             if key:
                 t = filter(lambda x: re.search(key, x, re.I), t)
 
+            return set(t)
+
         elif masked:
             t = system.settings.porttree.dbapi.xmatch("match-all", key)
         else:
             t = system.settings.porttree.dbapi.match(key)
+
+        if not with_version:
+            t = itt.imap(portage.dep.dep_getkey, t)
 
         return set(t)
 
