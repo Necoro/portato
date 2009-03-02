@@ -248,6 +248,11 @@ class SQLDatabase (Database):
             self._restrict = ""
         else:
             restrict = restrict.replace(".*","%").replace(".","_")
-            self._restrict = "AND name LIKE '%%%s%%'" % restrict
+            
+            if "/" in restrict:
+                cat,pkg = restrict.split("/")
+                self._restrict = "AND name LIKE '%%%s%%' AND cat LIKE '%s'" % (pkg, cat)
+            else:
+                self._restrict = "AND (name LIKE '%%%(restrict)s%%' OR cat LIKE '%(restrict)s%%')" % {"restrict":restrict}
 
     restrict = property(get_restrict, set_restrict)

@@ -86,7 +86,7 @@ class DictDatabase (Database):
 
         try:
             if self.restrict:
-                return (pkg for pkg in get_pkgs() if self.restrict.search(pkg.pkg))#if pkg[1].find(self.restrict) != -1)
+                return (pkg for pkg in get_pkgs() if self.restrict.search(pkg.cat+"/"+pkg.pkg))
             else:
                 return get_pkgs()
 
