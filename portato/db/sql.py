@@ -251,7 +251,7 @@ class SQLDatabase (Database):
             
             if "/" in restrict:
                 cat,pkg = restrict.split("/")
-                self._restrict = "AND name LIKE '%%%s%%' AND cat LIKE '%s'" % (pkg, cat)
+                self._restrict = "AND name LIKE '%s%%' AND cat LIKE '%s'" % (pkg, cat)
             else:
                 self._restrict = "AND (name LIKE '%%%(restrict)s%%' OR cat LIKE '%(restrict)s%%')" % {"restrict":restrict}
 
