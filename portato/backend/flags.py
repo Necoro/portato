@@ -411,7 +411,7 @@ def write_use_flags ():
                 msg += "=%s %s" % (cpv, comb)
             else: # add on a per-package-base
                 list = system.split_cpv(cpv)
-                msg += "%s/%s %s" % (list[0], list[1], combine)
+                msg += "%s/%s %s" % (list[0], list[1], comb)
 
             if not file in file_cache:
                 with open(file, "a") as f:

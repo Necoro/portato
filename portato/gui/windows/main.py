@@ -1646,6 +1646,9 @@ class MainWindow (Window):
         """Do a search."""
         text = entry.get_text()
         if text != "":
+            if not "*" in text:
+                text = ".*%s.*" % text
+
             packages = system.find_packages(text, with_version = False)
 
             if packages == []:
