@@ -27,6 +27,7 @@ Thanks goto:
     <property name="translator_credits">Catalan - Roger Calv&#xF3;
 German - Ren&#xE9; 'Necoro' Neumann
 Polish - Tomasz Osi&#x144;ski
+Spanish - Daniel Halens
 Turkish - G&#xFC;rkan 'seqizz' G&#xFC;r</property>
     <property name="artists">p4r4d0x (inspired by wolfden)</property>
     <signal handler="close" name="response"/>
