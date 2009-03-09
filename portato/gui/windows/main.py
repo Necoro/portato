@@ -1192,6 +1192,15 @@ class MainWindow (Window):
         
         self.show_package(cp = cp, version = version, queue = self.queue)
 
+    def _jump_check_search (self, model, pos, elsef):
+        try:
+            row = model[pos]
+        except IndexError: # position not in model
+            debug("Position is too large for model")
+            return True
+        else:
+            return elsef(row)
+
     def jump_to_pkg (self, name = None, pos = "0"):
         if isinstance(pos, int):
             pos = str(pos)
@@ -1200,7 +1209,7 @@ class MainWindow (Window):
         model = self.pkgList.get_model()
 
         if name:
-            if model[pos][col] != name: # need to search :(
+            if self._jump_check_search(model, pos, lambda r: r[col] != name):
                 debug("Pkg path does not match. Searching...")
                 for cname, path in ((x[col], x.path) for x in model):
                     if cname == name:
@@ -1227,7 +1236,7 @@ class MainWindow (Window):
             else:
                 sname = None
 
-            if sname is None and model[pos][col] != name: # need to search in normal list
+            if sname is None and self._jump_check_search(model, pos, lambda r: r[col] != name): # need to search in normal list
                 debug("Cat path does not match. Searching...")
                 for cname, path in ((x[col], x.path) for x in model):
                     if cname == name:
@@ -1235,17 +1244,20 @@ class MainWindow (Window):
                         break
             
             elif sname: # the collapse case
-                row = model[pos.split(":")[0]]
+                p = pos.split(":")[0]
                 no_match = False
-                if row[col] != sname[0]: # first part does not match :(
+                
+                if self._jump_check_search(model, p, lambda r: r[col] != sname[0]):
                     debug("First part of cat path does not match. Searching...")
                     no_match = True
                     for r in model:
                         if r[col] == sname[0]:
                             row = r
                             break
+                else:
+                    row = model[p]
 
-                if no_match or model[pos][col] != sname[1]:
+                if no_match or self._jump_check_search(model, pos, lambda r: r[col] != sname[1]):
                     debug("Second part of cat path does not match. Searching...")
                     for cname, path in ((x[col], x.path) for x in row.iterchildren()):
                         if cname == sname[1]: # found second
