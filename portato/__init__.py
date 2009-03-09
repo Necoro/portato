@@ -12,16 +12,17 @@
 
 from __future__ import absolute_import
 
-from . import log
-import gettext, locale
-from portato.constants import LOCALE_DIR, APP
+def start():
+    from . import log
+    import gettext, locale
+    from portato.constants import LOCALE_DIR, APP
 
-# set gettext stuff
-locale.setlocale(locale.LC_ALL, '')
-gettext.install(APP, LOCALE_DIR, unicode = True)
+    # set gettext stuff
+    locale.setlocale(locale.LC_ALL, '')
+    gettext.install(APP, LOCALE_DIR, unicode = True)
 
-# start logging
-log.start(file=False)
+    # start logging
+    log.start(file=False)
 
 # listener-handling
 __listener = None

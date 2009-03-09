@@ -19,11 +19,13 @@ import subprocess, threading
 import atexit
 from optparse import OptionParser, SUPPRESS_HELP
 
-from portato import get_listener, log
+from portato import get_listener, log, start
 from portato.helper import debug, info
 from portato.constants import VERSION, SU_COMMAND
 
 def main ():
+    start() # the first thing to do :)
+
     # build the parser
     desc = "Portato - A Portage GUI."
     usage = "%prog [options] [frontend]"
