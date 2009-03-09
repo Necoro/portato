@@ -1200,7 +1200,15 @@ class MainWindow (Window):
         model = self.pkgList.get_model()
 
         if name:
-            if model[pos][col] != name: # need to search :(
+            search = False
+            try:
+                row = model[pos]
+            except IndexError: # position not in model
+                search = True
+            else:
+                search = (row[col] != name)
+
+            if search:
                 debug("Pkg path does not match. Searching...")
                 for cname, path in ((x[col], x.path) for x in model):
                     if cname == name:
@@ -1227,7 +1235,15 @@ class MainWindow (Window):
             else:
                 sname = None
 
-            if sname is None and model[pos][col] != name: # need to search in normal list
+            search = False
+            try:
+                row = model[pos]
+            except IndexError: # position not in model
+                search = True
+            else:
+                search = (row[col] != name)
+            
+            if sname is None and search: # need to search in normal list
                 debug("Cat path does not match. Searching...")
                 for cname, path in ((x[col], x.path) for x in model):
                     if cname == name:
