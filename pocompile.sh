@@ -11,17 +11,22 @@ fi
 
 if [[ $# > 0 ]]; then
 	langs="$@"
-else
-	langs="$(ls *.po | sed 's/\.po//g')"
+else 
+    # in emerge case do not install anything if nothing is given
+    if [[ -z $eme ]]; then
+	    langs="$(ls *.po | sed 's/\.po//g')"
+    else
+        langs=""
+    fi
 fi
 
-for lang in $langs; do
+for lang in ${langs}; do
 	item=${lang}.po
 
 	if [[ -f $item ]]; then
 		echo "Creating translation file for ${lang}."
 
-		if [[ -n eme ]]; then
+		if [[ -n $eme ]]; then
 			mkdir mo -p
 			msgfmt ${item} -o mo/${lang}.mo
 		else
