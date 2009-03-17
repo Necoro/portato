@@ -12,7 +12,7 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 import sys, os, os.path
-from distutils.core import setup, Extension
+from distutils.core import setup
 from portato.constants import VERSION, DATA_DIR, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR
 
 def plugin_list (*args):
