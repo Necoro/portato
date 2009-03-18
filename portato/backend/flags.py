@@ -18,7 +18,7 @@ import itertools as itt
 from subprocess import Popen, PIPE # needed for grep
 
 from . import system, is_package
-from ..helper import debug, error, unique_array
+from ..helper import debug, error, warning, unique_array
 
 CONFIG = {
         "usefile" : "portato",
@@ -671,7 +671,7 @@ def set_testing (pkg, enable):
 
     arch = pkg.get_global_settings("ARCH")
     cpv = pkg.get_cpv()
-    if not cpv in newTesting: 
+    if not cpv in newTesting:
         newTesting[cpv] = []
 
     for file, line in newTesting[cpv]:
@@ -685,7 +685,14 @@ def set_testing (pkg, enable):
         test = get_data(pkg, CONST.testing_path())
         debug("data (test): %s", str(test))
         for file, line, crit, flags in test:
-            if pkg.matches(crit) and flags[0] == "~"+arch:
+            try:
+                flagMatches = flags[0] == "~"+arch
+            except IndexError: # no flags
+                warning(_("Line %(line)s in file %(file)s misses a keyword (i.e. '~x86')."), {'line' : line, 'file': file})
+                debug("No keyword. Assuming match.")
+                flagMatches = True
+                
+            if pkg.matches(crit) and flagMatches:
                 newTesting[cpv].append((file, line))
     else:
         if CONST.testing_path_is_dir():
