@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/plistener.py
+# File: portato/listener.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006-2009 René 'Necoro' Neumann
@@ -23,7 +23,7 @@ except ImportError:
 from .constants import APP
 from .helper import debug, warning
 
-class PListener (object):
+class Listener (object):
     """This class handles the communication between the "listener" and the GUI.
     This listener starts programs as the user while the GUI runs as root.
     

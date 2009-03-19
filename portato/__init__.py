@@ -30,7 +30,7 @@ __listener = None
 def get_listener():
     global __listener
     if __listener is None:
-        from .plistener import PListener
-        __listener = PListener()
+        from .listener import Listener
+        __listener = Listener()
     
     return __listener
