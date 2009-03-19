@@ -20,8 +20,9 @@ import atexit
 from optparse import OptionParser, SUPPRESS_HELP
 
 from portato import get_listener, log, start
-from portato.helper import debug, info
-from portato.constants import VERSION, SU_COMMAND
+from portato.su import detect_su_command
+from portato.helper import debug, info, error
+from portato.constants import VERSION
 
 def main ():
     start() # the first thing to do :)
@@ -74,23 +75,32 @@ def main ():
         lt.setDaemon(False)
         lt.start()
         
-        # set DBUS_SESSION_BUS_ADDRESS to "" to make dbus work as root ;)
-        env = os.environ.copy()
-        env.update(DBUS_SESSION_BUS_ADDRESS="")
-        cmd = SU_COMMAND.split()
-        
-        sp = subprocess.Popen(cmd+["%s --no-fork --shm %ld %ld %ld" % (sys.argv[0], mem.key, sig.key, rw.key)], env = env)
-
-        # wait for process to finish
         try:
-            sp.wait()
-            debug("Subprocess finished")
-        except KeyboardInterrupt:
-            debug("Got KeyboardInterrupt.")
+            # set DBUS_SESSION_BUS_ADDRESS to "" to make dbus work as root ;)
+            env = os.environ.copy()
+            env.update(DBUS_SESSION_BUS_ADDRESS="")
+            
+            su = detect_su_command()
+            if su:
+                debug("Using '%s' as su command.", su.bin)
+                cmd = su.cmd("%s --no-fork --shm %ld %ld %ld" % (sys.argv[0], mem.key, sig.key, rw.key))
 
-        if lt.isAlive():
-            debug("Listener is still running. Close it.")
-            get_listener().close()
+                sp = subprocess.Popen(cmd, env = env)
+
+                # wait for process to finish
+                try:
+                    sp.wait()
+                    debug("Subprocess finished")
+                except KeyboardInterrupt:
+                    debug("Got KeyboardInterrupt.")
+
+            else:
+                error(_("No valid su command detected. Aborting."))
+        
+        finally:
+            if lt.isAlive():
+                debug("Listener is still running. Close it.")
+                get_listener().close()
 
 if __name__ == "__main__":
     main()

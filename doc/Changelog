@@ -1,5 +1,6 @@
 next:
 - allow lines w/o keyword in package.keywords
+- added support for ktsuss as su-frontend
 
 0.12.1:
 - bugfixes

@@ -20,8 +20,6 @@ These should be set during the installation.
 @type VERSION: string
 @var HOME: shortcut to $HOME
 @type HOME: string
-@var SU_COMMAND: command to execute to "su"
-@type SU_COMMAND: string
 
 @var CONFIG_DIR: The configuration directory.
 @type CONFIG_DIR: string
@@ -58,7 +56,6 @@ APP_ICON = pjoin(ICON_DIR, "portato-icon.png")
 APP = "portato"
 VERSION = "9999"
 HOME = os.environ["HOME"]
-SU_COMMAND = "gksu -D 'Portato'"
 
 # config
 CONFIG_DIR = "etc/"
