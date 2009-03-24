@@ -15,6 +15,8 @@ import sys, os, os.path
 from distutils.core import setup
 from portato.constants import VERSION, DATA_DIR, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR
 
+from build_manpage import build_manpage
+
 def plugin_list (*args):
     """Creates a list of correct plugin pathes out of the arguments."""
     return [("plugins/%s.py" % x) for x in args]
@@ -34,5 +36,6 @@ setup(name="Portato",
         author = "René 'Necoro' Neumann",
         author_email = "necoro@necoro.net",
         packages = packages,
-        data_files = data_files
+        data_files = data_files,
+        cmdclass={'build_manpage': build_manpage}
         )
