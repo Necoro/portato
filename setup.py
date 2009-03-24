@@ -13,7 +13,7 @@
 
 import sys, os, os.path
 from distutils.core import setup
-from portato.constants import VERSION, DATA_DIR, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR
+from portato.constants import VERSION, DATA_DIR, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR, APP
 
 from build_manpage import build_manpage
 
@@ -28,9 +28,11 @@ data_files = [
         (PLUGIN_DIR, plugin_list("gpytage", "notify", "etc_proposals", "reload_portage"))]
 
 # do the distutils setup
-setup(name="Portato",
+setup(name=APP,
         version = VERSION,
         description = "GTK-Frontend to Portage",
+        long_description =
+        """%s is a frontend to the package manager of Gentoo and related distributions: Portage. It is meant to be used for browsing the tree and installing packages and their dependencies. It knows how to deal with useflags and masked packages, so it can make handling packages a lot easier.""" % APP,
         license = "GPLv2",
         url = "http://portato.origo.ethz.ch/",
         author = "René 'Necoro' Neumann",

@@ -40,17 +40,17 @@ def get_parser (use_ = False):
 
     if not use_: _ = lambda s : s
     
-    desc = "Portato - A Portage GUI."
-    usage = "%prog [options] [frontend]"
+    desc = "%prog - A Portage GUI."
+    usage = "%prog [options]"
     vers =  "%%prog v. %s" % VERSION
 
-    parser = OptionParser(version = vers, prog = "Portato", description = desc, usage = usage)
+    parser = OptionParser(version = vers, prog = "portato", description = desc, usage = usage)
     
     parser.add_option("--shm", action = "store", nargs = 3, type="long", dest = "shm",
             help = SUPPRESS_HELP)
 
-    parser.add_option("-F", "--no-fork", "-L", action = "store_true", dest = "nofork", default = False,
-            help = _("do not fork off as root") + (" (%s)" % _("-L is deprecated")))
+    parser.add_option("-F", "--no-fork", action = "store_true", dest = "nofork", default = False,
+            help = _("do not fork off as root"))
 
     return parser
 
