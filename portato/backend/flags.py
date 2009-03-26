@@ -673,7 +673,7 @@ def set_testing (pkg, enable):
     if not cpv in newTesting:
         newTesting[cpv] = []
 
-    for file, line in newTesting[cpv]:
+    for file, line in newTesting[cpv][:]:
         if (enable and line != "-1") or (not enable and line == "-1"):
             newTesting[cpv].remove((file, line))
 
