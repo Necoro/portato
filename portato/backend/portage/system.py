@@ -23,7 +23,7 @@ from . import sets as syssets
 from .package import PortagePackage
 from .settings import PortageSettings
 from ..system_interface import SystemInterface
-from ...helper import debug, info, warning, unique_array
+from ...helper import debug, info, warning
 
 class PortageSystem (SystemInterface):
     """This class provides access to the portage-system."""
@@ -193,7 +193,7 @@ class PortageSystem (SystemInterface):
             t += self.find_packages(search_key, self.SET_INSTALLED, only_cpv=True)
 
         if t:
-            t = unique_array(t)
+            t = list(set(t))
             return self.find_best(t, only_cpv)
 
         return None

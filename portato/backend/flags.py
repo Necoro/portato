@@ -17,7 +17,7 @@ import itertools as itt
 from subprocess import Popen, PIPE # needed for grep
 
 from . import system, is_package
-from ..helper import debug, error, warning, unique_array
+from ..helper import debug, error, warning
 
 CONFIG = {
         "usefile" : "portato",
@@ -298,7 +298,7 @@ def set_use_flag (pkg, flag):
         except ValueError: # not in UseFlags
             newUseFlags[cpv].append((path, -1, flag, False))
 
-    newUseFlags[cpv] = unique_array(newUseFlags[cpv])
+    newUseFlags[cpv] = list(set(newUseFlags[cpv]))
     debug("newUseFlags: %s", str(newUseFlags))
 
 def remove_new_use_flags (cpv):
@@ -497,7 +497,7 @@ def set_masked (pkg, masked = True):
         file = path
     
     link_neq[cpv].append((file, "-1"))
-    link_neq[cpv] = unique_array(link_neq[cpv])
+    link_neq[cpv] = list(set(link_neq[cpv]))
     debug("new_(un)masked: %s",str(link_neq))
 
 def remove_new_masked (cpv):
@@ -700,7 +700,7 @@ def set_testing (pkg, enable):
             file = CONST.testing_path()
         newTesting[cpv].append((file, "-1"))
 
-    newTesting[cpv] = unique_array(newTesting[cpv])
+    newTesting[cpv] = list(set(newTesting[cpv]))
     debug("newTesting: %s",str(newTesting))
 
 def write_testing ():
