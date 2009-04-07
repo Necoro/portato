@@ -14,14 +14,13 @@
 from __future__ import absolute_import, with_statement
 
 import gtk, pango, gobject
-import sys, traceback, os
+import sys, traceback
 
 from StringIO import StringIO
 
 from ..helper import debug, error, get_runsystem
 from .dialogs import file_chooser_dialog, io_ex_dialog
 from .windows.mailinfo import MailInfoWindow
-from .utils import GtkThread
 
 class UncaughtExceptionDialog(gtk.MessageDialog):
     """Original idea by Gustavo Carneiro - original code: http://www.daa.com.au/pipermail/pygtk/attachments/20030828/2d304204/gtkexcepthook.py."""

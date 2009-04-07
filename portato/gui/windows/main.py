@@ -17,17 +17,17 @@ import gtk
 import gobject
 
 # other
-import os.path
+import os
 import itertools as itt
 from collections import defaultdict
 
 # our backend stuff
 from ...backend import flags, system # must be the first to avoid circular deps
 from ... import get_listener, plugin
-from ...helper import debug, warning, error, info, unique_array
+from ...helper import debug, warning, error, info
 from ...session import Session
 from ...db import Database
-from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, ICON_DIR
+from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
 from ...backend.exceptions import PackageNotFoundException, BlockedException, VersionsNotFoundException
 
 # more GUI stuff
@@ -186,12 +186,12 @@ class PackageTable:
         # useflags
         flaglist = list(itt.ifilterfalse(pkg.use_expanded, pkg.get_iuse_flags()))
         flaglist.sort()
-        flags = ", ".join(flaglist)
+        flagstr = ", ".join(flaglist)
 
-        if flags:
+        if flagstr:
             self.useFlagsLL.show()
             self.useFlagsLabel.show()
-            self.useFlagsLabel.set_label(flags)
+            self.useFlagsLabel.set_label(flagstr)
         else:
             self.useFlagsLL.hide()
             self.useFlagsLabel.hide()

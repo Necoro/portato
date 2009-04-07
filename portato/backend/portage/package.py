@@ -16,7 +16,7 @@ from ..package import Package
 from .. import flags
 from .. import system
 from ..exceptions import BlockedException, PackageNotFoundException, DependencyCalcError
-from ...helper import debug, error, unique_array
+from ...helper import debug, error
 
 import portage
 

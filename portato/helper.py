@@ -15,9 +15,7 @@ Some nice functions used in the program.
 """
 from __future__ import absolute_import, with_statement
 
-import os, signal, logging, grp
-
-from .log import set_log_level
+import os, signal, logging
 
 debug         = logging.getLogger("portatoLogger").debug
 info         = logging.getLogger("portatoLogger").info

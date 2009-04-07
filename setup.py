@@ -11,9 +11,9 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-import sys, os, os.path
+import os
 from distutils.core import setup
-from portato.constants import VERSION, DATA_DIR, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR, APP
+from portato.constants import VERSION, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR, APP
 
 from build_manpage import build_manpage
 

@@ -12,7 +12,7 @@
 
 from __future__ import absolute_import, with_statement
 
-import os, os.path
+import os
 from UserDict import DictMixin
 
 from .config_parser import ConfigParser, SectionNotFoundException

@@ -14,8 +14,8 @@ from __future__ import absolute_import, with_statement
 
 import re
 from collections import defaultdict
-from threading import RLock
 
+from ..helper import info
 from ..backend import system
 from .database import Database, PkgData
 

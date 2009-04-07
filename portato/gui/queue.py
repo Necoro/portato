@@ -15,14 +15,13 @@ from __future__ import absolute_import
 # some stuff needed
 import os, pty
 import signal, threading, time
-import itertools as itt
 from subprocess import Popen
 
 # some backend things
 from .. import backend, plugin
 from ..backend import flags, system
 from ..backend.exceptions import BlockedException
-from ..helper import debug, info, warning, error, send_signal_to_group, unique_array, flatten
+from ..helper import debug, info, warning, error
 from ..waiting_queue import WaitingQueue
 from ..odict import OrderedDict
 from .updater import Updater

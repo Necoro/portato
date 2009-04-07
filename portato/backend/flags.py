@@ -13,7 +13,6 @@
 from __future__ import absolute_import, with_statement
 
 import os
-import os.path
 import itertools as itt
 from subprocess import Popen, PIPE # needed for grep
 
