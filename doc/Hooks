@@ -30,3 +30,13 @@ Parameters: None
 Return if override: Nothing
 
 Comment: DO NOT OVERRIDE :)
+
+List of widget slots
+====================
+
+Plugin Menu:
+------------
+Allows to add entries to the 'Plugins' menu.
+Widget Class: internal
+Needed Callbacks: activate
+Note: Only use "create_widget" instead of "add_widget"
