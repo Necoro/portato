@@ -22,7 +22,8 @@ import gtk
 
 # some backend things
 from ..backend import flags, set_system
-from ..helper import debug, info, set_log_level
+from ..helper import debug, info
+from ..log import set_log_level
 from ..constants import APP, LOCALE_DIR
 
 # parser
