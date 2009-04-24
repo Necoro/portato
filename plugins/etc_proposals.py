@@ -23,7 +23,7 @@ class EtcProposals (Plugin):
     def init (self):
         self.prog = ["/usr/sbin/etc-proposals"]
         self.add_call("after_emerge", self.hook, type = "after")
-        self.add_menu("Et_c-Proposals", self.menu)
+        self.create_widget("Plugin Menu", "Et_c-Proposals", activate = self.menu)
 
     def launch (self, options = []):
         if os.getuid() == 0:

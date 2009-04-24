@@ -30,7 +30,7 @@ class NewVersionFinder(Plugin):
 
     def init (self):
         self.add_call("main", self.run)
-        self.add_menu("Check for new _versions", self.menu)
+        self.create_widget("Plugin Menu", "Check for new _versions", activate = self.menu)
 
     def find_version (self, rev):
         try:
