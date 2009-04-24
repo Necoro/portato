@@ -8,6 +8,7 @@
           <object class="GtkAction" id="pluginMenuAction">
             <property name="name">pluginMenuAction</property>
             <property name="label" translatable="yes">Plu_gins</property>
+            <property name="is_important">True</property>
           </object>
         </child>
       </object>

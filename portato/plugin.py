@@ -115,8 +115,16 @@ class WidgetSlot (object):
         self.widget = widget
         self.name = name
         self.max = max
-        self.init = init
-        self.add = add
+
+        # we might be subclassed
+        # in this case do not overwrite
+
+        if not hasattr(self, "init"):
+            self.init = init
+
+        if not hasattr(self, "add"):
+            self.add = add
+        
         self._inited = False
 
         debug("Registering new WidgetSlot '%s'.", name)
@@ -128,7 +136,8 @@ class WidgetSlot (object):
                 self.init()
             self._inited = True
 
-        self.add(w)
+        if self.add is not None:
+            self.add(w)
 
 class Widget (object):
     """
@@ -295,6 +304,10 @@ class Plugin (object):
 
         :see: `Widget`
         """
+
+        if not slot in WidgetSlot.slots:
+            raise PluginLoadException, "Could not find specified widget slot: %s" % slot
+        
         self.__widgets.append(Widget(slot, widget))
 
     def create_widget (self, slot, args, **kwargs):
@@ -318,7 +331,10 @@ class Plugin (object):
         except KeyError:
             raise PluginLoadException, "Could not find specified widget slot: %s" % slot
 
-        w = widget(*args)
+        if not hasattr(args, "__iter__"):
+            w = widget(args)
+        else:
+            w = widget(*args)
 
         for k,v in kwargs.iteritems():
             w.connect(k, v)
@@ -410,7 +426,7 @@ class PluginQueue (object):
 
         for p in self.plugins:
             for w in p.widgets:
-                WidgetSlot[w.slot].add_widget(w)
+                WidgetSlot.slots[w.slot].add_widget(w)
 
     def add (self, plugin, disable = False):
         """

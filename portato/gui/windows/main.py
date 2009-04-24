@@ -63,13 +63,18 @@ class PluginMenuSlot (plugin.WidgetSlot):
         aname = "plugin%d" % self.ctr
         a = gtk.Action(aname, label, None, None)
         self.ctr += 1
+        
+        return a
 
-    def add (self, action):
+    def add (self, widget):
+        action = widget.widget
         self.ag.add_action(action)
 
         # add to UI
         mid = self.uim.new_merge_id()
         self.uim.add_ui(mid, "ui/menubar/pluginMenu", action.get_name(), action.get_name(), gtk.UI_MANAGER_MENUITEM, False)
+
+        self.uim.ensure_update()
 
 class PackageTable:
     """A window with data about a specfic package."""

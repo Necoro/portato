@@ -16,5 +16,5 @@ def throw (*args, **kwargs):
 p = Plugin()
 p.__name__ = "ExceptionThrower"
 p.__author__ = "René 'Necoro' Neumann"
-p.add_menu("Throw exception", throw)
+p.create_widget("Plugin Menu", "Throw exception", activate = throw)
 register(p)
