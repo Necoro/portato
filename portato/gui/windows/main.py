@@ -472,31 +472,6 @@ class MainWindow (Window):
         # package db
         splash(_("Creating Database"))
         self.db = Database(self.cfg.get("type", section = "DATABASE"))
-        
-        # set plugins and plugin-menu
-        splash(_("Loading Plugins"))
-
-        plugin.load_plugins()
-        menus = [p.menus for p in plugin.get_plugin_queue().get_plugins()]
-        if menus:
-            uim = self.tree.get_widget("uimanager")
-            ag = self.tree.get_widget("pluginActionGroup")
-
-            ctr = 0
-            for m in itt.chain(*menus):
-
-                # create action
-                aname = "plugin%d" % ctr
-                a = gtk.Action(aname, m.label, None, None)
-                a.connect("activate", m.call)
-                ag.add_action(a)
-
-                # add to UI
-                mid = uim.new_merge_id()
-                uim.add_ui(mid, "ui/menubar/pluginMenu", aname, aname, gtk.UI_MANAGER_MENUITEM, False)
-
-                ctr += 1
-                
 
         splash(_("Building frontend"))
         # set paned position
@@ -580,6 +555,11 @@ class MainWindow (Window):
         # set emerge queue
         self.queueTree = GtkTree(self.queueList.get_model())
         self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update, threadClass = GtkThread)
+        
+        # set plugins and plugin-menu
+        splash(_("Loading Plugins"))
+
+        plugin.load_plugins()
         
         # session
         splash(_("Restoring Session"))
