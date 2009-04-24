@@ -119,6 +119,7 @@ class WidgetSlot (object):
         self.add = add
         self._inited = False
 
+        debug("Registering new WidgetSlot '%s'.", name)
         WidgetSlot.slots[name] = self
 
     def add_widget (self, w):

@@ -50,6 +50,27 @@ from .preference import PreferenceWindow
 from .search import SearchWindow
 from .update import UpdateWindow
 
+class PluginMenuSlot (plugin.WidgetSlot):
+
+    def __init__ (self, tree):
+        plugin.WidgetSlot.__init__(self, self.create_action, "Plugin Menu")
+        
+        self.ctr = 0 # counter for the plugin actions
+        self.uim = tree.get_widget("uimanager")
+        self.ag = tree.get_widget("pluginActionGroup")
+
+    def create_action (self, label):
+        aname = "plugin%d" % self.ctr
+        a = gtk.Action(aname, label, None, None)
+        self.ctr += 1
+
+    def add (self, action):
+        self.ag.add_action(action)
+
+        # add to UI
+        mid = self.uim.new_merge_id()
+        self.uim.add_ui(mid, "ui/menubar/pluginMenu", action.get_name(), action.get_name(), gtk.UI_MANAGER_MENUITEM, False)
+
 class PackageTable:
     """A window with data about a specfic package."""
 
@@ -559,6 +580,7 @@ class MainWindow (Window):
         # set plugins and plugin-menu
         splash(_("Loading Plugins"))
 
+        PluginMenuSlot(self.tree)
         plugin.load_plugins()
         
         # session
