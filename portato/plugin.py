@@ -98,20 +98,36 @@ class WidgetSlot (object):
         name : string
             The slot's name.
 
+        init : function
+            Function to call, iff there is at least one widget for that slot.
+
+        add : function(`Widget`)
+            Function to call, if a widget is added.
+
         max : int
             The maximum number of widgets which can be registered. -1 means unlimited.
 
     """
     
     slots = {}
-    __slots__ = ("widget", "name", "max")
-
-    def __init__ (self, widget, name, max = -1):
+    
+    def __init__ (self, widget, name, add = None, init = None, max = -1):
         self.widget = widget
         self.name = name
         self.max = max
+        self.init = init
+        self.add = add
+        self._inited = False
 
         WidgetSlot.slots[name] = self
+
+    def add_widget (self, w):
+        if not self._inited:
+            if self.init is not None:
+                self.init()
+            self._inited = True
+
+        self.add(w)
 
 class Widget (object):
     """
@@ -126,6 +142,8 @@ class Widget (object):
             The widget which is added.
 
     """
+
+    __slots__ = ("slot", "widget")
 
     def __init__ (self, slot, widget):
         self.slot = slot
@@ -230,7 +248,7 @@ class Plugin (object):
         return getattr(self, "__name__", self.__class__.__name__)
 
     @property
-    def widget (self):
+    def widgets (self):
         """
         Returns an iterator over the widgets for this plugin.
 
@@ -389,6 +407,10 @@ class PluginQueue (object):
 
         self._organize()
 
+        for p in self.plugins:
+            for w in p.widgets:
+                WidgetSlot[w.slot].add_widget(w)
+
     def add (self, plugin, disable = False):
         """
         Adds a plugin to the internal list.
@@ -535,7 +557,6 @@ class PluginQueue (object):
 
         for hook, calls in star_after.iteritems():
             self.hooks[hook].after.extend(calls) # append the list
-
 
     def _resolve_unresolved (self, before, after):
         def resolve(hook, list, type, add):
