@@ -585,6 +585,9 @@ class MainWindow (Window):
         # set plugins and plugin-menu
         splash(_("Loading Plugins"))
 
+        optionsHB = self.tree.get_widget("optionsHB")
+        plugin.WidgetSlot(gtk.CheckButton, "Emerge Options", add = lambda w: optionsHB.pack_end(w.widget))
+
         PluginMenuSlot(self.tree)
         plugin.load_plugins()
         
