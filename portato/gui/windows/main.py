@@ -391,9 +391,6 @@ class PackageTable:
         flag = store[path][2]
         pkg = self.pkg
         
-        if pkg.use_expanded(flag): # ignore expanded flags
-            return False
-
         store[path][0] = not store[path][0]
         prefix = ""
         if not store[path][0]:
@@ -953,7 +950,7 @@ class MainWindow (Window):
         tCell = gtk.CellRendererToggle()
         tCell.set_property("activatable", True)
         tCell.connect("toggled", self.cb_use_flag_toggled)
-        useList.append_column(gtk.TreeViewColumn(_("Enabled"), tCell, active = 0))
+        useList.append_column(gtk.TreeViewColumn(_("Enabled"), tCell, active = 0, activatable = 4))
         useList.append_column(gtk.TreeViewColumn(_("Installed"), iCell, active = 1))
         useList.append_column(gtk.TreeViewColumn(_("Flag"), cell, text = 2))
         useList.append_column(gtk.TreeViewColumn(_("Description"), cell, markup = 3))
@@ -964,7 +961,7 @@ class MainWindow (Window):
         return useList
     
     def fill_use_list(self, pkg):
-        store = gtk.TreeStore(bool, bool, str, str)
+        store = gtk.TreeStore(bool, bool, str, str, bool)
 
         pkg_flags = pkg.get_iuse_flags()
         pkg_flags.sort()
@@ -979,7 +976,7 @@ class MainWindow (Window):
             exp = pkg.use_expanded(use, suggest = actual_exp)
             if exp is not None:
                 if exp != actual_exp:
-                    actual_exp_it = store.append(None, [None, None, exp, "<i>%s</i>" % _("This is an expanded use flag and cannot be selected")])
+                    actual_exp_it = store.append(None, [None, None, exp, "<i>%s</i>" % _("This is an expanded use flag and cannot be selected"), False])
                     actual_exp = exp
             else:
                 actual_exp_it = None
@@ -987,7 +984,7 @@ class MainWindow (Window):
 
             enabled = use in euse
             installed = use in instuse
-            store.append(actual_exp_it, [enabled, installed, use, system.get_use_desc(use, pkg.get_cp())])
+            store.append(actual_exp_it, [enabled, installed, use, system.get_use_desc(use, pkg.get_cp()), True])
 
         return store
 
