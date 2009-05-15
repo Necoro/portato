@@ -18,7 +18,7 @@ class GPytage (Plugin):
     __dependency__ = ["app-portage/gpytage"]
 
     def init (self):
-        self.add_menu("Config _Editor", self.menu)
+        self.create_widget("Plugin Menu", "Config _Editor", activate = self.menu)
 
     def menu (self, *args):
         Popen(["/usr/bin/gpytage"])

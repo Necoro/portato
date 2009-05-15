@@ -34,24 +34,6 @@ class PluginLoadException (Exception):
     """
     pass
 
-class Menu (object):
-    """
-    One single menu entry.
-
-    :IVariables:
-
-        label : string
-            The label of the entry. Can have underscores to define the shortcut.
-
-        call
-            The function to call, if the entry is clicked.
-    """
-    __slots__ = ("label", "call")
-
-    def __init__ (self, label, call):
-        self.label = label
-        self.call = call
-
 class Call (object):
     """
     This class represents an object, which is attached to a specified hook.
@@ -104,6 +86,79 @@ class Hook (object):
         self.override = None
         self.after = []
 
+class WidgetSlot (object):
+    """
+    A slot, where plugins can add widgets.
+
+    :IVariables:
+
+        widget : gobject.GObjectMeta
+            The widget class, which can be used in this slot.
+
+        name : string
+            The slot's name.
+
+        init : function
+            Function to call, iff there is at least one widget for that slot.
+
+        add : function(`Widget`)
+            Function to call, if a widget is added.
+
+        max : int
+            The maximum number of widgets which can be registered. -1 means unlimited.
+
+    """
+    
+    slots = {}
+    
+    def __init__ (self, widget, name, add = None, init = None, max = -1):
+        self.widget = widget
+        self.name = name
+        self.max = max
+
+        # we might be subclassed
+        # in this case do not overwrite
+
+        if not hasattr(self, "init"):
+            self.init = init
+
+        if not hasattr(self, "add"):
+            self.add = add
+        
+        self._inited = False
+
+        debug("Registering new WidgetSlot '%s'.", name)
+        WidgetSlot.slots[name] = self
+
+    def add_widget (self, w):
+        if not self._inited:
+            if self.init is not None:
+                self.init()
+            self._inited = True
+
+        if self.add is not None:
+            self.add(w)
+
+class Widget (object):
+    """
+    Fills a WidgetSlot.
+
+    :IVariables:
+
+        slot : string
+            The name of the slot to fill.
+
+        widget : gtk.Widget
+            The widget which is added.
+
+    """
+
+    __slots__ = ("slot", "widget")
+
+    def __init__ (self, slot, widget):
+        self.slot = slot
+        self.widget = widget
+
 class Plugin (object):
     """
     This is the main plugin object. It is used where ever a plugin is wanted, and it is the one, which needs to be subclassed by plugin authors.
@@ -134,7 +189,7 @@ class Plugin (object):
         :param disable: Forcefully disable the plugin
         :type disable: bool
         """
-        self.__menus = [] #: List of `Menu`
+        self.__widgets = [] #: List of `Widget`
         self.__calls = [] #: List of `Call`
         self._unresolved_deps = False #: Does this plugin has unresolved dependencies?
 
@@ -203,13 +258,13 @@ class Plugin (object):
         return getattr(self, "__name__", self.__class__.__name__)
 
     @property
-    def menus (self):
+    def widgets (self):
         """
-        Returns an iterator over the menus for this plugin.
+        Returns an iterator over the widgets for this plugin.
 
-        :rtype: iter<`Menu`>
+        :rtype: iter<`Widget`>
         """
-        return iter(self.__menus)
+        return iter(self.__widgets)
 
     @property
     def calls (self):
@@ -243,13 +298,48 @@ class Plugin (object):
         """
         return (self.status in (self.STAT_ENABLED, self.STAT_TEMP_ENABLED))
     
-    def add_menu (self, label, callable):
+    def add_widget (self, slot, widget):
         """
-        Adds a new menu item for this plugin.
+        Adds a new widget for this plugin.
 
-        :see: `Menu`
+        :see: `Widget`
         """
-        self.__menus.append(Menu(label, callable))
+
+        if not slot in WidgetSlot.slots:
+            raise PluginLoadException, "Could not find specified widget slot: %s" % slot
+        
+        self.__widgets.append(Widget(slot, widget))
+
+    def create_widget (self, slot, args, **kwargs):
+        """
+        Creates a new widget for the plugin.
+
+        :Parameters:
+            
+            slot : string
+                The slot to create a widget for.
+
+            args : list of objects
+                The arguments to pass to the widget constructor.
+
+            kwargs : dict
+                Additional named parameters are for callback functions.
+        """
+
+        try:
+            widget = WidgetSlot.slots[slot].widget
+        except KeyError:
+            raise PluginLoadException, "Could not find specified widget slot: %s" % slot
+
+        if not hasattr(args, "__iter__"):
+            w = widget(args)
+        else:
+            w = widget(*args)
+
+        for k,v in kwargs.iteritems():
+            w.connect(k, v)
+
+        self.add_widget(slot, w)
 
     def add_call (self, hook, callable, type = "before", dep = None):
         """
@@ -333,6 +423,10 @@ class PluginQueue (object):
                 error(_("Loading plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : tb})
 
         self._organize()
+
+        for p in self.plugins:
+            for w in p.widgets:
+                WidgetSlot.slots[w.slot].add_widget(w)
 
     def add (self, plugin, disable = False):
         """
@@ -480,7 +574,6 @@ class PluginQueue (object):
 
         for hook, calls in star_after.iteritems():
             self.hooks[hook].after.extend(calls) # append the list
-
 
     def _resolve_unresolved (self, before, after):
         def resolve(hook, list, type, add):
