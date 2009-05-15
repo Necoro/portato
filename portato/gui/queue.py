@@ -27,7 +27,7 @@ from ..odict import OrderedDict
 from .updater import Updater
 
 # the wrapper
-from .wrapper import GtkConsole, GtkTree
+from .utils import GtkTree
 
 class EmergeQueue:
     """This class manages the emerge queue."""
@@ -38,7 +38,7 @@ class EmergeQueue:
         @param tree: Tree to append all the items to.
         @type tree: GtkTree
         @param console: Output is shown here.
-        @type console: GtkConsole
+        @type console: vte.Terminal
         @param db: A database instance.
         @type db: Database
         @param title_update: A function, which will be called whenever there is a title update.
@@ -64,7 +64,6 @@ class EmergeQueue:
         if self.tree and not isinstance(self.tree, GtkTree): raise TypeError, "tree passed is not a GtkTree-object"
         
         self.console = console
-        if self.console and not isinstance(self.console, GtkConsole): raise TypeError, "console passed is not a GtkConsole-object"
         
         self.db = db
         self.title_update = title_update
@@ -350,7 +349,7 @@ class EmergeQueue:
 
             # open tty
             if self.console:
-                self.console.reset()
+                self.console.reset(True, True)
 
             def pre ():
                 os.setsid() # new session

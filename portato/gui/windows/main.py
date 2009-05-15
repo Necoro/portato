@@ -15,6 +15,7 @@ from __future__ import absolute_import, with_statement
 # gtk stuff
 import gtk
 import gobject
+import vte
 
 # other
 import os
@@ -35,10 +36,9 @@ from ... import plugin
 from .. import slots
 
 # more GUI stuff
-from ..utils import Config, GtkThread, get_color
+from ..utils import Config, GtkThread, GtkTree, get_color
 from ..queue import EmergeQueue
 from ..session import SESSION_VERSION, SessionException, OldSessionException, NewSessionException
-from ..wrapper import GtkTree, GtkConsole
 from ..views import LogView, HighlightView, InstalledOnlyView, LazyStoreView
 from ..dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
         nothing_found_dialog, queue_not_empty_dialog, remove_deps_dialog,
@@ -503,7 +503,7 @@ class MainWindow (Window):
         self.build_queue_list()
 
         # the terminal
-        self.console = GtkConsole()
+        self.console = vte.Terminal()
         self.termHB = self.tree.get_widget("termHB")
         self.build_terminal()
         
