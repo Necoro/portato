@@ -17,6 +17,12 @@ class SystemInterface (object):
     SET_INSTALLED = "__portato_installed__"
     SET_UNINSTALLED = "__portato_uninstalled__"
 
+    def eapi_supported (self, eapi):
+        """Signals, whether the given eapi is supported.
+
+        @rtype: boolean"""
+        raise NotImplementedError
+
     def has_set_support (self):
         """Signals, whether this backend supports sets.
 

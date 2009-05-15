@@ -49,6 +49,9 @@ class PortageSystem (SystemInterface):
                 "system" : syssets.SystemSet
                 }
 
+    def eapi_supported (self, eapi):
+        return portage.eapi_is_supported(eapi)
+
     def has_set_support (self):
         return False
 
