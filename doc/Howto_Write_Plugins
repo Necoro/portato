@@ -17,7 +17,7 @@ Add the end you only call ``register`` once for each class and are done :).
 Of course there are some things you should bare in mind:
     
     1. Do not use the ``__init__`` method, but ``init``.
-    2. Do not use a member which shadows one from the original class:
+    2. Do not declare a member which shadows one from the original class:
        ``description``, ``author``, ``status``, ``menus``, ``name``, ``calls``, ``deps``, ``enabled``, ``add_widget``, ``create_widget``, ``add_call``
     3. Of course you can *use* the members mentioned under point 2.
 
