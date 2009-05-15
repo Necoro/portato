@@ -13,7 +13,7 @@
 from __future__ import absolute_import, with_statement
 
 import gtk
-from ...plugin import WidgetSlot # other modules might import WidgetSlot from here
+from ..plugin import WidgetSlot # other modules might import WidgetSlot from here
 
 class PluginMenuSlot (WidgetSlot):
 
