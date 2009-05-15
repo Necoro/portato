@@ -36,14 +36,11 @@ from ... import plugin
 from .. import slots
 
 # more GUI stuff
+from .. import dialogs
 from ..utils import Config, GtkThread, GtkTree, get_color
 from ..queue import EmergeQueue
 from ..session import SESSION_VERSION, SessionException, OldSessionException, NewSessionException
 from ..views import LogView, HighlightView, InstalledOnlyView, LazyStoreView
-from ..dialogs import (blocked_dialog, changed_flags_dialog, io_ex_dialog,
-        nothing_found_dialog, queue_not_empty_dialog, remove_deps_dialog,
-        remove_queue_dialog, remove_updates_dialog, unmask_dialog,
-        no_versions_dialog)
 from ..exceptions import PreReqError
 
 # even more GUI stuff
@@ -207,10 +204,10 @@ class PackageTable:
                 try:
                     self.queue.append(self.pkg.get_cpv(), type = type, update = update)
                 except PackageNotFoundException, e:
-                    if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
+                    if dialogs.unmask_dialog(e[0]) == gtk.RESPONSE_YES:
                         self.queue.append(self.pkg.get_cpv(), type = type, unmask = True, update = update)
             except BlockedException, e:
-                blocked_dialog(e[0], e[1])
+                dialogs.blocked_dialog(e[0], e[1])
         else:
             try:
                 self.queue.append(self.pkg.get_cpv(), type = "uninstall")
@@ -463,7 +460,7 @@ class MainWindow (Window):
         try:
             self.cfg = Config(CONFIG_LOCATION)
         except IOError, e:
-            io_ex_dialog(e)
+            dialogs.io_ex_dialog(e)
             raise
 
         self.cfg.modify_external_configs()
@@ -994,7 +991,7 @@ class MainWindow (Window):
         try:
             self.session = Session("gui.cfg", name="GUI", oldfiles=["gtk_session.cfg"])
         except (OSError, IOError), e:
-            io_ex_dialog(e)
+            dialogs.io_ex_dialog(e)
             return
 
         oldVersion = SESSION_VERSION
@@ -1369,7 +1366,7 @@ class MainWindow (Window):
                 self.fill_version_list(self.selCP)
             except VersionsNotFoundException, e:
                 warning(_("No versions of package '%s' found!") % self.selCP)
-                no_versions_dialog(self.selCP)
+                dialogs.no_versions_dialog(self.selCP)
                 self.db.disable(self.selCP)
                 self.selCP = oldcp
 
@@ -1504,11 +1501,11 @@ class MainWindow (Window):
         
         if len(flags.newUseFlags) > 0:
             if not self.session.get_boolean("useflags", "dialogs"):
-                self.session.set("useflags", changed_flags_dialog(_("use flags"))[1], "dialogs")
+                self.session.set("useflags", dialogs.changed_flags_dialog(_("use flags"))[1], "dialogs")
             try:
                 flags.write_use_flags()
             except IOError, e:
-                io_ex_dialog(e)
+                dialogs.io_ex_dialog(e)
                 return True
         
         if len(flags.new_masked)>0 or len(flags.new_unmasked)>0 or len(flags.newTesting)>0:
@@ -1516,12 +1513,12 @@ class MainWindow (Window):
             debug("new unmasked: %s", flags.new_unmasked)
             debug("new testing: %s", flags.newTesting)
             if not self.session.get_boolean("keywords", "dialogs"):
-                self.session.set("keywords", changed_flags_dialog(_("masking keywords"))[1], "dialogs")
+                self.session.set("keywords", dialogs.changed_flags_dialog(_("masking keywords"))[1], "dialogs")
             try:
                 flags.write_masked()
                 flags.write_testing()
             except IOError, e:
-                io_ex_dialog(e)
+                dialogs.io_ex_dialog(e)
                 return True
             else:
                 system.reload_settings()
@@ -1555,12 +1552,12 @@ class MainWindow (Window):
                         for pkg, old_pkg in updating:
                             self.queue.append(pkg.get_cpv(), type = "update", unmask = False)
                     except PackageNotFoundException, e:
-                        if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
+                        if dialogs.unmask_dialog(e[0]) == gtk.RESPONSE_YES:
                             for pkg, old_pkg in updating:
                                 self.queue.append(pkg.get_cpv(), type = "update", unmask = True)
 
                 except BlockedException, e:
-                    blocked_dialog(e[0], e[1])
+                    dialogs.blocked_dialog(e[0], e[1])
                     self.queue.remove_children(self.queueTree.get_update_it())
                 
                 return False
@@ -1593,18 +1590,18 @@ class MainWindow (Window):
             parent = model.iter_parent(iter)
             
             if self.queueTree.is_in_update(iter) and parent:
-                if remove_updates_dialog() == gtk.RESPONSE_YES:
+                if dialogs.remove_updates_dialog() == gtk.RESPONSE_YES:
                     self.queue.remove_with_children(self.queueTree.get_update_it())
             
             elif not parent: # top-level
                 if model.iter_n_children(iter) > 0: # and has children which can be removed :)
-                    if remove_queue_dialog() == gtk.RESPONSE_YES :
+                    if dialogs.remove_queue_dialog() == gtk.RESPONSE_YES :
                         self.queue.remove_with_children(iter)
                 else:
                     self.queue.remove(iter)
             
             elif model.iter_parent(parent): # this is in the 3rd level => dependency
-                remove_deps_dialog()
+                dialogs.remove_deps_dialog()
             else:
                 self.queue.remove_with_children(iter)
 
@@ -1630,7 +1627,7 @@ class MainWindow (Window):
             flags.write_testing()
             flags.write_masked()
         except IOError, e:
-            io_ex_dialog(e)
+            dialogs.io_ex_dialog(e)
 
     @Window.watch_cursor
     def cb_reload_clicked (self, action):
@@ -1649,7 +1646,7 @@ class MainWindow (Window):
             packages = system.find_packages(text, with_version = False)
 
             if packages == []:
-                nothing_found_dialog()
+                dialogs.nothing_found_dialog()
             else:
                 if len(packages) == 1:
                     self.jump_to(packages[0])
@@ -1818,7 +1815,7 @@ class MainWindow (Window):
         self.__save_queue = False
 
         if not self.queue.is_empty():
-            ret = queue_not_empty_dialog()
+            ret = dialogs.queue_not_empty_dialog()
             if ret == gtk.RESPONSE_CANCEL:
                 return True
             else: # there is sth in queue AND the user still wants to close -> kill emerge
