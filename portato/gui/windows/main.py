@@ -23,12 +23,16 @@ from collections import defaultdict
 
 # our backend stuff
 from ...backend import flags, system # must be the first to avoid circular deps
-from ... import get_listener, plugin
+from ... import get_listener
 from ...helper import debug, warning, error, info
 from ...session import Session
 from ...db import Database
 from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
 from ...backend.exceptions import PackageNotFoundException, BlockedException, VersionsNotFoundException
+
+# plugin stuff
+from ... import plugin
+from .. import slots
 
 # more GUI stuff
 from ..utils import Config, GtkThread, get_color
@@ -49,32 +53,6 @@ from .plugin import PluginWindow
 from .preference import PreferenceWindow
 from .search import SearchWindow
 from .update import UpdateWindow
-
-class PluginMenuSlot (plugin.WidgetSlot):
-
-    def __init__ (self, tree):
-        plugin.WidgetSlot.__init__(self, self.create_action, "Plugin Menu")
-        
-        self.ctr = 0 # counter for the plugin actions
-        self.uim = tree.get_widget("uimanager")
-        self.ag = tree.get_widget("pluginActionGroup")
-
-    def create_action (self, label):
-        aname = "plugin%d" % self.ctr
-        a = gtk.Action(aname, label, None, None)
-        self.ctr += 1
-        
-        return a
-
-    def add (self, widget):
-        action = widget.widget
-        self.ag.add_action(action)
-
-        # add to UI
-        mid = self.uim.new_merge_id()
-        self.uim.add_ui(mid, "ui/menubar/pluginMenu", action.get_name(), action.get_name(), gtk.UI_MANAGER_MENUITEM, False)
-
-        self.uim.ensure_update()
 
 class PackageTable:
     """A window with data about a specfic package."""
@@ -586,9 +564,9 @@ class MainWindow (Window):
         splash(_("Loading Plugins"))
 
         optionsHB = self.tree.get_widget("optionsHB")
-        plugin.WidgetSlot(gtk.CheckButton, "Emerge Options", add = lambda w: optionsHB.pack_end(w.widget))
+        slots.WidgetSlot(gtk.CheckButton, "Emerge Options", add = lambda w: optionsHB.pack_end(w.widget))
 
-        PluginMenuSlot(self.tree)
+        slots.PluginMenuSlot(self.tree)
         plugin.load_plugins()
         
         # session
