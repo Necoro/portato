@@ -3,6 +3,8 @@ next:
 - added support for ktsuss as su-frontend
 - add man-page
 - remove the deprecated -L cmdline option: use -F instead
+- honor EAPI-masking
+- overhaul plugin system: now allow plugins to add widgets
 
 0.12.1:
 - bugfixes
