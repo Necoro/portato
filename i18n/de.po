@@ -39,7 +39,7 @@ msgstr "Debug"
 
 #: portato/gui/templates/PreferenceWindow.ui:61
 msgid "Search while typing"
-msgstr "Suche währen des Tippens"
+msgstr "Suche während des Tippens"
 
 #: portato/gui/templates/PreferenceWindow.ui:81
 msgid "Browser command: "
