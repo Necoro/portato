@@ -117,7 +117,7 @@ class PortagePackage (Package):
     def is_masked (self, use_changed = True):
         
         # things with bad EAPI are _always_ masked
-        if self.status.startswith("EAPI"): return True
+        if any(x.startswith("EAPI") for x in self._status): return True
         
         if use_changed:
             status = flags.new_masking_status(self.get_cpv())
