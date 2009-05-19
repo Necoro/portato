@@ -508,6 +508,7 @@ class MainWindow (Window):
         self.sysNotebook = self.tree.get_widget("systemNotebook")
         self.pkgNotebook = self.tree.get_widget("packageNotebook")
         self.set_notebook_tabpos(map(PreferenceWindow.tabpos.get, map(int, (self.cfg.get("packageTabPos", "GUI"), self.cfg.get("systemTabPos", "GUI")))))
+        slots.NotebookSlot(self.pkgNotebook, gtk.Widget, "Package Notebook")
         
         # the different scrolls
         ebuildScroll = self.tree.get_widget("ebuildScroll")

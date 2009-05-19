@@ -40,3 +40,20 @@ class PluginMenuSlot (WidgetSlot):
         self.uim.add_ui(mid, "ui/menubar/pluginMenu", action.get_name(), action.get_name(), gtk.UI_MANAGER_MENUITEM, False)
 
         self.uim.ensure_update()
+
+class NotebookSlot (WidgetSlot):
+
+    def __init__ (self, notebook, *args, **kwargs):
+        self.notebook = notebook
+
+        WidgetSlot.__init__(self, *args, **kwargs)
+
+    def add (self, widget):
+        if isinstance(widget.widget, tuple):
+            label = gtk.Label(widget.widget[1])
+        else:
+            label = None
+        
+        widget = widget.widget[0]
+
+        self.notebook.append_page(widget, label)
