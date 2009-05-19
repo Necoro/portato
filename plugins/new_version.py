@@ -34,6 +34,12 @@ class NewVersionFinder(Plugin):
 
     def find_version (self, rev):
         try:
+            plugin.load_plugins() # to have lp: addresses parsed
+        except Exception, e:
+            warning("NEW_VERSION :: Exception occured while loading bzr-plugins: %s", str(e))
+            return
+
+        try:
             b = branch.Branch.open(REPOURI)
         except Exception, e:
             warning("NEW_VERSION :: Exception occured while accessing the remote branch: %s", str(e))
@@ -63,8 +69,6 @@ class NewVersionFinder(Plugin):
 
         rev = v[-1]
 
-        plugin.load_plugins() # to have lp: addresses parsed
-        
         self.start_thread(rev)
         return rev
 
