@@ -15,7 +15,7 @@ Some nice functions used in the program.
 """
 from __future__ import absolute_import, with_statement
 
-import os, signal, logging
+import os, logging
 
 debug         = logging.getLogger("portatoLogger").debug
 info         = logging.getLogger("portatoLogger").info
@@ -25,21 +25,6 @@ critical     = logging.getLogger("portatoLogger").critical
 
 def N_ (s):
     return s
-
-def send_signal_to_group (sig):
-    """Sends a signal to all processes of our process group (w/o ourselves).
-    
-    @param sig: signal number to send
-    @type sig: int"""
-
-    def handler (sig, stack):
-        """Ignores the signal exactly one time and then restores the default."""
-        signal.signal(sig, signal.SIG_DFL)
-    
-    signal.signal(sig, handler)
-    
-    pgid = os.getpgrp()
-    os.killpg(pgid, sig)
 
 def get_runsystem ():
      # check for sabayon first, as sabayon also has the gentoo release
