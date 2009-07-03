@@ -1,4 +1,4 @@
-next:
+0.13:
 - allow lines w/o keyword in package.keywords
 - added support for ktsuss as su-frontend
 - add man-page
