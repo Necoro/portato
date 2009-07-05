@@ -19,9 +19,6 @@ Thus it keeps comments and structuring of the file.
 
 :Variables:
 
-    DELIMITER : string[]
-        list of delimiters allowed
-
     COMMENT : string []
         comment marks allowed
 
@@ -48,14 +45,13 @@ from threading import Lock
 
 from .helper import debug, error
 
-DELIMITER = ["=", ":"]
 COMMENT = [";","#"]
 
 # precompiled expressions
 TRUE = re.compile("((true)|(1)|(on)|(wahr)|(ja)|(yes))", re.I)
 FALSE = re.compile("((false)|(0)|(off)|(falsch)|(nein)|(no))", re.I)
 SECTION = re.compile("\s*\[(?P<name>\w(\w|[-_])*)\]\s*")
-EXPRESSION = re.compile(r"\s*(?P<key>\w(\w|[-_])*)\s*[:=]\s*(?P<value>.*)\s*")
+EXPRESSION = re.compile(r"\s*(?P<key>\w(\w|[-_:])*)\s*=\s*(?P<value>.*)\s*")
 
 class KeyNotFoundException (KeyError):
     """
