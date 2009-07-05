@@ -98,7 +98,7 @@ class PackageTable:
         # views
         self.views = map (lambda x: self.tree.get_widget(x).get_child(),
                 [
-                    "ebuildScroll", "filesScroll",
+                    "filesScroll",
                     "dependencyScroll", "useListScroll"
                 ])
 
@@ -522,8 +522,6 @@ class MainWindow (Window):
         slots.NotebookSlot(self.pkgNotebook, gtk.Widget, "Package Notebook")
         
         # the different scrolls
-        ebuildScroll = self.tree.get_widget("ebuildScroll")
-        ebuildScroll.add(HighlightView(lambda p: p.get_ebuild_path(), ["gentoo", "sh"]))
 
         def show_files (p):
             try:

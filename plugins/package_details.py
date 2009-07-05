@@ -56,7 +56,19 @@ class ChangelogDetail (ScrolledDetail):
     _widget_name_ = "Changelog"
 
     def widget_init (self):
-        self._view_ = HighlightView(lambda p: os.path.join(p.get_package_path(), "ChangeLog"), ["changelog"])
+        self._view_ = HighlightView(self.view_update, ["changelog"])
         ScrolledDetail.widget_init(self)
 
+    def view_update (self, pkg):
+        return os.path.join(pkg.get_package_path(), "Changelog")
+
+class EbuildDetail (ScrolledDetail):
+    __description__ = "Shows the ebuild of a package"
+    _widget_name_ = "Ebuild"
+    
+    def widget_init(self):
+        self._view_ = HighlightView(lambda p: p.get_ebuild_path(), ["gentoo", "sh"])
+        ScrolledDetail.widget_init(self)
+
+register(EbuildDetail)
 register(ChangelogDetail)
