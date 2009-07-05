@@ -470,6 +470,15 @@ class MainWindow (Window):
         # package db
         splash(_("Creating Database"))
         self.db = Database(self.cfg.get("type", section = "DATABASE"))
+        
+        # set plugins and plugin-menu
+        splash(_("Loading Plugins"))
+
+        optionsHB = self.tree.get_widget("optionsHB")
+        slots.WidgetSlot(gtk.CheckButton, "Emerge Options", add = lambda w: optionsHB.pack_end(w.widget))
+
+        slots.PluginMenuSlot(self.tree)
+        plugin.load_plugins()
 
         splash(_("Building frontend"))
         # set paned position
@@ -555,14 +564,6 @@ class MainWindow (Window):
         self.queueTree = GtkTree(self.queueList.get_model())
         self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update, threadClass = GtkThread)
         
-        # set plugins and plugin-menu
-        splash(_("Loading Plugins"))
-
-        optionsHB = self.tree.get_widget("optionsHB")
-        slots.WidgetSlot(gtk.CheckButton, "Emerge Options", add = lambda w: optionsHB.pack_end(w.widget))
-
-        slots.PluginMenuSlot(self.tree)
-        plugin.load_plugins()
         
         # session
         splash(_("Restoring Session"))
@@ -574,6 +575,9 @@ class MainWindow (Window):
         except SessionException, e:
             warning(str(e))
             self.load_session(defaults_only = True) # last ressort
+
+        splash(_("Loading Plugin Widgets"))
+        plugin.load_plugin_widgets()
         
         splash(_("Finishing startup"))
         

@@ -189,7 +189,6 @@ class Plugin (object):
         :param disable: Forcefully disable the plugin
         :type disable: bool
         """
-        self.__widgets = [] #: List of `Widget`
         self.__calls = [] #: List of `Call`
         self._unresolved_deps = False #: Does this plugin has unresolved dependencies?
 
@@ -258,15 +257,6 @@ class Plugin (object):
         return getattr(self, "__name__", self.__class__.__name__)
 
     @property
-    def widgets (self):
-        """
-        Returns an iterator over the widgets for this plugin.
-
-        :rtype: iter<`Widget`>
-        """
-        return iter(self.__widgets)
-
-    @property
     def calls (self):
         """
         Returns an iterator over the registered calls for this plugin.
@@ -298,6 +288,27 @@ class Plugin (object):
         """
         return (self.status in (self.STAT_ENABLED, self.STAT_TEMP_ENABLED))
     
+    def add_call (self, hook, callable, type = "before", dep = None):
+        """
+        Adds a new call for this plugin.
+
+        :see: `Call`
+        """
+        self.__calls.append(Call(self, hook, callable, type, dep))
+
+class WidgetPlugin (Plugin):
+
+    def __init__ (self, *args, **kwargs):
+        Plugin.__init__(self, *args, **kwargs)
+        self.__widgets = [] #: List of `Widget`
+
+    def _widget_init (self):
+        if self.status == self.STAT_ENABLED and not self._unresolved_deps:
+            self.widget_init()
+
+    def widget_init (self):
+        debug("No widgets to initialize. Wrong class used for plugin?")
+
     def add_widget (self, slot, widget):
         """
         Adds a new widget for this plugin.
@@ -340,15 +351,15 @@ class Plugin (object):
             w.connect(k, v)
 
         self.add_widget(slot, w)
-
-    def add_call (self, hook, callable, type = "before", dep = None):
+    
+    @property
+    def widgets (self):
         """
-        Adds a new call for this plugin.
+        Returns an iterator over the widgets for this plugin.
 
-        :see: `Call`
+        :rtype: iter<`Widget`>
         """
-        self.__calls.append(Call(self, hook, callable, type, dep))
-
+        return iter(self.__widgets)
 
 class PluginQueue (object):
     """
@@ -411,6 +422,7 @@ class PluginQueue (object):
         plugin_module.__path__.insert(0, PLUGIN_DIR.rstrip("/")) # make the plugins loadable as "portato.plugins.name"
         # add Plugin and register to the builtins, so the plugins always have the correct version :)
         plugin_module.__builtins__["Plugin"] = Plugin
+        plugin_module.__builtins__["WidgetPlugin"] = WidgetPlugin
         plugin_module.__builtins__["register"] = register
 
         for p in plugins: # import them
@@ -424,9 +436,12 @@ class PluginQueue (object):
 
         self._organize()
 
+    def load_widgets(self):
         for p in self.plugins:
-            for w in p.widgets:
-                WidgetSlot.slots[w.slot].add_widget(w)
+            if isinstance(p, WidgetPlugin):
+                p._widget_init()
+                for w in p.widgets:
+                    WidgetSlot.slots[w.slot].add_widget(w)
 
     def add (self, plugin, disable = False):
         """
@@ -443,7 +458,7 @@ class PluginQueue (object):
         :raise PluginLoadException: passed plugin is not of class `Plugin`
         """
 
-        if callable(plugin) and Plugin in plugin.__bases__:
+        if callable(plugin) and issubclass(plugin, Plugin):
             p = plugin(disable = disable) # need an instance and not the class
         elif isinstance(plugin, Plugin):
             p = plugin
@@ -616,6 +631,13 @@ def load_plugins():
         __plugins = PluginQueue()
         __plugins.load()
     
+
+def load_plugin_widgets():
+    """
+    Loads the widgets of the plugins.
+    """
+    if __plugins is not None:
+        __plugins.load_widgets()
 
 def get_plugin_queue():
     """
