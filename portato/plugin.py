@@ -635,6 +635,18 @@ def hook(hook, *args, **kwargs):
     else:
         return __plugins.hook(hook, *args, **kwargs)
 
+def dummy_hook (h, *args, **kwargs):
+    """
+    Creates a dummy hook, i.e. a hook which is only needed to trigger something in the plugins, but does nothing for itself.
+    """
+
+    if __plugins is None:
+        pass
+    else:
+        def dummy ():
+            pass
+        hook(h, *args, **kwargs)(dummy)()
+
 def register (plugin, disable = False):
     """
     Registers a plugin.
