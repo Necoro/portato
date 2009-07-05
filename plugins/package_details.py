@@ -17,6 +17,11 @@ from portato.gui import views
 from portato.backend import system
 
 class Detail (WidgetPlugin):
+    """
+    The baseclass for a detail.
+    This inherits from `WidgetPlugin` and manages the basic things, like adding to the Notebook.
+    """
+
     __author__ = "René 'Necoro' Neumann"
     _view_ = None
     old_pkg = None
@@ -27,6 +32,7 @@ class Detail (WidgetPlugin):
     def widget_init (self):
         self.add_widget("Package Notebook", (self._widget_, self._widget_name_))
 
+        # if the detail was updated before it was actually initialized, update it again :)
         if self._old_pkg is not None:
             self._update(self._old_pkg)
 
@@ -39,14 +45,19 @@ class Detail (WidgetPlugin):
 
             self._view_.update(pkg, force = force)
             self._old_pkg = None
-        else:
+        
+        else: # save
             self._old_pkg = pkg
 
 class ScrolledDetail (Detail):
+    """
+    Add a ScrolledWindow.
+    """
 
     def widget_init (self):
         self._widget_ = gtk.ScrolledWindow()
         self._widget_.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        
         if self._view_ is not None:
             self._widget_.add(self._view_)
 
@@ -67,6 +78,7 @@ class ChangelogDetail (ScrolledDetail):
 class EbuildDetail (ScrolledDetail):
     __description__ = _("Shows the ebuild of a package")
     __name__ = "Detail: Ebuild"
+    __dependency__ = [">=dev-python/pygtksourceview-2.4.0"]
     _widget_name_ = _("Ebuild")
     
     def widget_init(self):
@@ -196,6 +208,7 @@ class DependencyDetail (ScrolledDetail):
 
         return store
 
+# register them
 register(DependencyDetail)
 register(EbuildDetail)
 register(FilesDetail)
