@@ -25,7 +25,7 @@ packages = ["portato", "portato.db", "portato.gui", "portato.gui.windows", "port
 data_files = [
         (TEMPLATE_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if x.endswith(".ui")]),
         (ICON_DIR, ["icons/portato-icon.png"]),
-        (PLUGIN_DIR, plugin_list("gpytage", "notify", "etc_proposals", "reload_portage"))]
+        (PLUGIN_DIR, plugin_list("gpytage", "notify", "etc_proposals", "reload_portage", "package_details"))]
 
 # do the distutils setup
 setup(name=APP,
