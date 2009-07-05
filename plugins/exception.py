@@ -13,8 +13,8 @@
 def throw (*args, **kwargs):
     raise Exception, "As requested, Sir!"
 
-p = Plugin()
+p = WidgetPlugin()
 p.__name__ = "ExceptionThrower"
 p.__author__ = "René 'Necoro' Neumann"
-p.create_widget("Plugin Menu", "Throw exception", activate = throw)
+p.widget_init = lambda: p.create_widget("Plugin Menu", "Throw exception", activate = throw)
 register(p)

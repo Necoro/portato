@@ -15,7 +15,7 @@ from portato.helper import error
 import os
 from subprocess import Popen
 
-class EtcProposals (Plugin):
+class EtcProposals (WidgetPlugin):
     __author__ = "René 'Necoro' Neumann"
     __description__ = "Adds support for <b>etc-proposals</b>, a graphical etc-update replacement."
     __dependency__ = ["app-portage/etc-proposals"]
@@ -23,6 +23,8 @@ class EtcProposals (Plugin):
     def init (self):
         self.prog = ["/usr/sbin/etc-proposals"]
         self.add_call("after_emerge", self.hook, type = "after")
+
+    def widget_init(self):
         self.create_widget("Plugin Menu", "Et_c-Proposals", activate = self.menu)
 
     def launch (self, options = []):

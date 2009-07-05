@@ -21,7 +21,7 @@ from portato import get_listener
 from portato.constants import REPOURI, VERSION, APP_ICON, APP
 from portato.gui.utils import GtkThread
 
-class NewVersionFinder(Plugin):
+class NewVersionFinder(WidgetPlugin):
     """
     Checks for a new version of portato every 30 minutes and on startup.
     """
@@ -30,6 +30,8 @@ class NewVersionFinder(Plugin):
 
     def init (self):
         self.add_call("main", self.run)
+
+    def widget_init (self):
         self.create_widget("Plugin Menu", "Check for new _versions", activate = self.menu)
 
     def find_version (self, rev):
