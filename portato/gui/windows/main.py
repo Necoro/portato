@@ -98,7 +98,6 @@ class PackageTable:
         # views
         self.views = map (lambda x: self.tree.get_widget(x).get_child(),
                 [
-                    "filesScroll",
                     "dependencyScroll", "useListScroll"
                 ])
 
@@ -522,16 +521,6 @@ class MainWindow (Window):
         slots.NotebookSlot(self.pkgNotebook, gtk.Widget, "Package Notebook")
         
         # the different scrolls
-
-        def show_files (p):
-            try:
-                for f in p.get_files():
-                    yield " %s\n" % f
-            except IOError, e:
-                yield _("Error: %s") % e.strerror
-
-        filesScroll = self.tree.get_widget("filesScroll")
-        filesScroll.add(InstalledOnlyView(show_files))
 
         depScroll = self.tree.get_widget("dependencyScroll")
         depScroll.add(self.build_dep_list())

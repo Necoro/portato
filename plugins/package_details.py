@@ -12,7 +12,7 @@
 
 import gtk
 import os
-from portato.gui.views import HighlightView
+from portato.gui import views
 
 class Detail (WidgetPlugin):
     __author__ = "René 'Necoro' Neumann"
@@ -49,26 +49,41 @@ class ScrolledDetail (Detail):
             self._widget_.add(self._view_)
 
         Detail.widget_init(self)
-        self._widget_.show_all()
 
 class ChangelogDetail (ScrolledDetail):
-    __description__ = "Shows the Changelog of a package"
-    _widget_name_ = "Changelog"
+    __description__ = _("Shows the Changelog of a package")
+    _widget_name_ = _("Changelog")
 
     def widget_init (self):
-        self._view_ = HighlightView(self.view_update, ["changelog"])
+        self._view_ = views.HighlightView(self.view_update, ["changelog"])
         ScrolledDetail.widget_init(self)
 
     def view_update (self, pkg):
-        return os.path.join(pkg.get_package_path(), "Changelog")
+        return os.path.join(pkg.get_package_path(), "ChangeLog")
 
 class EbuildDetail (ScrolledDetail):
-    __description__ = "Shows the ebuild of a package"
-    _widget_name_ = "Ebuild"
+    __description__ = _("Shows the ebuild of a package")
+    _widget_name_ = _("Ebuild")
     
     def widget_init(self):
-        self._view_ = HighlightView(lambda p: p.get_ebuild_path(), ["gentoo", "sh"])
+        self._view_ = views.HighlightView(lambda p: p.get_ebuild_path(), ["gentoo", "sh"])
         ScrolledDetail.widget_init(self)
 
+class FilesDetail (ScrolledDetail):
+    __description__ = _("Shows the installed files of a package")
+    _widget_name_ = _("Files")
+
+    def widget_init (self):
+        self._view_ = views.InstalledOnlyView(self.show_files)
+        ScrolledDetail.widget_init(self)
+
+    def show_files (self, pkg):
+        try:
+            for f in pkg.get_files():
+                yield " %s\n" % f
+        except IOError, e:
+            yield _("Error: %s") % e.strerror
+
 register(EbuildDetail)
+register(FilesDetail)
 register(ChangelogDetail)
