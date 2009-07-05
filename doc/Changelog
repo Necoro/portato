@@ -5,6 +5,8 @@
 - remove the deprecated -L cmdline option: use -F instead
 - honor EAPI-masking
 - overhaul plugin system: now allow plugins to add widgets
+- move some UI-Elements to extra plugins
+- do not allow ":" to be an assignment operator in config files anymore
 
 0.12.1:
 - bugfixes
