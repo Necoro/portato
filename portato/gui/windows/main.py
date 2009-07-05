@@ -98,7 +98,7 @@ class PackageTable:
         # views
         self.views = map (lambda x: self.tree.get_widget(x).get_child(),
                 [
-                    "ebuildScroll", "changelogScroll", "filesScroll",
+                    "ebuildScroll", "filesScroll",
                     "dependencyScroll", "useListScroll"
                 ])
 
@@ -216,78 +216,80 @@ class PackageTable:
                 #masked_dialog(e[0])
 
     def _update_table (self, *args):
-
         pkg = self.pkg
 
-        # set the views
         nb_page = self.notebook.get_nth_page(self.notebook.get_current_page())
         for v in self.views:
             v.update(pkg, force = nb_page == v.get_parent())
-
-        # set the labels
-        self.set_labels()
-
-        #
-        # rebuild the buttons and checkboxes in all the different manners which are possible
-        #
-        if (not pkg.is_in_system()) or pkg.is_missing_keyword():
-            if not pkg.is_in_system():
-                self.missingLabel.hide()
-                self.notInSysLabel.show()
-            else: # missing keyword
-                self.missingLabel.show()
-                self.notInSysLabel.hide()
-#            
-            self.installedCheck.hide()
-            self.maskedCheck.hide()
-            self.maskedLabel.hide()
-            self.testingCheck.hide()
-            self.emergeBtn.set_sensitive(False)
-        else: # normal package
-            self.missingLabel.hide()
-            self.notInSysLabel.hide()
-            self.installedCheck.show()
-            self.maskedCheck.show()
-            self.maskedLabel.show()
-            self.testingCheck.show()
-            if self.doEmerge:
-                self.emergeBtn.set_sensitive(True)
-            self.installedCheck.set_active(pkg.is_installed())
-            
-            reason = pkg.get_masking_reason() or " "
-            if pkg.is_masked(use_changed = False) and not pkg.is_masked(use_changed = True):
-                self.maskedCheck.set_label("<i>(%s)</i>" % _("Masked"))
-                self.maskedCheck.get_child().set_use_markup(True)
-            else:
-                self.maskedCheck.set_label(_("Masked"))
-            
-            if pkg.is_locally_masked():
-                self.maskedCheck.set_label("<b>%s</b>" % _("Masked"))
-                self.maskedCheck.get_child().set_use_markup(True)
-                self.maskedCheck.set_active(True)
-                reason = _("Masked by user")
-            else:
-                self.maskedCheck.set_active(pkg.is_masked(use_changed = False))
-            
-            if reason:
-                self.maskedLabel.set_label(reason)
-            
-            if pkg.is_testing(use_keywords = False) and not pkg.is_testing(use_keywords = True):
-                self.testingCheck.set_label("<i>(%s)</i>" % _("Testing"))
-                self.testingCheck.get_child().set_use_markup(True)
-            else:
-                self.testingCheck.set_label(_("Testing"))
-            
-            self.testingCheck.set_active(pkg.is_testing(use_keywords = False))
-
-        if self.doEmerge:
-            # set emerge-button-label
-            if not pkg.is_installed():
-                self.unmergeBtn.set_sensitive(False)
-            else:
-                self.unmergeBtn.set_sensitive(True)
         
-        self.vb.show_all()
+        @plugin.hook("update_table", pkg = pkg, page = self.notebook.get_nth_page(self.notebook.get_current_page()))
+        def _update():
+            # set the labels
+            self.set_labels()
+
+            #
+            # rebuild the buttons and checkboxes in all the different manners which are possible
+            #
+            if (not pkg.is_in_system()) or pkg.is_missing_keyword():
+                if not pkg.is_in_system():
+                    self.missingLabel.hide()
+                    self.notInSysLabel.show()
+                else: # missing keyword
+                    self.missingLabel.show()
+                    self.notInSysLabel.hide()
+                
+                self.installedCheck.hide()
+                self.maskedCheck.hide()
+                self.maskedLabel.hide()
+                self.testingCheck.hide()
+                self.emergeBtn.set_sensitive(False)
+            else: # normal package
+                self.missingLabel.hide()
+                self.notInSysLabel.hide()
+                self.installedCheck.show()
+                self.maskedCheck.show()
+                self.maskedLabel.show()
+                self.testingCheck.show()
+                if self.doEmerge:
+                    self.emergeBtn.set_sensitive(True)
+                self.installedCheck.set_active(pkg.is_installed())
+                
+                reason = pkg.get_masking_reason() or " "
+                if pkg.is_masked(use_changed = False) and not pkg.is_masked(use_changed = True):
+                    self.maskedCheck.set_label("<i>(%s)</i>" % _("Masked"))
+                    self.maskedCheck.get_child().set_use_markup(True)
+                else:
+                    self.maskedCheck.set_label(_("Masked"))
+                
+                if pkg.is_locally_masked():
+                    self.maskedCheck.set_label("<b>%s</b>" % _("Masked"))
+                    self.maskedCheck.get_child().set_use_markup(True)
+                    self.maskedCheck.set_active(True)
+                    reason = _("Masked by user")
+                else:
+                    self.maskedCheck.set_active(pkg.is_masked(use_changed = False))
+                
+                if reason:
+                    self.maskedLabel.set_label(reason)
+                
+                if pkg.is_testing(use_keywords = False) and not pkg.is_testing(use_keywords = True):
+                    self.testingCheck.set_label("<i>(%s)</i>" % _("Testing"))
+                    self.testingCheck.get_child().set_use_markup(True)
+                else:
+                    self.testingCheck.set_label(_("Testing"))
+                
+                self.testingCheck.set_active(pkg.is_testing(use_keywords = False))
+
+            if self.doEmerge:
+                # set emerge-button-label
+                if not pkg.is_installed():
+                    self.unmergeBtn.set_sensitive(False)
+                else:
+                    self.unmergeBtn.set_sensitive(True)
+            
+            self.vb.show_all()
+
+        _update()
         return True
 
     def cb_button_pressed (self, b, event):
@@ -522,9 +524,6 @@ class MainWindow (Window):
         # the different scrolls
         ebuildScroll = self.tree.get_widget("ebuildScroll")
         ebuildScroll.add(HighlightView(lambda p: p.get_ebuild_path(), ["gentoo", "sh"]))
-
-        changelogScroll = self.tree.get_widget("changelogScroll")
-        changelogScroll.add(HighlightView(lambda p: os.path.join(p.get_package_path(), "ChangeLog"), ["changelog"]))
 
         def show_files (p):
             try:
