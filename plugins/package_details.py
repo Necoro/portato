@@ -14,6 +14,8 @@ import gtk
 import os
 from portato.gui import views
 
+from portato.backend import system
+
 class Detail (WidgetPlugin):
     __author__ = "René 'Necoro' Neumann"
     _view_ = None
@@ -84,6 +86,113 @@ class FilesDetail (ScrolledDetail):
         except IOError, e:
             yield _("Error: %s") % e.strerror
 
+class DependencyDetail (ScrolledDetail):
+    __description__ = _("Shows the dependencies of a package")
+    _widget_name_ = _("Dependencies")
+
+    def widget_init (self):
+        self.icons = {}
+        self.icons["use"] = self.window.render_icon(gtk.STOCK_REMOVE, gtk.ICON_SIZE_MENU)
+        self.icons["installed"] = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
+        self.icons["or"] = self.window.render_icon(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_MENU)
+        self.icons["block"] = self.window.render_icon(gtk.STOCK_NO, gtk.ICON_SIZE_MENU)
+        
+        self._view_ = self.build_list()
+        ScrolledDetail.widget_init(self)
+    
+    def sort_key (self, x):
+        split = system.split_cpv(x.dep)
+
+        if split is None: # split_cpv returns None if this is only a CP; we assume there are only valid deps
+            return x.dep
+        else:
+            return "/".join(split[0:2])
+    
+    def cmp_flag (self, x, y):
+        # get strings - as tuples are passed
+        x = x[0]
+        y = y[0]
+
+        # remove "!"
+        ret = 0
+        if x[0] == "!":
+            ret = 1
+            x = x[1:]
+        if y[0] == "!":
+            ret = ret - 1 # if it is already 1, it is 0 now :)
+            y = y[1:]
+
+        # cmp -- if two flags are equal, the negated one is greater
+        return cmp(x,y) or ret
+    
+    def get_icon (self, dep):
+        if dep.satisfied:
+            return self.icons["installed"]
+        elif dep.dep[0] == "!":
+            return self.icons["block"]
+        else:
+            return None
+    
+    def build_list (self):
+        listView = views.LazyStoreView(self.fill_list)
+
+        col = gtk.TreeViewColumn()
+
+        cell = gtk.CellRendererPixbuf()
+        col.pack_start(cell, False)
+        col.add_attribute(cell, "pixbuf", 0)
+
+        cell = gtk.CellRendererText()
+        col.pack_start(cell, True)
+        col.add_attribute(cell, "text", 1)
+
+        listView.append_column(col)
+        listView.set_headers_visible(False)
+
+        return listView
+
+    def fill_list(self, pkg):
+
+        store = gtk.TreeStore(gtk.gdk.Pixbuf, str)
+                
+        def add (tree, it):
+            # useflags
+            flags = sorted(tree.flags.iteritems(), cmp = self.cmp_flag)
+            for use, usetree in flags:
+                if use[0] == "!":
+                    usestring = _("If '%s' is disabled") % use[1:]
+                else:
+                    usestring = _("If '%s' is enabled") % use
+                useit = store.append(it, [self.icons["use"], usestring])
+                add(usetree, useit)
+            
+            # ORs
+            for ortree in tree.ors:
+                orit = store.append(it, [self.icons["or"], _("One of the following")])
+                add(ortree, orit)
+
+            # Sub (all of)
+            for subtree in tree.subs:
+                allit = store.append(it, [None, _("All of the following")])
+                add(subtree, allit)
+
+            # normal    
+            ndeps = sorted(tree.deps, key = self.sort_key)
+            for dep in ndeps:
+                store.append(it, [self.get_icon(dep), dep.dep])
+        
+        try:
+            deptree = pkg.get_dependencies()
+        except AssertionError:
+            w =  _("Can't display dependencies: This package has an unsupported dependency string.")
+            error(w)
+            store.append(None, [None, w])
+        else:
+            add(deptree, None)
+
+        return store
+
+register(DependencyDetail)
 register(EbuildDetail)
 register(FilesDetail)
 register(ChangelogDetail)

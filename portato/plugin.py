@@ -306,7 +306,9 @@ class WidgetPlugin (Plugin):
         Plugin.__init__(self, *args, **kwargs)
         self.__widgets = [] #: List of `Widget`
 
-    def _widget_init (self):
+    def _widget_init (self, window):
+        self.window = window
+
         if self.status == self.STAT_ENABLED and not self._unresolved_deps:
             self.widget_init()
 
@@ -440,10 +442,10 @@ class PluginQueue (object):
 
         self._organize()
 
-    def load_widgets(self):
+    def load_widgets(self, window):
         for p in self.plugins:
             if isinstance(p, WidgetPlugin):
-                p._widget_init()
+                p._widget_init(window)
                 for w in p.widgets:
                     WidgetSlot.slots[w.slot].add_widget(w)
                 info(_("Widgets of plugin '%s' loaded."), p.name)
@@ -637,12 +639,12 @@ def load_plugins():
         __plugins.load()
     
 
-def load_plugin_widgets():
+def load_plugin_widgets(window):
     """
     Loads the widgets of the plugins.
     """
     if __plugins is not None:
-        __plugins.load_widgets()
+        __plugins.load_widgets(window)
 
 def get_plugin_queue():
     """

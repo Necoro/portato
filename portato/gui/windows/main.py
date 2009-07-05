@@ -98,7 +98,7 @@ class PackageTable:
         # views
         self.views = map (lambda x: self.tree.get_widget(x).get_child(),
                 [
-                    "dependencyScroll", "useListScroll"
+                    "useListScroll"
                 ])
 
         self.useList = self.tree.get_widget("useListScroll").get_child()
@@ -448,10 +448,7 @@ class MainWindow (Window):
 
         # icons
         self.icons = {}
-        self.icons["use"] = self.window.render_icon(gtk.STOCK_REMOVE, gtk.ICON_SIZE_MENU)
         self.icons["installed"] = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
-        self.icons["or"] = self.window.render_icon(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_MENU)
-        self.icons["block"] = self.window.render_icon(gtk.STOCK_NO, gtk.ICON_SIZE_MENU)
         
         # get the logging window as soon as possible
         self.logView = LogView(self.tree.get_widget("logView"))
@@ -522,9 +519,6 @@ class MainWindow (Window):
         
         # the different scrolls
 
-        depScroll = self.tree.get_widget("dependencyScroll")
-        depScroll.add(self.build_dep_list())
-        
         useScroll = self.tree.get_widget("useListScroll")
         useScroll.add(self.build_use_list())
         
@@ -563,7 +557,7 @@ class MainWindow (Window):
             self.load_session(defaults_only = True) # last ressort
 
         splash(_("Loading Plugin Widgets"))
-        plugin.load_plugin_widgets()
+        plugin.load_plugin_widgets(self.window)
         
         splash(_("Finishing startup"))
         
@@ -820,99 +814,6 @@ class MainWindow (Window):
 
         self.versionList.get_selection().select_path(pos)
         self.versionList.scroll_to_cell(pos)
-
-    def build_dep_list (self):
-
-        listView = LazyStoreView(self.fill_dep_list)
-
-        col = gtk.TreeViewColumn()
-
-        cell = gtk.CellRendererPixbuf()
-        col.pack_start(cell, False)
-        col.add_attribute(cell, "pixbuf", 0)
-
-        cell = gtk.CellRendererText()
-        col.pack_start(cell, True)
-        col.add_attribute(cell, "text", 1)
-
-        listView.append_column(col)
-        listView.set_headers_visible(False)
-
-        return listView
-
-    def fill_dep_list(self, pkg):
-
-        store = gtk.TreeStore(gtk.gdk.Pixbuf, str)
-        
-        def sort_key (x):
-            split = system.split_cpv(x.dep)
-
-            if split is None: # split_cpv returns None if this is only a CP; we assume there are only valid deps
-                return x.dep
-            else:
-                return "/".join(split[0:2])
-
-        def cmp_flag (x, y):
-            # get strings - as tuples are passed
-            x = x[0]
-            y = y[0]
-
-            # remove "!"
-            ret = 0
-            if x[0] == "!":
-                ret = 1
-                x = x[1:]
-            if y[0] == "!":
-                ret = ret - 1 # if it is already 1, it is 0 now :)
-                y = y[1:]
-
-            # cmp -- if two flags are equal, the negated one is greater
-            return cmp(x,y) or ret
-        
-        def get_icon (dep):
-            if dep.satisfied:
-                return self.icons["installed"]
-            elif dep.dep[0] == "!":
-                return self.icons["block"]
-            else:
-                return None
-                
-        def add (tree, it):
-            # useflags
-            flags = sorted(tree.flags.iteritems(), cmp = cmp_flag)
-            for use, usetree in flags:
-                if use[0] == "!":
-                    usestring = _("If '%s' is disabled") % use[1:]
-                else:
-                    usestring = _("If '%s' is enabled") % use
-                useit = store.append(it, [self.icons["use"], usestring])
-                add(usetree, useit)
-            
-            # ORs
-            for ortree in tree.ors:
-                orit = store.append(it, [self.icons["or"], _("One of the following")])
-                add(ortree, orit)
-
-            # Sub (all of)
-            for subtree in tree.subs:
-                allit = store.append(it, [None, _("All of the following")])
-                add(subtree, allit)
-
-            # normal    
-            ndeps = sorted(tree.deps, key = sort_key)
-            for dep in ndeps:
-                store.append(it, [get_icon(dep), dep.dep])
-        
-        try:
-            deptree = pkg.get_dependencies()
-        except AssertionError:
-            w =  _("Can't display dependencies: This package has an unsupported dependency string.")
-            error(w)
-            store.append(None, [None, w])
-        else:
-            add(deptree, None)
-
-        return store
 
     def build_use_list (self):
         """Builds the useList."""
