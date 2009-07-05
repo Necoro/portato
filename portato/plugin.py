@@ -197,6 +197,10 @@ class Plugin (object):
         if disable:
             self.status = self.STAT_HARD_DISABLED
 
+        # debug test
+        if hasattr(self, "widget_init") and not isinstance(self, WidgetPlugin):
+            debug("Plugin '%s' has an init_widget() function but is not a WidgetPlugin. Are you sure, this is correct?", self.name)
+
     def _init (self):
         """
         Method called from outside to init the extension parts of this plugin.
@@ -307,7 +311,7 @@ class WidgetPlugin (Plugin):
             self.widget_init()
 
     def widget_init (self):
-        debug("No widgets to initialize. Wrong class used for plugin?")
+        debug("%s: No widgets to initialize. Wrong class used for plugin?", self.name)
 
     def add_widget (self, slot, widget):
         """
@@ -442,6 +446,7 @@ class PluginQueue (object):
                 p._widget_init()
                 for w in p.widgets:
                     WidgetSlot.slots[w.slot].add_widget(w)
+                info(_("Widgets of plugin '%s' loaded."), p.name)
 
     def add (self, plugin, disable = False):
         """
