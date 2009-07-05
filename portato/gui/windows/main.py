@@ -20,6 +20,7 @@ import vte
 # other
 import os
 import itertools as itt
+import operator as op
 from collections import defaultdict
 
 # our backend stuff
@@ -40,7 +41,7 @@ from .. import dialogs
 from ..utils import Config, GtkThread, GtkTree, get_color
 from ..queue import EmergeQueue
 from ..session import SESSION_VERSION, SessionException, OldSessionException, NewSessionException
-from ..views import LogView, HighlightView, InstalledOnlyView, LazyStoreView
+from ..views import LogView, LazyStoreView
 from ..exceptions import PreReqError
 
 # even more GUI stuff
@@ -95,12 +96,7 @@ class PackageTable:
         self.unmergeBtn = self.tree.get_widget("pkgUnmergeBtn")
         self.revertBtn = self.tree.get_widget("pkgRevertBtn")
         
-        # views
-        self.views = map (lambda x: self.tree.get_widget(x).get_child(),
-                [
-                    "useListScroll"
-                ])
-
+        # useList
         self.useList = self.tree.get_widget("useListScroll").get_child()
 
 
@@ -217,9 +213,9 @@ class PackageTable:
     def _update_table (self, *args):
         pkg = self.pkg
 
+        # update useList if needed
         nb_page = self.notebook.get_nth_page(self.notebook.get_current_page())
-        for v in self.views:
-            v.update(pkg, force = nb_page == v.get_parent())
+        self.useList.update(pkg, force = nb_page == self.useList.get_parent())
         
         @plugin.hook("update_table", pkg = pkg, page = self.notebook.get_nth_page(self.notebook.get_current_page()))
         def _update():
@@ -449,6 +445,7 @@ class MainWindow (Window):
         # icons
         self.icons = {}
         self.icons["installed"] = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
+        self.icons["or"] = self.window.render_icon(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_MENU)
         
         # get the logging window as soon as possible
         self.logView = LogView(self.tree.get_widget("logView"))
@@ -517,8 +514,7 @@ class MainWindow (Window):
         self.set_notebook_tabpos(map(PreferenceWindow.tabpos.get, map(int, (self.cfg.get("packageTabPos", "GUI"), self.cfg.get("systemTabPos", "GUI")))))
         slots.NotebookSlot(self.pkgNotebook, gtk.Widget, "Package Notebook")
         
-        # the different scrolls
-
+        # the useScroll
         useScroll = self.tree.get_widget("useListScroll")
         useScroll.add(self.build_use_list())
         
@@ -543,7 +539,6 @@ class MainWindow (Window):
         # set emerge queue
         self.queueTree = GtkTree(self.queueList.get_model())
         self.queue = EmergeQueue(console = self.console, tree = self.queueTree, db = self.db, title_update = self.title_update, threadClass = GtkThread)
-        
         
         # session
         splash(_("Restoring Session"))
@@ -1595,7 +1590,7 @@ class MainWindow (Window):
         if queue is None:
             plugins = []
         else:
-            plugins = list(queue.get_plugins())
+            plugins = list(sorted(queue.get_plugins(), key = op.attrgetter("name")))
 
         PluginWindow(self.window, plugins, self.queue)
         return True

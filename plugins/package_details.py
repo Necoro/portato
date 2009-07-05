@@ -54,6 +54,7 @@ class ScrolledDetail (Detail):
 
 class ChangelogDetail (ScrolledDetail):
     __description__ = _("Shows the Changelog of a package")
+    __name__ = "Detail: Changelog"
     _widget_name_ = _("Changelog")
 
     def widget_init (self):
@@ -65,6 +66,7 @@ class ChangelogDetail (ScrolledDetail):
 
 class EbuildDetail (ScrolledDetail):
     __description__ = _("Shows the ebuild of a package")
+    __name__ = "Detail: Ebuild"
     _widget_name_ = _("Ebuild")
     
     def widget_init(self):
@@ -73,6 +75,7 @@ class EbuildDetail (ScrolledDetail):
 
 class FilesDetail (ScrolledDetail):
     __description__ = _("Shows the installed files of a package")
+    __name__ = "Detail: Files"
     _widget_name_ = _("Files")
 
     def widget_init (self):
@@ -88,6 +91,7 @@ class FilesDetail (ScrolledDetail):
 
 class DependencyDetail (ScrolledDetail):
     __description__ = _("Shows the dependencies of a package")
+    __name__ = "Detail: Dependency"
     _widget_name_ = _("Dependencies")
 
     def widget_init (self):
