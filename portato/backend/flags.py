@@ -687,7 +687,7 @@ def set_testing (pkg, enable):
             try:
                 flagMatches = flags[0] == "~"+arch
             except IndexError: # no flags
-                warning(_("Line %(line)s in file %(file)s misses a keyword (i.e. '~x86')."), {'line' : line, 'file': file})
+                warning(_("Line %(line)s in file %(file)s misses a keyword (e.g. '~x86')."), {'line' : line, 'file': file})
                 debug("No keyword. Assuming match.")
                 flagMatches = True
                 
