@@ -12,6 +12,7 @@
 
 from __future__ import absolute_import, with_statement
 
+import os
 import struct
 from functools import wraps
 
@@ -45,7 +46,7 @@ class EixReader (object):
         self.closed = 0
         
         try:
-            self.version = self.get_number()
+            self.version = self.number()
 
             if self.version not in self.supported_versions:
                 raise UnsupportedVersionError(self.version)
@@ -65,7 +66,7 @@ class EixReader (object):
         return wrapper
 
     @check_closed
-    def get_number (self):
+    def number (self):
         n = self._get_bytes(1)
 
         if n < 0xFF:
@@ -90,6 +91,38 @@ class EixReader (object):
                     value += r << ((count - i - 1)*8)
             
         return value
+
+    @check_closed
+    def vector (self, get_type, skip = False):
+        nelems = self.number()
+        
+        if skip:
+            for i in range(nelems):
+                get_type(skip = True)
+        else:
+            return (get_type() for i in range(nelems))
+
+    @check_closed
+    def string (self, skip = False):
+        nelems = self.number()
+
+        if skip:
+            self.file.seek(nelems, os.SEEK_CUR)
+        else:
+            s = self.file.read(nelems)
+
+            if len(s) != nelems:
+                raise EndOfFileException, self.filename
+
+            return s
+
+    @check_closed
+    def overlay (self, skip = False):
+        if skip:
+            self.file.seek(self.number(), os.SEEK_CUR) # path
+            self.file.seek(self.number(), os.SEEK_CUR) # label
+        else:
+            return (self.string(), self.string())
 
     def _get_bytes (self, length, expect_list = False):
         s = self.file.read(length)
