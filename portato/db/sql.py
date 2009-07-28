@@ -58,7 +58,7 @@ class SQLDatabase (Database):
         else:
             debug("package.db not existant")
 
-        pkg_conn = sql.connect(os.path.join(SESSION_DIR, "package.db"))
+        pkg_conn = sql.connect(pkgdb)
         pkg_conn.row_factory = sql.Row
         if pkgdb_existed and updateFormat:
             pkg_conn.execute("DROP TABLE packages")
@@ -82,15 +82,6 @@ class SQLDatabase (Database):
             self.populate(connection = pkg_conn)
             
         pkg_conn.close()
-
-        descr_conn = sql.connect(os.path.join(SESSION_DIR, "descr.db"))
-        descr_conn.execute("""
-        CREATE TABLE IF NOT EXISTS descriptions
-        (
-            cp TEXT,
-            descr TEXT
-        )""")
-        descr_conn.close()
 
     def updated (self):
         changed = False
