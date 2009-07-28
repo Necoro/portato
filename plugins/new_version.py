@@ -10,13 +10,16 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+from portato.helper import debug, warning
+
 try:
     from bzrlib import plugin, branch
 except ImportError:
     plugin = branch =  None
+    warning("NEW_VERSION :: Cannot import 'bzrlib'")
+
 import gobject
 
-from portato.helper import debug, warning
 from portato import get_listener
 from portato.constants import REPOURI, VERSION, APP_ICON, APP
 from portato.gui.utils import GtkThread

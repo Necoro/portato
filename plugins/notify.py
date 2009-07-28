@@ -12,15 +12,16 @@
 
 disable = False
 
-try:
-    import pynotify
-except ImportError:
-    disable = True
-
 from portato import get_listener
 
 from portato.helper import warning, error, debug
 from portato.constants import APP_ICON, APP
+
+try:
+    import pynotify
+except ImportError:
+    disable = True
+    warning("NOTIFY :: %s", _("Cannot import 'pynotify'."))
 
 class Notify (Plugin):
     __author__ = "René 'Necoro' Neumann"
