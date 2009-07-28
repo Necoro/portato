@@ -17,11 +17,11 @@ from __future__ import absolute_import, with_statement
 
 import os, logging
 
-debug         = logging.getLogger("portatoLogger").debug
-info         = logging.getLogger("portatoLogger").info
+debug       = logging.getLogger("portatoLogger").debug
+info        = logging.getLogger("portatoLogger").info
 warning     = logging.getLogger("portatoLogger").warning
-error         = logging.getLogger("portatoLogger").error
-critical     = logging.getLogger("portatoLogger").critical
+error       = logging.getLogger("portatoLogger").error
+critical    = logging.getLogger("portatoLogger").critical
 
 def N_ (s):
     return s
