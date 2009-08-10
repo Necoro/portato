@@ -1,4 +1,6 @@
 # Brazilian Portoguese translation of Portato.
+# Portato developer:
+#  Copyright (C) 2008 Rene Necoro Neumann
 # This file is distributed under the same license as the Portato package.
 # Translated by Alberto Federman Neto <albfneto@fcfrp.usp.br>, 2009.
 #
@@ -7,12 +9,13 @@ msgstr ""
 "Project-Id-Version: Portato 0.12\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-20 01:15+0100\n"
-"PO-Revision-Date: 2009-08-10 17:13-0300\n"
+"PO-Revision-Date: 2009-08-10 18:13-0300\n"
 "Last-Translator: Alberto Federman Neto <albfneto@fcfrp.usp.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language-Team: \n"
 
 #: portato/gui/templates/UpdateWindow.ui:6
 msgid "Updatable Packages"
@@ -96,7 +99,7 @@ msgstr "<b>Opções de Sincronização</b>"
 
 #: portato/gui/templates/PreferenceWindow.ui:413
 msgid "File name to use, if package.use is a directory: "
-msgstr "Nome de arquivo a usar se o pacotefor um diretório:"
+msgstr "Nome de arquivo a usar se o pacote for um diretório:"
 
 #: portato/gui/templates/PreferenceWindow.ui:423
 msgid "Add only exact version to package.use"
