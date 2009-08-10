@@ -63,3 +63,11 @@ class PortageSystem_22 (PortageSystem):
 
     def new_package (self, cpv):
         return PortagePackage_22(cpv)
+
+    def get_config_path (self):
+        path = PortageSystem.get_config_path(self)
+
+        if path[0] != "/":
+            return os.path.join(self.settings.settings["ROOT"], path)
+        else:
+            return path
