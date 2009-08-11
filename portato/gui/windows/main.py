@@ -235,6 +235,7 @@ class PackageTable:
                 
                 self.installedCheck.hide()
                 self.maskedCheck.hide()
+                self.maskedLabel.set_label("") # this is needed for some unknown reason
                 self.maskedLabel.hide()
                 self.testingCheck.hide()
                 self.emergeBtn.set_sensitive(False)
@@ -264,8 +265,7 @@ class PackageTable:
                 else:
                     self.maskedCheck.set_active(pkg.is_masked(use_changed = False))
                 
-                if reason:
-                    self.maskedLabel.set_label(reason)
+                self.maskedLabel.set_label(reason)
                 
                 if pkg.is_testing(use_keywords = False) and not pkg.is_testing(use_keywords = True):
                     self.testingCheck.set_label("<i>(%s)</i>" % _("Testing"))
