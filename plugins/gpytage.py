@@ -12,12 +12,12 @@
 
 from subprocess import Popen
 
-class GPytage (Plugin):
+class GPytage (WidgetPlugin):
     __author__ = "René 'Necoro' Neumann"
     __description__ = "Adds a menu entry to directly start <b>gpytage</b>, a config editor."
     __dependency__ = ["app-portage/gpytage"]
 
-    def init (self):
+    def widget_init (self):
         self.create_widget("Plugin Menu", "Config _Editor", activate = self.menu)
 
     def menu (self, *args):

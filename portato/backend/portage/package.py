@@ -308,4 +308,6 @@ class PortagePackage (Package):
             return portage.pkgcmp(v1[1:],v2[1:])
 
     def matches (self, criterion):
-        return system.cpv_matches(self.get_cpv(), criterion)
+        # cpv_matches needs explicit slot info
+        scpv = "%s:%s" % (self.get_cpv(), self.get_package_settings("SLOT"))
+        return system.cpv_matches(scpv, criterion)

@@ -24,7 +24,7 @@ class Detail (WidgetPlugin):
 
     __author__ = "René 'Necoro' Neumann"
     _view_ = None
-    old_pkg = None
+    _old_pkg = None
     
     def init(self):
         self.add_call("update_table", self._update, type = "after")

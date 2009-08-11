@@ -115,7 +115,7 @@ def get_data(pkg, path):
     flags = []
 
     for line in grep(pkg, path):
-        file, line, fl = line.split(":") # get file, line and flag-list
+        file, line, fl = line.split(":", 2) # get file, line and flag-list
         fl = fl.split()
         crit = fl[0]
         fl = fl[1:]
