@@ -532,6 +532,15 @@ class EmergeQueue:
         except ValueError: # no && in command
             self.doEmerge([],[],{}, command, caller = self.sync)
 
+        # syncing portage and DB after emerge sync
+        def finish ():
+            debug("Finishing sync...")
+            system.reload_settings()
+            self.db.reload()
+            debug("Sync finished")
+
+        self.threadQueue.put(finish, caller = self.sync)
+
     def kill_emerge (self):
         """Kills the emerge process."""
         if self.process is not None:
