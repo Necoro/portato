@@ -14,14 +14,13 @@ disable = False
 
 from portato import get_listener
 
-from portato.helper import warning, error, debug
 from portato.constants import APP_ICON, APP
 
 try:
     import pynotify
 except ImportError:
     disable = True
-    warning("NOTIFY :: %s", _("Cannot import 'pynotify'."))
+    helper.warning("NOTIFY :: %s", _("Cannot import 'pynotify'."))
 
 class Notify (Plugin):
     __author__ = "René 'Necoro' Neumann"
@@ -33,7 +32,7 @@ class Notify (Plugin):
 
     def notify (self, retcode, **kwargs):
         if retcode is None:
-            warning("NOTIFY :: %s", _("Notify called while process is still running!"))
+            helper.warning("NOTIFY :: %s", _("Notify called while process is still running!"))
         else:
             icon = APP_ICON
             if retcode == 0:

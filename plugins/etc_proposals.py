@@ -10,8 +10,6 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from portato.helper import error
-
 import os
 from subprocess import Popen
 
@@ -31,7 +29,7 @@ class EtcProposals (WidgetPlugin):
         if os.getuid() == 0:
             Popen(self.prog+options)
         else:
-            error("ETC_PROPOSALS :: %s",_("Cannot start etc-proposals. Not root!"))
+            helper.error("ETC_PROPOSALS :: %s",_("Cannot start etc-proposals. Not root!"))
 
     def hook (self, *args, **kwargs):
         """Entry point for this plugin."""

@@ -30,7 +30,6 @@ class Detail (WidgetPlugin):
     _widget_name_ = None
     
     def init(self):
-        raise Exception, "e"
         self.add_call("update_table", self._update, type = "after")
 
     def widget_init (self):
