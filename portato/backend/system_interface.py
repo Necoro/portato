@@ -108,8 +108,8 @@ class SystemInterface (object):
         
         @param key: the key to look for
         @type key: string
-        @param all: the package set to use
-        @type all: string
+        @param pkgSet: the package set to use
+        @type pkgSet: string
         @param masked: if True, also look for masked packages
         @type masked: boolean
         @param with_version: if True, return CPVs - else CP

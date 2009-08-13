@@ -18,7 +18,7 @@ import subprocess, threading
 import atexit
 from optparse import OptionParser, SUPPRESS_HELP
 
-from . import log
+from .log import start as logstart
 from .constants import LOCALE_DIR, APP, VERSION
 from .su import detect_su_command
 from .helper import debug, info, error
@@ -61,7 +61,7 @@ def start():
     gettext.install(APP, LOCALE_DIR, unicode = True)
 
     # start logging
-    log.start(file=False)
+    logstart(file=False)
 
     # run parser
     (options, args) = get_parser().parse_args()
@@ -70,7 +70,7 @@ def start():
     atexit.register(get_listener().close)
 
     if options.nofork or os.getuid() == 0: # start GUI
-        log.start(file = True) # start logging to file
+        logstart(file = True) # start logging to file
 
         from .gui import run
         info("%s v. %s", _("Starting Portato"), VERSION)
