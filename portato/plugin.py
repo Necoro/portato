@@ -23,6 +23,7 @@ import traceback
 from collections import defaultdict
 from functools import wraps
 
+from . import helper
 from .helper import debug, warning, info, error
 from .constants import PLUGIN_DIR
 from .backend import system
@@ -435,6 +436,7 @@ class PluginQueue (object):
         plugin_module.__builtins__["Plugin"] = Plugin
         plugin_module.__builtins__["WidgetPlugin"] = WidgetPlugin
         plugin_module.__builtins__["register"] = register
+        plugin_module.__builtins__["helper"] = helper
         plugin_module.__builtins__["PluginLoadException"] = PluginLoadException
 
         for p in plugins: # import them
