@@ -300,6 +300,11 @@ class Plugin (object):
         """
         self.__calls.append(Call(self, hook, callable, type, dep))
 
+    def __str__ (self):
+        return self.name
+
+    __repr__ = __str__
+
 class WidgetPlugin (Plugin):
 
     def __init__ (self, *args, **kwargs):
@@ -430,25 +435,33 @@ class PluginQueue (object):
         plugin_module.__builtins__["Plugin"] = Plugin
         plugin_module.__builtins__["WidgetPlugin"] = WidgetPlugin
         plugin_module.__builtins__["register"] = register
+        plugin_module.__builtins__["PluginLoadException"] = PluginLoadException
 
         for p in plugins: # import them
             try:
                 exec "from portato.plugins import %s" % p in {}
             except PluginLoadException, e:
-                error(_("Loading plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : e.message})
+                error(_("Loading plugin module '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : e})
             except:
                 tb = traceback.format_exc()
-                error(_("Loading plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : tb})
+                error(_("Loading plugin module '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : tb})
 
         self._organize()
 
     def load_widgets(self, window):
         for p in self.plugins:
             if isinstance(p, WidgetPlugin):
-                p._widget_init(window)
-                for w in p.widgets:
-                    WidgetSlot.slots[w.slot].add_widget(w)
-                info(_("Widgets of plugin '%s' loaded."), p.name)
+                try:
+                    p._widget_init(window)
+                except PluginLoadException, e:
+                    error(_("Loading widgets plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : e})
+                except:
+                    tb = traceback.format_exc()
+                    error(_("Loading widgets of plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : tb})
+                else:
+                    for w in p.widgets:
+                        WidgetSlot.slots[w.slot].add_widget(w)
+                    info(_("Widgets of plugin '%s' loaded."), p.name)
 
     def add (self, plugin, disable = False):
         """
@@ -683,4 +696,10 @@ def register (plugin, disable = False):
     :see: `PluginQueue.add`
     """
     if __plugins is not None:
-        __plugins.add(plugin, disable)
+        try:
+            __plugins.add(plugin, disable)
+        except PluginLoadException, e:
+            error(_("Registrating plugin '%(plugin)s' failed: %(error)s"), {"plugin" : plugin, "error" : e})
+        except:
+            tb = traceback.format_exc()
+            error(_("Registrating plugin '%(plugin)s' failed: %(error)s"), {"plugin" : plugin, "error" : tb})

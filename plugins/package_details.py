@@ -23,13 +23,20 @@ class Detail (WidgetPlugin):
     """
 
     __author__ = "René 'Necoro' Neumann"
+
     _view_ = None
     _old_pkg = None
+    _widget_ = None
+    _widget_name_ = None
     
     def init(self):
+        raise Exception, "e"
         self.add_call("update_table", self._update, type = "after")
 
     def widget_init (self):
+        if (self._widget_ is None) or (self._widget_name_ is None):
+            raise PluginLoadException, ("Has not set _widget_ or _widget_name_.")
+
         self.add_widget("Package Notebook", (self._widget_, self._widget_name_))
 
         # if the detail was updated before it was actually initialized, update it again :)
