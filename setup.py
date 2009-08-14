@@ -12,7 +12,10 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 import os
+import sys
+
 from distutils.core import setup
+
 from portato.constants import VERSION, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR, APP
 
 from build_manpage import build_manpage
@@ -21,11 +24,32 @@ def plugin_list (*args):
     """Creates a list of correct plugin pathes out of the arguments."""
     return [("plugins/%s.py" % x) for x in args]
 
-packages = ["portato", "portato.db", "portato.gui", "portato.gui.windows", "portato.plugins", "portato.backend", "portato.backend.portage"]
+packages = [
+            "portato",
+            "portato.db",
+            "portato.gui", "portato.gui.windows",
+            "portato.plugins",
+            "portato.backend", "portato.backend.portage"
+            ]
+
 data_files = [
         (TEMPLATE_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if x.endswith(".ui")]),
         (ICON_DIR, ["icons/portato-icon.png"]),
         (PLUGIN_DIR, plugin_list("gpytage", "notify", "etc_proposals", "reload_portage", "package_details"))]
+
+# extension stuff
+ext_modules = []
+cmdclass={'build_manpage': build_manpage}
+
+if "--disable-eix" in sys.argv:
+    sys.argv.remove("--disable-eix")
+else:
+    from Cython.Distutils import build_ext
+    from distutils.extension import Extension
+    
+    ext_modules.append(Extension("portato.eix.parser", ["portato/eix/parser.pyx"]))
+    cmdclass['build_ext'] = build_ext
+    packages.append("portato.eix")
 
 # do the distutils setup
 setup(name=APP,
@@ -39,5 +63,6 @@ setup(name=APP,
         author_email = "necoro@necoro.net",
         packages = packages,
         data_files = data_files,
-        cmdclass={'build_manpage': build_manpage}
+        ext_modules = ext_modules,
+        cmdclass = cmdclass
         )

@@ -1,0 +1,855 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<title>eix - index file format</title>
+<meta name="authors" content="Martin Väth &lt;vaeth AT mathematik DOT uni-wuerzburg DOT de&gt; (active)  Emil Beinroth &lt;emilbeinroth AT gmx DOT net&gt; (active)  Wolfgang Frisch &lt;xororand AT users DOT sourceforge DOT net&gt; (inactive)" />
+<meta name="copyright" content="This file is part of the eix project and distributed under the terms of the GNU General Public License v2." />
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 5196 2007-06-03 20:25:28Z wiemann $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left {
+  clear: left }
+
+img.align-right {
+  clear: right }
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font-family: serif ;
+  font-size: 100% }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="eix-index-file-format">
+<h1 class="title">eix - index file format</h1>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Authors:</th>
+<td>Martin Väth &lt;vaeth AT mathematik DOT uni-wuerzburg DOT de&gt; (active)
+<br />Emil Beinroth &lt;emilbeinroth AT gmx DOT net&gt; (active)
+<br />Wolfgang Frisch &lt;xororand AT users DOT sourceforge DOT net&gt; (inactive)</td></tr>
+<tr><th class="docinfo-name">Copyright:</th>
+<td>This file is part of the eix project and distributed under the
+terms of the GNU General Public License v2.</td></tr>
+</tbody>
+</table>
+<p>This article describes the format of the eix index file, usually located at /var/cache/eix. The
+format includes a version field in the <a class="reference internal" href="#header">header</a> block. The current version is <strong>28</strong> (eix 0.17.0).</p>
+<div class="contents topic" id="table-of-contents">
+<p class="topic-title first"><strong>Table of Contents</strong>:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overall-layout" id="id3">Overall layout</a></li>
+<li><a class="reference internal" href="#basic-datatypes" id="id4">Basic Datatypes</a><ul>
+<li><a class="reference internal" href="#number" id="id5">Number</a></li>
+<li><a class="reference internal" href="#vector" id="id6">Vector</a></li>
+<li><a class="reference internal" href="#string" id="id7">String</a></li>
+<li><a class="reference internal" href="#hash" id="id8">Hash</a></li>
+<li><a class="reference internal" href="#hashedstring" id="id9">HashedString</a></li>
+<li><a class="reference internal" href="#hashedwords" id="id10">HashedWords</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data-blocks" id="id11">Data blocks</a><ul>
+<li><a class="reference internal" href="#header" id="id12">Header</a></li>
+<li><a class="reference internal" href="#overlay" id="id13">Overlay</a></li>
+<li><a class="reference internal" href="#category" id="id14">Category</a></li>
+<li><a class="reference internal" href="#package" id="id15">Package</a></li>
+<li><a class="reference internal" href="#version" id="id16">Version</a></li>
+<li><a class="reference internal" href="#versionpart" id="id17">VersionPart</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#historical-notes" id="id18">Historical notes</a></li>
+</ul>
+</div>
+<div class="section" id="overall-layout">
+<h1>Overall layout</h1>
+<p>The file is made up of blocks of data,
+which may in turn contain other other blocks. <a class="footnote-reference" href="#vector-vs-blocks" id="id1">[1]</a>
+The first block is a special header.
+The remaining blocks are the categories which in turn contain the package blocks
+which contain the version blocks, ...</p>
+<blockquote>
+<div class="layout-block header-block container">
+<a class="reference internal" href="#header">Header</a></div>
+<div class="layout-block category-block container">
+<p>1st <a class="reference internal" href="#category">Category</a></p>
+<div class="layout-block package-block container">
+<p>1st <a class="reference internal" href="#package">Package</a> in 1st Category</p>
+<div class="layout-block version-block container">
+1st <a class="reference internal" href="#version">Version</a> of this Package</div>
+<div class="layout-block version-block container">
+[..]</div>
+</div>
+<div class="layout-block package-block container">
+<p>2nd <a class="reference internal" href="#package">Package</a> in 1st Category</p>
+<p>[..]</p>
+</div>
+</div>
+<div class="layout-block category-block container">
+<p>2nd <a class="reference internal" href="#category">Category</a></p>
+<p>[..]</p>
+</div>
+</blockquote>
+<table class="docutils footnote" frame="void" id="vector-vs-blocks" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Most blocks here occur as a <cite>vector</cite> (described below), i.e. the
+first entry is the number of elements, followed by the individual elements.
+However, if not stated explicitly that a block is a <cite>vector</cite>, it is
+indicated otherwise in the file how many elements it has.
+For example, the number of category blocks is contained in the <a class="reference internal" href="#header">header</a>.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="basic-datatypes">
+<h1>Basic Datatypes</h1>
+<p>This section covers the datatypes <cite>number</cite> and <cite>vector</cite> (resp. <cite>string</cite>) which are used in the index file.</p>
+<div class="section" id="number">
+<h2>Number</h2>
+<p>The index file contains non-negative integer values only. The format we use avoids fixed length
+integers by encoding the number of bytes into the integer itself. It has a bias towards numbers
+smaller than 0xFF, which are encoded into a single byte.</p>
+<blockquote>
+<p>To determine the number of bytes used, you must first count how often the byte <strong>0xFF</strong> occurs at
+the beginning of the number.
+Let <cite>n</cite> be this count (<cite>n</cite> may be 0). Then, as a rule, there will follow <cite>n+1</cite> bytes that
+contain the actual integer stored in big-endian byte order (highest byte first).</p>
+<p><em>But</em> since it would be impossible to store any number that has a leading 0xFF with this format,
+a leading 0xFF is stored as 0x00. Meaning, if a 0x00 byte follows the last 0xFF, you must
+interpret this byte as 0xFF inside the number.</p>
+</blockquote>
+<p>Examples:</p>
+<blockquote>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="77%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Number</th>
+<th class="head">Bytes stored in the file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>0x00</td>
+<td>0x00</td>
+</tr>
+<tr><td>0xFE</td>
+<td>0xFE</td>
+</tr>
+<tr><td>0xFF</td>
+<td>0xFF 0x00</td>
+</tr>
+<tr><td>0x0100</td>
+<td>0xFF 0x01 0x00</td>
+</tr>
+<tr><td>0x01FF</td>
+<td>0xFF 0x01 0xFF</td>
+</tr>
+<tr><td>0xFEFF</td>
+<td>0xFF 0xFE 0xFF</td>
+</tr>
+<tr><td>0xFF00</td>
+<td>0xFF 0xFF 0x00 0x00</td>
+</tr>
+<tr><td>0xFF01</td>
+<td>0xFF 0xFF 0x00 0x01</td>
+</tr>
+<tr><td>0x010000</td>
+<td>0xFF 0xFF 0x01 0x00 0x00</td>
+</tr>
+<tr><td>0xABCDEF</td>
+<td>0xFF 0xFF 0xAB 0xCD 0xEF</td>
+</tr>
+<tr><td>0xFFABCD</td>
+<td>0xFF 0xFF 0xFF 0x00 0xAB 0xCD</td>
+</tr>
+<tr><td>0x01ABCDEF</td>
+<td>0xFF 0xFF 0xFF 0x01 0xAB 0xCD 0xEF</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+</div>
+<div class="section" id="vector">
+<h2>Vector</h2>
+<p>Vectors (or lists) are extensively used throughout the index file. They are stored as the <a class="reference internal" href="#number">number</a> of
+elements, followed by the elements themselves.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Type</th>
+<th class="head">Content</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>Number</td>
+<td>Number of elements (<cite>n</cite>)</td>
+</tr>
+<tr><td></td>
+<td>1st element</td>
+</tr>
+<tr><td></td>
+<td>...</td>
+</tr>
+<tr><td></td>
+<td><cite>n</cite>th element</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="string">
+<h2>String</h2>
+<p>Strings are stored as a <a class="reference internal" href="#vector">vector</a> of characters. A trailing '\0' is not included.</p>
+</div>
+<div class="section" id="hash">
+<h2>Hash</h2>
+<p>A hash is a <a class="reference internal" href="#vector">vector</a> of <a class="reference internal" href="#string">string</a>s.</p>
+</div>
+<div class="section" id="hashedstring">
+<h2>HashedString</h2>
+<p>A <a class="reference internal" href="#number">number</a> which is considered as an index in the corresponding <a class="reference internal" href="#hash">hash</a>;
+0 denotes the first string of the hash, 1 the second, ...</p>
+</div>
+<div class="section" id="hashedwords">
+<h2>HashedWords</h2>
+<p>A <a class="reference internal" href="#vector">vector</a> of <a class="reference internal" href="#hashedstring">HashedString</a>s.
+The resulting strings are meant to be concatenated, with spaces as separators.</p>
+</div>
+</div>
+<div class="section" id="data-blocks">
+<h1>Data blocks</h1>
+<div class="section" id="header">
+<h2>Header</h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Type</th>
+<th class="head">Content</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>Number</td>
+<td>File format version</td>
+</tr>
+<tr><td>Number</td>
+<td>Number of <a class="reference internal" href="#category">Category</a> blocks</td>
+</tr>
+<tr><td>Vector</td>
+<td><a class="reference internal" href="#overlay">Overlay</a>s</td>
+</tr>
+<tr><td>Hash</td>
+<td>Hash for &quot;Provide&quot;</td>
+</tr>
+<tr><td>Hash</td>
+<td>Hash for &quot;Licenses&quot;</td>
+</tr>
+<tr><td>Hash</td>
+<td>Hash for &quot;Keywords&quot;</td>
+</tr>
+<tr><td>Hash</td>
+<td>Hash for &quot;Useflags&quot;</td>
+</tr>
+<tr><td>Hash</td>
+<td>Hash for &quot;Slot&quot;</td>
+</tr>
+<tr><td>Vector</td>
+<td>names of world sets</td>
+</tr>
+</tbody>
+</table>
+<p>The names of world sets are the names (without leading &#64;) of the world sets
+stored in /var/lib/portage/world_sets. If SAVE_WORLD=false, the list is empty.</p>
+</div>
+<div class="section" id="overlay">
+<h2>Overlay</h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Type</th>
+<th class="head">Content</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>String</td>
+<td>overlay path</td>
+</tr>
+<tr><td>String</td>
+<td>label (repository name)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="category">
+<h2>Category</h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="82%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Type</th>
+<th class="head">Content</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>String</td>
+<td>Name of category</td>
+</tr>
+<tr><td>Vector</td>
+<td><a class="reference internal" href="#package">Package</a>s in this category</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="package">
+<h2>Package</h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="92%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Type</th>
+<th class="head">Content</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>Number</td>
+<td>Offset to the next package in the eix cache file (in bytes; counting starts after the number)</td>
+</tr>
+<tr><td>String</td>
+<td>Package name</td>
+</tr>
+<tr><td>String</td>
+<td>Description</td>
+</tr>
+<tr><td>HashedWords</td>
+<td>Provide</td>
+</tr>
+<tr><td>String</td>
+<td>Homepage</td>
+</tr>
+<tr><td>HashedString</td>
+<td>Licenses, e.g. MPL-1.1 NPL-1.1</td>
+</tr>
+<tr><td>HashedWords</td>
+<td>Useflags (all useflags of all versions of the package are added). This might &quot;falsely&quot; be the empty string if per-version IUSE flags are stored.</td>
+</tr>
+<tr><td>Vector</td>
+<td><a class="reference internal" href="#version">Version</a>s</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="version">
+<h2>Version</h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Type</th>
+<th class="head">Content</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>char</td>
+<td><p class="first">Mask bitset for the current $ARCH:</p>
+<blockquote class="last">
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">0x00:</th><td class="field-body">none of the following</td>
+</tr>
+<tr class="field"><th class="field-name">0x01:</th><td class="field-body">masked by package.mask</td>
+</tr>
+<tr class="field"><th class="field-name">0x02:</th><td class="field-body">masked by profile</td>
+</tr>
+<tr class="field"><th class="field-name">0x04:</th><td class="field-body">version is in &#64;system</td>
+</tr>
+<tr class="field"><th class="field-name">0x08:</th><td class="field-body">version is in &#64;world (if SAVE_WORLD=true)</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+</td>
+</tr>
+<tr><td>char</td>
+<td><dl class="first last docutils">
+<dt>Mask bitset for the PROPERTIES variable:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">0x01:</th><td class="field-body">PROPERTIES=interactive</td>
+</tr>
+<tr class="field"><th class="field-name">0x02:</th><td class="field-body">PROPERTIES=live</td>
+</tr>
+<tr class="field"><th class="field-name">0x04:</th><td class="field-body">PROPERTIES=virtual</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</td>
+</tr>
+<tr><td>Number</td>
+<td><dl class="first last docutils">
+<dt>Mask bitset for the RESTRICT variable:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">0x0001:</th><td class="field-body">RESTRICT=binchecks</td>
+</tr>
+<tr class="field"><th class="field-name">0x0002:</th><td class="field-body">RESTRICT=strip</td>
+</tr>
+<tr class="field"><th class="field-name">0x0004:</th><td class="field-body">RESTRICT=test</td>
+</tr>
+<tr class="field"><th class="field-name">0x0008:</th><td class="field-body">RESTRICT=userpriv</td>
+</tr>
+<tr class="field"><th class="field-name">0x0010:</th><td class="field-body">RESTRICT=installsources</td>
+</tr>
+<tr class="field"><th class="field-name">0x0020:</th><td class="field-body">RESTRICT=fetch</td>
+</tr>
+<tr class="field"><th class="field-name">0x0040:</th><td class="field-body">RESTRICT=mirror</td>
+</tr>
+<tr class="field"><th class="field-name">0x0080:</th><td class="field-body">RESTRICT=primaryuri</td>
+</tr>
+<tr class="field"><th class="field-name">0x0100:</th><td class="field-body">RESTRICT=bindist</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</td>
+</tr>
+<tr><td>HashedWords</td>
+<td>Full keywords string of the ebuild.</td>
+</tr>
+<tr><td>Vector</td>
+<td><a class="reference internal" href="#versionpart">VersionPart</a>s</td>
+</tr>
+<tr><td>HashedString</td>
+<td>Slot name. The slot name &quot;0&quot; is stored as &quot;&quot;.</td>
+</tr>
+<tr><td>Number</td>
+<td>Index of the portage overlay (in the overlays block)</td>
+</tr>
+<tr><td>HashedWords</td>
+<td>Useflags of this version. This might &quot;falsely&quot; be empty if only per-package IUSE flags are stored.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="versionpart">
+<h2>VersionPart</h2>
+<p>A VersionPart consists of two data: a number (referred to as <em>type</em>) and a &quot;<a class="reference internal" href="#string">string</a>&quot; (referred to as <em>value</em>).</p>
+<p>The number is encoded in the lower 5 bits of the length-part of the &quot;<a class="reference internal" href="#string">string</a>&quot;;
+of course, the actual length is shifted by the same number of bits.</p>
+<p>For the type, these named values are possible:</p>
+<blockquote>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="16%" />
+<col width="77%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Value</th>
+<th class="head">Name</th>
+<th class="head">Content of value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>0</td>
+<td><cite>garbage</cite></td>
+<td>garbage that was found after any valid version string</td>
+</tr>
+<tr><td>1</td>
+<td><cite>alpha</cite></td>
+<td>number of &quot;_alpha&quot; (may be empty)</td>
+</tr>
+<tr><td>2</td>
+<td><cite>beta</cite></td>
+<td>number of &quot;_beta&quot; (may be empty)</td>
+</tr>
+<tr><td>3</td>
+<td><cite>pre</cite></td>
+<td>number of &quot;_pre&quot; (may be empty)</td>
+</tr>
+<tr><td>4</td>
+<td><cite>rc</cite></td>
+<td>number of &quot;_rc&quot; (may be empty)</td>
+</tr>
+<tr><td>5</td>
+<td><cite>revision</cite></td>
+<td>number of &quot;-r&quot; (may be empty)</td>
+</tr>
+<tr><td>6</td>
+<td><cite>inter_rev</cite></td>
+<td>number of inter-revision <a class="footnote-reference" href="#inter-revisions" id="id2">[2]</a></td>
+</tr>
+<tr><td>7</td>
+<td><cite>patch</cite></td>
+<td>number of &quot;_p&quot; (may be empty)</td>
+</tr>
+<tr><td>8</td>
+<td><cite>char</cite></td>
+<td>single character</td>
+</tr>
+<tr><td>9</td>
+<td><cite>primary</cite></td>
+<td>numeric version part</td>
+</tr>
+<tr><td>10</td>
+<td><cite>first</cite></td>
+<td>first numeric version part</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>As an example, we split the version string <cite>1.2c_pre12_alpha-r01.01-foo</cite> like this:</p>
+<blockquote>
+(first, &quot;1&quot;) (primary, &quot;2&quot;) (char, &quot;c&quot;) (pre, &quot;12&quot;) (alpha, &quot;&quot;) (revision, &quot;01&quot;) (inter_rev, &quot;01&quot;) (garbage, &quot;-foo&quot;)</blockquote>
+<p>To reconstruct a version string, iterate through the vector of parts,
+and for each part append a specific prefix and the value stored in the string.
+The prefixes you need should be obvious, but here they are listed anyway:</p>
+<blockquote>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Prefix</th>
+<th class="head">Name</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>&quot;.&quot; (dot)</td>
+<td>primary, inter_rev</td>
+</tr>
+<tr><td>&quot;&quot; (empty)</td>
+<td>first, char, garbage</td>
+</tr>
+<tr><td>&quot;_alpha&quot;</td>
+<td>alpha</td>
+</tr>
+<tr><td>&quot;_beta&quot;</td>
+<td>beta</td>
+</tr>
+<tr><td>&quot;_pre&quot;</td>
+<td>pre</td>
+</tr>
+<tr><td>&quot;_rc&quot;</td>
+<td>rc</td>
+</tr>
+<tr><td>&quot;-r&quot;</td>
+<td>revision</td>
+</tr>
+<tr><td>&quot;_p&quot;</td>
+<td>patch</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<table class="docutils footnote" frame="void" id="inter-revisions" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>inter-revision ares used by gentoo-alt to keep their prefixed portage tree in
+sync with the main tree
+<a class="reference external" href="http://www.gentoo.org/proj/en/gentoo-alt/prefix/techdocs.xml#doc_chap2_sect5">http://www.gentoo.org/proj/en/gentoo-alt/prefix/techdocs.xml#doc_chap2_sect5</a></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="historical-notes">
+<h1>Historical notes</h1>
+<ul class="simple">
+<li>Since version 17, the format of this file is architecture-independent.</li>
+</ul>
+<!-- vim:set tw=100 ft=rst: -->
+</div>
+</div>
+</body>
+</html>

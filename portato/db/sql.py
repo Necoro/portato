@@ -166,7 +166,7 @@ class SQLDatabase (Database):
     def populate (self, category = None, connection = None):
         def _get():
             # get the lists
-            inst = system.find_packages(pkgSet = system.SET_INSTALLED, key=category, with_version = False)
+            inst = set(system.find_packages(pkgSet = system.SET_INSTALLED, key=category, with_version = False))
             for p in system.find_packages(key = category, with_version = False):
                 cat, pkg = p.split("/")
 
@@ -247,3 +247,4 @@ class SQLDatabase (Database):
                 self._restrict = "AND (name LIKE '%%%(restrict)s%%' OR cat LIKE '%(restrict)s%%')" % {"restrict":restrict}
 
     restrict = property(get_restrict, set_restrict)
+    con = staticmethod(con)
