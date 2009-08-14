@@ -92,13 +92,6 @@ def string (file, skip = False):
 
     return s
 
-def overlay (file, skip = False):
-    if skip:
-        string(file, skip = True) # path
-        string(file, skip = True) # label
-    else:
-        return (string(file), string(file))
-
 class LazyElement (object):
     __slots__ = ("file", "get_type", "_value", "pos")
     
@@ -122,6 +115,13 @@ class LazyElement (object):
 
     def __call__ (self):
         return self.value
+
+class overlay (object):
+    __slots__ = ("path", "label")
+
+    def __init__ (file, skip = False):
+        self.path = LazyElement(string, file)
+        self.label = LazyElement(string, label)
 
 class header (object):
     __slots__ = ("version", "ncats", "overlays", "provide",
