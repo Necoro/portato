@@ -10,7 +10,12 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
+"""
+A module to parse the eix-cache files.
+"""
+
 from __future__ import absolute_import, with_statement
+__docformat__ = "restructuredtext"
 
 from . import parser
 from .exceptions import UnsupportedVersionError
@@ -18,10 +23,37 @@ from .exceptions import UnsupportedVersionError
 from ..helper import debug
 
 class EixReader(object):
+    """
+    The main class to use to have access to the eix-cache.
+
+    Note that the file used internally stays open during the whole operation.
+    So please call `close()` when you are finished.
+
+    :CVariables:
+
+        supported_versions : int[]
+            The list of versions of the eix-cache, which are supported by this reader.
+
+    :IVariables:
+
+        file : file
+            The eix cache file.
+
+        header : `parser.header`
+            The header of the eix cache.
+
+        categories : `parser.category` []
+            The list of categories.
+    """
+
     supported_versions = (28,)
         
     def __init__ (self, filename):
-        self.filename = filename
+        """
+        :param filename: Path to the cache file
+        :type filename: string
+        """
+
         self.file = open(filename, "r")
         
         try:
@@ -41,5 +73,8 @@ class EixReader(object):
             raise
 
     def close (self):
+        """
+        Closes the cache file.
+        """
         self.file.close()
         debug("EixReader closed.")
