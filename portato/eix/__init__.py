@@ -18,7 +18,7 @@ from . import exceptions as ex
 from ..helper import debug
 
 class EixReader(object):
-    supported_version = (28,)
+    supported_versions = (28,)
         
     def __init__ (self, filename):
         self.filename = filename
@@ -31,9 +31,14 @@ class EixReader(object):
                 raise ex.UnsupportedVersionError(self.version)
 
             debug("Started EixReader for version %s.", self.version)
+
+            self.file.seek(0)
         except:
             self.close()
             raise
+
+    def header (self):
+        return parser.header(self.file)
 
     def close (self):
         self.file.close()

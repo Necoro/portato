@@ -15,7 +15,8 @@ from __future__ import absolute_import, with_statement
 import os
 import struct
 
-from .helper import debug
+from ..helper import debug
+from functools import partial
 
 from . import exceptions as ex
 
@@ -30,7 +31,7 @@ def _get_bytes (file, length, expect_list = False):
     else:
         return struct.unpack("%sB" % length, s)
 
-def number (file):
+def number (file, skip = False):
     n = _get_bytes(file, 1)
 
     if n < 0xFF:
@@ -49,10 +50,16 @@ def number (file):
         value = n << (count*8)
 
         if count > 0:
-            rest = _get_bytes(file, count, expect_list = True)
 
-            for i, r in enumerate(rest):
-                value += r << ((count - i - 1)*8)
+            if skip:
+                file.seek(count, os.SEEK_CUR)
+                return
+            
+            else:
+                rest = _get_bytes(file, count, expect_list = True)
+
+                for i, r in enumerate(rest):
+                    value += r << ((count - i - 1)*8)
         
     return value
 
@@ -65,11 +72,15 @@ def vector (file, get_type, skip = False):
     else:
         return [get_type(file) for i in range(nelems)]
 
+def typed_vector(type):
+    return partial(vector, get_type = type)
+
 def string (file, skip = False):
     nelems = number(file)
 
     if skip:
         file.seek(nelems, os.SEEK_CUR)
+        return
     else:
         s = file.read(nelems)
 
@@ -92,17 +103,32 @@ class LazyElement (object):
         self._value = None
 
         self.pos = file.tell()
-        get_type(skip=True) # skip it for the moment
+        get_type(file, skip=True) # skip it for the moment
 
     @property
     def value (self):
         if self._value is None:
             old_pos = self.file.tell()
-            self.file.seek(self.pos)
-            self._value = self.get_type(skip = False)
-            self.file.seek(old_pos)
+            self.file.seek(self.pos, os.SEEK_SET)
+            self._value = self.get_type(self.file, skip = False)
+            self.file.seek(old_pos, os.SEEK_SET)
         
         return self._value
 
     def __call__ (self):
         return self.value
+
+class header (object):
+    def __init__ (self, file):
+        def LE (t):
+            return LazyElement(t, file)
+
+        self.version = LE(number)
+        self.ncats = LE(number)
+        self.overlays = LE(typed_vector(overlay))
+        self.provide = LE(typed_vector(string))
+        self.licenses = LE(typed_vector(string))
+        self.keywords = LE(typed_vector(string))
+        self.useflags = LE(typed_vector(string))
+        self.slots = LE(typed_vector(string))
+        self.sets = LE(typed_vector(string))
