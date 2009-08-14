@@ -119,7 +119,7 @@ class LazyElement (object):
         return self.value
 
 class header (object):
-    def __init__ (self, file):
+    def __init__ (self, file, skip = False):
         def LE (t):
             return LazyElement(t, file)
 
