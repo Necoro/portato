@@ -101,6 +101,7 @@ def overlay (file, skip = False):
 
 class LazyElement (object):
     __slots__ = ("file", "get_type", "_value", "pos")
+    
     def __init__ (self, get_type, file):
         self.file = file
         self.get_type = get_type
@@ -123,6 +124,9 @@ class LazyElement (object):
         return self.value
 
 class header (object):
+    __slots__ = ("version", "ncats", "overlays", "provide",
+            "licenses", "keywords", "useflags", "slots", "sets")
+
     def __init__ (self, file, skip = False):
         def LE (t):
             return LazyElement(t, file)
@@ -138,6 +142,9 @@ class header (object):
         self.sets = LE(typed_vector(string))
 
 class package (object):
+    __slots__ = ("offset","name", "description",
+            "provide", "homepage", "license", "useflags")
+
     def __init__ (self, file, skip = False):
         def LE (t):
             return LazyElement(t, file)
