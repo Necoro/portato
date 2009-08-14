@@ -1,3 +1,7 @@
+next:
+
+- allow eix as backend DB
+
 0.13:
 - allow lines w/o keyword in package.keywords
 - added support for ktsuss as su-frontend
