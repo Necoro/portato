@@ -43,9 +43,9 @@ def Database(type):
             return SQLDatabase(SectionDict(_SESSION, "SQL"))
 
     elif type == "dict":
-        debug("Using DictDatabase")
-        from .dict import DictDatabase
-        return DictDatabase(SectionDict(_SESSION, "dict"))
+        debug("Using HashDatabase")
+        from .hash import HashDatabase
+        return HashDatabase(SectionDict(_SESSION, "dict"))
     
     else:
         error(_("Unknown database type: %s"), type)

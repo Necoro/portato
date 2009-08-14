@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/db/dict.py
+# File: portato/db/hash.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006-2009 René 'Necoro' Neumann
@@ -19,7 +19,7 @@ from ..helper import info
 from ..backend import system
 from .database import Database, PkgData
 
-class DictDatabase (Database):
+class HashDatabase (Database):
     """An internal database which holds a simple dictionary cat -> [package_list]."""
 
     lock = Database.lock
