@@ -14,11 +14,10 @@ from __future__ import absolute_import, with_statement
 
 import os
 import struct
-
-from ..helper import debug
 from functools import partial
 
-from . import exceptions as ex
+from ..helper import debug
+from .exceptions import EndOfFileException
 
 def _get_bytes (file, length, expect_list = False):
     s = file.read(length)
@@ -137,3 +136,30 @@ class header (object):
         self.useflags = LE(typed_vector(string))
         self.slots = LE(typed_vector(string))
         self.sets = LE(typed_vector(string))
+
+class package (object):
+    def __init__ (self, file, skip = False):
+        def LE (t):
+            return LazyElement(t, file)
+        
+        self.offset = number(file)
+        
+        after_offset = file.tell()
+        
+        self.name = LE(string)
+        self.description = LE(string)
+        self.provide = LE(typed_vector(number))
+        self.homepage = LE(string)
+        self.license = LE(number)
+        self.useflags = LE(typed_vector(number))
+        
+        # self.versions = LE(typed_vector(version))
+        # for the moment just skip the versions
+        file.seek(self.offset - (file.tell() - after_offset), os.SEEK_CUR)
+
+class category (object):
+    __slots__ = ("name", "packages")
+
+    def __init__ (self, file, skip = False):
+        self.name = LazyElement(string, file)
+        self.packages = LazyElement(typed_vector(package), file)
