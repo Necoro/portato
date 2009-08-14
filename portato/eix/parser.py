@@ -101,6 +101,7 @@ def overlay (file, skip = False):
         return (string(file), string(file))
 
 class LazyElement (object):
+    __slots__ = ("file", "get_type", "_value", "pos")
     def __init__ (self, get_type, file):
         self.file = file
         self.get_type = get_type
