@@ -51,7 +51,7 @@ class EixSQLDatabase (SQLDatabase):
 
     @SQLDatabase.con
     def populate (self, category = None, connection = None):
-        inst = system.find_packages(pkgSet = system.SET_INSTALLED, key = category, with_version = False)
+        inst = set(system.find_packages(pkgSet = system.SET_INSTALLED, key = category, with_version = False))
 
         def _get():
             with EixReader(self.cache) as eix:
