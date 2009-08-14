@@ -51,6 +51,9 @@ else:
     cmdclass['build_ext'] = build_ext
     packages.append("portato.eix")
 
+    if "--enable--eix" in sys.argv:
+        sys.argv.remove("--enable-eix")
+
 # do the distutils setup
 setup(name=APP,
         version = VERSION,
