@@ -13,6 +13,8 @@
 
 import os
 from distutils.core import setup
+from distutils.extension import Extension
+from Cython.Distutils import build_ext
 
 from portato.constants import VERSION, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR, APP
 
@@ -22,11 +24,23 @@ def plugin_list (*args):
     """Creates a list of correct plugin pathes out of the arguments."""
     return [("plugins/%s.py" % x) for x in args]
 
-packages = ["portato", "portato.db", "portato.gui", "portato.gui.windows", "portato.plugins", "portato.backend", "portato.backend.portage"]
+packages = [
+            "portato",
+            "portato.db",
+            "portato.eix",
+            "portato.gui", "portato.gui.windows",
+            "portato.plugins",
+            "portato.backend", "portato.backend.portage"
+            ]
+
 data_files = [
         (TEMPLATE_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if x.endswith(".ui")]),
         (ICON_DIR, ["icons/portato-icon.png"]),
         (PLUGIN_DIR, plugin_list("gpytage", "notify", "etc_proposals", "reload_portage", "package_details"))]
+
+ext_modules = [
+        Extension("portato.eix.parser", ["portato/eix/parser.pyx"])
+        ]
 
 # do the distutils setup
 setup(name=APP,
@@ -40,5 +54,6 @@ setup(name=APP,
         author_email = "necoro@necoro.net",
         packages = packages,
         data_files = data_files,
-        cmdclass={'build_manpage': build_manpage}
+        cmdclass={'build_manpage': build_manpage, 'build_ext' : build_ext},
+        ext_modules = ext_modules
         )
