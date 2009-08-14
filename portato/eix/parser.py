@@ -119,9 +119,9 @@ class LazyElement (object):
 class overlay (object):
     __slots__ = ("path", "label")
 
-    def __init__ (file, skip = False):
+    def __init__ (self, file, skip = False):
         self.path = LazyElement(string, file)
-        self.label = LazyElement(string, label)
+        self.label = LazyElement(string, file)
 
 class header (object):
     __slots__ = ("version", "ncats", "overlays", "provide",
