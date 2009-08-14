@@ -50,8 +50,13 @@ def Database(type):
     
     elif type == "eixsql":
         debug("Using EixSQLDatabase")
-        from .eix_sql import EixSQLDatabase
-        return EixSQLDatabase(SectionDict(_SESSION, type))
+        try:
+            from .eix_sql import EixSQLDatabase
+        except ImportError:
+            warning(_("Cannot load EixSQLDatabase."))
+            return Database("sql")
+        else:
+            return EixSQLDatabase(SectionDict(_SESSION, type))
 
     else:
         error(_("Unknown database type: %s"), type)
