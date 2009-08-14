@@ -63,8 +63,9 @@ def number (file, skip = False):
         
     return value
 
-def vector (file, get_type, skip = False):
-    nelems = number(file)
+def vector (file, get_type, skip = False, nelems = None):
+    if nelems is None:
+        nelems = number(file)
     
     if skip:
         for i in range(nelems):
@@ -72,8 +73,11 @@ def vector (file, get_type, skip = False):
     else:
         return [get_type(file) for i in range(nelems)]
 
-def typed_vector(type):
-    return partial(vector, get_type = type)
+def typed_vector(type, nelems = None):
+    if nelems is None:
+        return partial(vector, get_type = type)
+    else:
+        return partial(vector, get_type = type, nelems = nelems)
 
 def string (file, skip = False):
     nelems = number(file)
