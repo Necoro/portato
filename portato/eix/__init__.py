@@ -29,6 +29,8 @@ class EixReader(object):
     Note that the file used internally stays open during the whole operation.
     So please call `close()` when you are finished.
 
+    The ``EixReader`` supports the context manager protocol, so you can the ``with ... as ...``.
+
     :CVariables:
 
         supported_versions : int[]
@@ -71,6 +73,13 @@ class EixReader(object):
         except:
             self.close()
             raise
+
+    def __enter__ (self):
+        return self
+
+    def __exit__ (self, exc_type, exc_val, exc_tb):
+        self.close()
+        return True
 
     def close (self):
         """
