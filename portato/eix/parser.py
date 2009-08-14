@@ -63,7 +63,7 @@ def vector (file, get_type, skip = False):
         for i in range(nelems):
             get_type(file, skip = True)
     else:
-        return (get_type(file) for i in range(nelems))
+        return [get_type(file) for i in range(nelems)]
 
 def string (file, skip = False):
     nelems = number(file)
@@ -84,3 +84,25 @@ def overlay (file, skip = False):
         string(file, skip = True) # label
     else:
         return (string(file), string(file))
+
+class LazyElement (object):
+    def __init__ (self, get_type, file):
+        self.file = file
+        self.get_type = get_type
+        self._value = None
+
+        self.pos = file.tell()
+        get_type(skip=True) # skip it for the moment
+
+    @property
+    def value (self):
+        if self._value is None:
+            old_pos = self.file.tell()
+            self.file.seek(self.pos)
+            self._value = self.get_type(skip = False)
+            self.file.seek(old_pos)
+        
+        return self._value
+
+    def __call__ (self):
+        return self.value
