@@ -22,7 +22,8 @@ _SESSION = None
 
 types = {
         "sql": (_("SQLite"), _("Uses an SQLite-database to store package information.\nMay take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data.")),
-        "dict": (_("Hashmap"), _("Uses an in-memory hashmap to store package information.\nHas been used since at least version 0.3.3, but all information has to be regenerated on each startup."))
+        "dict": (_("Hashmap"), _("Uses an in-memory hashmap to store package information.\nHas been used since at least version 0.3.3, but all information has to be regenerated on each startup.")),
+        "eixsql" : (_("eix + SQLite"), _("Similar to SQLite, but now uses the eix database to get the package information.\nThis should be much faster on startup, but requires that your eix database is always up-to-date."))
         }
 
 def Database(type):
@@ -40,13 +41,18 @@ def Database(type):
             warning(_("Cannot load SQLDatabase."))
             return Database("dict")
         else:
-            return SQLDatabase(SectionDict(_SESSION, "SQL"))
+            return SQLDatabase(SectionDict(_SESSION, type))
 
     elif type == "dict":
         debug("Using HashDatabase")
         from .hash import HashDatabase
-        return HashDatabase(SectionDict(_SESSION, "dict"))
+        return HashDatabase(SectionDict(_SESSION, type))
     
+    elif type == "eixsql":
+        debug("Using EixSQLDatabase")
+        from .eix_sql import EixSQLDatabase
+        return EixSQLDatabase(SectionDict(_SESSION, type))
+
     else:
         error(_("Unknown database type: %s"), type)
         raise UnknownDatabaseTypeError, type
