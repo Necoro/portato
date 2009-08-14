@@ -54,6 +54,11 @@ def get_parser (use_ = False):
 
     return parser
 
+def _sub_start ():
+    # set gettext stuff
+    locale.setlocale(locale.LC_ALL, '')
+    gettext.install(APP, LOCALE_DIR, unicode = True)
+
 def start():
 
     # set gettext stuff
