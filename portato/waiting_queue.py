@@ -36,10 +36,9 @@ class WaitingQueue (Queue):
     def put (self, method, *args, **kwargs):
         self.counter += 1;
         
-        if "caller" in kwargs:
-            name = "Waiting Thread #%d (called by:%s)" % (self.counter, kwargs["caller"])
-            del kwargs["caller"]
-        else:
+        try:
+            name = "Waiting Thread #%d (called by:%s)" % (self.counter, kwargs.pop("caller"))
+        except KeyError:
             name = "Waiting Thread #%d" % self.counter
 
         t = self.threadClass(name = name, target = method, args = args, kwargs = kwargs)
