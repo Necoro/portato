@@ -13,7 +13,7 @@
 from __future__ import absolute_import, with_statement
 
 from . import parser
-from . import exceptions as ex
+from .exceptions import UnsupportedVersionError
 
 from ..helper import debug
 
@@ -25,20 +25,20 @@ class EixReader(object):
         self.file = open(filename, "r")
         
         try:
-            self.version = parser.number(self.file)
+            version = parser.number(self.file)
 
-            if self.version not in self.supported_versions:
-                raise ex.UnsupportedVersionError(self.version)
+            if version not in self.supported_versions:
+                raise UnsupportedVersionError(self.version)
 
-            debug("Started EixReader for version %s.", self.version)
+            debug("Started EixReader for version %s.", version)
 
             self.file.seek(0)
+
+            self.header = parser.header(self.file)
+            self.categories = parser.vector(self.file, parser.category, nelems = self.header.ncats())
         except:
             self.close()
             raise
-
-    def header (self):
-        return parser.header(self.file)
 
     def close (self):
         self.file.close()
