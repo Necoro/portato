@@ -256,3 +256,4 @@ class SQLDatabase (Database):
                 self._restrict = "AND (name LIKE '%%%(restrict)s%%' OR cat LIKE '%(restrict)s%%')" % {"restrict":restrict}
 
     restrict = property(get_restrict, set_restrict)
+    con = staticmethod(con)

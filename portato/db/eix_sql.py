@@ -21,29 +21,31 @@ import os
 
 from .sql import SQLDatabase
 from ..eix import EixReader
-from ..helper import debug
+from ..helper import debug, warning
 from ..backend import system
 
 class EixSQLDatabase (SQLDatabase):
 
-    CACHE_FILE = "/var/eix/cache"
+    CACHE_FILE = "/var/cache/eix"
 
     def __init__ (self, session):
-        SQLDatabase.__init__(self, session)
 
-        if "cache" not in session:
+        self.cache = session.get("cache", self.CACHE_FILE)
+        if not os.path.exists(self.cache):
+            warning(_("Cache file '%s' does not exist. Using default instead."), self.cache)
             self.cache = self.CACHE_FILE
-            session["cache"] = self.cache
-        else:
-            self.cache = session["cache"]
 
         debug("Using '%s' as eix cache file.", self.cache)
+        
+        session["cache"] = self.cache
+        
+        SQLDatabase.__init__(self, session)
 
     def updated (self):
         mtime = os.stat(self.cache).st_mtime
         old = self.session.get("mtime", 0)
         
-        self.session["mtime"] = mtime
+        self.session["mtime"] = str(mtime)
 
         return old < mtime
 

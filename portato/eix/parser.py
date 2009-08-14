@@ -357,7 +357,7 @@ class package (object):
             The indices of `header.useflags` representing the IUSE value of the package.
     """
 
-    __slots__ = ("name", "description", "provide",
+    __slots__ = ("_offset", "name", "description", "provide",
             "homepage", "license", "useflags")
 
     def __init__ (self, file, skip = False):
