@@ -56,9 +56,10 @@ class EixSQLDatabase (SQLDatabase):
         def _get():
             with EixReader(self.cache) as eix:
                 for cat in eix.categories:
-                    if category is None or cat.name() == category:
-                        for pkg in cat.packages():
-                            yield (cat.name(), pkg.name(), pkg.name() in inst, False)
+                    if category is None or cat.name == category:
+                        for pkg in cat.packages:
+                            p = "%s/%s" % (cat.name, pkg.name)
+                            yield (cat.name, pkg.name, p in inst, False)
 
         connection.executemany("INSERT INTO packages (cat, name, inst, disabled) VALUES (?, ?, ?, ?)", _get())
         connection.commit()

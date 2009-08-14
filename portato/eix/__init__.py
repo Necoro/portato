@@ -69,7 +69,7 @@ class EixReader(object):
             self.file.seek(0)
 
             self.header = parser.header(self.file)
-            self.categories = parser.vector(self.file, parser.category, nelems = self.header.ncats())
+            self.categories = parser.vector(self.file, parser.category, nelems = self.header.ncats)
         except:
             self.close()
             raise
