@@ -89,12 +89,12 @@ def start():
         
     else: # start us again in root modus and launch listener
         
-        from . import sysv_ipc as ipc
+        from . import mq
 
-        mq = ipc.MessageQueue(None, ipc.IPC_CREX)
+        _mq = mq.MessageQueue(None, mq.MessageQueue.CREAT | mq.MessageQueue.EXCL)
         
         # start listener
-        lt = threading.Thread(target=get_listener().set_recv, args = (mq,))
+        lt = threading.Thread(target=get_listener().set_recv, args = (_mq,))
         lt.setDaemon(False)
         lt.start()
         
@@ -106,7 +106,7 @@ def start():
             su = detect_su_command()
             if su:
                 debug("Using '%s' as su command.", su.bin)
-                cmd = su.cmd("%s --no-fork --mq %ld" % (sys.argv[0], mq.key))
+                cmd = su.cmd("%s --no-fork --mq %ld" % (sys.argv[0], _mq.key))
 
                 sp = subprocess.Popen(cmd, env = env)
 
@@ -126,4 +126,4 @@ def start():
                 get_listener().close()
                 lt.join()
 
-            mq.remove()
+            _mq.remove()

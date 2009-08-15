@@ -32,13 +32,13 @@ class Listener (object):
     @ivar _send: sender socket
     @type _send: int"""
 
-    def set_recv (self, mq):
+    def set_recv (self, _mq):
 
-        self._mq = mq
+        self._mq = _mq
 
         while True:
             try:
-                msg, type = self._mq.receive(block = True)
+                msg, type = self._mq.receive()
 
                 data = msg.split("\0")
                 debug("Listener received: %s", data)
@@ -76,17 +76,17 @@ class Listener (object):
                 n.set_urgency(int(urgency))
             n.show()
 
-    def set_send (self, mq = None):
-        if mq is None:
+    def set_send (self, _mq = None):
+        if _mq is None:
             warning(_("Listener has not been started."))
             self._mq = None
         else:
-            from . import sysv_ipc as ipc
+            from . import mq
 
-            self._mq = ipc.MessageQueue(mq)
+            self._mq = mq.MessageQueue(_mq)
 
     def __send (self, string):
-        self._mq.send(string, block = True)
+        self._mq.send(string)
 
     def send_notify (self, base = "", descr = "", icon = "", urgency = None):
         if self._mq is None:
