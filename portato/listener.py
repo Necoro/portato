@@ -21,7 +21,8 @@ except ImportError:
     pynotify = None
 
 from .constants import APP
-from .helper import debug, warning
+from .helper import debug, warning, error
+from . import ipc
 
 class Listener (object):
     """This class handles the communication between the "listener" and the GUI.
@@ -52,6 +53,9 @@ class Listener (object):
             except KeyboardInterrupt:
                 debug("Got KeyboardInterrupt. Aborting.")
                 break
+            except ipc.MessageQueueRemovedError:
+                debug("MessageQueue removed. Aborting.")
+                break
 
         self.mq = None
     
@@ -81,12 +85,13 @@ class Listener (object):
             warning(_("Listener has not been started."))
             self.mq = None
         else:
-            from . import ipc
-
             self.mq = ipc.MessageQueue(mq)
 
     def __send (self, string):
-        self.mq.send(string)
+        try:
+            self.mq.send(string)
+        except ipc.MessageQueueError, e:
+            error(_("An exception occured while accessing the message queue: %s"), e)
 
     def send_notify (self, base = "", descr = "", icon = "", urgency = None):
         if self.mq is None:

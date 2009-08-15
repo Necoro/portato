@@ -126,4 +126,7 @@ def start():
                 get_listener().close()
                 lt.join()
 
-            mq.remove()
+            try:
+                mq.remove()
+            except ipc.MessageQueueRemovedError:
+                debug("MessageQueue already removed. Ignore.")
