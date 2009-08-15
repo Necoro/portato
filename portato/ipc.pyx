@@ -169,5 +169,5 @@ cdef class MessageQueue (object):
 
         return retTuple
 
-    cdef key_t random_key (self):
+    cdef inline key_t random_key (self):
         return <int>(<double>rand() / (<double>RAND_MAX + 1) * INT_MAX)

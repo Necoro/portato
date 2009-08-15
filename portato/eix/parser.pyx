@@ -24,6 +24,8 @@ cdef extern from "stdio.h":
         pass
 
     int fgetc(FILE* stream)
+    long ftell(FILE* stream)
+    int fseek(FILE* stream, long offset, int whence)
     
     int EOF
     int SEEK_CUR
@@ -47,7 +49,6 @@ cdef int _get_byte (FILE* file) except -1:
         raise EndOfFileException
 
     return c
-
 
 #
 # Base Types
@@ -135,8 +136,6 @@ def string (file):
     :type file: file
     :rtype: str
     """
-    cdef LLong nelems
-
     nelems = _number(file)
 
     s = file.read(nelems)
@@ -225,8 +224,8 @@ cdef class header:
         :param file: The file to read from
         :type file: file
         """
-        self.version = number(file)
-        self.ncats = number(file)
+        self.version = _number(file)
+        self.ncats = _number(file)
         self.overlays = vector(file, overlay)
         self.provide = vector(file, string)
         self.licenses = vector(file, string)
@@ -263,7 +262,7 @@ cdef class package:
             The indices of `header.useflags` representing the IUSE value of the package.
     """
 
-    cdef readonly object _offset
+    cdef LLong _offset
     cdef readonly object name
     cdef readonly object description
     cdef readonly object provide
@@ -276,9 +275,12 @@ cdef class package:
         :param file: The file to read from
         :type file: file
         """
-        self._offset = number(file)
+        cdef FILE* cfile = PyFile_AsFile(file)
+        cdef long after_offset
         
-        after_offset = file.tell()
+        self._offset = _number(file)
+        
+        after_offset = ftell(cfile)
         
         self.name = string(file)
         self.description = string(file)
@@ -289,7 +291,7 @@ cdef class package:
         
         # self.versions = LE(typed_vector(version))
         # for the moment just skip the versions
-        file.seek(self._offset - (file.tell() - after_offset), SEEK_CUR)
+        fseek(cfile, self._offset - (ftell(cfile) - after_offset), SEEK_CUR)
 
 cdef class category:
     """
