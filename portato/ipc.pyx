@@ -11,12 +11,21 @@
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
 class MessageQueueError(Exception):
+    """
+    Base class for different queue errors.
+    """
     pass
 
 class MessageQueueRemovedError (MessageQueueError):
+    """
+    This class is used iff the queue is already removed.
+    """
     pass
 
 cdef class MessageQueue (object):
+    """
+    A simple interface to the SysV message queues.
+    """
 
     CREAT = IPC_CREAT
     EXCL = IPC_EXCL
@@ -25,12 +34,18 @@ cdef class MessageQueue (object):
     cdef readonly key_t key
 
     def __init__ (self, key = None, int flags = 0):
+        """
+        Create a new MessageQueue instance. Depending on the passed in flags,
+        different behavior occurs. See man msgget for the details.
+
+        If key is None, a random key is created.
+        """
 
         if (flags & IPC_EXCL) and not (flags & IPC_CREAT):
-            raise MessageQueueError("EXCL must be combined with CREAT.")
+            raise ValueError("EXCL must be combined with CREAT.")
 
         if key is None and not (flags & IPC_EXCL):
-            raise MessageQueueError("The key can only be None if EXCL is set.")
+            raise ValueError("The key can only be None if EXCL is set.")
 
         # make sure there is nothing ... obscure
         flags &= (IPC_CREAT | IPC_EXCL)
@@ -55,11 +70,14 @@ cdef class MessageQueue (object):
             elif errno == ENOENT:
                 raise MessageQueueError("Queue does not exist and CREAT is not set.")
             elif errno == ENOMEM or errno == ENOSPC:
-                raise MessageQueueError("Insufficient ressources.")
+                raise MemoryError("Insufficient ressources.")
             else:
                 raise OSError(errno, strerror(errno))
 
     def remove (self):
+        """
+        Removes the message queue.
+        """
         cdef msqid_ds info
         cdef int ret
 
@@ -74,6 +92,12 @@ cdef class MessageQueue (object):
                 raise OSError(errno, strerror(errno))
 
     def send (self, message, int type = 1):
+        """
+        Sends a message with a specific type.
+
+        The type must be larger zero.
+        Also note, that this is always blocking.
+        """
         cdef msg_data * msg
         cdef int ret
         cdef long size = len(message)
@@ -109,6 +133,11 @@ cdef class MessageQueue (object):
             PyMem_Free(msg)
 
     def receive (self):
+        """
+        Receives a message from the queue and returns the (msg, type) pair.
+
+        Note that this method is always blocking.
+        """
         cdef msg_data * msg
         cdef int ret
         cdef object retTuple

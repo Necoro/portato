@@ -1,6 +1,7 @@
 next:
 
 - allow eix as backend DB
+- use an internal messagequeue module instead of external shm
 
 0.13:
 - allow lines w/o keyword in package.keywords
