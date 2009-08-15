@@ -106,7 +106,7 @@ cdef class MessageQueue (object):
             raise ValueError("type must be > 0")
 
         if size >= MAX_MESSAGE_SIZE:
-            raise ValueError("Message must be smaller than %d", MAX_MESSAGE_SIZE)
+            raise ValueError("Message must be smaller than %d" % MAX_MESSAGE_SIZE)
 
         msg = <msg_data*>PyMem_Malloc(sizeof(msg_data) + size)
 
