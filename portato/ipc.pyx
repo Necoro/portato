@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/mq.pyx
+# File: portato/ipc.pyx
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006-2009 René 'Necoro' Neumann

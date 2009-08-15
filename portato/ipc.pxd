@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/mq.pxd
+# File: portato/ipc.pxd
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006-2009 René 'Necoro' Neumann

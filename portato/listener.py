@@ -32,13 +32,13 @@ class Listener (object):
     @ivar _send: sender socket
     @type _send: int"""
 
-    def set_recv (self, _mq):
+    def set_recv (self, mq):
 
-        self._mq = _mq
+        self.mq = mq
 
         while True:
             try:
-                msg, type = self._mq.receive()
+                msg, type = self.mq.receive()
 
                 data = msg.split("\0")
                 debug("Listener received: %s", data)
@@ -53,7 +53,7 @@ class Listener (object):
                 debug("Got KeyboardInterrupt. Aborting.")
                 break
 
-        self._mq = None
+        self.mq = None
     
     def do_cmd (self, cmdlist):
         """Starts a command as the user.
@@ -76,20 +76,20 @@ class Listener (object):
                 n.set_urgency(int(urgency))
             n.show()
 
-    def set_send (self, _mq = None):
-        if _mq is None:
+    def set_send (self, mq = None):
+        if mq is None:
             warning(_("Listener has not been started."))
-            self._mq = None
+            self.mq = None
         else:
-            from . import mq
+            from . import ipc
 
-            self._mq = mq.MessageQueue(_mq)
+            self.mq = ipc.MessageQueue(mq)
 
     def __send (self, string):
-        self._mq.send(string)
+        self.mq.send(string)
 
     def send_notify (self, base = "", descr = "", icon = "", urgency = None):
-        if self._mq is None:
+        if self.mq is None:
             self.do_notify(base, descr, icon, urgency)
         else:
             string = "\0".join(["notify", base, descr, icon])
@@ -102,11 +102,11 @@ class Listener (object):
             self.__send(string)
 
     def send_cmd (self, cmdlist):
-        if self._mq is None:
+        if self.mq is None:
             self.do_cmd(cmdlist)
         else:
             self.__send("\0".join(["cmd"] +cmdlist))
 
     def close (self):
-        if self._mq is not None:
+        if self.mq is not None:
             self.__send("close")
