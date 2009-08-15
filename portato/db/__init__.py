@@ -38,7 +38,7 @@ def Database(type):
         try:
             from .sql import SQLDatabase
         except ImportError:
-            warning(_("Cannot load SQLDatabase."))
+            warning(_("Cannot load %s."), "SQLDatabase")
             return Database("dict")
         else:
             return SQLDatabase(SectionDict(_SESSION, type))
@@ -53,7 +53,7 @@ def Database(type):
         try:
             from .eix_sql import EixSQLDatabase
         except ImportError:
-            warning(_("Cannot load EixSQLDatabase."))
+            warning(_("Cannot load %s."), "EixSQLDatabase.")
             return Database("sql")
         else:
             return EixSQLDatabase(SectionDict(_SESSION, type))
