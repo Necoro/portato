@@ -264,11 +264,11 @@ cdef class package:
 
     cdef LLong _offset
     cdef readonly object name
-    cdef readonly object description
-    cdef readonly object provide
-    cdef readonly object homepage
-    cdef readonly object license
-    cdef readonly object useflags
+    #cdef readonly object description
+    #cdef readonly object provide
+    #cdef readonly object homepage
+    #cdef readonly object license
+    #cdef readonly object useflags
 
     def __init__ (self, file):
         """
@@ -283,11 +283,13 @@ cdef class package:
         after_offset = ftell(cfile)
         
         self.name = string(file)
-        self.description = string(file)
-        self.provide = vector(file, number)
-        self.homepage = string(file)
-        self.license = number(file)
-        self.useflags = vector(file, number)
+
+        # skip the rest, as it is currently unneeded
+        #self.description = string(file)
+        #self.provide = vector(file, number)
+        #self.homepage = string(file)
+        #self.license = number(file)
+        #self.useflags = vector(file, number)
         
         # self.versions = LE(typed_vector(version))
         # for the moment just skip the versions
