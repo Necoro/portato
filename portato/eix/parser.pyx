@@ -122,11 +122,7 @@ def vector (file, get_type, nelems = None):
     else:
         n = nelems
     
-    l = []
-    for i in range(n):
-        l.append(get_type(file))
-    
-    return l
+    return [get_type(file) for i in range(n)]
 
 def string (file):
     """
