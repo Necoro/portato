@@ -10,7 +10,8 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from stdlib cimport *
+from python_string cimport *
+from python_mem cimport *
 
 cdef extern from "errno.h":
     int errno

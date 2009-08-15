@@ -84,7 +84,7 @@ cdef class MessageQueue (object):
         if size >= MAX_MESSAGE_SIZE:
             raise ValueError("Message must be smaller than %d", MAX_MESSAGE_SIZE)
 
-        msg = <msg_data*>malloc(sizeof(msg_data) + size)
+        msg = <msg_data*>PyMem_Malloc(sizeof(msg_data) + size)
 
         if msg is NULL:
             raise MemoryError("Out of memory")
@@ -93,7 +93,7 @@ cdef class MessageQueue (object):
         msg.mtype = type
 
         with nogil:
-            ret = msgsnd(self.msgid, &msg, size, 0)
+            ret = msgsnd(self.msgid, msg, size, 0)
 
         try:
             if ret == -1:
@@ -106,14 +106,14 @@ cdef class MessageQueue (object):
                 else:
                     raise OSError(errno, strerror(errno))
         finally:
-            free(msg)
+            PyMem_Free(msg)
 
     def receive (self):
         cdef msg_data * msg
         cdef int ret
         cdef object retTuple
 
-        msg = <msg_data*>malloc(sizeof(msg_data) + MAX_MESSAGE_SIZE)
+        msg = <msg_data*>PyMem_Malloc(sizeof(msg_data) + MAX_MESSAGE_SIZE)
 
         if msg is NULL:
             raise MemoryError("Out of memory")
@@ -134,9 +134,9 @@ cdef class MessageQueue (object):
                 else:
                     raise OSError(errno, strerror(errno))
 
-            retTuple = (msg.mtext, msg.mtype)
+            retTuple = (PyString_FromStringAndSize(msg.mtext, ret), msg.mtype)
         finally:
-            free(msg)
+            PyMem_Free(msg)
 
         return retTuple
 
