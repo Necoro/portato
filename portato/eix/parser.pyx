@@ -31,8 +31,6 @@ cdef extern from "stdio.h":
 cdef extern from "Python.h":
     FILE* PyFile_AsFile(object)
 
-    ctypedef int Py
-
 ctypedef unsigned char UChar
 ctypedef long long LLong
 
