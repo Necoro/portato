@@ -46,7 +46,7 @@ def get_parser (use_ = False):
 
     parser = OptionParser(version = vers, prog = "portato", description = desc, usage = usage)
     
-    parser.add_option("--shm", action = "store", nargs = 3, type="long", dest = "shm",
+    parser.add_option("--mq", action = "store", nargs = 1, type="long", dest = "mq", default = None,
             help = SUPPRESS_HELP)
 
     parser.add_option("-F", "--no-fork", action = "store_true", dest = "nofork", default = False,
@@ -80,10 +80,7 @@ def start():
         from .gui import run
         info("%s v. %s", _("Starting Portato"), VERSION)
         
-        if options.shm:
-            get_listener().set_send(*options.shm)
-        else:
-            get_listener().set_send()
+        get_listener().set_send(options.mq)
         
         try:
             run()
@@ -92,14 +89,12 @@ def start():
         
     else: # start us again in root modus and launch listener
         
-        import shm_wrapper as shm
+        from . import ipc
 
-        mem = shm.create_memory(1024, permissions=0600)
-        sig = shm.create_semaphore(InitialValue = 0, permissions = 0600)
-        rw = shm.create_semaphore(InitialValue = 1, permissions = 0600)
+        mq = ipc.MessageQueue(None, ipc.MessageQueue.CREAT | ipc.MessageQueue.EXCL)
         
         # start listener
-        lt = threading.Thread(target=get_listener().set_recv, args = (mem, sig, rw))
+        lt = threading.Thread(target=get_listener().set_recv, args = (mq,))
         lt.setDaemon(False)
         lt.start()
         
@@ -111,7 +106,7 @@ def start():
             su = detect_su_command()
             if su:
                 debug("Using '%s' as su command.", su.bin)
-                cmd = su.cmd("%s --no-fork --shm %ld %ld %ld" % (sys.argv[0], mem.key, sig.key, rw.key))
+                cmd = su.cmd("%s --no-fork --mq %ld" % (sys.argv[0], mq.key))
 
                 sp = subprocess.Popen(cmd, env = env)
 
@@ -129,3 +124,9 @@ def start():
             if lt.isAlive():
                 debug("Listener is still running. Close it.")
                 get_listener().close()
+                lt.join()
+
+            try:
+                mq.remove()
+            except ipc.MessageQueueRemovedError:
+                debug("MessageQueue already removed. Ignore.")

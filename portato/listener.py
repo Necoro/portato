@@ -21,7 +21,8 @@ except ImportError:
     pynotify = None
 
 from .constants import APP
-from .helper import debug, warning
+from .helper import debug, warning, error
+from . import ipc
 
 class Listener (object):
     """This class handles the communication between the "listener" and the GUI.
@@ -32,22 +33,15 @@ class Listener (object):
     @ivar _send: sender socket
     @type _send: int"""
 
-    def set_recv (self, mem, sig, rw):
-        self._mem = mem
-        self._sig = sig
-        self._rw = rw
+    def set_recv (self, mq):
+
+        self.mq = mq
 
         while True:
             try:
-                try:
-                    self._sig.P()
-                    self._rw.P()
-                    len = self._mem.read(NumberOfBytes = 4)
-                    string = self._mem.read(NumberOfBytes = int(len), offset = 4)
-                finally:
-                    self._rw.V()
+                msg, type = self.mq.receive()
 
-                data = string.split("\0")
+                data = msg.split("\0")
                 debug("Listener received: %s", data)
 
                 if data[0] == "notify":
@@ -59,15 +53,12 @@ class Listener (object):
             except KeyboardInterrupt:
                 debug("Got KeyboardInterrupt. Aborting.")
                 break
+            except ipc.MessageQueueRemovedError:
+                debug("MessageQueue removed. Aborting.")
+                break
 
-        self._mem.remove()
-        self._sig.remove()
-        self._rw.remove()
-
-        self._mem = None
-        self._sig = None
-        self._rw = None
-
+        self.mq = None
+    
     def do_cmd (self, cmdlist):
         """Starts a command as the user.
         
@@ -89,30 +80,21 @@ class Listener (object):
                 n.set_urgency(int(urgency))
             n.show()
 
-    def set_send (self, mem = None, sig = None, rw = None):
-        if mem is None or sig is None or rw is None:
+    def set_send (self, mq = None):
+        if mq is None:
             warning(_("Listener has not been started."))
-            self._mem = None
-            self._sig = None
-            self._rw = None
+            self.mq = None
         else:
-            import shm_wrapper as shm
-
-            self._mem = shm.SharedMemoryHandle(mem)
-            self._sig = shm.SemaphoreHandle(sig)
-            self._rw = shm.SemaphoreHandle(rw)
+            self.mq = ipc.MessageQueue(mq)
 
     def __send (self, string):
-        self._rw.P()
-        self._sig.Z()
         try:
-            self._mem.write("%4d%s" % (len(string), string))
-            self._sig.V()
-        finally:
-            self._rw.V()
+            self.mq.send(string)
+        except ipc.MessageQueueError, e:
+            error(_("An exception occured while accessing the message queue: %s"), e)
 
     def send_notify (self, base = "", descr = "", icon = "", urgency = None):
-        if self._sig is None:
+        if self.mq is None:
             self.do_notify(base, descr, icon, urgency)
         else:
             string = "\0".join(["notify", base, descr, icon])
@@ -125,11 +107,11 @@ class Listener (object):
             self.__send(string)
 
     def send_cmd (self, cmdlist):
-        if self._sig is None:
+        if self.mq is None:
             self.do_cmd(cmdlist)
         else:
             self.__send("\0".join(["cmd"] +cmdlist))
 
     def close (self):
-        if self._sig is not None:
+        if self.mq is not None:
             self.__send("close")

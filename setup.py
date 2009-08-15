@@ -15,6 +15,8 @@ import os
 import sys
 
 from distutils.core import setup
+from distutils.extension import Extension
+from Cython.Distutils import build_ext
 
 from portato.constants import VERSION, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR, APP
 
@@ -38,17 +40,12 @@ data_files = [
         (PLUGIN_DIR, plugin_list("gpytage", "notify", "etc_proposals", "reload_portage", "package_details"))]
 
 # extension stuff
-ext_modules = []
-cmdclass={'build_manpage': build_manpage}
+ext_modules = [Extension("portato.ipc", ["portato/ipc.pyx"])]
 
 if "--disable-eix" in sys.argv:
     sys.argv.remove("--disable-eix")
 else:
-    from Cython.Distutils import build_ext
-    from distutils.extension import Extension
-    
     ext_modules.append(Extension("portato.eix.parser", ["portato/eix/parser.pyx"]))
-    cmdclass['build_ext'] = build_ext
     packages.append("portato.eix")
 
     if "--enable-eix" in sys.argv:
@@ -67,5 +64,5 @@ setup(name=APP,
         packages = packages,
         data_files = data_files,
         ext_modules = ext_modules,
-        cmdclass = cmdclass
+        cmdclass={'build_manpage': build_manpage, 'build_ext' : build_ext}
         )
