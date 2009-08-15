@@ -27,13 +27,10 @@ cdef class MessageQueue (object):
     A simple interface to the SysV message queues.
     """
 
-    CREAT = IPC_CREAT
-    EXCL = IPC_EXCL
-    
     cdef int msgid
     cdef readonly key_t key
 
-    def __init__ (self, key = None, int flags = 0):
+    def __init__ (self, key = None, create = False, exclusive = False):
         """
         Create a new MessageQueue instance. Depending on the passed in flags,
         different behavior occurs. See man msgget for the details.
@@ -41,17 +38,20 @@ cdef class MessageQueue (object):
         If key is None, a random key is created.
         """
 
-        if (flags & IPC_EXCL) and not (flags & IPC_CREAT):
-            raise ValueError("EXCL must be combined with CREAT.")
+        cdef int flags = 0600 # start mode
 
-        if key is None and not (flags & IPC_EXCL):
-            raise ValueError("The key can only be None if EXCL is set.")
+        if exclusive and not create:
+            raise ValueError("'exclusive' must be combined with 'create'.")
 
-        # make sure there is nothing ... obscure
-        flags &= (IPC_CREAT | IPC_EXCL)
+        if key is None and not exclusive:
+            raise ValueError("The key can only be None if 'exclusive' is set.")
 
-        flags |= 0600 # mode
+        if create:
+            flags |= IPC_CREAT
 
+        if exclusive:
+            flags |= IPC_EXCL
+        
         if key is None:
             check = True
             while check:
@@ -68,7 +68,7 @@ cdef class MessageQueue (object):
             elif errno == EEXIST:
                 raise MessageQueueError("Queue already exists.")
             elif errno == ENOENT:
-                raise MessageQueueError("Queue does not exist and CREAT is not set.")
+                raise MessageQueueError("Queue does not exist and 'create' is not set.")
             elif errno == ENOMEM or errno == ENOSPC:
                 raise MemoryError("Insufficient ressources.")
             else:

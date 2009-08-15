@@ -1,3 +1,5 @@
+from __future__ import with_statement
+
 from portato import _sub_start
 _sub_start()
 

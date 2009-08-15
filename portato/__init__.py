@@ -91,7 +91,7 @@ def start():
         
         from . import ipc
 
-        mq = ipc.MessageQueue(None, ipc.MessageQueue.CREAT | ipc.MessageQueue.EXCL)
+        mq = ipc.MessageQueue(None, create = True, exclusive = True)
         
         # start listener
         lt = threading.Thread(target=get_listener().set_recv, args = (mq,))
