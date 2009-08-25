@@ -538,6 +538,7 @@ class EmergeQueue:
             system.reload_settings()
             self.db.reload()
             debug("Sync finished")
+            self.threadQueue.next()
 
         self.threadQueue.put(finish, caller = self.sync)
 
