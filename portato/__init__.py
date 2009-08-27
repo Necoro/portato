@@ -14,13 +14,10 @@ from __future__ import absolute_import
 
 import gettext, locale
 import sys, os
-import subprocess, threading
-import atexit
 from optparse import OptionParser, SUPPRESS_HELP
 
 from .log import start as logstart
 from .constants import LOCALE_DIR, APP, VERSION
-from .su import detect_su_command
 from .helper import debug, info, error
 
 # listener-handling
@@ -62,8 +59,7 @@ def _sub_start ():
 def start():
 
     # set gettext stuff
-    locale.setlocale(locale.LC_ALL, '')
-    gettext.install(APP, LOCALE_DIR, unicode = True)
+    _sub_start()
 
     # start logging
     logstart(file=False)
@@ -71,10 +67,12 @@ def start():
     # run parser
     (options, args) = get_parser().parse_args()
 
-    # close listener at exit
-    atexit.register(get_listener().close)
-
     if options.nofork or os.getuid() == 0: # start GUI
+        
+        # close listener at exit
+        import atexit
+        atexit.register(get_listener().close)
+
         logstart(file = True) # start logging to file
 
         from .gui import run
@@ -90,6 +88,8 @@ def start():
     else: # start us again in root modus and launch listener
         
         from . import ipc
+        import subprocess, threading
+        from .su import detect_su_command
 
         mq = ipc.MessageQueue(None, create = True, exclusive = True)
         
