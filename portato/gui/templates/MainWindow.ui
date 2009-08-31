@@ -41,7 +41,7 @@
         </child>
         <child>
           <object class="GtkAction" id="closeAction">
-            <property name="stock_id" translatable="yes">gtk-quit</property>
+            <property name="stock_id">gtk-quit</property>
             <property name="name">closeAction</property>
             <signal handler="cb_close" name="activate"/>
           </object>
@@ -243,7 +243,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">gtk-delete</property>
+                <property name="label">gtk-delete</property>
                 <property name="use_stock">True</property>
                 <signal handler="cb_delete_search_clicked" name="clicked"/>
               </object>
@@ -256,7 +256,7 @@
             <child>
               <object class="GtkButton" id="searchButton">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">gtk-find</property>
+                <property name="label">gtk-find</property>
                 <property name="use_stock">True</property>
                 <signal handler="cb_search_clicked" name="clicked" object="searchEntry"/>
               </object>
