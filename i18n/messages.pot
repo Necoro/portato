@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-31 22:04+0200\n"
+"POT-Creation-Date: 2009-08-31 22:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -573,7 +573,7 @@ msgstr ""
 msgid "No %(old)s language file installed. Disable highlighting."
 msgstr ""
 
-#: portato/gui/views.py:130 plugins/package_details.py:102
+#: portato/gui/views.py:130 plugins/package_details.py:108
 #, python-format
 msgid "Error: %s"
 msgstr ""
@@ -836,6 +836,20 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
+#: portato/eix/exceptions.py:26
+msgid "Unknown error."
+msgstr ""
+
+#: portato/eix/exceptions.py:37
+#, python-format
+msgid "End of file reached though it was not expected: '%s'"
+msgstr ""
+
+#: portato/eix/exceptions.py:45
+#, python-format
+msgid "Version '%s' is not supported."
+msgstr ""
+
 #: portato/backend/flags.py:527
 #, python-format
 msgid "Conflicting values for masking status: %s"
@@ -867,11 +881,11 @@ msgstr ""
 msgid "BUG in flags.new_masking_status. It returns '%s'"
 msgstr ""
 
-#: portato/__init__.py:53
+#: portato/__init__.py:50
 msgid "do not fork off as root"
 msgstr ""
 
-#: portato/__init__.py:76
+#: portato/__init__.py:79
 msgid "Starting Portato"
 msgstr ""
 
@@ -906,29 +920,47 @@ msgid ""
 "regenerated on each startup."
 msgstr ""
 
-#: portato/db/__init__.py:40
-msgid "Cannot load SQLDatabase."
+#: portato/db/__init__.py:26
+msgid "eix + SQLite"
 msgstr ""
 
-#: portato/db/__init__.py:51
+#: portato/db/__init__.py:26
+msgid ""
+"Similar to SQLite, but now uses the eix database to get the package "
+"information.\n"
+"This should be much faster on startup, but requires that your eix database "
+"is always up-to-date."
+msgstr ""
+
+#: portato/db/__init__.py:41 portato/db/__init__.py:56
+#, python-format
+msgid "Cannot load %s."
+msgstr ""
+
+#: portato/db/__init__.py:62
 #, python-format
 msgid "Unknown database type: %s"
 msgstr ""
 
-#: portato/db/database.py:38
-msgid "ALL"
-msgstr ""
-
-#: portato/db/dict.py:94
+#: portato/db/hash.py:94
 #, python-format
 msgid ""
 "Catched KeyError => %s seems not to be an available category. Have you "
 "played with rsync-excludes?"
 msgstr ""
 
-#: portato/db/dict.py:149
+#: portato/db/hash.py:149
 #, python-format
 msgid "Error while compiling search expression: '%s'."
+msgstr ""
+
+#: portato/db/eix_sql.py:35
+#, python-format
+msgid "Cache file '%s' does not exist. Using default instead."
+msgstr ""
+
+#: portato/db/database.py:38
+msgid "ALL"
 msgstr ""
 
 #: portato/db/sql.py:79
@@ -964,133 +996,153 @@ msgstr ""
 msgid "Unrecognized line in configuration: %s"
 msgstr ""
 
-#: portato/listener.py:94
+#: portato/listener.py:85
 msgid "Listener has not been started."
 msgstr ""
 
-#: portato/plugin.py:438 portato/plugin.py:441
+#: portato/listener.py:94
 #, python-format
-msgid "Loading plugin '%(plugin)s' failed: %(error)s"
+msgid "An exception occured while accessing the message queue: %s"
 msgstr ""
 
-#: portato/plugin.py:451
+#: portato/plugin.py:446 portato/plugin.py:449
+#, python-format
+msgid "Loading plugin module '%(plugin)s' failed: %(error)s"
+msgstr ""
+
+#: portato/plugin.py:459
+#, python-format
+msgid "Loading widgets plugin '%(plugin)s' failed: %(error)s"
+msgstr ""
+
+#: portato/plugin.py:462
+#, python-format
+msgid "Loading widgets of plugin '%(plugin)s' failed: %(error)s"
+msgstr ""
+
+#: portato/plugin.py:466
 #, python-format
 msgid "Widgets of plugin '%s' loaded."
 msgstr ""
 
-#: portato/plugin.py:482
+#: portato/plugin.py:497
 msgid "Plugin is disabled!"
 msgstr ""
 
-#: portato/plugin.py:484
+#: portato/plugin.py:499
 msgid "Plugin has unresolved dependencies - disabled!"
 msgstr ""
 
-#: portato/plugin.py:488
+#: portato/plugin.py:503
 #, python-format
 msgid "Plugin '%s' loaded."
 msgstr ""
 
-#: portato/plugin.py:528
+#: portato/plugin.py:543
 #, python-format
 msgid "Overriding hook '%(hook)s' with plugin '%(plugin)s'."
 msgstr ""
 
-#: portato/plugin.py:586
+#: portato/plugin.py:601
 #, python-format
 msgid ""
 "For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"
 msgstr ""
 
-#: portato/plugin.py:587
+#: portato/plugin.py:602
 #, python-format
 msgid "It is now replaced by the one from plugin '%s'!"
 msgstr ""
 
-#: portato/plugin.py:620
+#: portato/plugin.py:635
 #, python-format
 msgid ""
 "Dependant '%(dep)s' for '%(hook)s' in plugin '%(plugin)s' not found! Adding "
 "nevertheless."
 msgstr ""
 
-#: plugins/etc_proposals.py:34
+#: portato/plugin.py:704 portato/plugin.py:707
+#, python-format
+msgid "Registrating plugin '%(plugin)s' failed: %(error)s"
+msgstr ""
+
+#: plugins/etc_proposals.py:32
 msgid "Cannot start etc-proposals. Not root!"
 msgstr ""
 
-#: plugins/package_details.py:67
+#: plugins/package_details.py:73
 msgid "Shows the Changelog of a package"
 msgstr ""
 
-#: plugins/package_details.py:69
+#: plugins/package_details.py:75
 msgid "Changelog"
 msgstr ""
 
-#: plugins/package_details.py:79
+#: plugins/package_details.py:85
 msgid "Shows the ebuild of a package"
 msgstr ""
 
-#: plugins/package_details.py:82
+#: plugins/package_details.py:88
 msgid "Ebuild"
 msgstr ""
 
-#: plugins/package_details.py:89
+#: plugins/package_details.py:95
 msgid "Shows the installed files of a package"
 msgstr ""
 
-#: plugins/package_details.py:91
+#: plugins/package_details.py:97
 msgid "Files"
 msgstr ""
 
-#: plugins/package_details.py:105
+#: plugins/package_details.py:111
 msgid "Shows the dependencies of a package"
 msgstr ""
 
-#: plugins/package_details.py:107
+#: plugins/package_details.py:113
 msgid "Dependencies"
 msgstr ""
 
-#: plugins/package_details.py:179
+#: plugins/package_details.py:185
 #, python-format
 msgid "If '%s' is disabled"
 msgstr ""
 
-#: plugins/package_details.py:181
+#: plugins/package_details.py:187
 #, python-format
 msgid "If '%s' is enabled"
 msgstr ""
 
-#: plugins/package_details.py:187
+#: plugins/package_details.py:193
 msgid "One of the following"
 msgstr ""
 
-#: plugins/package_details.py:192
+#: plugins/package_details.py:198
 msgid "All of the following"
 msgstr ""
 
-#: plugins/package_details.py:203
+#: plugins/package_details.py:209
 msgid ""
 "Can't display dependencies: This package has an unsupported dependency "
 "string."
 msgstr ""
 
-#: plugins/notify.py:24
+#: plugins/notify.py:23
 msgid "Cannot import 'pynotify'."
 msgstr ""
 
-#: plugins/notify.py:36
+#: plugins/notify.py:35
 msgid "Notify called while process is still running!"
 msgstr ""
 
-#: plugins/notify.py:40
+#: plugins/notify.py:39
 msgid "Emerge finished!"
 msgstr ""
 
-#: plugins/notify.py:44
+#: plugins/notify.py:43
 msgid "Emerge failed!"
 msgstr ""
 
-#: plugins/notify.py:45
+#: plugins/notify.py:44
 #, python-format
 msgid "Error Code: %d"
 msgstr ""
