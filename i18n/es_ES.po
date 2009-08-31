@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato 0.12\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-07-05 04:18+0200\n"
-"PO-Revision-Date: 2009-08-15 18:16-0000\n"
-"Last-Translator: Daniel Halens Rodriguez <daniel.halens@sabayonlinux.org>\n"
+"POT-Creation-Date: 2009-08-31 22:04+0200\n"
+"PO-Revision-Date: 2009-08-31 22:08+0100\n"
+"Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -228,18 +228,6 @@ msgstr "<b>Opciones de Color</b>"
 msgid "Visual"
 msgstr "Interfaz"
 
-#: portato/gui/templates/PreferenceWindow.ui:1120
-#: portato/gui/templates/PluginWindow.ui:211
-#: portato/gui/templates/MailInfoWindow.ui:168
-#: portato/gui/templates/SearchWindow.ui:47
-msgid "gtk-cancel"
-msgstr "_Cancelar"
-
-#: portato/gui/templates/PreferenceWindow.ui:1133
-#: portato/gui/templates/PluginWindow.ui:222
-msgid "gtk-apply"
-msgstr "_Aplicar"
-
 #: portato/gui/templates/PluginWindow.ui:7
 msgid "Plugins"
 msgstr "Plugins"
@@ -329,14 +317,6 @@ msgstr "_Enviar"
 msgid "Search Results"
 msgstr "Resultados de la búsqueda"
 
-#: portato/gui/templates/SearchWindow.ui:58
-msgid "gtk-jump-to"
-msgstr "gtk-jump-to"
-
-#: portato/gui/templates/SearchWindow.ui:72
-msgid "gtk-ok"
-msgstr "_Aceptar"
-
 #: portato/gui/templates/MainWindow.ui:10
 msgid "Plu_gins"
 msgstr "_Plugins"
@@ -352,10 +332,6 @@ msgstr "_Preferencias"
 #: portato/gui/templates/MainWindow.ui:36
 msgid "Re_load Portage"
 msgstr "Re_frescar Portage"
-
-#: portato/gui/templates/MainWindow.ui:44
-msgid "gtk-quit"
-msgstr "_Salir"
 
 #: portato/gui/templates/MainWindow.ui:52
 msgid "_Emerge"
@@ -414,14 +390,6 @@ msgstr "_Acerca de..."
 msgid "_Plugins"
 msgstr "_Plugins"
 
-#: portato/gui/templates/MainWindow.ui:246
-msgid "gtk-delete"
-msgstr "_Borrar"
-
-#: portato/gui/templates/MainWindow.ui:259
-msgid "gtk-find"
-msgstr "_Buscar"
-
 #: portato/gui/templates/MainWindow.ui:380
 msgid "Install onto system"
 msgstr "Instalar en el sistema"
@@ -464,9 +432,9 @@ msgid "Installed"
 msgstr "Instalado"
 
 #: portato/gui/templates/MainWindow.ui:665
-#: portato/gui/windows/main.py:254
-#: portato/gui/windows/main.py:257
-#: portato/gui/windows/main.py:260
+#: portato/gui/windows/main.py:255
+#: portato/gui/windows/main.py:258
+#: portato/gui/windows/main.py:261
 #: portato/gui/windows/main.py:361
 #: portato/gui/windows/main.py:365
 #: portato/gui/windows/main.py:372
@@ -741,7 +709,7 @@ msgstr "Sitio web en blanco."
 msgid "Package could not be found: %s"
 msgstr "No se pudo encontrar el paquete %s"
 
-#: portato/gui/windows/main.py:263
+#: portato/gui/windows/main.py:264
 #: portato/gui/windows/main.py:363
 msgid "Masked by user"
 msgstr "Enmascarado por el usuario"
@@ -1124,20 +1092,39 @@ msgstr "Todas las siguientes"
 msgid "Can't display dependencies: This package has an unsupported dependency string."
 msgstr "No se pueden mostrar las dependencias: este paquete tiene una cadena de dependecias no soportada."
 
-#: plugins/notify.py:35
+#: plugins/notify.py:24
+msgid "Cannot import 'pynotify'."
+msgstr ""
+
+#: plugins/notify.py:36
 msgid "Notify called while process is still running!"
 msgstr "¡Se llamó a Notify mientras el proceso aún estaba en ejecución!"
 
-#: plugins/notify.py:39
+#: plugins/notify.py:40
 msgid "Emerge finished!"
 msgstr "¡Emerge ha terminado!"
 
-#: plugins/notify.py:43
+#: plugins/notify.py:44
 msgid "Emerge failed!"
 msgstr "¡Emerge ha fallado!"
 
-#: plugins/notify.py:44
+#: plugins/notify.py:45
 #, python-format
 msgid "Error Code: %d"
 msgstr "Código de error: %d"
+
+#~ msgid "gtk-cancel"
+#~ msgstr "_Cancelar"
+#~ msgid "gtk-apply"
+#~ msgstr "_Aplicar"
+#~ msgid "gtk-jump-to"
+#~ msgstr "gtk-jump-to"
+#~ msgid "gtk-ok"
+#~ msgstr "_Aceptar"
+#~ msgid "gtk-quit"
+#~ msgstr "_Salir"
+#~ msgid "gtk-delete"
+#~ msgstr "_Borrar"
+#~ msgid "gtk-find"
+#~ msgstr "_Buscar"
 

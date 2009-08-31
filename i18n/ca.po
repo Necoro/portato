@@ -7,313 +7,30 @@ msgid ""
 msgstr ""
 "Project-Id-Version: portato\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-11 10:09+0200\n"
-"PO-Revision-Date: 2009-08-12 08:49+0100\n"
-"Last-Translator: Roger Calvó <rcalvoi@yahoo.com>\n"
+"POT-Creation-Date: 2009-08-31 22:04+0200\n"
+"PO-Revision-Date: 2009-08-31 22:08+0100\n"
+"Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: Català\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: portato/gui/templates/AboutWindow.ui:7
-msgid "About Portato"
-msgstr "Quant a Portato"
+#: portato/gui/templates/UpdateWindow.ui:6
+msgid "Updatable Packages"
+msgstr "Paquets actualitzables"
 
-#: portato/gui/templates/MailInfoWindow.ui:5
-msgid "Send Bug Mail ..."
-msgstr "Envia Mail d'un Bug ..."
+#: portato/gui/templates/UpdateWindow.ui:48
+msgid "_Close"
+msgstr "_Tanca"
 
-#: portato/gui/templates/MailInfoWindow.ui:30
-msgid ""
-"<b><u>Additional Information</u></b>\n"
-"\n"
-"(all optional)"
-msgstr ""
-"<b><u>Informació addicional (en Anglès)</u></b>\n"
-"\n"
-"(tot opcional)"
+#: portato/gui/templates/UpdateWindow.ui:59
+msgid "Select _All"
+msgstr "_Selecciona-ho tot"
 
-#: portato/gui/templates/MailInfoWindow.ui:74
-msgid "Email address:"
-msgstr "Correu electrònic:"
-
-#: portato/gui/templates/MailInfoWindow.ui:89
-msgid "Name:"
-msgstr "Nom:"
-
-#: portato/gui/templates/MailInfoWindow.ui:104
-msgid ""
-"Comments /\n"
-"what did you do to hit the bug?"
-msgstr ""
-"Comentaris /\n"
-"Què vau fer per arribar aquí?"
-
-#: portato/gui/templates/MailInfoWindow.ui:141
-msgid "Attaches the logfile to the mail. This log only contains debug information."
-msgstr "Adjunta el fitxer de registres al correu electrònic. Aquest registre només conté informació de depuració."
-
-#: portato/gui/templates/MailInfoWindow.ui:142
-msgid "Attach _Logfile"
-msgstr "Adjunta e_l registre"
-
-#: portato/gui/templates/MailInfoWindow.ui:168
-#: portato/gui/templates/PluginWindow.ui:211
-#: portato/gui/templates/PreferenceWindow.ui:1120
-#: portato/gui/templates/SearchWindow.ui:47
-msgid "gtk-cancel"
-msgstr "gtk-cancel"
-
-#: portato/gui/templates/MailInfoWindow.ui:194
-msgid "_Send"
-msgstr "_Envia"
-
-#: portato/gui/templates/MainWindow.ui:10
-msgid "Plu_gins"
-msgstr "Con_nectors"
-
-#: portato/gui/templates/MainWindow.ui:20
-msgid "_File"
-msgstr "_Fitxer"
-
-#: portato/gui/templates/MainWindow.ui:27
-msgid "_Preferences"
-msgstr "_Preferències"
-
-#: portato/gui/templates/MainWindow.ui:36
-msgid "Re_load Portage"
-msgstr "Torna a carregar P_ortage"
-
-#: portato/gui/templates/MainWindow.ui:44
-msgid "gtk-quit"
-msgstr "gtk-quit"
-
-#: portato/gui/templates/MainWindow.ui:52
-msgid "_Emerge"
-msgstr "_Emerge"
-
-#: portato/gui/templates/MainWindow.ui:59
-msgid "_Install"
-msgstr "_Instal·la"
-
-#: portato/gui/templates/MainWindow.ui:68
-msgid "_Uninstall"
-msgstr "Desi_nsta·la"
-
-#: portato/gui/templates/MainWindow.ui:76
-#: portato/gui/templates/MainWindow.ui:847
-msgid "Update _World"
-msgstr "Actualitza _World"
-
-#: portato/gui/templates/MainWindow.ui:83
-msgid "Show Updatable P_ackages"
-msgstr "Mostra els _paquets que es poden actualitzar"
-
-#: portato/gui/templates/MainWindow.ui:90
-msgid "Show _Only Installed Packages"
-msgstr "M_ostra només els paquets instal·lats"
-
-#: portato/gui/templates/MainWindow.ui:99
-msgid "_Sync"
-msgstr "_Sincronitza"
-
-#: portato/gui/templates/MainWindow.ui:108
-msgid "Save _Flags"
-msgstr "Desa els _Flags"
-
-#: portato/gui/templates/MainWindow.ui:115
-msgid "Emerge _Paused"
-msgstr "_Pausa Emerge"
-
-#: portato/gui/templates/MainWindow.ui:124
-msgid "_Kill Emerge"
-msgstr "_Mata Emerge"
-
-#: portato/gui/templates/MainWindow.ui:133
-msgid "_Copy"
-msgstr "_Copia"
-
-#: portato/gui/templates/MainWindow.ui:140
-msgid "_?"
-msgstr "_?"
-
-#: portato/gui/templates/MainWindow.ui:147
-msgid "_About"
-msgstr "_Quant a"
-
-#: portato/gui/templates/MainWindow.ui:155
-msgid "_Plugins"
-msgstr "_Connectors"
-
-#: portato/gui/templates/MainWindow.ui:246
-msgid "gtk-delete"
-msgstr "gtk-delete"
-
-#: portato/gui/templates/MainWindow.ui:259
-msgid "gtk-find"
-msgstr "gtk-find"
-
-#: portato/gui/templates/MainWindow.ui:369
-#: portato/gui/templates/MainWindow.ui:485
-#: portato/gui/templates/MainWindow.ui:598
-#: portato/gui/templates/MainWindow.ui:613
-#: portato/gui/templates/PluginWindow.ui:93
-#: portato/gui/templates/PluginWindow.ui:118
-#: portato/gui/templates/PreferenceWindow.ui:178
-msgid "label"
-msgstr "Etiqueta"
-
-#: portato/gui/templates/MainWindow.ui:380
-msgid "Install onto system"
-msgstr "Instal·la al sistema"
-
-#: portato/gui/templates/MainWindow.ui:402
-msgid "Uninstall from system"
-msgstr "Desinstal·la del sistema"
-
-#: portato/gui/templates/MainWindow.ui:424
-msgid "Revert changes"
-msgstr "Desfés els canvis"
-
-#: portato/gui/templates/MainWindow.ui:501
-msgid "<b>License:</b>"
-msgstr "<b>Llicència:</b>"
-
-#: portato/gui/templates/MainWindow.ui:518
-msgid "<b>Installed, but not in portage anymore</b>"
-msgstr "<b> està instal·lat, però ja no es troba en el portage</b>"
-
-#: portato/gui/templates/MainWindow.ui:533
-msgid "<span foreground='red'><b>MISSING KEYWORD</b></span>"
-msgstr "<span foreground='red'><b>S'HA PERDUT LA PARAULA CLAU</b></span>"
-
-#: portato/gui/templates/MainWindow.ui:565
-msgid "<b>Description:</b>"
-msgstr "<b>Descripció:</b>"
-
-#: portato/gui/templates/MainWindow.ui:581
-msgid "<b>Overlay:</b>"
-msgstr "<b>Overlay:</b>"
-
-#: portato/gui/templates/MainWindow.ui:629
-msgid "<b>Homepage:</b>"
-msgstr "<b>Pàgina principal:</b>"
-
-#: portato/gui/templates/MainWindow.ui:647
-#: portato/gui/windows/main.py:826
-msgid "Installed"
-msgstr "Instal·lat"
-
-#: portato/gui/templates/MainWindow.ui:665
-#: portato/gui/windows/main.py:254
-#: portato/gui/windows/main.py:257
-#: portato/gui/windows/main.py:260
-#: portato/gui/windows/main.py:361
-#: portato/gui/windows/main.py:365
-#: portato/gui/windows/main.py:372
-#: portato/gui/windows/main.py:376
-msgid "Masked"
-msgstr "Emmascarat"
-
-#: portato/gui/templates/MainWindow.ui:697
-#: portato/gui/windows/main.py:271
-#: portato/gui/windows/main.py:274
-#: portato/gui/windows/main.py:334
-#: portato/gui/windows/main.py:338
-msgid "Testing"
-msgstr "Testing"
-
-#: portato/gui/templates/MainWindow.ui:715
-msgid "<b>Use Flags:</b>"
-msgstr "<b>Use Flags:</b>"
-
-#: portato/gui/templates/MainWindow.ui:754
-#: portato/gui/templates/PreferenceWindow.ui:226
-msgid "General"
-msgstr "General"
-
-#: portato/gui/templates/MainWindow.ui:776
-msgid "Use List"
-msgstr "Llista Use"
-
-#: portato/gui/templates/MainWindow.ui:813
-msgid "Execute the current selected queue"
-msgstr "Executa la cua seleccionada"
-
-#: portato/gui/templates/MainWindow.ui:831
-msgid "E_xecute"
-msgstr "E_xecuta"
-
-#: portato/gui/templates/MainWindow.ui:846
-msgid "Calculate the packages which will be installed during an \"update world\""
-msgstr "Calcula tots els paquets que s'instal·laran en un \"update world\""
-
-#: portato/gui/templates/MainWindow.ui:858
-msgid "Remove the selected package from the queue"
-msgstr "Suprimeix el/s paquet/s seleccionat/s de la cua"
-
-#: portato/gui/templates/MainWindow.ui:859
-msgid "_Remove"
-msgstr "Sup_rimeix"
-
-#: portato/gui/templates/MainWindow.ui:929
-#: portato/gui/windows/main.py:606
-msgid "Queue"
-msgstr "Cua"
-
-#: portato/gui/templates/MainWindow.ui:950
-#: portato/gui/windows/main.py:1206
-#: portato/gui/windows/main.py:1208
-msgid "Console"
-msgstr "Terminal"
-
-#: portato/gui/templates/MainWindow.ui:981
-msgid "Log"
-msgstr "Registre"
-
-#: portato/gui/templates/PluginWindow.ui:7
-msgid "Plugins"
-msgstr "Connectors"
-
-#: portato/gui/templates/PluginWindow.ui:51
-msgid "_Install dependencies"
-msgstr "_Instal·la les dependències"
-
-#: portato/gui/templates/PluginWindow.ui:79
-msgid "Needed dependencies"
-msgstr "Dependències necessàries"
-
-#: portato/gui/templates/PluginWindow.ui:104
-msgid "<b>Author:</b>"
-msgstr "<b>Autor:</b>"
-
-#: portato/gui/templates/PluginWindow.ui:139
-#: portato/gui/windows/main.py:825
-#: portato/gui/windows/plugin.py:27
-#: portato/gui/windows/update.py:47
-msgid "Enabled"
-msgstr "Habilitat"
-
-#: portato/gui/templates/PluginWindow.ui:148
-#: portato/gui/windows/plugin.py:27
-msgid "Temporarily enabled"
-msgstr "Habilitat temporalment"
-
-#: portato/gui/templates/PluginWindow.ui:159
-#: portato/gui/windows/plugin.py:27
-msgid "Temporarily disabled"
-msgstr "Temporalment desactivat"
-
-#: portato/gui/templates/PluginWindow.ui:171
-#: portato/gui/windows/plugin.py:27
-msgid "Disabled"
-msgstr "Desactivat"
-
-#: portato/gui/templates/PluginWindow.ui:222
-#: portato/gui/templates/PreferenceWindow.ui:1133
-msgid "gtk-apply"
-msgstr "gtk-apply"
+#: portato/gui/templates/UpdateWindow.ui:73
+msgid "_Install Selected"
+msgstr "_Instal·la els seleccionats"
 
 #: portato/gui/templates/PreferenceWindow.ui:12
 msgid "Preferences"
@@ -340,6 +57,16 @@ msgstr "<b>Opcions generals</b>"
 msgid "Used database type"
 msgstr "Tipus de base de dades en ús"
 
+#: portato/gui/templates/PreferenceWindow.ui:178
+#: portato/gui/templates/PluginWindow.ui:93
+#: portato/gui/templates/PluginWindow.ui:118
+#: portato/gui/templates/MainWindow.ui:369
+#: portato/gui/templates/MainWindow.ui:485
+#: portato/gui/templates/MainWindow.ui:598
+#: portato/gui/templates/MainWindow.ui:613
+msgid "label"
+msgstr "Etiqueta"
+
 #: portato/gui/templates/PreferenceWindow.ui:188
 msgid "<b>Description</b>"
 msgstr "<b>Descripció</b>"
@@ -347,6 +74,11 @@ msgstr "<b>Descripció</b>"
 #: portato/gui/templates/PreferenceWindow.ui:204
 msgid "<b>Database Options</b>"
 msgstr "<b>Opcions de base de dades</b>"
+
+#: portato/gui/templates/PreferenceWindow.ui:226
+#: portato/gui/templates/MainWindow.ui:754
+msgid "General"
+msgstr "General"
 
 #: portato/gui/templates/PreferenceWindow.ui:308
 msgid "<b>Package sets to update</b>"
@@ -495,369 +227,269 @@ msgstr "<b>Opcions de colors</b>"
 msgid "Visual"
 msgstr "Visualització"
 
+#: portato/gui/templates/PluginWindow.ui:7
+msgid "Plugins"
+msgstr "Connectors"
+
+#: portato/gui/templates/PluginWindow.ui:51
+msgid "_Install dependencies"
+msgstr "_Instal·la les dependències"
+
+#: portato/gui/templates/PluginWindow.ui:79
+msgid "Needed dependencies"
+msgstr "Dependències necessàries"
+
+#: portato/gui/templates/PluginWindow.ui:104
+msgid "<b>Author:</b>"
+msgstr "<b>Autor:</b>"
+
+#: portato/gui/templates/PluginWindow.ui:139
+#: portato/gui/windows/update.py:47
+#: portato/gui/windows/main.py:825
+#: portato/gui/windows/plugin.py:27
+msgid "Enabled"
+msgstr "Habilitat"
+
+#: portato/gui/templates/PluginWindow.ui:148
+#: portato/gui/windows/plugin.py:27
+msgid "Temporarily enabled"
+msgstr "Habilitat temporalment"
+
+#: portato/gui/templates/PluginWindow.ui:159
+#: portato/gui/windows/plugin.py:27
+msgid "Temporarily disabled"
+msgstr "Temporalment desactivat"
+
+#: portato/gui/templates/PluginWindow.ui:171
+#: portato/gui/windows/plugin.py:27
+msgid "Disabled"
+msgstr "Desactivat"
+
+#: portato/gui/templates/AboutWindow.ui:7
+msgid "About Portato"
+msgstr "Quant a Portato"
+
+#: portato/gui/templates/MailInfoWindow.ui:5
+msgid "Send Bug Mail ..."
+msgstr "Envia Mail d'un Bug ..."
+
+#: portato/gui/templates/MailInfoWindow.ui:30
+msgid ""
+"<b><u>Additional Information</u></b>\n"
+"\n"
+"(all optional)"
+msgstr ""
+"<b><u>Informació addicional (en Anglès)</u></b>\n"
+"\n"
+"(tot opcional)"
+
+#: portato/gui/templates/MailInfoWindow.ui:74
+msgid "Email address:"
+msgstr "Correu electrònic:"
+
+#: portato/gui/templates/MailInfoWindow.ui:89
+msgid "Name:"
+msgstr "Nom:"
+
+#: portato/gui/templates/MailInfoWindow.ui:104
+msgid ""
+"Comments /\n"
+"what did you do to hit the bug?"
+msgstr ""
+"Comentaris /\n"
+"Què vau fer per arribar aquí?"
+
+#: portato/gui/templates/MailInfoWindow.ui:141
+msgid "Attaches the logfile to the mail. This log only contains debug information."
+msgstr "Adjunta el fitxer de registres al correu electrònic. Aquest registre només conté informació de depuració."
+
+#: portato/gui/templates/MailInfoWindow.ui:142
+msgid "Attach _Logfile"
+msgstr "Adjunta e_l registre"
+
+#: portato/gui/templates/MailInfoWindow.ui:194
+msgid "_Send"
+msgstr "_Envia"
+
 #: portato/gui/templates/SearchWindow.ui:7
 msgid "Search Results"
 msgstr "Resultats de la cerca"
 
-#: portato/gui/templates/SearchWindow.ui:58
-msgid "gtk-jump-to"
-msgstr "gtk-jump-to"
-
-#: portato/gui/templates/SearchWindow.ui:72
-msgid "gtk-ok"
-msgstr "gtk-ok"
-
-#: portato/gui/templates/UpdateWindow.ui:6
-msgid "Updatable Packages"
-msgstr "Paquets actualitzables"
-
-#: portato/gui/templates/UpdateWindow.ui:48
-msgid "_Close"
-msgstr "_Tanca"
-
-#: portato/gui/templates/UpdateWindow.ui:59
-msgid "Select _All"
-msgstr "_Selecciona-ho tot"
-
-#: portato/gui/templates/UpdateWindow.ui:73
-msgid "_Install Selected"
-msgstr "_Instal·la els seleccionats"
-
-#: plugins/etc_proposals.py:34
-msgid "Cannot start etc-proposals. Not root!"
-msgstr "No s'ha pogut iniciar etc-proposals. No sou usuari root!"
-
-#: plugins/notify.py:24
-msgid "Cannot import 'pynotify'."
-msgstr "No es pot importar 'pynotify'."
-
-#: plugins/notify.py:36
-msgid "Notify called while process is still running!"
-msgstr "S'ha notificat una crida mentre el procés està en execució!"
-
-#: plugins/notify.py:40
-msgid "Emerge finished!"
-msgstr "Emerge ha acabat!"
-
-#: plugins/notify.py:44
-msgid "Emerge failed!"
-msgstr "Emerge ha fallat!"
-
-#: plugins/notify.py:45
-#, python-format
-msgid "Error Code: %d"
-msgstr "Codi d'error: %d"
-
-#: plugins/package_details.py:67
-msgid "Shows the Changelog of a package"
-msgstr "Mostra el registre de canvis d'un paquet"
-
-#: plugins/package_details.py:69
-msgid "Changelog"
-msgstr "Registre de canvis"
-
-#: plugins/package_details.py:79
-msgid "Shows the ebuild of a package"
-msgstr "Mostra l'ebuild d'un paquet"
-
-#: plugins/package_details.py:82
-msgid "Ebuild"
-msgstr "Ebuild"
-
-#: plugins/package_details.py:89
-msgid "Shows the installed files of a package"
-msgstr "Mostra els fitxers instal·lats per un paquet"
-
-#: plugins/package_details.py:91
-msgid "Files"
-msgstr "Fitxers"
-
-#: plugins/package_details.py:102
-#: portato/gui/views.py:130
-#, python-format
-msgid "Error: %s"
-msgstr "Error: %s"
-
-#: plugins/package_details.py:105
-msgid "Shows the dependencies of a package"
-msgstr "Mostra les dependències d'un paquet"
-
-#: plugins/package_details.py:107
-msgid "Dependencies"
-msgstr "Dependències"
-
-#: plugins/package_details.py:179
-#, python-format
-msgid "If '%s' is disabled"
-msgstr "Si '%s' està desactivat"
-
-#: plugins/package_details.py:181
-#, python-format
-msgid "If '%s' is enabled"
-msgstr "Si '%s' està activat"
-
-#: plugins/package_details.py:187
-msgid "One of the following"
-msgstr "Un dels següents"
-
-#: plugins/package_details.py:192
-msgid "All of the following"
-msgstr "Tots els següents"
-
-#: plugins/package_details.py:203
-msgid "Can't display dependencies: This package has an unsupported dependency string."
-msgstr "No s'han pogut mostrar les dependències. Aquest paquet té una sentència de dependència no vàlida."
-
-#: portato/backend/portage/package.py:129
-#, python-format
-msgid "BUG in flags.new_masking_status. It returns '%s'"
-msgstr "Hi ha un error en flags.new_masking_status. Retorna '%s'"
-
-#: portato/backend/portage/system.py:258
-#, python-format
-msgid "No best match for %s. It seems not to be in the tree anymore."
-msgstr "No s'ha trobat cap coincidència millor per %s. Sembla que ja no es troba en l'arbre."
-
-#: portato/backend/portage/system.py:316
-#, python-format
-msgid "Found a not installed dependency: %s."
-msgstr "S'ha trobat una dependència no instal·lada: %s."
-
-#: portato/backend/portage/system.py:358
-#, python-format
-msgid "Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
-msgstr "Es tracta d'un error? No s'ha trobat cap coincidencia millor per '%(package)s'. És necessari per a '%(cpv)s'."
-
-#: portato/backend/flags.py:527
-#, python-format
-msgid "Conflicting values for masking status: %s"
-msgstr "Hi ha un conflicte en els valors d'estat d'emmascarat: %s"
-
-#: portato/backend/flags.py:690
-#, python-format
-msgid "Line %(line)s in file %(file)s misses a keyword (e.g. '~x86')."
-msgstr "Falta una paraula clau a la línia %(línia)s en el fitxer %(fitxer)s (exemple '~x86')."
-
-#: portato/db/__init__.py:24
-msgid "SQLite"
-msgstr "SQLite"
-
-#: portato/db/__init__.py:24
-msgid ""
-"Uses an SQLite-database to store package information.\n"
-"May take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data."
-msgstr ""
-"Usa una base de dades SQLite per desar informació de paquets.\n"
-"Es pot trigar bastant generar-la el primer cop, però té avantatges si es reinicia Portato amb un arbre de portage sense canvis. Additionalment, us permetrà usar expressions SQL ràpides per obtenir dades."
-
-#: portato/db/__init__.py:25
-msgid "Hashmap"
-msgstr "Hashmap"
-
-#: portato/db/__init__.py:25
-msgid ""
-"Uses an in-memory hashmap to store package information.\n"
-"Has been used since at least version 0.3.3, but all information has to be regenerated on each startup."
-msgstr ""
-"Usa una memòria interna hashmap per desar informació de paquets.\n"
-"S'ha estat usant des de la versió 0.3.3, però tota la informació s'ha de regenerar en cada inici."
-
-#: portato/db/__init__.py:40
-msgid "Cannot load SQLDatabase."
-msgstr "No es pot carregar SQLDatabase."
-
-#: portato/db/__init__.py:51
-#, python-format
-msgid "Unknown database type: %s"
-msgstr "Tipus de base de dades desconegut: %s"
-
-#: portato/db/database.py:38
-msgid "ALL"
-msgstr "TOT"
-
-#: portato/db/dict.py:94
-#, python-format
-msgid "Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?"
-msgstr "S'ha capturat un error KeyError => %s sembla no ser una categoria vàlida. Heu provat la reproducció amb rsync-excludes?"
-
-#: portato/db/dict.py:149
-#, python-format
-msgid "Error while compiling search expression: '%s'."
-msgstr "S'ha produït un error mentre es compilava l'expressió de cerca: '%s'."
-
-#: portato/db/sql.py:79
-msgid "Cleaning database..."
-msgstr "S'està netejant la base de dades..."
-
-#: portato/db/sql.py:81
-msgid "Populating database..."
-msgstr "S'està omplint la base de dades..."
-
-#: portato/gui/windows/mailinfo.py:83
-#, python-format
-msgid "An error occurred while sending. I think we were greylisted. The error: %s"
-msgstr "S'ha produït un error en l'enviament. Crec que estem a la llista de spam. L'error és: %s"
-
-#: portato/gui/windows/mailinfo.py:84
-msgid "Retrying after waiting 60 seconds."
-msgstr "Es reintentarà d'aquí a 60 segons. "
-
-#: portato/gui/windows/main.py:141
-msgid "<no description>"
-msgstr "<sense descripció>"
-
-#: portato/gui/windows/main.py:167
-msgid "The first homepage part does not start with 'http' or 'ftp'."
-msgstr "La primera part de la pàgina principal no comença amb 'http' ni amb 'ftp'."
-
-#: portato/gui/windows/main.py:171
-msgid "Blank inside homepage."
-msgstr "La pàgina principal està en blanc."
-
-#: portato/gui/windows/main.py:210
-#, python-format
-msgid "Package could not be found: %s"
-msgstr "No s'ha pogut trobar el paquet: %s"
-
-#: portato/gui/windows/main.py:263
-#: portato/gui/windows/main.py:363
-msgid "Masked by user"
-msgstr "Emmascarat per l'usuari"
-
-#: portato/gui/windows/main.py:454
-msgid "Loading Config"
-msgstr "carregant la configuració"
-
-#: portato/gui/windows/main.py:466
-msgid "Creating Database"
-msgstr "creant base de dades"
-
-#: portato/gui/windows/main.py:470
-msgid "Loading Plugins"
-msgstr "carregant els connectors"
-
-#: portato/gui/windows/main.py:478
-msgid "Building frontend"
-msgstr "alçant el frontal"
-
-#: portato/gui/windows/main.py:544
-msgid "Restoring Session"
-msgstr "restaurant la sessió"
-
-#: portato/gui/windows/main.py:554
-msgid "Loading Plugin Widgets"
-msgstr "Carregant estris de connectors"
-
-#: portato/gui/windows/main.py:557
-msgid "Finishing startup"
-msgstr "acabant la inicialització"
-
-#: portato/gui/windows/main.py:609
-msgid "Options"
-msgstr "Opcions"
-
-#: portato/gui/windows/main.py:625
-msgid "Categories"
-msgstr "Categories"
-
-#: portato/gui/windows/main.py:684
-msgid "Packages"
-msgstr "Paquets"
-
-#: portato/gui/windows/main.py:719
-#, python-format
-msgid "Package '%s/%s' is disabled."
-msgstr "El paquet '%s/%s' està desactivat."
-
-#: portato/gui/windows/main.py:736
-msgid "Versions"
-msgstr "Versions"
-
-#: portato/gui/windows/main.py:739
-msgid "Slot"
-msgstr "Slot"
-
-#: portato/gui/windows/main.py:827
-msgid "Flag"
-msgstr "Flag"
-
-#: portato/gui/windows/main.py:828
-#: portato/gui/windows/preference.py:259
-msgid "Description"
-msgstr "Descripció"
-
-#: portato/gui/windows/main.py:851
-msgid "This is an expanded use flag and cannot be selected"
-msgstr "Això és un use flag expandit i no es pot seleccionar"
-
-#: portato/gui/windows/main.py:889
-#, python-format
-msgid "Translating session from version %d to %d."
-msgstr "Traduïnt la sessió de la versió %d a la %d."
-
-#: portato/gui/windows/main.py:892
-#, python-format
-msgid "Cannot translate session from version %d to %d."
-msgstr "No es pot traduir la sessió de la versió %d a la %d."
-
-#: portato/gui/windows/main.py:1255
-#: portato/gui/dialogs.py:123
-#, python-format
-msgid "No versions of package '%s' found!"
-msgstr "No s'ha trobat cap versió del paquet '%s'!"
-
-#: portato/gui/windows/main.py:1391
-msgid "use flags"
-msgstr "use flags"
-
-#: portato/gui/windows/main.py:1403
-msgid "masking keywords"
-msgstr "masking keywords"
-
-#: portato/gui/windows/main.py:1780
-msgid "The portage tree is not existing."
-msgstr "L'arbre de portage no existeix."
-
-#: portato/gui/windows/main.py:1784
-msgid "The portage tree seems to be empty."
-msgstr "L'arbre de portage sembla estar buit."
-
-#: portato/gui/windows/preference.py:154
-msgid "Top"
-msgstr "A dalt"
-
-#: portato/gui/windows/preference.py:154
-msgid "Bottom"
-msgstr "A baix"
-
-#: portato/gui/windows/preference.py:154
-msgid "Left"
-msgstr "A l'esquerra"
-
-#: portato/gui/windows/preference.py:154
-msgid "Right"
-msgstr "A la dreta"
-
-#: portato/gui/windows/preference.py:254
-msgid "Package Set"
-msgstr "Definicions de paquets"
-
-#: portato/gui/windows/search.py:57
-msgid "Results"
-msgstr "Resultats"
-
-#: portato/gui/windows/splash.py:35
-#, python-format
-msgid "... is starting up: %s"
-msgstr "... s'està iniciant: %s"
-
-#: portato/gui/windows/update.py:48
-msgid "Package"
-msgstr "Paquet"
-
-#: portato/gui/__init__.py:22
-msgid "Loading Backend"
-msgstr "S'està carregant el rerefons"
+#: portato/gui/templates/MainWindow.ui:10
+msgid "Plu_gins"
+msgstr "Con_nectors"
+
+#: portato/gui/templates/MainWindow.ui:20
+msgid "_File"
+msgstr "_Fitxer"
+
+#: portato/gui/templates/MainWindow.ui:27
+msgid "_Preferences"
+msgstr "_Preferències"
+
+#: portato/gui/templates/MainWindow.ui:36
+msgid "Re_load Portage"
+msgstr "Torna a carregar P_ortage"
+
+#: portato/gui/templates/MainWindow.ui:52
+msgid "_Emerge"
+msgstr "_Emerge"
+
+#: portato/gui/templates/MainWindow.ui:59
+msgid "_Install"
+msgstr "_Instal·la"
+
+#: portato/gui/templates/MainWindow.ui:68
+msgid "_Uninstall"
+msgstr "Desi_nsta·la"
+
+#: portato/gui/templates/MainWindow.ui:76
+#: portato/gui/templates/MainWindow.ui:847
+msgid "Update _World"
+msgstr "Actualitza _World"
+
+#: portato/gui/templates/MainWindow.ui:83
+msgid "Show Updatable P_ackages"
+msgstr "Mostra els _paquets que es poden actualitzar"
+
+#: portato/gui/templates/MainWindow.ui:90
+msgid "Show _Only Installed Packages"
+msgstr "M_ostra només els paquets instal·lats"
+
+#: portato/gui/templates/MainWindow.ui:99
+msgid "_Sync"
+msgstr "_Sincronitza"
+
+#: portato/gui/templates/MainWindow.ui:108
+msgid "Save _Flags"
+msgstr "Desa els _Flags"
+
+#: portato/gui/templates/MainWindow.ui:115
+msgid "Emerge _Paused"
+msgstr "_Pausa Emerge"
+
+#: portato/gui/templates/MainWindow.ui:124
+msgid "_Kill Emerge"
+msgstr "_Mata Emerge"
+
+#: portato/gui/templates/MainWindow.ui:133
+msgid "_Copy"
+msgstr "_Copia"
+
+#: portato/gui/templates/MainWindow.ui:140
+msgid "_?"
+msgstr "_?"
+
+#: portato/gui/templates/MainWindow.ui:147
+msgid "_About"
+msgstr "_Quant a"
+
+#: portato/gui/templates/MainWindow.ui:155
+msgid "_Plugins"
+msgstr "_Connectors"
+
+#: portato/gui/templates/MainWindow.ui:380
+msgid "Install onto system"
+msgstr "Instal·la al sistema"
+
+#: portato/gui/templates/MainWindow.ui:402
+msgid "Uninstall from system"
+msgstr "Desinstal·la del sistema"
+
+#: portato/gui/templates/MainWindow.ui:424
+msgid "Revert changes"
+msgstr "Desfés els canvis"
+
+#: portato/gui/templates/MainWindow.ui:501
+msgid "<b>License:</b>"
+msgstr "<b>Llicència:</b>"
+
+#: portato/gui/templates/MainWindow.ui:518
+msgid "<b>Installed, but not in portage anymore</b>"
+msgstr "<b> està instal·lat, però ja no es troba en el portage</b>"
+
+#: portato/gui/templates/MainWindow.ui:533
+msgid "<span foreground='red'><b>MISSING KEYWORD</b></span>"
+msgstr "<span foreground='red'><b>S'HA PERDUT LA PARAULA CLAU</b></span>"
+
+#: portato/gui/templates/MainWindow.ui:565
+msgid "<b>Description:</b>"
+msgstr "<b>Descripció:</b>"
+
+#: portato/gui/templates/MainWindow.ui:581
+msgid "<b>Overlay:</b>"
+msgstr "<b>Overlay:</b>"
+
+#: portato/gui/templates/MainWindow.ui:629
+msgid "<b>Homepage:</b>"
+msgstr "<b>Pàgina principal:</b>"
+
+#: portato/gui/templates/MainWindow.ui:647
+#: portato/gui/windows/main.py:826
+msgid "Installed"
+msgstr "Instal·lat"
+
+#: portato/gui/templates/MainWindow.ui:665
+#: portato/gui/windows/main.py:255
+#: portato/gui/windows/main.py:258
+#: portato/gui/windows/main.py:261
+#: portato/gui/windows/main.py:361
+#: portato/gui/windows/main.py:365
+#: portato/gui/windows/main.py:372
+#: portato/gui/windows/main.py:376
+msgid "Masked"
+msgstr "Emmascarat"
+
+#: portato/gui/templates/MainWindow.ui:697
+#: portato/gui/windows/main.py:271
+#: portato/gui/windows/main.py:274
+#: portato/gui/windows/main.py:334
+#: portato/gui/windows/main.py:338
+msgid "Testing"
+msgstr "Testing"
+
+#: portato/gui/templates/MainWindow.ui:715
+msgid "<b>Use Flags:</b>"
+msgstr "<b>Use Flags:</b>"
+
+#: portato/gui/templates/MainWindow.ui:776
+msgid "Use List"
+msgstr "Llista Use"
+
+#: portato/gui/templates/MainWindow.ui:813
+msgid "Execute the current selected queue"
+msgstr "Executa la cua seleccionada"
+
+#: portato/gui/templates/MainWindow.ui:831
+msgid "E_xecute"
+msgstr "E_xecuta"
+
+#: portato/gui/templates/MainWindow.ui:846
+msgid "Calculate the packages which will be installed during an \"update world\""
+msgstr "Calcula tots els paquets que s'instal·laran en un \"update world\""
+
+#: portato/gui/templates/MainWindow.ui:858
+msgid "Remove the selected package from the queue"
+msgstr "Suprimeix el/s paquet/s seleccionat/s de la cua"
+
+#: portato/gui/templates/MainWindow.ui:859
+msgid "_Remove"
+msgstr "Sup_rimeix"
+
+#: portato/gui/templates/MainWindow.ui:929
+#: portato/gui/windows/main.py:606
+msgid "Queue"
+msgstr "Cua"
+
+#: portato/gui/templates/MainWindow.ui:950
+#: portato/gui/windows/main.py:1206
+#: portato/gui/windows/main.py:1208
+msgid "Console"
+msgstr "Terminal"
+
+#: portato/gui/templates/MainWindow.ui:981
+msgid "Log"
+msgstr "Registre"
 
 #: portato/gui/dialogs.py:17
 msgid "Mail could not be sent"
@@ -947,6 +579,42 @@ msgstr ""
 "<b>Nota</b>: En instal·lacions noves de Sabayon o els seus LiveDVD/CDs, no hi ha arbres de Portage per defecte.\n"
 "Si-us-plau executeu <i>emerge --sync &amp;&amp; layman -S</i>."
 
+#: portato/gui/dialogs.py:123
+#: portato/gui/windows/main.py:1255
+#, python-format
+msgid "No versions of package '%s' found!"
+msgstr "No s'ha trobat cap versió del paquet '%s'!"
+
+#: portato/gui/views.py:85
+msgid "Package is not installed"
+msgstr "Paquet no instal·lat"
+
+#: portato/gui/views.py:102
+#, python-format
+msgid "No %(old)s language file installed. Falling back to %(new)s."
+msgstr "No s'ha instal·lat el fitxer de llenguatge %(old)s. Alternativa en %(new)s."
+
+#: portato/gui/views.py:111
+#, python-format
+msgid "No %(old)s language file installed. Disable highlighting."
+msgstr "No s'ha instal·lat el fitxer de llenguatge %(old)s. S'ha inhabilitat el llenguatge d'alt nivell."
+
+#: portato/gui/views.py:130
+#: plugins/package_details.py:102
+#, python-format
+msgid "Error: %s"
+msgstr "Error: %s"
+
+#: portato/gui/updater.py:100
+#, python-format
+msgid "No unmasked version of package '%s' found. Trying masked ones. This normally should not happen..."
+msgstr "No s'ha trobat cap versió desemmascarada del paquet '%s'. Proveu-ho amb els emmascarats. Això normalment no hauria de passar..."
+
+#: portato/gui/updater.py:104
+#, python-format
+msgid "Trying to remove package '%s' from queue which does not exist in system."
+msgstr "S'està intentant suprimir el paquet '%s' de la cua que no existeix en el sistema."
+
 #: portato/gui/exception_handling.py:30
 msgid "A programming error has been detected during the execution of this program."
 msgstr "S'ha detectat un problema de programació en l'execució del programa."
@@ -971,6 +639,166 @@ msgstr "Envia..."
 msgid "Save traceback..."
 msgstr "Desa la traça enrera..."
 
+#: portato/gui/__init__.py:22
+msgid "Loading Backend"
+msgstr "S'està carregant el rerefons"
+
+#: portato/gui/windows/search.py:57
+msgid "Results"
+msgstr "Resultats"
+
+#: portato/gui/windows/mailinfo.py:83
+#, python-format
+msgid "An error occurred while sending. I think we were greylisted. The error: %s"
+msgstr "S'ha produït un error en l'enviament. Crec que estem a la llista de spam. L'error és: %s"
+
+#: portato/gui/windows/mailinfo.py:84
+msgid "Retrying after waiting 60 seconds."
+msgstr "Es reintentarà d'aquí a 60 segons. "
+
+#: portato/gui/windows/update.py:48
+msgid "Package"
+msgstr "Paquet"
+
+#: portato/gui/windows/splash.py:35
+#, python-format
+msgid "... is starting up: %s"
+msgstr "... s'està iniciant: %s"
+
+#: portato/gui/windows/preference.py:154
+msgid "Top"
+msgstr "A dalt"
+
+#: portato/gui/windows/preference.py:154
+msgid "Bottom"
+msgstr "A baix"
+
+#: portato/gui/windows/preference.py:154
+msgid "Left"
+msgstr "A l'esquerra"
+
+#: portato/gui/windows/preference.py:154
+msgid "Right"
+msgstr "A la dreta"
+
+#: portato/gui/windows/preference.py:254
+msgid "Package Set"
+msgstr "Definicions de paquets"
+
+#: portato/gui/windows/preference.py:259
+#: portato/gui/windows/main.py:828
+msgid "Description"
+msgstr "Descripció"
+
+#: portato/gui/windows/main.py:141
+msgid "<no description>"
+msgstr "<sense descripció>"
+
+#: portato/gui/windows/main.py:167
+msgid "The first homepage part does not start with 'http' or 'ftp'."
+msgstr "La primera part de la pàgina principal no comença amb 'http' ni amb 'ftp'."
+
+#: portato/gui/windows/main.py:171
+msgid "Blank inside homepage."
+msgstr "La pàgina principal està en blanc."
+
+#: portato/gui/windows/main.py:210
+#, python-format
+msgid "Package could not be found: %s"
+msgstr "No s'ha pogut trobar el paquet: %s"
+
+#: portato/gui/windows/main.py:264
+#: portato/gui/windows/main.py:363
+msgid "Masked by user"
+msgstr "Emmascarat per l'usuari"
+
+#: portato/gui/windows/main.py:454
+msgid "Loading Config"
+msgstr "carregant la configuració"
+
+#: portato/gui/windows/main.py:466
+msgid "Creating Database"
+msgstr "creant base de dades"
+
+#: portato/gui/windows/main.py:470
+msgid "Loading Plugins"
+msgstr "carregant els connectors"
+
+#: portato/gui/windows/main.py:478
+msgid "Building frontend"
+msgstr "alçant el frontal"
+
+#: portato/gui/windows/main.py:544
+msgid "Restoring Session"
+msgstr "restaurant la sessió"
+
+#: portato/gui/windows/main.py:554
+msgid "Loading Plugin Widgets"
+msgstr "Carregant estris de connectors"
+
+#: portato/gui/windows/main.py:557
+msgid "Finishing startup"
+msgstr "acabant la inicialització"
+
+#: portato/gui/windows/main.py:609
+msgid "Options"
+msgstr "Opcions"
+
+#: portato/gui/windows/main.py:625
+msgid "Categories"
+msgstr "Categories"
+
+#: portato/gui/windows/main.py:684
+msgid "Packages"
+msgstr "Paquets"
+
+#: portato/gui/windows/main.py:719
+#, python-format
+msgid "Package '%s/%s' is disabled."
+msgstr "El paquet '%s/%s' està desactivat."
+
+#: portato/gui/windows/main.py:736
+msgid "Versions"
+msgstr "Versions"
+
+#: portato/gui/windows/main.py:739
+msgid "Slot"
+msgstr "Slot"
+
+#: portato/gui/windows/main.py:827
+msgid "Flag"
+msgstr "Flag"
+
+#: portato/gui/windows/main.py:851
+msgid "This is an expanded use flag and cannot be selected"
+msgstr "Això és un use flag expandit i no es pot seleccionar"
+
+#: portato/gui/windows/main.py:889
+#, python-format
+msgid "Translating session from version %d to %d."
+msgstr "Traduïnt la sessió de la versió %d a la %d."
+
+#: portato/gui/windows/main.py:892
+#, python-format
+msgid "Cannot translate session from version %d to %d."
+msgstr "No es pot traduir la sessió de la versió %d a la %d."
+
+#: portato/gui/windows/main.py:1391
+msgid "use flags"
+msgstr "use flags"
+
+#: portato/gui/windows/main.py:1403
+msgid "masking keywords"
+msgstr "masking keywords"
+
+#: portato/gui/windows/main.py:1780
+msgid "The portage tree is not existing."
+msgstr "L'arbre de portage no existeix."
+
+#: portato/gui/windows/main.py:1784
+msgid "The portage tree seems to be empty."
+msgstr "L'arbre de portage sembla estar buit."
+
 #: portato/gui/session.py:21
 msgid "Version mismatch."
 msgstr "La versió no coincideix."
@@ -987,16 +815,6 @@ msgstr "El format de la versió actual és massa antic."
 #: portato/gui/session.py:33
 msgid "Current session format is newer than this version supports."
 msgstr "El format de la versió actual és més nou que el que suporta la versió actual."
-
-#: portato/gui/updater.py:100
-#, python-format
-msgid "No unmasked version of package '%s' found. Trying masked ones. This normally should not happen..."
-msgstr "No s'ha trobat cap versió desemmascarada del paquet '%s'. Proveu-ho amb els emmascarats. Això normalment no hauria de passar..."
-
-#: portato/gui/updater.py:104
-#, python-format
-msgid "Trying to remove package '%s' from queue which does not exist in system."
-msgstr "S'està intentant suprimir el paquet '%s' de la cua que no existeix en el sistema."
 
 #: portato/gui/utils.py:190
 msgid "oneshot"
@@ -1040,19 +858,35 @@ msgstr "Desinstal·la"
 msgid "Update"
 msgstr "Actualitza"
 
-#: portato/gui/views.py:85
-msgid "Package is not installed"
-msgstr "Paquet no instal·lat"
-
-#: portato/gui/views.py:102
+#: portato/backend/flags.py:527
 #, python-format
-msgid "No %(old)s language file installed. Falling back to %(new)s."
-msgstr "No s'ha instal·lat el fitxer de llenguatge %(old)s. Alternativa en %(new)s."
+msgid "Conflicting values for masking status: %s"
+msgstr "Hi ha un conflicte en els valors d'estat d'emmascarat: %s"
 
-#: portato/gui/views.py:111
+#: portato/backend/flags.py:690
 #, python-format
-msgid "No %(old)s language file installed. Disable highlighting."
-msgstr "No s'ha instal·lat el fitxer de llenguatge %(old)s. S'ha inhabilitat el llenguatge d'alt nivell."
+msgid "Line %(line)s in file %(file)s misses a keyword (e.g. '~x86')."
+msgstr "Falta una paraula clau a la línia %(línia)s en el fitxer %(fitxer)s (exemple '~x86')."
+
+#: portato/backend/portage/system.py:258
+#, python-format
+msgid "No best match for %s. It seems not to be in the tree anymore."
+msgstr "No s'ha trobat cap coincidència millor per %s. Sembla que ja no es troba en l'arbre."
+
+#: portato/backend/portage/system.py:316
+#, python-format
+msgid "Found a not installed dependency: %s."
+msgstr "S'ha trobat una dependència no instal·lada: %s."
+
+#: portato/backend/portage/system.py:358
+#, python-format
+msgid "Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
+msgstr "Es tracta d'un error? No s'ha trobat cap coincidencia millor per '%(package)s'. És necessari per a '%(cpv)s'."
+
+#: portato/backend/portage/package.py:129
+#, python-format
+msgid "BUG in flags.new_masking_status. It returns '%s'"
+msgstr "Hi ha un error en flags.new_masking_status. Retorna '%s'"
 
 #: portato/__init__.py:53
 msgid "do not fork off as root"
@@ -1066,14 +900,89 @@ msgstr "S'està inicialitzant Portato"
 msgid "No valid su command detected. Aborting."
 msgstr "No s'ha trobat cam ordre su vàlida. S'interromp."
 
+#: portato/helper.py:70
+msgid "Invalid dependency string"
+msgstr "Sentència de dependència no vàlida"
+
+#: portato/db/__init__.py:24
+msgid "SQLite"
+msgstr "SQLite"
+
+#: portato/db/__init__.py:24
+msgid ""
+"Uses an SQLite-database to store package information.\n"
+"May take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data."
+msgstr ""
+"Usa una base de dades SQLite per desar informació de paquets.\n"
+"Es pot trigar bastant generar-la el primer cop, però té avantatges si es reinicia Portato amb un arbre de portage sense canvis. Additionalment, us permetrà usar expressions SQL ràpides per obtenir dades."
+
+#: portato/db/__init__.py:25
+msgid "Hashmap"
+msgstr "Hashmap"
+
+#: portato/db/__init__.py:25
+msgid ""
+"Uses an in-memory hashmap to store package information.\n"
+"Has been used since at least version 0.3.3, but all information has to be regenerated on each startup."
+msgstr ""
+"Usa una memòria interna hashmap per desar informació de paquets.\n"
+"S'ha estat usant des de la versió 0.3.3, però tota la informació s'ha de regenerar en cada inici."
+
+#: portato/db/__init__.py:40
+msgid "Cannot load SQLDatabase."
+msgstr "No es pot carregar SQLDatabase."
+
+#: portato/db/__init__.py:51
+#, python-format
+msgid "Unknown database type: %s"
+msgstr "Tipus de base de dades desconegut: %s"
+
+#: portato/db/database.py:38
+msgid "ALL"
+msgstr "TOT"
+
+#: portato/db/dict.py:94
+#, python-format
+msgid "Catched KeyError => %s seems not to be an available category. Have you played with rsync-excludes?"
+msgstr "S'ha capturat un error KeyError => %s sembla no ser una categoria vàlida. Heu provat la reproducció amb rsync-excludes?"
+
+#: portato/db/dict.py:149
+#, python-format
+msgid "Error while compiling search expression: '%s'."
+msgstr "S'ha produït un error mentre es compilava l'expressió de cerca: '%s'."
+
+#: portato/db/sql.py:79
+msgid "Cleaning database..."
+msgstr "S'està netejant la base de dades..."
+
+#: portato/db/sql.py:81
+msgid "Populating database..."
+msgstr "S'està omplint la base de dades..."
+
+#: portato/session.py:67
+#, python-format
+msgid "Loading '%s' session from %s."
+msgstr "S'està carregant la sessió '%s' de %s."
+
+#: portato/session.py:69
+#, python-format
+msgid "Loading session from %s."
+msgstr "S'està carregant la sessió des de %s."
+
+#: portato/session.py:141
+#, python-format
+msgid "Saving '%s' session to %s."
+msgstr "S'està desant la sessió de '%s' a %s."
+
+#: portato/session.py:143
+#, python-format
+msgid "Saving session to %s."
+msgstr "S'està desant la sessió a %s."
+
 #: portato/config_parser.py:266
 #, python-format
 msgid "Unrecognized line in configuration: %s"
 msgstr "S'ha trobat una línia no reconeguda en la configuració: %s"
-
-#: portato/helper.py:70
-msgid "Invalid dependency string"
-msgstr "Sentència de dependència no vàlida"
 
 #: portato/listener.py:94
 msgid "Listener has not been started."
@@ -1123,22 +1032,97 @@ msgstr "Ara s'ha substituït pel del connector '%s'!"
 msgid "Dependant '%(dep)s' for '%(hook)s' in plugin '%(plugin)s' not found! Adding nevertheless."
 msgstr "No s'han trobat '%(dep)s' per '%(hook)s' en el connector '%(plugin)s'! Malgrat tot s'afegeixen."
 
-#: portato/session.py:67
-#, python-format
-msgid "Loading '%s' session from %s."
-msgstr "S'està carregant la sessió '%s' de %s."
+#: plugins/etc_proposals.py:34
+msgid "Cannot start etc-proposals. Not root!"
+msgstr "No s'ha pogut iniciar etc-proposals. No sou usuari root!"
 
-#: portato/session.py:69
-#, python-format
-msgid "Loading session from %s."
-msgstr "S'està carregant la sessió des de %s."
+#: plugins/package_details.py:67
+msgid "Shows the Changelog of a package"
+msgstr "Mostra el registre de canvis d'un paquet"
 
-#: portato/session.py:141
-#, python-format
-msgid "Saving '%s' session to %s."
-msgstr "S'està desant la sessió de '%s' a %s."
+#: plugins/package_details.py:69
+msgid "Changelog"
+msgstr "Registre de canvis"
 
-#: portato/session.py:143
+#: plugins/package_details.py:79
+msgid "Shows the ebuild of a package"
+msgstr "Mostra l'ebuild d'un paquet"
+
+#: plugins/package_details.py:82
+msgid "Ebuild"
+msgstr "Ebuild"
+
+#: plugins/package_details.py:89
+msgid "Shows the installed files of a package"
+msgstr "Mostra els fitxers instal·lats per un paquet"
+
+#: plugins/package_details.py:91
+msgid "Files"
+msgstr "Fitxers"
+
+#: plugins/package_details.py:105
+msgid "Shows the dependencies of a package"
+msgstr "Mostra les dependències d'un paquet"
+
+#: plugins/package_details.py:107
+msgid "Dependencies"
+msgstr "Dependències"
+
+#: plugins/package_details.py:179
 #, python-format
-msgid "Saving session to %s."
-msgstr "S'està desant la sessió a %s."
+msgid "If '%s' is disabled"
+msgstr "Si '%s' està desactivat"
+
+#: plugins/package_details.py:181
+#, python-format
+msgid "If '%s' is enabled"
+msgstr "Si '%s' està activat"
+
+#: plugins/package_details.py:187
+msgid "One of the following"
+msgstr "Un dels següents"
+
+#: plugins/package_details.py:192
+msgid "All of the following"
+msgstr "Tots els següents"
+
+#: plugins/package_details.py:203
+msgid "Can't display dependencies: This package has an unsupported dependency string."
+msgstr "No s'han pogut mostrar les dependències. Aquest paquet té una sentència de dependència no vàlida."
+
+#: plugins/notify.py:24
+msgid "Cannot import 'pynotify'."
+msgstr "No es pot importar 'pynotify'."
+
+#: plugins/notify.py:36
+msgid "Notify called while process is still running!"
+msgstr "S'ha notificat una crida mentre el procés està en execució!"
+
+#: plugins/notify.py:40
+msgid "Emerge finished!"
+msgstr "Emerge ha acabat!"
+
+#: plugins/notify.py:44
+msgid "Emerge failed!"
+msgstr "Emerge ha fallat!"
+
+#: plugins/notify.py:45
+#, python-format
+msgid "Error Code: %d"
+msgstr "Codi d'error: %d"
+
+#~ msgid "gtk-cancel"
+#~ msgstr "gtk-cancel"
+#~ msgid "gtk-quit"
+#~ msgstr "gtk-quit"
+#~ msgid "gtk-delete"
+#~ msgstr "gtk-delete"
+#~ msgid "gtk-find"
+#~ msgstr "gtk-find"
+#~ msgid "gtk-apply"
+#~ msgstr "gtk-apply"
+#~ msgid "gtk-jump-to"
+#~ msgstr "gtk-jump-to"
+#~ msgid "gtk-ok"
+#~ msgstr "gtk-ok"
+
