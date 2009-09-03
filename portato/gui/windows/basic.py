@@ -32,6 +32,7 @@ except OSError:
 else:
     getlib.textdomain(APP)
     getlib.bindtextdomain(APP, LOCALE_DIR)
+    getlib.bind_textdomain_codeset(APP, "UTF-8")
 
     # some debugging output about the current codeset used
     nll = getlib.nl_langinfo
