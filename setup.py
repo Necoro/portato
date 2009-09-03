@@ -40,7 +40,10 @@ data_files = [
         (PLUGIN_DIR, plugin_list("gpytage", "notify", "etc_proposals", "reload_portage", "package_details"))]
 
 # extension stuff
-ext_modules = [Extension("portato.ipc", ["portato/ipc.pyx"])]
+ext_modules = [
+        Extension("portato.ipc", ["portato/ipc.pyx"]),
+        Extension("portato.gui.windows.gettext", ["portato/gui/windows/gettext.pyx"])
+        ]
 
 if "--disable-eix" in sys.argv:
     sys.argv.remove("--disable-eix")
