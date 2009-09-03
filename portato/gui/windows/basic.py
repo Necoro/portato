@@ -20,17 +20,13 @@ from functools import wraps
 import os.path
 
 from ...constants import TEMPLATE_DIR, APP, LOCALE_DIR
-from ...helper import error
+from ...helper import error, debug
 
 # for the GtkBuilder to translate correctly :)
-import ctypes
-try:
-    getlib = ctypes.cdll.LoadLibrary("libgettextlib.so")
-except OSError:
-    error("'libgettextlib.so' cannot be loaded. Might be, that there are no translations available in the GUI.")
-else:
-    getlib.textdomain(APP)
-    getlib.bindtextdomain(APP, LOCALE_DIR)
+from . import gettext
+old_charset = gettext.set_gtk_gettext(APP, LOCALE_DIR)
+debug("Changed from old charset '%s' to UTF-8.", old_charset)
+del old_charset
 
 class WrappedTree (object):
     __slots__ = ("klass", "tree", "get_widget", "get_ui")
