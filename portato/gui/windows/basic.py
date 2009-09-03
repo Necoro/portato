@@ -31,6 +31,7 @@ except OSError:
 else:
     getlib.textdomain(APP)
     getlib.bindtextdomain(APP, LOCALE_DIR)
+    getlib.bind_textdomain_codeset(APP, "UTF-8")
 
 class WrappedTree (object):
     __slots__ = ("klass", "tree", "get_widget", "get_ui")
