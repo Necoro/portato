@@ -20,10 +20,11 @@ from functools import wraps
 import os.path
 
 from ...constants import TEMPLATE_DIR, APP, LOCALE_DIR
-from ...helper import error
+from ...helper import error, debug
 
 # for the GtkBuilder to translate correctly :)
 import ctypes
+from locale import CODESET
 try:
     getlib = ctypes.cdll.LoadLibrary("libgettextlib.so")
 except OSError:
@@ -31,6 +32,12 @@ except OSError:
 else:
     getlib.textdomain(APP)
     getlib.bindtextdomain(APP, LOCALE_DIR)
+
+    # some debugging output about the current codeset used
+    nll = getlib.nl_langinfo
+    nll.restype = ctypes.c_char_p
+    debug("Switching from '%s' to 'UTF-8'.", nll(CODESET))
+
     getlib.bind_textdomain_codeset(APP, "UTF-8")
 
 class WrappedTree (object):
