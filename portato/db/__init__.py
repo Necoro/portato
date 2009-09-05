@@ -19,6 +19,7 @@ class UnknownDatabaseTypeError (Exception):
     pass
 
 _SESSION = None
+_TYPE = None
 
 types = {
         "sql": (_("SQLite"), _("Uses an SQLite-database to store package information.\nMay take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data.")),
@@ -27,11 +28,13 @@ types = {
         }
 
 def Database(type):
-    global _SESSION
+    global _SESSION, _TYPE
 
     if _SESSION is None:
         _SESSION = Session("db.cfg", name = "DB")
         _SESSION.load()
+
+    _TYPE = type
 
     if type == "sql":
         debug("Using SQLDatabase")

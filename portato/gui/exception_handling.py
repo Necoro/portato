@@ -99,12 +99,14 @@ def convert (version):
 def get_version_infos():
     from ..constants import VERSION
     from ..backend import system
+    from ..db import _TYPE as db_type
     
     return "\n".join((
         "Portato version: %s" % VERSION,
         "System: %s" % " ".join(get_runsystem()),
         "Python version: %s" % sys.version,
         "Used backend: %s" % system.get_version(),
+        "Used database type: %s" % db_type,
         "pygtk: %s (using GTK+: %s)" % (convert(gtk.pygtk_version), convert(gtk.gtk_version)),
         "pygobject: %s (using GLib: %s)" % (convert(gobject.pygobject_version), convert(gobject.glib_version))))
 
