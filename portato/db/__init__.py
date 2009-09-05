@@ -20,6 +20,8 @@ class UnknownDatabaseTypeError (Exception):
 
 _SESSION = None
 _TYPE = None
+_DEFAULT = "dict"
+_DATABASE = None
 
 types = {
         "sql": (_("SQLite"), _("Uses an SQLite-database to store package information.\nMay take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data.")),
@@ -27,9 +29,16 @@ types = {
         "eixsql" : (_("eix + SQLite"), _("Similar to SQLite, but now uses the eix database to get the package information.\nThis should be much faster on startup, but requires that your eix database is always up-to-date."))
         }
 
-def Database(type):
-    global _SESSION, _TYPE
+def Database(type = None):
+    global _SESSION, _TYPE, _DATABASE
 
+    if type is None:
+        if _DATABASE is None:
+            warning("No database type specified! Falling back to default.")
+            return Database(_DEFAULT)
+        else:
+            return _DATABASE
+    
     if _SESSION is None:
         _SESSION = Session("db.cfg", name = "DB")
         _SESSION.load()
@@ -42,14 +51,14 @@ def Database(type):
             from .sql import SQLDatabase
         except ImportError:
             warning(_("Cannot load %s."), "SQLDatabase")
-            return Database("dict")
+            _DATABASE = Database("dict")
         else:
-            return SQLDatabase(SectionDict(_SESSION, type))
+            _DATABASE = SQLDatabase(SectionDict(_SESSION, type))
 
     elif type == "dict":
         debug("Using HashDatabase")
         from .hash import HashDatabase
-        return HashDatabase(SectionDict(_SESSION, type))
+        _DATABASE = HashDatabase(SectionDict(_SESSION, type))
     
     elif type == "eixsql":
         debug("Using EixSQLDatabase")
@@ -57,10 +66,12 @@ def Database(type):
             from .eix_sql import EixSQLDatabase
         except ImportError:
             warning(_("Cannot load %s."), "EixSQLDatabase.")
-            return Database("sql")
+            _DATABASE = Database("sql")
         else:
-            return EixSQLDatabase(SectionDict(_SESSION, type))
+            _DATABASE = EixSQLDatabase(SectionDict(_SESSION, type))
 
     else:
         error(_("Unknown database type: %s"), type)
         raise UnknownDatabaseTypeError, type
+
+    return _DATABASE
