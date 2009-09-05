@@ -49,6 +49,10 @@ class EixSQLDatabase (SQLDatabase):
 
         return old < mtime
 
+    def generate_cat_expr (self, cat):
+        # be a noop
+        return cat
+
     @SQLDatabase.con
     def populate (self, category = None, connection = None):
         inst = set(system.find_packages(pkgSet = system.SET_INSTALLED, key = category, with_version = False))

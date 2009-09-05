@@ -213,12 +213,26 @@ class SQLDatabase (Database):
         for cat in l:
             yield cat["cat"]
 
+    def generate_cat_expr (self, cat):
+        """
+        Generates an expression from a category name to match all packages of the category.
+
+        E.g. as SQLDatabase uses regexps internally, return cat/*
+
+        @param cat: the category
+        @type cat: string
+
+        @returns: expression
+        """
+
+        return cat+"/*"
+
     @con
     def reload (self, cat = None, connection = None):
         if cat:
             connection.execute("DELETE FROM packages WHERE cat = ?", (cat,))
             connection.commit()
-            self.populate(cat+"/*", connection = connection)
+            self.populate(self.generate_cat_expr(cat), connection = connection)
         else:
             connection.execute("DELETE FROM packages")
             connection.commit()
