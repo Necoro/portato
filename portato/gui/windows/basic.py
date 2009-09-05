@@ -77,10 +77,24 @@ class UIBuilder (object):
         if not hasattr(self, "__file__"):
             self.__file__ = self.__class__.__name__
 
+        # general setup
         self._builder = gtk.Builder()
         self._builder.add_from_file(os.path.join(TEMPLATE_DIR, self.__file__+".ui"))
         self._builder.set_translation_domain(APP)
+        
+        self.tree = WrappedTree(self.__class__.__name__, self._builder)
 
+        # load menu if existing
+        menufile = os.path.join(TEMPLATE_DIR, self.__file__+".menu")
+        if os.path.exists(menufile):
+            debug("Menufile for '%s' exists.", self.__file__)
+            barbox = self.tree.get_widget("menubar_box")
+            if barbox is not None:
+                self._builder.add_from_file(menufile)
+                bar = self.tree.get_ui("menubar")
+                barbox.pack_start(bar, expand = False, fill = False)
+        
+        # signal connections
         if connector is None: connector = self
 
         unconnected = self._builder.connect_signals(connector)
@@ -88,8 +102,6 @@ class UIBuilder (object):
         if unconnected is not None:
             for uc in set(unconnected):
                 error("Signal '%s' not connected in class '%s'.", uc, self.__class__.__name__)
-
-        self.tree = WrappedTree(self.__class__.__name__, self._builder)
 
 class Window (UIBuilder):
     def __init__ (self):
