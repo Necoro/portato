@@ -87,7 +87,7 @@ class UIBuilder (object):
         # load menu if existing
         menufile = os.path.join(TEMPLATE_DIR, self.__file__+".menu")
         if os.path.exists(menufile):
-            debug("Menufile for '%s' exists.", self.__file__)
+            debug("There is a menu-file for '%s'. Trying to load it.", self.__file__)
             barbox = self.tree.get_widget("menubar_box")
             if barbox is not None:
                 self._builder.add_from_file(menufile)
