@@ -7,6 +7,7 @@ blddir = "build"
 def configure (conf):
     conf.check_tool("python")
     conf.check_tool("gcc")
+    conf.check_tool("cython", tooldir="./waf_tools")
     conf.check_python_version((2,5))
     conf.check_python_headers()
 
