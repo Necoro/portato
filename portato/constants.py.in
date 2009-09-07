@@ -48,22 +48,22 @@ These should be set during the installation.
 import os
 from os.path import join as pjoin
 
-# icons
-ICON_DIR = "icons/"
-APP_ICON = pjoin(ICON_DIR, "portato-icon.png")
-
 # general
 APP = "portato"
-VERSION = "9999"
+VERSION = @VERSION@
 HOME = os.environ["HOME"]
+DATA_DIR = @DATADIR@
+
+# icons
+ICON_DIR = pjoin(DATA_DIR,"icons/")
+APP_ICON = pjoin(ICON_DIR, "portato-icon.png")
 
 # config
-CONFIG_DIR = "etc/"
+CONFIG_DIR = pjoin(@PREFIX@, "etc/")
 CONFIG_LOCATION = pjoin(CONFIG_DIR, "portato.cfg")
 SESSION_DIR = pjoin(os.environ["HOME"], ".portato")
 
 # misc dirs
-DATA_DIR = "./"
 LOCALE_DIR = "i18n/"
 PLUGIN_DIR = pjoin(DATA_DIR, "plugins/")
 SETTINGS_DIR = pjoin(HOME, "."+APP)

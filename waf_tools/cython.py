@@ -5,7 +5,7 @@ import TaskGen
 
 TaskGen.declare_chain(
         name = 'cython',
-        rule = '${CYTHON} -o ${TGT[0].bld_dir(env)} ${CYTHONFLAGS} ${SRC}',
+        rule = '${CYTHON} -o ${TGT} ${CYTHONFLAGS} ${SRC}',
         ext_in = '.pyx',
         ext_out = '.c'
 )

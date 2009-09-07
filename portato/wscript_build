@@ -1,0 +1,21 @@
+import os
+import Options, Constants
+
+src_loc = ['.', 'db', 'gui', 'gui/windows', 'plugins', 'backend', 'backend/portage']
+
+bld.new_task_gen(features = "cc pyext cshlib", target = "ipc", source = "ipc.pyx", install_path = "bla")
+
+if Options.options.eix:
+    bld.new_task_gen(features = "cc pyext cshlib", target = "parser", source = "eix/parser.pyx", install_path = "bla/eix")
+    src_loc.append("eix")
+
+for loc in src_loc:
+    py = bld.new_task_gen(features = 'py')
+    py.find_sources_in_dirs(loc, exts = [".py", ".in"])
+    py.install_path = os.path.join("bla", loc)
+
+#replace = bld.new_task_gen("subst", source = "constants.py.in", target = "constants.py", before="py")
+#replace.dict = dict(replace.env + {"VERSION": Constants.VERSION}
+
+
+# vim: ft=python

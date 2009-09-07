@@ -14,7 +14,9 @@ def configure (conf):
 
     conf.check_tool("python")
     conf.check_tool("gcc")
+    conf.check_tool("misc")
     conf.check_tool("cython", tooldir="./waf_tools")
+    conf.check_tool("replace", tooldir="./waf_tools")
     conf.check_python_version((2,5))
     conf.check_python_headers()
 
@@ -31,5 +33,8 @@ def set_options (opt):
     opt.add_option_group(o)
 
     opt.add_option("--local", "-l", action = "store_true", default = False, help = "Local build")
+
+def build (bld):
+    bld.add_subdirs("portato")
 
 # vim: ft=python
