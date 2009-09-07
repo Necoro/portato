@@ -11,5 +11,5 @@ TaskGen.declare_chain(
 )
 
 def detect(conf):
-        gob2 = conf.find_program('cython', var='CYTHON', mandatory=True)
+        conf.find_program('cython', var='CYTHON', mandatory=True)
         conf.env['CYTHONFLAGS'] = ''
