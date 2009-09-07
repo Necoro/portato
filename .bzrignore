@@ -1,1 +1,4 @@
 tags
+.lock-wscript
+.waf*
+./build
