@@ -120,6 +120,20 @@ class PortageSystem (SystemInterface):
         else:
             return True
 
+    def compare_versions(self, v1, v2):
+        v1 = self.split_cpv(v1)
+        v2 = self.split_cpv(v2)
+
+        # if category is different
+        if v1[0] != v2[0]:
+            return cmp(v1[0],v2[0])
+        # if name is different
+        elif v1[1] != v2[1]:
+            return cmp(v1[1],v2[1])
+        # Compare versions
+        else:
+            return portage.pkgcmp(v1[1:],v2[1:])
+
     def with_bdeps(self):
         """Returns whether the "--with-bdeps" option is set to true.
 
@@ -218,8 +232,11 @@ class PortageSystem (SystemInterface):
         cpv = portage.dep_getcpv(cpv)
         return portage.catpkgsplit(cpv)
 
-    def sort_package_list(self, pkglist):
-        pkglist.sort(PortagePackage.compare_version) # XXX: waaah ... direct package naming... =/
+    def sort_package_list(self, pkglist, only_cpv = False):
+        if only_cpv:
+            pkglist.sort(self.compare_versions)
+        else:
+            pkglist.sort()
         return pkglist
 
     def reload_settings (self):

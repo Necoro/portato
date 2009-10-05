@@ -68,6 +68,18 @@ class SystemInterface (object):
         """
 
         raise NotImplementedError
+
+    def compare_versions(self, v1, v2):
+        """Compares two CPVs; returns -1, 0, 1.
+        
+        @param v1: one CPV
+        @type v1: cpv
+        @param v2: the second CPV
+        @type v2: cpv
+        @returns: -1, 0 or 1
+        @rtype: int"""
+
+        raise NotImplementedError
     
     def find_best(self, list, only_cpv = False):
         """Returns the best package out of a list of packages.
@@ -134,11 +146,13 @@ class SystemInterface (object):
 
         raise NotImplementedError
 
-    def sort_package_list(self, pkglist):
+    def sort_package_list(self, pkglist, only_cpv = False):
         """Sorts a package list in the same manner portage does.
         
         @param pkglist: list to sort
-        @type pkglist: Packages[]
+        @type pkglist: Packages[] or cpv[]
+        @param only_cpv: flags whether the passed list consists of Packages or of CPVs
+        @type: bool
         """
 
         raise NotImplementedError
