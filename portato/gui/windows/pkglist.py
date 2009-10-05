@@ -34,7 +34,7 @@ class PkgListWindow (AbstractDialog):
 
         self.queue = queue
         self.jump = jump_to
-        self.packages = packages
+        self.packages = system.sort_package_list(packages, only_cpv = True)
 
         self.build_list()
 

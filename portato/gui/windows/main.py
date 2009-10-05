@@ -1626,14 +1626,20 @@ class MainWindow (Window):
         Show the list of updateble packages.
         """
 
-        self.show_package_list(system.get_updated_packages, UpdateWindow, "Show Updates Thread")
+        self.show_package_list(
+                lambda: (x.get_cpv() for x in system.get_updated_packages()),
+                UpdateWindow, "Show Updates Thread")
+
         return True
 
     def cb_show_world_clicked (self, *args):
         """
         Show the list of world packages.
         """
-        self.show_package_list(lambda: system.find_packages(pkgSet = "world", only_cpv = True), WorldListWindow)
+        self.show_package_list(
+                lambda: system.find_packages(pkgSet = "world", only_cpv = True),
+                WorldListWindow)
+
         return True
 
     def cb_show_installed_toggled (self, *args):
