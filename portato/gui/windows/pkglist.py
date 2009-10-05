@@ -30,6 +30,11 @@ class PkgListWindow (AbstractDialog):
 
         self.installBtn = self.tree.get_widget("installBtn")
         self.uninstallBtn = self.tree.get_widget("uninstallBtn")
+
+        self.selectBtnLabels = {
+                False: _("Select _All"),
+                True: _("Unselect _All")}
+
         self.all_selected = False
 
         self.queue = queue
@@ -73,11 +78,15 @@ class PkgListWindow (AbstractDialog):
         self.window.set_geometry_hints(self.window, min_height = val)
 
     def cb_select_all_clicked (self, btn):
+        sel = self.all_selected = not self.all_selected
+
+        btn.set_label(self.selectBtnLabels[sel])
+
         model = self.view.get_model()
         iter = model.get_iter_first()
         
         while iter:
-            model.set_value(iter, 0, not self.all_selected)
+            model.set_value(iter, 0, sel)
             iter = model.iter_next(iter)
 
         return True
