@@ -294,18 +294,8 @@ class PortagePackage (Package):
             return self.get_package_settings("USE", installed = True).split()
         else: return []
 
-    def compare_version(self,other):
-        v1 = self._scpv
-        v2 = portage.catpkgsplit(other.get_cpv())
-        # if category is different
-        if v1[0] != v2[0]:
-            return cmp(v1[0],v2[0])
-        # if name is different
-        elif v1[1] != v2[1]:
-            return cmp(v1[1],v2[1])
-        # Compare versions
-        else:
-            return portage.pkgcmp(v1[1:],v2[1:])
+    def __cmp__ (self, other):
+        return system.compare_versions(self.get_cpv(), other.get_cpv())
 
     def matches (self, criterion):
         # cpv_matches needs explicit slot info

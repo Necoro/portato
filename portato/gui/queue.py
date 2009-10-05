@@ -144,7 +144,7 @@ class EmergeQueue:
                 old = system.find_packages(pkg.get_slot_cp(), system.SET_INSTALLED)
                 if old:
                     old = old[0] # assume we have only one there
-                    cmp = pkg.compare_version(old)
+                    cmp = pkg.__cmp__(old)
                     if cmp > 0:
                         update = True
                     elif cmp < 0:

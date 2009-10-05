@@ -371,16 +371,6 @@ class Package (_Package):
         
         raise NotImplementedError
 
-    def compare_version(self, other):
-        """Compares this package's version to another's CPV; returns -1, 0, 1.
-        
-        @param other: the other package
-        @type other: Package
-        @returns: -1, 0 or 1
-        @rtype: int"""
-
-        raise NotImplementedError
-
     def matches (self, criterion):
         """This checks, whether this package matches a specific versioning criterion - e.g.: "<=net-im/foobar-1.2".
         
