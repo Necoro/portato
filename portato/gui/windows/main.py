@@ -50,7 +50,7 @@ from .about import AboutWindow
 from .plugin import PluginWindow
 from .preference import PreferenceWindow
 from .search import SearchWindow
-from .update import UpdateWindow, WorldListWindow
+from .pkglist import UpdateWindow, WorldListWindow
 
 class PackageTable:
     """A window with data about a specfic package."""
@@ -1594,41 +1594,46 @@ class MainWindow (Window):
 
         PluginWindow(self.window, plugins, self.queue)
         return True
+
+    def show_package_list (self, pkg_generator, klass, thread_name = "PkgList Update Thread"):
+        
+        def cb_idle_show(packages):
+            """
+            Callback opening the menu when the calculation is finished.
+
+            @returns: False to signal that it is finished
+            """
+            klass(self.window, packages, self.queue, self.jump_to)
+            return False
+        
+        def __update():
+            watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
+            self.window.window.set_cursor(watch)
+            
+            packages = []
+            try:
+                packages.extend(pkg_generator())
+            finally:
+                self.window.window.set_cursor(None)
+
+            gobject.idle_add(cb_idle_show, packages)
+        
+        GtkThread(name = thread_name, target = __update).start()
+        return True
     
     def cb_show_updates_clicked (self, *args):
         """
         Show the list of updateble packages.
         """
 
-        def __update():
-            def cb_idle_show(packages):
-                """
-                Callback opening the menu when the calculation is finished.
-
-                @returns: False to signal that it is finished
-                """
-                UpdateWindow(self.window, packages, self.queue, self.jump_to)
-                return False
-            
-            watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
-            self.window.window.set_cursor(watch)
-            
-            packages = []
-            try:
-                packages.extend(system.get_updated_packages())
-            finally:
-                self.window.window.set_cursor(None)
-
-            gobject.idle_add(cb_idle_show, packages)
-        
-        GtkThread(name="Show Updates Thread", target = __update).start()
+        self.show_package_list(system.get_updated_packages, UpdateWindow, "Show Updates Thread")
         return True
 
     def cb_show_world_clicked (self, *args):
         """
         Show the list of world packages.
         """
-        WorldListWindow(self.window, system.find_packages(pkgSet = "world"), self.queue, self.jump_to)
+        self.show_package_list(lambda: system.find_packages(pkgSet = "world", only_cpv = True), WorldListWindow)
         return True
 
     def cb_show_installed_toggled (self, *args):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/gui/windows/update.py
+# File: portato/gui/windows/pkglist.py
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006-2009 René 'Necoro' Neumann
@@ -19,15 +19,22 @@ from ...backend import system
 from ...backend.exceptions import PackageNotFoundException, BlockedException
 from ...helper import debug
 
-class UpdateWindow (AbstractDialog):
+class PkgListWindow (AbstractDialog):
 
-    def __init__ (self, parent, packages, queue, jump_to):
+    # need this, so it can be safely subclassed
+    __file__ = __window__ = "PkgListWindow"
+
+    def __init__ (self, title, parent, packages, queue, jump_to):
         AbstractDialog.__init__(self, parent)
+        self.window.set_title(title)
+
+        self.installBtn = self.tree.get_widget("installBtn")
+        self.uninstallBtn = self.tree.get_widget("uninstallBtn")
+        self.all_selected = False
 
         self.queue = queue
         self.jump = jump_to
-
-        self.packages = system.sort_package_list(packages)
+        self.packages = packages
 
         self.build_list()
 
@@ -48,7 +55,7 @@ class UpdateWindow (AbstractDialog):
         self.view.append_column(gtk.TreeViewColumn(_("Package"), cell, text = 1))
 
         for p in self.packages:
-            store.append([False, p.get_cpv()])
+            store.append([False, p])
 
     def cb_set_size (self, *args):
         """
@@ -70,12 +77,12 @@ class UpdateWindow (AbstractDialog):
         iter = model.get_iter_first()
         
         while iter:
-            model.set_value(iter, 0, True)
+            model.set_value(iter, 0, not self.all_selected)
             iter = model.iter_next(iter)
 
         return True
 
-    def cb_install_clicked (self, btn):
+    def install_uninstall (self, type):
         model = self.view.get_model()
         iter = model.get_iter_first()
         if iter is None: return
@@ -86,19 +93,29 @@ class UpdateWindow (AbstractDialog):
                 items.append(model.get_value(iter, 1))
             iter = model.iter_next(iter)
         
-        for item in items:
-            try:
+        if type == "install":
+            for item in items:
                 try:
-                    self.queue.append(item, type = "install", oneshot = True)
-                except PackageNotFoundException, e:
-                    if unmask_dialog(e[0]) == gtk.RESPONSE_YES :
-                        self.queue.append(item, type = "install", unmask = True, oneshot = True)
+                    try:
+                        self.queue.append(item, "install", oneshot = True)
+                    except PackageNotFoundException, e:
+                        if unmask_dialog(e[0]) == gtk.RESPONSE_YES :
+                            self.queue.append(item, "install", unmask = True, oneshot = True)
 
-            except BlockedException, e:
-                blocked_dialog(e[0], e[1])
+                except BlockedException, e:
+                    blocked_dialog(e[0], e[1])
+        else:
+            for item in items:
+                self.queue.append(item, "uninstall")
 
         self.close()
         return True
+
+    def cb_install_clicked (self, btn):
+        return self.install_uninstall("install")
+
+    def cb_uninstall_clicked (self, btn):
+        return self.install_uninstall("uninstall")
 
     def cb_package_selected (self, view):
         sel = view.get_selection()
@@ -116,9 +133,11 @@ class UpdateWindow (AbstractDialog):
         store[path][0] = not store[path][0]
         return True
 
-class WorldListWindow (UpdateWindow):
-    __file__ = __window__ = "UpdateWindow"
-
+class UpdateWindow (PkgListWindow):
     def __init__ (self, *args, **kwargs):
-        UpdateWindow.__init__(self, *args, **kwargs)
-        self.window.set_title(_("World Packages"))
+        PkgListWindow.__init__(self, _("Updatable Packages"), *args, **kwargs)
+
+class WorldListWindow (UpdateWindow):
+    def __init__ (self, *args, **kwargs):
+        PkgListWindow.__init__(self, _("World Packages"), *args, **kwargs)
+        self.installBtn.hide()
