@@ -72,7 +72,7 @@
         <child>
           <object class="GtkAction" id="updateAction">
             <property name="name">updateAction</property>
-            <property name="label" translatable="yes">Update _World</property>
+            <property name="label" translatable="yes">Up_date World</property>
             <signal handler="cb_update_clicked" name="activate"/>
           </object>
         </child>
@@ -81,6 +81,13 @@
             <property name="name">showUpdatesAction</property>
             <property name="label" translatable="yes">Show Updatable P_ackages</property>
             <signal handler="cb_show_updates_clicked" name="activate"/>
+          </object>
+        </child>
+        <child>
+          <object class="GtkAction" id="showWorldPkgsAction">
+            <property name="name">showWorldPkgsAction</property>
+            <property name="label" translatable="yes">Show _World Packages</property>
+            <signal handler="cb_show_world_clicked" name="activate"/>
           </object>
         </child>
         <child>
@@ -170,6 +177,7 @@
           <menuitem name="unmergeMenuItem" action="unmergeAction"/>
           <menuitem name="updateMenuItem" action="updateAction"/>
           <menuitem name="showUpdatesMenuItem" action="showUpdatesAction"/>
+          <menuitem name="showWorldPkgsMenuItem" action="showWorldPkgsAction" />
           <menuitem name="showInstalledMenuItem" action="showInstalledAction"/>
           <separator/>
           <menuitem name="syncMenuItem" action="syncAction"/>

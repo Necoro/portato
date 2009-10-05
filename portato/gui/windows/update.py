@@ -115,3 +115,10 @@ class UpdateWindow (AbstractDialog):
         store = self.view.get_model()
         store[path][0] = not store[path][0]
         return True
+
+class WorldListWindow (UpdateWindow):
+    __file__ = __window__ = "UpdateWindow"
+
+    def __init__ (self, *args, **kwargs):
+        UpdateWindow.__init__(self, *args, **kwargs)
+        self.window.set_title(_("World Packages"))

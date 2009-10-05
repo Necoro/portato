@@ -50,7 +50,7 @@ from .about import AboutWindow
 from .plugin import PluginWindow
 from .preference import PreferenceWindow
 from .search import SearchWindow
-from .update import UpdateWindow
+from .update import UpdateWindow, WorldListWindow
 
 class PackageTable:
     """A window with data about a specfic package."""
@@ -1622,6 +1622,13 @@ class MainWindow (Window):
             gobject.idle_add(cb_idle_show, packages)
         
         GtkThread(name="Show Updates Thread", target = __update).start()
+        return True
+
+    def cb_show_world_clicked (self, *args):
+        """
+        Show the list of world packages.
+        """
+        WorldListWindow(self.window, system.find_packages(pkgSet = "world"), self.queue, self.jump_to)
         return True
 
     def cb_show_installed_toggled (self, *args):
