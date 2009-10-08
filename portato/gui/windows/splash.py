@@ -40,11 +40,16 @@ class SplashScreen (Window):
             gtk.main_iteration()
     
     def show (self):
+        self.window.set_keep_above(True)
         self.window.show_all()
         self.do_iteration()
 
     def hide (self):
         self.window.hide()
+        self.do_iteration()
+
+    def destroy(self):
+        self.window.destroy()
         self.do_iteration()
 
     __call__ = set_descr

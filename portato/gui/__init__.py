@@ -27,9 +27,11 @@ def run ():
     from .windows.main import MainWindow
     try:
         m = MainWindow(s)
-        s.hide()
+        s.destroy()
+        del s
+        
         m.main()
     except PreReqError, e:
         error("Prerequisite not matched. Aborting.")
         prereq_error_dialog(e)
-        s.hide()
+        s.destroy()
