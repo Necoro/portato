@@ -21,7 +21,7 @@ from threading import Thread
 import gtk
 
 # some backend things
-from ..backend import flags, set_system
+from ..backend import flags, system
 from ..helper import debug, info
 from ..log import set_log_level
 from ..constants import APP, LOCALE_DIR
@@ -90,9 +90,8 @@ class Config (ConfigParser):
         set_log_level(level)
 
     def modify_system_config (self):
-        """Sets the system config.
-        @see: L{backend.set_system()}"""
-        set_system(self.get("system"))
+        """Sets the system config."""
+        system.set_system(self.get("system"))
 
     def modify_external_configs (self):
         """Convenience function setting all external configs."""
