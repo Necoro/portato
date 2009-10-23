@@ -12,14 +12,27 @@ KBabel (kde-base/kbabel) or Gtranslator (app-text/gtranslator).
 
 Getting the sources:
 ===================
+You do need the sources to make translations, as the installed program is not sufficient. 
+Therefore you need to have dev-util/git installed.
 
-You do need the sources to make translations. The installed program is not sufficient.
 Change into a local directory where you want to have the sources installed.
 Then do:
 
-> bzr pull lp:portato
+> git clone git://github.com/Necoro/portato.git
 
 You now should have the actual sources in the "portato" subdirectory.
+
+If you later on want to update these sources, you do:
+
+> git pull
+
+Important: If you are working on a given version, you need to change to the correct branch:
+
+> git checkout -b 0.13 origin/0.13
+
+where '0.13' has to be replaced by the version you are going to use.
+
+Have a look at http://www.git-scm.com for more information on how to use git.
 
 
 To update an incomplete translation:
