@@ -17,8 +17,12 @@ import sys, os
 from optparse import OptionParser, SUPPRESS_HELP
 
 from .log import start as logstart
-from .constants import LOCALE_DIR, APP, VERSION
+from .constants import LOCALE_DIR, APP, VERSION, REVISION
 from .helper import debug, info, error
+
+# set better version info
+if REVISION:
+    VERSION = '%s (git: %s)' % (VERSION, REVISION)
 
 # listener-handling
 __listener = None
