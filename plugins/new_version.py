@@ -44,9 +44,11 @@ class NewVersionFinder(WidgetPlugin):
 
     def find_version (self, rev):
 
-        remote_rev = Popen(['git', 'ls-remote', 'HEAD'], stdout = PIPE).communicate()[0].split('\t')
+        repo, branch = REPOURI.split('::')
+
+        remote_rev = Popen(['git', 'ls-remote', repo, branch], stdout = PIPE).communicate()[0].split('\t')
         
-        if len(remote_rev) and not remote_rev[1] == 'HEAD':
+        if len(remote_rev) and remote_rev[1] not in (branch, 'refs/heads/'+branch, 'refs/tags/'+branch):
             warning('NEW_VERSION :: Returned revision information looks strange: %s', str(remote_rev))
         else:
             remote_rev = remote_rev[0]
