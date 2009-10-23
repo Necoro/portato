@@ -42,8 +42,10 @@ These should be set during the installation.
 @var TEMPLATE_DIR: Directory containing the UI template files.
 @type TEMPLATE_DIR: string
 
-@var REPOURI: the URI of the bzr repository -- only used in live versions
+@var REPOURI: the URI of the git repository -- only used in live versions
 @type REPOURI: string
+@var REVISION: the revision of the live version
+@type REVISION: string
 """
 import os
 from os.path import join as pjoin
@@ -70,4 +72,5 @@ SETTINGS_DIR = pjoin(HOME, "."+APP)
 TEMPLATE_DIR = "portato/gui/templates/"
 
 # live versions only
-REPOURI = "lp:portato"
+REPOURI = "git://github.com/Necoro/portato.git"
+REVISION = ""

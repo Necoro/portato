@@ -12,16 +12,11 @@
 
 from portato.helper import debug, warning
 
-try:
-    from bzrlib import plugin, branch
-except ImportError:
-    plugin = branch =  None
-    warning("NEW_VERSION :: Cannot import 'bzrlib'")
-
+from subprocess import Popen, PIPE
 import gobject
 
 from portato import get_listener
-from portato.constants import REPOURI, VERSION, APP_ICON, APP
+from portato.constants import REPOURI, REVISION, APP_ICON, APP
 from portato.gui.utils import GtkThread
 
 class NewVersionFinder(WidgetPlugin):
@@ -29,7 +24,7 @@ class NewVersionFinder(WidgetPlugin):
     Checks for a new version of portato every 30 minutes and on startup.
     """
     __author__ = "René 'Necoro' Neumann"
-    __dependency__ = ["dev-util/bzr"]
+    __dependency__ = ["dev-util/git"]
 
     def init (self):
         self.add_call("main", self.run)
@@ -37,20 +32,28 @@ class NewVersionFinder(WidgetPlugin):
     def widget_init (self):
         self.create_widget("Plugin Menu", "Check for new _versions", activate = self.menu)
 
-    def find_version (self, rev):
-        try:
-            b = branch.Branch.open(REPOURI)
-        except Exception, e:
-            warning("NEW_VERSION :: Exception occured while accessing the remote branch: %s", str(e))
-            return
+    def get_notify_callback (self, rev):
+        def callback():
+             get_listener().send_notify(
+                     base = "New Portato Live Version Found",
+                     descr = "The most recent revision is %s." % rev,
+                     icon = APP_ICON)
+             return False
 
-        debug("NEW_VERSION :: Installed rev: %s - Current rev: %s", rev, b.revno())
-        if int(rev) < int(b.revno()):
-            def callback():
-                get_listener().send_notify(base = "New Portato Live Version Found", descr = "You have rev. %s, but the most recent revision is %s." % (rev, b.revno()), icon = APP_ICON)
-                return False
-            
-            gobject.idle_add(callback)
+         return callback
+
+    def find_version (self, rev):
+
+        remote_rev = Popen(['git', 'ls-remote', 'HEAD'], stdout = PIPE).communicate()[0].split('\t')
+        
+        if len(remote_rev) and not remote_rev[1] == 'HEAD':
+            warning('NEW_VERSION :: Returned revision information looks strange: %s', str(remote_rev))
+        else:
+            remote_rev = remote_rev[0]
+            debug("NEW_VERSION :: Installed rev: %s - Current rev: %s", rev, remove_rev)
+
+            if rev != remote_rev:
+                gobject.idle_add(self.get_notify_callback(remote_rev))
 
     def start_thread(self, rev):
         t = GtkThread(target = self.find_version, name = "Version Updater Thread", args = (rev,))
@@ -62,16 +65,11 @@ class NewVersionFinder(WidgetPlugin):
         """
         Run the thread once.
         """
-        v = VERSION.split()
-        if len(v) != 3:
+        if not REVISION:
             return None
-
-        rev = v[-1]
-
-        plugin.load_plugins() # to have lp: addresses parsed
         
-        self.start_thread(rev)
-        return rev
+        self.start_thread(REVISION)
+        return REVISION
 
     def run (self, *args, **kwargs):
         """
@@ -82,4 +80,4 @@ class NewVersionFinder(WidgetPlugin):
         if rev is not None:
             gobject.timeout_add(30*60*1000, self.start_thread, rev) # call it every 30 minutes
 
-register(NewVersionFinder, (branch is None))
+register(NewVersionFinder, REVISION != '')
