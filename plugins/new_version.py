@@ -52,7 +52,7 @@ class NewVersionFinder(WidgetPlugin):
             warning('NEW_VERSION :: Returned revision information looks strange: %s', str(remote_rev))
         else:
             remote_rev = remote_rev[0]
-            debug("NEW_VERSION :: Installed rev: %s - Current rev: %s", rev, remote_rev)
+            debug("NEW_VERSION :: Installed rev: %s - Current rev: %s", remote_rev, rev)
 
             if rev != remote_rev:
                 gobject.idle_add(self.get_notify_callback(remote_rev))
