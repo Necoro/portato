@@ -15,7 +15,7 @@ from __future__ import absolute_import
 import gtk
 
 from .basic import AbstractDialog
-from ...constants import VERSION, APP_ICON
+from ...constants import VERSION, REVISION, APP_ICON
 
 class AboutWindow (AbstractDialog):
     """A window showing the "about"-informations."""
@@ -29,6 +29,12 @@ class AboutWindow (AbstractDialog):
 
         self.window.set_version(VERSION)
         self.window.set_logo(img.get_pixbuf())
+
+        if REVISION:
+            gitlabel = self.tree.get_widget("gitLabel")
+            gitlabel.set_label(REVISION)
+        else:
+            self.tree.get_widget("gitHB").hide()
 
         self.window.show_all()
 

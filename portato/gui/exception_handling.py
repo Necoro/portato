@@ -97,10 +97,13 @@ def convert (version):
     return ".".join(map(str, version))
 
 def get_version_infos():
-    from ..constants import VERSION
+    from ..constants import VERSION, REVISION
     from ..backend import system
     from ..db import _TYPE as db_type
     
+    if REVISION:
+        VERSION = "%s (git: %s)" % (VERSION, REVISION)
+
     return "\n".join((
         "Portato version: %s" % VERSION,
         "System: %s" % " ".join(get_runsystem()),
