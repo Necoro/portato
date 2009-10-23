@@ -72,5 +72,5 @@ SETTINGS_DIR = pjoin(HOME, "."+APP)
 TEMPLATE_DIR = "portato/gui/templates/"
 
 # live versions only
-REPOURI = "git://github.com/Necoro/portato.git"
+REPOURI = "git://github.com/Necoro/portato.git::master"
 REVISION = ""

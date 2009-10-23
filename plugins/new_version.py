@@ -34,25 +34,25 @@ class NewVersionFinder(WidgetPlugin):
 
     def get_notify_callback (self, rev):
         def callback():
-             get_listener().send_notify(
-                     base = "New Portato Live Version Found",
-                     descr = "The most recent revision is %s." % rev,
-                     icon = APP_ICON)
-             return False
+            get_listener().send_notify(
+                    base = "New Portato Live Version Found",
+                    descr = "The most recent revision is %s." % rev,
+                    icon = APP_ICON)
+            return False
 
-         return callback
+        return callback
 
     def find_version (self, rev):
 
         repo, branch = REPOURI.split('::')
 
-        remote_rev = Popen(['git', 'ls-remote', repo, branch], stdout = PIPE).communicate()[0].split('\t')
+        remote_rev = Popen(['git', 'ls-remote', repo, branch], stdout = PIPE).communicate()[0].strip().split('\t')
         
         if len(remote_rev) and remote_rev[1] not in (branch, 'refs/heads/'+branch, 'refs/tags/'+branch):
             warning('NEW_VERSION :: Returned revision information looks strange: %s', str(remote_rev))
         else:
             remote_rev = remote_rev[0]
-            debug("NEW_VERSION :: Installed rev: %s - Current rev: %s", rev, remove_rev)
+            debug("NEW_VERSION :: Installed rev: %s - Current rev: %s", rev, remote_rev)
 
             if rev != remote_rev:
                 gobject.idle_add(self.get_notify_callback(remote_rev))
@@ -82,4 +82,4 @@ class NewVersionFinder(WidgetPlugin):
         if rev is not None:
             gobject.timeout_add(30*60*1000, self.start_thread, rev) # call it every 30 minutes
 
-register(NewVersionFinder, REVISION != '')
+register(NewVersionFinder, REVISION == '')
