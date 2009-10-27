@@ -68,7 +68,12 @@ class PortageSystem (SystemInterface):
         return PortagePackage(cpv)
 
     def get_config_path (self):
-        return portage.USER_CONFIG_PATH
+        path = portage.USER_CONFIG_PATH
+
+        if path[0] != "/":
+            return os.path.join(self.settings.settings["ROOT"], path)
+        else:
+            return path
 
     def get_merge_command (self):
         return ["/usr/bin/python", "/usr/bin/emerge"]
