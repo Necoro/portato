@@ -167,24 +167,6 @@ class PortageSystem (SystemInterface):
         else:
             return lambda x: True
 
-    def geneticize_list (self, list_of_packages, only_cpv = False):
-        """Convertes a list of cpv's into L{backend.Package}s.
-        
-        @param list_of_packages: the list of packages
-        @type list_of_packages: string[]
-        @param only_cpv: do nothing - return the passed list
-        @type only_cpv: boolean
-        @returns: converted list
-        @rtype: PortagePackage[]
-        """
-        
-        if not only_cpv:
-            return [self.new_package(x) for x in list_of_packages]
-        elif not isinstance(list_of_packages, list):
-            return list(list_of_packages)
-        else:
-            return list_of_packages
-
     def get_global_settings (self, key):
         return self.settings.global_settings[key]
 
@@ -222,7 +204,12 @@ class PortageSystem (SystemInterface):
         return self.setmap[pkgSet]()
 
     def find_packages (self, key = "", pkgSet = SystemInterface.SET_ALL, masked = False, with_version = True, only_cpv = False):
-        return self.geneticize_list(self._get_set(pkgSet).find(key, masked, with_version, only_cpv), only_cpv or not with_version)
+        result = self._get_set(pkgSet).find(key, masked, with_version, only_cpv)
+
+        if (not only_cpv) and with_version:
+            result = map(self.new_package, result)
+        
+        return result
 
     def list_categories (self, name = None):
         categories = self.settings.global_settings.categories
