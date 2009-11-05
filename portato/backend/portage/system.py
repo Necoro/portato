@@ -280,9 +280,9 @@ class PortageSystem (SystemInterface):
             if len(inst) > 1:
                 myslots = set()
                 for i in inst: # get the slots of the installed packages
-                    myslots.add(i.get_package_settings("SLOT"))
+                    myslots.add(i.get_slot())
 
-                myslots.add(best_p.get_package_settings("SLOT")) # add the slot of the best package in portage
+                myslots.add(best_p.get_slot()) # add the slot of the best package in portage
                 for slot in myslots:
                     crit = "%s:%s" % (p, slot)
                     append(crit, self.find_best_match(crit), inst)

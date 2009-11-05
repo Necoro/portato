@@ -27,6 +27,7 @@ class Package (_Package):
         @type cpv: string (cat/pkg-ver)"""
 
         self._cpv = cpv
+        self._slot = None
 
     def __repr__ (self):
         return "<Package '%s' @0x%x>" % (self._cpv, id(self))
@@ -154,15 +155,26 @@ class Package (_Package):
         @returns: category/package.
         @rtype: string"""
         
-        return self.get_category()+"/"+self.get_name()
+        return "/".join(self.get_category(), self.get_name())
 
+    def get_slot (self):
+        """Returns the slot.
+        
+        @returns: Slot
+        @rtype: string"""
+        
+        if self._slot is None:
+            self._slot = self.get_package_settings("SLOT")
+        
+        return self._slot
+    
     def get_slot_cp (self):
         """Returns the current cp followed by a colon and the slot-number.
         
         @returns: cp:slot
         @rtype: string"""
 
-        return ("%s:%s" % (self.get_cp(), self.get_package_settings("SLOT")))
+        return ":".join(self.get_cp(), self.get_slot())
 
     def get_package_path(self):
         """Returns the path to where the ChangeLog, Manifest, .ebuild files reside.
