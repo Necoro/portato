@@ -4,6 +4,10 @@ next:
 - use an internal messagequeue module instead of external shm
 - show the list of world packages
 
+0.13.1:
+- fix segfault in GLib
+- correct config path handling for portage-2.1.7.x
+
 0.13:
 - allow lines w/o keyword in package.keywords
 - added support for ktsuss as su-frontend
