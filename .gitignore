@@ -2,3 +2,4 @@ tags
 *.pyc
 *.so
 *.c
+*.sw?
