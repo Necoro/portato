@@ -47,7 +47,7 @@ class Database (object):
     TYPES = {
             SEARCH_NAME : _("Name"),
             SEARCH_DESCRIPTION : _("Description"),
-            SEARCH_NAME | SEARCH_DESCRIPTION : _("Name + Description")
+            SEARCH_NAME | SEARCH_DESCRIPTION : "%s + %s" % (_("Name"), _("Description"))
             }
 
 
