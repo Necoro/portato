@@ -16,7 +16,7 @@
         <child>
           <object class="GtkAction" id="fileMenuAction">
             <property name="name">fileMenuAction</property>
-            <property name="label" translatable="yes">_File</property>
+            <property name="label" translatable="yes">_General</property>
           </object>
         </child>
         <child>
@@ -158,7 +158,7 @@
           <object class="GtkAction" id="pluginsAction">
             <property name="stock_id">gtk-connect</property>
             <property name="name">pluginsAction</property>
-            <property name="label" translatable="yes">_Plugins</property>
+            <property name="label" translatable="yes">Plu_gins</property>
             <signal handler="cb_plugins_clicked" name="activate"/>
           </object>
         </child>
@@ -168,6 +168,7 @@
       <menubar name="menubar">
         <menu name="fileMenu" action="fileMenuAction">
           <menuitem name="prefMenuItem" action="prefAction"/>
+          <menuitem name="pluginsMenuItem" action="pluginsAction"/>
           <menuitem name="reloadMenuItem" action="reloadAction"/>
           <separator/>
           <menuitem name="closeMenuItem" action="closeAction"/>
@@ -189,7 +190,6 @@
         <menu name="pluginMenu" action="pluginMenuAction"/>
         <menu name="helpMenu" action="helpMenuAction">
           <menuitem name="aboutMenuItem" action="aboutAction"/>
-          <menuitem name="pluginsMenuItem" action="pluginsAction"/>
         </menu>
       </menubar>
       <popup name="systrayPopup">
