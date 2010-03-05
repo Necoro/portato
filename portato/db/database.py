@@ -45,9 +45,9 @@ class Database (object):
     SEARCH_DESCRIPTION = 2
 
     TYPES = {
-            SEARCH_NAME = _("Name"),
-            SEARCH_DESCRIPTION = _("Description"),
-            SEARCH_NAME | SEARCH_DESCRIPTION = _("Name + Description")
+            SEARCH_NAME : _("Name"),
+            SEARCH_DESCRIPTION : _("Description"),
+            SEARCH_NAME | SEARCH_DESCRIPTION : _("Name + Description")
             }
 
 
