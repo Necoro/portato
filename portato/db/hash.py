@@ -32,6 +32,9 @@ class HashDatabase (Database):
         self.__initialize()
         self.populate()
 
+    def search_types(self):
+        return Database.SEARCH_NAME
+
     def __initialize (self):
         self._db = defaultdict(list)
         self.inst_cats = set([self.ALL])

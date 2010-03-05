@@ -41,6 +41,9 @@ class EixSQLDatabase (SQLDatabase):
         
         SQLDatabase.__init__(self, session)
 
+    def search_types(self):
+        return Database.SEARCH_NAME | Database.SEARCH_DESCRIPTION
+
     def updated (self):
         mtime = os.stat(self.cache).st_mtime
         old = self.session.get("mtime", 0)
@@ -63,7 +66,7 @@ class EixSQLDatabase (SQLDatabase):
                     if category is None or cat.name == category:
                         for pkg in cat.packages:
                             p = "%s/%s" % (cat.name, pkg.name)
-                            yield (cat.name, pkg.name, p in inst, False)
+                            yield (cat.name, pkg.name, pkg.desription, p in inst, False)
 
-        connection.executemany("INSERT INTO packages (cat, name, inst, disabled) VALUES (?, ?, ?, ?)", _get())
+        connection.executemany("INSERT INTO packages (cat, name, descr, inst, disabled) VALUES (?, ?, ?, ?)", _get())
         connection.commit()

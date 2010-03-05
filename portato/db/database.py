@@ -14,6 +14,10 @@ from __future__ import absolute_import, with_statement
 
 from threading import RLock
 from functools import wraps
+from ..helper import error
+
+class UnsupportedSearchTypeError(Exception):
+    pass
 
 class PkgData (object):
     __slots__ = ("cat", "pkg", "inst", "disabled")
@@ -37,8 +41,12 @@ class Database (object):
 
     ALL = _("ALL")
 
+    SEARCH_NAME = 1
+    SEARCH_DESCRIPTION = 2
+
     def __init__ (self):
         self._lock = RLock()
+        self.type = self.SEARCH_NAME
 
     @staticmethod
     def lock (f):
@@ -50,6 +58,25 @@ class Database (object):
             return r
         
         return wrapper
+
+    def search_types (self):
+        """The types of search supported by the database.
+
+        @return: type
+        @rtype: int"""
+        raise NotImplentedError
+
+    def set_type (self, type):
+        if type & self.search_types() == 0:
+            error("Search type %s not supported by database '%s'.", type, self.__class__.__name__)
+            raise UnsupportedSearchTypeError, type
+
+        self._type = type
+
+    def get_type (self):
+        return self._type
+
+    type = property(get_type, set_type)
 
     def populate (self, category = None):
         """Populates the database.

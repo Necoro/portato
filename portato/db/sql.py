@@ -34,7 +34,7 @@ from .database import Database, PkgData
 
 class SQLDatabase (Database):
     
-    FORMAT = "1"
+    FORMAT = "2"
     FORBIDDEN = (".bzr", ".svn", ".git", "CVS", ".hg", "_darcs")
     lock = Database.lock
 
@@ -68,6 +68,7 @@ class SQLDatabase (Database):
         (
             name TEXT,
             cat TEXT,
+            descr TEXT DEFAULT "",
             inst INTEGER,
             disabled INTEGER
         )""")
@@ -82,6 +83,9 @@ class SQLDatabase (Database):
             self.populate(connection = pkg_conn)
             
         pkg_conn.close()
+
+    def search_types(self):
+        return Database.SEARCH_NAME
 
     def updated (self):
         changed = False
@@ -253,12 +257,22 @@ class SQLDatabase (Database):
             self._restrict = ""
         else:
             restrict = restrict.replace(".*","%").replace(".","_")
+            rest = ""
+
+            if self._type & Database.NAME_DESCRIPTION:
+                if "/" in restrict:
+                    rest = "(name LIKE '%s%%' AND cat LIKE '%s')" % (pkg, cat)
+                else:
+                    rest = "(name LIKE '%%%(restrict)s%%' OR cat LIKE '%(restrict)s%%')" % {"restrict":restrict}
             
-            if "/" in restrict:
-                cat,pkg = restrict.split("/")
-                self._restrict = "AND name LIKE '%s%%' AND cat LIKE '%s'" % (pkg, cat)
-            else:
-                self._restrict = "AND (name LIKE '%%%(restrict)s%%' OR cat LIKE '%(restrict)s%%')" % {"restrict":restrict}
+            if self._type & Database.SEARCH_DESCRIPTION:
+                r = "descr LIKE '%%%(restrict)s%%'" % {"restrict":restrict}
+                if not rest:
+                    rest = "(%s OR %s)" % (r, rest)
+                else:
+                    rest = r
+
+            self._restrict = "AND " + rest
 
     restrict = property(get_restrict, set_restrict)
     con = staticmethod(con)
