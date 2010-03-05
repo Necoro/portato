@@ -85,7 +85,7 @@ class SQLDatabase (Database):
         pkg_conn.close()
 
     def search_types(self):
-        return Database.SEARCH_NAME
+        return self.SEARCH_NAME
 
     def updated (self):
         changed = False
@@ -259,13 +259,13 @@ class SQLDatabase (Database):
             restrict = restrict.replace(".*","%").replace(".","_")
             rest = ""
 
-            if self._type & Database.NAME_DESCRIPTION:
+            if self._type & self.SEARCH_NAME:
                 if "/" in restrict:
                     rest = "(name LIKE '%s%%' AND cat LIKE '%s')" % (pkg, cat)
                 else:
                     rest = "(name LIKE '%%%(restrict)s%%' OR cat LIKE '%(restrict)s%%')" % {"restrict":restrict}
             
-            if self._type & Database.SEARCH_DESCRIPTION:
+            if self._type & self.SEARCH_DESCRIPTION:
                 r = "descr LIKE '%%%(restrict)s%%'" % {"restrict":restrict}
                 if not rest:
                     rest = "(%s OR %s)" % (r, rest)
