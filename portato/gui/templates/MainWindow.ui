@@ -30,6 +30,16 @@
             <property name="visible">True</property>
             <property name="border_width">3</property>
             <child>
+              <object class="GtkComboBox" id="typeCombo">
+                <property name="visible">True</property>
+                <signal name="changed" handler="cb_type_combo_changed"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkEntry" id="searchEntry">
                 <property name="visible">True</property>
                 <signal name="changed" handler="cb_search_changed"/>
@@ -38,7 +48,7 @@
               </object>
               <packing>
                 <property name="padding">5</property>
-                <property name="position">0</property>
+                <property name="position">1</property>
               </packing>
             </child>
             <child>
@@ -54,7 +64,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="padding">5</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child>
@@ -69,7 +79,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="padding">5</property>
-                <property name="position">2</property>
+                <property name="position">3</property>
               </packing>
             </child>
           </object>

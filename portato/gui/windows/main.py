@@ -496,6 +496,8 @@ class MainWindow (Window):
 
         # search entry
         self.searchEntry = self.tree.get_widget("searchEntry")
+        self.typeCombo = self.tree.get_widget("typeCombo")
+        self.build_type_combo()
 
         # queue list
         self.queueOneshot = self.tree.get_widget("oneshotCB")
@@ -870,6 +872,26 @@ class MainWindow (Window):
             self.fill_pkg_store(name = self.selCatName)
         else: # no selCatName -> so no category selected --> ignore
             debug("No category selected --> should be no harm.")
+
+    def build_type_combo (self):
+        model = gtk.ListStore(int, str)
+        for k,v in self.db.TYPES.iteritems():
+            model.append((k,v))
+
+        self.typeCombo.set_model(model)
+        cell = gtk.CellRendererText()
+        self.typeCombo.pack_start(cell)
+        self.typeCombo.set_attributes(cell, text = 1)
+
+
+        for i, (k, v) in enumerate(model):
+            if k == self.db.type: break
+
+        self.typeCombo.set_active(i)
+
+        types = self.db.search_types()
+        if types == 1 or types % 2 == 0:
+            self.typeCombo.set_sensitive(False)
 
     def load_session(self, sessionEx = None, defaults_only = False):
         """
@@ -1562,7 +1584,13 @@ class MainWindow (Window):
 
                 return False # not again ;)
 
-            gobject.timeout_add(100, __update)
+            gobject.timeout_add(200, __update)
+
+    def cb_type_combo_changed (self, *args):
+        model = self.typeCombo.get_model()
+        active = self.typeCombo.get_active()
+
+        self.db.type = model[active][0]
 
     def cb_delete_search_clicked (self, *args):
         self.searchEntry.set_text("")

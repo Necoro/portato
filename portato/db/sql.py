@@ -267,7 +267,7 @@ class SQLDatabase (Database):
             
             if self._type & self.SEARCH_DESCRIPTION:
                 r = "descr LIKE '%%%(restrict)s%%'" % {"restrict":restrict}
-                if not rest:
+                if rest:
                     rest = "(%s OR %s)" % (r, rest)
                 else:
                     rest = r
