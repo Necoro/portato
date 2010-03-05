@@ -100,3 +100,13 @@ def start(file = True):
 def set_log_level (lvl):
     for h in streamhandlers:
         h.setLevel(lvl)
+
+# embed warnings in our logging functionality
+import warnings
+def showwarnings(msg, cat, filename, lineno, file = None, line = None):
+    msg = warnings.formatwarning(msg, cat, filename, lineno, line)
+
+    record = logging.LogRecord("portatoLogger", logging.WARNING, filename, lineno, "Portage Warning: %s", (msg,), None)
+    logging.getLogger("portatoLogger").handle(record)
+
+warnings.showwarning = showwarnings
