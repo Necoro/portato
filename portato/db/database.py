@@ -44,6 +44,13 @@ class Database (object):
     SEARCH_NAME = 1
     SEARCH_DESCRIPTION = 2
 
+    TYPES = {
+            SEARCH_NAME = _("Name"),
+            SEARCH_DESCRIPTION = _("Description"),
+            SEARCH_NAME | SEARCH_DESCRIPTION = _("Name + Description")
+            }
+
+
     def __init__ (self):
         self._lock = RLock()
         self.type = self.SEARCH_NAME
