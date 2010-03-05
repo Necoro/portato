@@ -29,6 +29,7 @@ from ... import get_listener
 from ...helper import debug, warning, error, info
 from ...session import Session
 from ...db import Database
+from ...db.database import UnsupportedSearchTypeError
 from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
 from ...backend.exceptions import PackageNotFoundException, BlockedException, VersionsNotFoundException
 
@@ -496,8 +497,6 @@ class MainWindow (Window):
 
         # search entry
         self.searchEntry = self.tree.get_widget("searchEntry")
-        self.typeCombo = self.tree.get_widget("typeCombo")
-        self.build_type_combo()
 
         # queue list
         self.queueOneshot = self.tree.get_widget("oneshotCB")
@@ -557,6 +556,10 @@ class MainWindow (Window):
         plugin.load_plugin_widgets(self.window)
         
         splash(_("Finishing startup"))
+        
+        # depends on session
+        self.typeCombo = self.tree.get_widget("typeCombo")
+        self.build_type_combo()
         
         self.window.show_all()
     
@@ -1009,6 +1012,14 @@ class MainWindow (Window):
             
             return _save
 
+        # SEARCH TYPE
+        def load_search_type (t):
+            t = int(t)
+            try:
+                self.db.type = t
+            except UnsupportedSearchTypeError:
+                info("Cannot set search type. '%s' not supported by database '%s'.", t, self.db.__class__.__name__)
+
         # SESSION VERSION
         def load_session_version (version):
 
@@ -1037,7 +1048,8 @@ class MainWindow (Window):
             (["width", "height"], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
             (["vpanedpos", "hpanedpos"], load_paned, save_paned),
             (["catsel"], load_cat_selection, save_cat_selection, ["app-portage@0"]),
-            (["pkgsel"], load_pkg_selection, save_pkg_selection, ["portato@0"])
+            (["pkgsel"], load_pkg_selection, save_pkg_selection, ["portato@0"]),
+            (["searchtype"], load_search_type, lambda: self.db.type)
             #([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue),
             ])
 

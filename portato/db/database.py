@@ -14,7 +14,7 @@ from __future__ import absolute_import, with_statement
 
 from threading import RLock
 from functools import wraps
-from ..helper import error
+from ..helper import warning
 
 class UnsupportedSearchTypeError(Exception):
     pass
@@ -74,8 +74,7 @@ class Database (object):
         raise NotImplentedError
 
     def set_type (self, type):
-        if type & self.search_types() == 0:
-            error("Search type %s not supported by database '%s'.", type, self.__class__.__name__)
+        if type & self.search_types() != type:
             raise UnsupportedSearchTypeError, type
 
         self._type = type
