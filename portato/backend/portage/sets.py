@@ -102,7 +102,7 @@ class InstalledSet (Set):
         else:
             t = system.settings.vartree.dbapi.match(key)
             if not with_version:
-                t = itt.imap(portage.dep.dep_getkey, t)
+                t = itt.imap(portage.cpv_getkey, t)
 
         return set(t)
 
