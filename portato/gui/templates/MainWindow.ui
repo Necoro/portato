@@ -53,7 +53,7 @@
             </child>
             <child>
               <object class="GtkButton" id="deleteSearchButton">
-                <property name="label">gtk-delete</property>
+                <property name="label">gtk-clear</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
