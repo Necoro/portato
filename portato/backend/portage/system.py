@@ -262,7 +262,7 @@ class PortageSystem (SystemInterface):
             if not best:
                 return
 
-            if not best.is_installed() and (best.is_masked() or best.is_testing(True)): # check to not update unnecessairily
+            if not best.is_installed() and (best.is_masked() or best.is_testing(True)): # check to not update unnecessarily
                 for i in inst:
                     if i.matches(crit):
                         debug("The installed %s matches %s. Discarding upgrade to masked version %s.", i.get_cpv(), crit, best.get_version())

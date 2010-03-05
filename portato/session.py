@@ -124,7 +124,7 @@ class Session (object):
         for options, lfn, sfn, default in self._handlers:
             vals = sfn()
             
-            # map into list if necessairy
+            # map into list if necessary
             if not hasattr(vals, "__iter__"):
                 vals = [vals]
             debug("Saving %s with values %s", options, vals)

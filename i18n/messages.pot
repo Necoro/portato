@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-05 21:15+0100\n"
+"POT-Creation-Date: 2010-03-05 21:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -457,7 +457,7 @@ msgstr ""
 #: portato/gui/dialogs.py:71
 msgid ""
 "Portato will write these changes into the appropriate files.\n"
-"Please backup them if you think it is necessairy."
+"Please backup them if you think it is necessary."
 msgstr ""
 
 #: portato/gui/dialogs.py:80

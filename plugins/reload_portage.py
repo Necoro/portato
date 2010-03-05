@@ -15,7 +15,7 @@ from portato.backend import system
 class ReloadPortage (Plugin):
     __author__ = "René 'Necoro' Neumann"
     __description__ = """Reloads portage when an emerge process has finished.
-This can take some time, but sometimes it is necessairy."""
+This can take some time, but sometimes it is necessary."""
     
     def init(self):
         self.add_call("after_emerge", self.hook, type = "after", dep = "EtcProposals")

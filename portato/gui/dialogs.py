@@ -68,7 +68,7 @@ def nothing_found_dialog ():
 def changed_flags_dialog (what = "flags"):
     check = gtk.CheckButton(_("Do not show this dialog again."))
     hintMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("Changed %s") % what)
-    hintMB.format_secondary_text(_("Portato will write these changes into the appropriate files.\nPlease backup them if you think it is necessairy."))
+    hintMB.format_secondary_text(_("Portato will write these changes into the appropriate files.\nPlease backup them if you think it is necessary."))
     hintMB.vbox.add(check)
     hintMB.vbox.show_all()
     ret = hintMB.run()
