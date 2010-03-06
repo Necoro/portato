@@ -15,7 +15,7 @@ from __future__ import absolute_import
 import gtk
 
 from .basic import AbstractDialog
-from ...constants import VERSION, APP_ICON
+from ...constants import VERSION
 
 class AboutWindow (AbstractDialog):
     """A window showing the "about"-informations."""
@@ -24,11 +24,8 @@ class AboutWindow (AbstractDialog):
 
         AbstractDialog.__init__(self, parent)
 
-        img = gtk.Image()
-        img.set_from_file(APP_ICON)
-
         self.window.set_version(VERSION)
-        self.window.set_logo(img.get_pixbuf())
+        self.window.set_logo(None)
 
         self.window.show_all()
 
