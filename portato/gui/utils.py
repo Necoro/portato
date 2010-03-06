@@ -73,12 +73,12 @@ class Config (ConfigParser):
         @see: L{flags.set_config()}"""
 
         flagCfg = {
-                "usefile": self.get("useFile"),
-                "usePerVersion" : self.get_boolean("usePerVersion"),
-                "maskfile" : self.get("maskFile"),
-                "maskPerVersion" : self.get_boolean("maskPerVersion"),
-                "testingfile" : self.get("keywordFile"),
-                "testingPerVersion" : self.get_boolean("keywordPerVersion")}
+                "usefile": self.get("useFile", "backend"),
+                "usePerVersion" : self.get_boolean("usePerVersion", "backend"),
+                "maskfile" : self.get("maskFile", "backend"),
+                "maskPerVersion" : self.get_boolean("maskPerVersion", "backend"),
+                "testingfile" : self.get("keywordFile", "backend"),
+                "testingPerVersion" : self.get_boolean("keywordPerVersion", "backend")}
         flags.set_config(flagCfg)
 
     def modify_debug_config (self):

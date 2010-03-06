@@ -30,26 +30,26 @@ class PreferenceWindow (AbstractDialog):
     checkboxes = {
             "collapseCatCheck"        : ("collapseCats", "GUI"),
             "consoleUpdateCheck"    : ("updateConsole", "GUI"),
-            "debugCheck"            : "debug",
-            "deepCheck"                : "deep",
-            "newUseCheck"            : "newuse",
-            "maskPerVersionCheck"    : "maskPerVersion",
+            "debugCheck"            : ("debug", "MAIN"),
+            "deepCheck"                : ("deep", "backend"),
+            "newUseCheck"            : ("newuse", "backend"),
+            "maskPerVersionCheck"    : ("maskPerVersion", "backend"),
             "minimizeCheck"            : ("hideOnMinimize", "GUI"),
             "searchOnTypeCheck"        : ("searchOnType", "GUI"),
             "showSlotsCheck"        : ("showSlots", "GUI"),
             "systrayCheck"            : ("showSystray", "GUI"),
-            "testPerVersionCheck"    : "keywordPerVersion",
+            "testPerVersionCheck"    : ("keywordPerVersion", "backend"),
             "titleUpdateCheck"        : ("updateTitle", "GUI"),
-            "usePerVersionCheck"    : "usePerVersion"
+            "usePerVersionCheck"    : ("usePerVersion", "backend")
             }
     
     # all edits in the window
     # widget name -> option name
     edits = {
-            "maskFileEdit"        : "maskFile",
-            "testFileEdit"        : "keywordFile",
-            "useFileEdit"        : "useFile",
-            "syncCommandEdit"    : "syncCommand",
+            "maskFileEdit"        : ("maskFile", "backend"),
+            "testFileEdit"        : ("keywordFile", "backend"),
+            "useFileEdit"        : ("useFile", "backend"),
+            "syncCommandEdit"    : ("syncCommand", "backend"),
             "browserEdit"        : ("browserCmd", "GUI")
             }
 
@@ -112,17 +112,11 @@ class PreferenceWindow (AbstractDialog):
 
         # the checkboxes
         for box, val in self.checkboxes.iteritems():
-            if isinstance(val, tuple):
-                self.tree.get_widget(box).set_active(self.cfg.get_boolean(val[0], section = val[1]))
-            else:
-                self.tree.get_widget(box).set_active(self.cfg.get_boolean(val))
+            self.tree.get_widget(box).set_active(self.cfg.get_boolean(val[0], section = val[1]))
 
         # the edits
         for edit, val in self.edits.iteritems():
-            if isinstance(val,tuple):
-                self.tree.get_widget(edit).set_text(self.cfg.get(val[0], section = val[1]))
-            else:
-                self.tree.get_widget(edit).set_text(self.cfg.get(val))
+            self.tree.get_widget(edit).set_text(self.cfg.get(val[0], section = val[1]))
 
         # the set list
         self.setList = self.tree.get_widget("setList")
@@ -192,16 +186,10 @@ class PreferenceWindow (AbstractDialog):
         """Sets all options in the Config-instance."""
         
         for box, val in self.checkboxes.iteritems():
-            if isinstance(val, tuple):
-                self.cfg.set(val[0], self.tree.get_widget(box).get_active(), section = val[1])
-            else:
-                self.cfg.set(val, self.tree.get_widget(box).get_active())
+            self.cfg.set(val[0], self.tree.get_widget(box).get_active(), section = val[1])
 
         for edit, val in self.edits.iteritems():
-            if isinstance(val,tuple):
-                self.cfg.set(val[0], self.tree.get_widget(edit).get_text(), section = val[1])
-            else:
-                self.cfg.set(val,self.tree.get_widget(edit).get_text())
+            self.cfg.set(val[0], self.tree.get_widget(edit).get_text(), section = val[1])
 
         if system.has_set_support():
             self.cfg.set("updatesets", ", ".join(sorted(name for enabled, markup, descr, name in self.setList.get_model() if enabled)))
@@ -240,7 +228,7 @@ class PreferenceWindow (AbstractDialog):
     def fill_setlist (self):
         store = gtk.ListStore(bool, str, str, str)
 
-        enabled = [x.strip() for x in self.cfg.get("updatesets").split(",")]
+        enabled = [x.strip() for x in self.cfg.get("updatesets", section = "backend").split(",")]
         
         for set, descr in system.get_sets(description = True):
             store.append([set in enabled, "<i>%s</i>" % set, descr, set])

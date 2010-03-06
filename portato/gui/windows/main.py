@@ -1473,7 +1473,7 @@ class MainWindow (Window):
         elif self.queueTree.is_in_unmerge(iter):
             self.queue.unmerge(force = True)
         else:
-            self.queue.update_world(sets = self.updateSets, force=True, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
+            self.queue.update_world(sets = self.updateSets, force=True, newuse = self.cfg.get_boolean("newuse", "backend"), deep = self.cfg.get_boolean("deep", "backend"))
 
         return True
         
@@ -1500,11 +1500,11 @@ class MainWindow (Window):
             self.window.window.set_cursor(watch)
             try:
                 if system.has_set_support():
-                    confsets = [x.strip() for x in self.cfg.get("updatesets").split(",")]
+                    confsets = [x.strip() for x in self.cfg.get("updatesets", "backend").split(",")]
                     self.updateSets = [s for s in confsets if s in system.get_sets()]
-                    updating = system.update_world(sets = self.updateSets, newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
+                    updating = system.update_world(sets = self.updateSets, newuse = self.cfg.get_boolean("newuse", "backend"), deep = self.cfg.get_boolean("deep", "backend"))
                 else:
-                    updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep"))
+                    updating = system.update_world(newuse = self.cfg.get_boolean("newuse"), deep = self.cfg.get_boolean("deep", "backend"))
                     self.updateSets = ("world",)
                 
                 debug("updating list: %s --> length: %s", [(x.get_cpv(), y.get_cpv()) for x,y in updating], len(updating))
@@ -1547,7 +1547,7 @@ class MainWindow (Window):
 
     def cb_sync_clicked (self, action):
         self.sysNotebook.set_current_page(self.CONSOLE_PAGE)
-        cmd = self.cfg.get("syncCommand")
+        cmd = self.cfg.get("syncCommand", "backend")
 
         if cmd != "emerge --sync":
             cmd = cmd.split()
