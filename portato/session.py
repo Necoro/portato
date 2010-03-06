@@ -15,10 +15,12 @@ from __future__ import absolute_import, with_statement
 import os
 from UserDict import DictMixin
 
-from .config_parser import ConfigParser, SectionNotFoundException
+from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
 from .constants import SESSION_DIR
 from .helper import debug, info
+from .odict import OrderedDict
 
+NoSuchThing = (NoSectionError, NoOptionError)
 sessionlist = []
 
 class Session (object):
@@ -44,37 +46,31 @@ class Session (object):
         @param register: register in the global sessionlist, which is closed at the end
         """
 
-        self._cfg = None
+        self._cfg = SafeConfigParser({}, OrderedDict)
         self._handlers = []
         self._name = name if name else "MAIN"
+        self._file = os.path.join(SESSION_DIR, file)
 
         if not (os.path.exists(SESSION_DIR) and os.path.isdir(SESSION_DIR)):
             os.mkdir(SESSION_DIR)
 
-        file = os.path.join(SESSION_DIR, file)
         oldfiles = [os.path.join(SESSION_DIR, x) for x in oldfiles]
 
-        if not os.path.exists(file):
+        if not os.path.exists(self._file):
             for o in oldfiles:
                 if os.path.exists(o):
                     debug("Moving old session file '%s' to '%s'." % (o, file))
-                    os.rename(o,file)
+                    os.rename(o,self._file)
                     break
 
-        self._cfg = ConfigParser(file)
+        self._cfg.read([self._file])
 
         if name:
-            i = _("Loading '%s' session from %s.") % (name, self._cfg.file)
+            i = _("Loading '%s' session from %s.") % (name, self._file)
         else:
-            i = _("Loading session from %s.") % self._cfg.file
+            i = _("Loading session from %s.") % self._file
 
         info(i)
-
-        try:
-            self._cfg.parse()
-        except IOError, e:
-            if e.errno == 2: pass
-            else: raise
 
         # register
         if register: sessionlist.append(self)
@@ -90,7 +86,8 @@ class Session (object):
             - a function returning the number of option return values - getting them out of the program
         """
 
-        options = map(lambda x: (x, self._name) if not hasattr(x, "__iter__") else x, options)
+        convert = lambda (x,y): (y.upper(), x.lower())
+        options = map(lambda x: (self._name, x.lower()) if not hasattr(x, "__iter__") else convert(x), options)
         self._handlers.append((options, load_fn, save_fn, default))
 
     def load (self, defaults_only = False):
@@ -109,7 +106,7 @@ class Session (object):
             else:
                 try:
                     loaded = [self._cfg.get(*x) for x in options]
-                except KeyError: # does not exist -> ignore
+                except NoSuchThing: # does not exist -> ignore
                     debug("No values for %s.", options)
                     ldefault(options, lfn, default)
                 else:
@@ -129,86 +126,71 @@ class Session (object):
                 vals = [vals]
             debug("Saving %s with values %s", options, vals)
 
-            for value, (option, section) in zip(vals, options):
+            for value, (section, option) in zip(vals, options):
                 self.set(option, str(value), section)
         
-        self._cfg.write()
+        with open(self._file, "w") as f:
+            self._cfg.write(f)
 
     @classmethod
     def close (cls):
         for s in sessionlist:
             if s._name != "MAIN":
-                info(_("Saving '%s' session to %s.") % (s._name, s._cfg.file))
+                info(_("Saving '%s' session to %s.") % (s._name, s._file))
             else:
-                info(_("Saving session to %s.") % s._cfg.file)
+                info(_("Saving session to %s.") % s._file)
             s.save()
 
-    def set (self, key, value, section = ""):
-        if not section: section = self._name
-
-        try:
-            self._cfg.add(key, value, section, with_blankline = False)
-        except SectionNotFoundException:
-            self._cfg.add_section(section)
-            self._cfg.add(key, value, section, with_blankline = False)
-    
-    def get (self, key, section = ""):
-        if not section: section = self._name
-
-        try:
-            return self._cfg.get(key, section)
-        except KeyError:
-            return None
-    
-    def get_boolean (self, key, section = ""):
-        if not section: section = self._name
-
-        try:
-            return self._cfg.get_boolean(key, section)
-        except KeyError:
-            return None
-
-    def remove (self, key, section = ""):
-        if not section: section = self._name
-
+    def set (self, key, value, section = None):
+        if section is None: section = self._name
         section = section.upper()
-        key = key.lower()
 
-        val = self._cfg._access(key, section)
-        del self._cfg.cache[val.line]
+        try:
+            self._cfg.set(section, key, value)
+        except NoSectionError:
+            self._cfg.add_section(section)
+            self._cfg.set(section, key, value)
+    
+    def get (self, key, section = None):
+        if section is None: section = self._name
+        section = section.upper()
 
-        self._cfg.write()
+        try:
+            return self._cfg.get(section, key)
+        except NoSuchThing:
+            return None
+    
+    def remove (self, key, section = None):
+        if section is None: section = self._name
+        section = section.upper()
+
+        self._cfg.remove_option(section, key)
 
     def remove_section (self, section):
         section = section.upper()
+        self._cfg.remove_section(section)
 
-        sline = self._cfg.sections[section]
+    def rename (self, old, new, section = None):
+        if section is None: section = self._name
+        section = section.upper()
 
-        try:
-            mline = max(v.line for v in self._cfg.vars[section].itervalues())
-        except ValueError: # nothing in the section
-            mline = sline
-        
-        sline = max(sline - 1, 0) # remove blank line too - but only if there is one ;)
-
-        del self._cfg.cache[sline:mline+1]
-        self._cfg.write()
-
-    def rename (self, old, new, section = ""):
-        if not section: section = self._name
-        
         val = self.get(old, section)
-        self.remove(old, section)
-        self._cfg.add(new, val, section, with_blankline = False)
+
+        if val is not None:
+            self.remove(old, section)
+            self.set(new, val, section)
 
     def rename_section (self, old, new):
-        old = old.upper()
-        line = self._cfg.sections[old]
-        self._cfg.cache[line] = "[%s]\n" % new.upper()
-        self._cfg.write()
+        new = new.upper()
+
+        values = self._cfg.items(old)
+        self.remove_section(old)
+        for k,v in values:
+            self.set(k,v,new)
 
     def check_version (self, vers):
         pass # do nothing atm
+
 
 class SectionDict (DictMixin):
     """A class, which maps a specific section of a session to a dictionary."""
@@ -231,7 +213,7 @@ class SectionDict (DictMixin):
         self._session.remove(name, self._section)
 
     def keys (self):
-        return self._session._cfg.vars[self._section].keys()
+        return self._session._cfg.options(self._section)
 
     def __contains__ (self, name):
-        return self._session.get(name, self._section) is not None
+        return self._session._cfg.has_option(self._section, name)
