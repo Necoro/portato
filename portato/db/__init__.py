@@ -40,7 +40,7 @@ def Database(type = None):
             return _DATABASE
     
     if _SESSION is None:
-        _SESSION = Session("db.cfg", name = "DB")
+        _SESSION = Session("db.session", name = "DB", oldfiles = ["db.cfg"])
         _SESSION.load()
 
     _TYPE = type
