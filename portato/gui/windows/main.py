@@ -1070,7 +1070,7 @@ class MainWindow (Window):
         queue = plugin.get_plugin_queue()
         if queue:
             for p in queue.get_plugins():
-                self.session.add_handler(([(p.name.replace(" ","_"), "plugins")], load_plugin(p), save_plugin(p)))
+                self.session.add_handler(([(p.name.replace(" ","_").replace(":","_"), "plugins")], load_plugin(p), save_plugin(p)))
 
         # the other things
         def load_cfg ((name, cat)):
