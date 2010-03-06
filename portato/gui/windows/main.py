@@ -30,7 +30,7 @@ from ...helper import debug, warning, error, info
 from ...session import Session
 from ...db import Database
 from ...db.database import UnsupportedSearchTypeError
-from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
+from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, ICON_DIR
 from ...backend.exceptions import PackageNotFoundException, BlockedException, VersionsNotFoundException
 
 # plugin stuff
@@ -435,18 +435,27 @@ class MainWindow (Window):
         self.window.set_geometry_hints (self.window, max_height = gtk.gdk.screen_height(), max_width = gtk.gdk.screen_width())
         
         # app icon
-        self.window.set_icon_from_file(APP_ICON)
-        gtk.window_set_default_icon(self.window.get_icon())
+        gtk.window_set_default_icon_from_file(APP_ICON)
         
         # booleans
         self.doUpdate = False
         self.showAll = True # show only installed or all packages?
         self.__searchChanged = False
 
+        # our own icon factory
+        fac = gtk.IconFactory()
+        iSet = gtk.IconSet()
+        iSource = gtk.IconSource()
+        iSource.set_filename(os.path.abspath(os.path.join(ICON_DIR, "better-package.svg")))
+        iSet.add_source(iSource)
+        fac.add("portato-better-pkg", iSet)
+        fac.add_default()
+
         # icons
         self.icons = {}
         self.icons["installed"] = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
         self.icons["or"] = self.window.render_icon(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_MENU)
+        self.icons["better"] = self.window.render_icon("portato-better-pkg", gtk.ICON_SIZE_MENU)
         
         # get the logging window as soon as possible
         self.logView = LogView(self.tree.get_widget("logView"))
@@ -787,10 +796,14 @@ class MainWindow (Window):
         if not packages:
             raise VersionsNotFoundException(cp)
         
+        best = system.find_best_match(cp)
+
         # append versions
         for vers, inst, slot in ((x.get_version(), x.is_installed(), get_slot(x)) for x in packages):
             if inst:
                 icon = self.icons["installed"]
+            elif best is not None and vers == best.get_version():
+                icon = self.icons["better"]
             else:
                 icon = None
                 
