@@ -25,13 +25,6 @@ Thanks goto:
 	- The Porthole team, which often inspired me and gave me hints :)
 	- franzf, who often tested and gave comments
 	- the Sabayon-Distro for making Portato the default Portage-GUI</property>
-    <property name="translator_credits">Catalan - Roger Calv&#xF3;
-German - Ren&#xE9; 'Necoro' Neumann
-Italian - Ponsi
-Polish - Tomasz Osi&#x144;ski
-Portugese (Brazilian) - Alberto Federman Neto
-Spanish - Daniel Halens
-Turkish - G&#xFC;rkan 'seqizz' G&#xFC;r</property>
     <property name="artists">p4r4d0x (inspired by wolfden)</property>
     <signal name="response" handler="close"/>
     <child internal-child="vbox">

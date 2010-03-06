@@ -10,12 +10,13 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
+import os
 import gtk
 
 from .basic import AbstractDialog
-from ...constants import VERSION, REVISION
+from ...constants import VERSION, REVISION, DATA_DIR
 
 class AboutWindow (AbstractDialog):
     """A window showing the "about"-informations."""
@@ -26,6 +27,9 @@ class AboutWindow (AbstractDialog):
 
         self.window.set_version(VERSION)
         self.window.set_logo(None)
+
+        with open(os.path.join(DATA_DIR, "TRANSLATORS")) as f:
+            self.window.set_translator_credits("".join(f.readlines()))
 
         if REVISION:
             gitlabel = self.tree.get_widget("gitLabel")
