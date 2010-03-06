@@ -29,7 +29,7 @@ from ... import get_listener
 from ...helper import debug, warning, error, info
 from ...session import Session
 from ...db import Database
-from ...constants import CONFIG_LOCATION, VERSION, APP_ICON
+from ...constants import CONFIG_LOCATION, VERSION, APP_ICON, ICON_DIR
 from ...backend.exceptions import PackageNotFoundException, BlockedException, VersionsNotFoundException
 
 # plugin stuff
@@ -441,10 +441,20 @@ class MainWindow (Window):
         self.showAll = True # show only installed or all packages?
         self.__searchChanged = False
 
+        # our own icon factory
+        fac = gtk.IconFactory()
+        iSet = gtk.IconSet()
+        iSource = gtk.IconSource()
+        iSource.set_filename(os.path.abspath(os.path.join(ICON_DIR, "better-package.svg")))
+        iSet.add_source(iSource)
+        fac.add("portato-better-pkg", iSet)
+        fac.add_default()
+
         # icons
         self.icons = {}
         self.icons["installed"] = self.window.render_icon(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
         self.icons["or"] = self.window.render_icon(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_MENU)
+        self.icons["better"] = self.window.render_icon("portato-better-pkg", gtk.ICON_SIZE_MENU)
         
         # get the logging window as soon as possible
         self.logView = LogView(self.tree.get_widget("logView"))
@@ -781,10 +791,14 @@ class MainWindow (Window):
         if not packages:
             raise VersionsNotFoundException(cp)
         
+        best = system.find_best([x.get_cpv() for x in packages]).get_version()
+
         # append versions
         for vers, inst, slot in ((x.get_version(), x.is_installed(), get_slot(x)) for x in packages):
             if inst:
                 icon = self.icons["installed"]
+            elif vers == best:
+                icon = self.icons["better"]
             else:
                 icon = None
                 
