@@ -791,13 +791,13 @@ class MainWindow (Window):
         if not packages:
             raise VersionsNotFoundException(cp)
         
-        best = system.find_best([x.get_cpv() for x in packages]).get_version()
+        best = system.find_best_match(cp)
 
         # append versions
         for vers, inst, slot in ((x.get_version(), x.is_installed(), get_slot(x)) for x in packages):
             if inst:
                 icon = self.icons["installed"]
-            elif vers == best:
+            elif best is not None and vers == best.get_version():
                 icon = self.icons["better"]
             else:
                 icon = None
