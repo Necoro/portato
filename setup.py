@@ -17,7 +17,7 @@ import sys
 from distutils.core import setup
 from distutils.extension import Extension
 
-from portato.constants import VERSION, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR, APP
+from portato.constants import VERSION, ICON_DIR, PLUGIN_DIR, DATA_DIR, TEMPLATE_DIR, APP
 
 from build_manpage import build_manpage
 
