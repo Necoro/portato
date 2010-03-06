@@ -16,7 +16,6 @@ import sys
 
 from distutils.core import setup
 from distutils.extension import Extension
-from Cython.Distutils import build_ext
 
 from portato.constants import VERSION, ICON_DIR, PLUGIN_DIR, TEMPLATE_DIR, APP
 
@@ -36,20 +35,34 @@ packages = [
 
 data_files = [
         (TEMPLATE_DIR, [os.path.join("portato/gui/templates",x) for x in os.listdir("portato/gui/templates") if (x.endswith(".ui") or x.endswith(".menu"))]),
-        (ICON_DIR, ["icons/portato-icon.png"]),
+        (ICON_DIR, ["icons/portato-icon.png", "icons/better-package.svg"]),
         (PLUGIN_DIR, plugin_list("gpytage", "notify", "etc_proposals", "reload_portage", "package_details"))]
 
+cmdclass = {'build_manpage': build_manpage}
+
+# remove useless options / they are the default
+for o in ("cython", "eix"):
+    try:
+        sys.argv.remove("--enable-"+o)
+    except ValueError:
+        pass
+
 # extension stuff
-ext_modules = [Extension("portato.ipc", ["portato/ipc.pyx"])]
+if "--disable-cython" in sys.argv:
+    sys.argv.remove("--disable-cython")
+    ext = "c"
+else:
+    from Cython.Distutils import build_ext
+    cmdclass['build_ext'] = build_ext
+    ext = "pyx"
+
+ext_modules = [Extension("portato.ipc", ["portato/ipc."+ext])]
 
 if "--disable-eix" in sys.argv:
     sys.argv.remove("--disable-eix")
 else:
-    ext_modules.append(Extension("portato.eix.parser", ["portato/eix/parser.pyx"]))
+    ext_modules.append(Extension("portato.eix.parser", ["portato/eix/parser."+ext]))
     packages.append("portato.eix")
-
-    if "--enable-eix" in sys.argv:
-        sys.argv.remove("--enable-eix")
 
 # do the distutils setup
 setup(name=APP,
@@ -64,5 +77,5 @@ setup(name=APP,
         packages = packages,
         data_files = data_files,
         ext_modules = ext_modules,
-        cmdclass={'build_manpage': build_manpage, 'build_ext' : build_ext}
+        cmdclass = cmdclass
         )
