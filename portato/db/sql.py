@@ -47,6 +47,7 @@ class SQLDatabase (Database):
         
         updateFormat = False
         if "format" not in session or session["format"] != self.FORMAT:
+            debug("Need to update database format from '%s' to '%s'", session["format"], self.FORMAT)
             session["format"] = self.FORMAT
             updateFormat = True
 
@@ -61,6 +62,7 @@ class SQLDatabase (Database):
         pkg_conn = sql.connect(pkgdb)
         pkg_conn.row_factory = sql.Row
         if pkgdb_existed and updateFormat:
+            debug("Dropping old table")
             pkg_conn.execute("DROP TABLE packages")
 
         pkg_conn.execute("""
