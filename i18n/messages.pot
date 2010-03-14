@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-05 21:26+0100\n"
+"POT-Creation-Date: 2010-03-14 20:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -239,7 +239,7 @@ msgid "<b>Author:</b>"
 msgstr ""
 
 #: portato/gui/templates/PluginWindow.ui:141 portato/gui/windows/pkglist.py:59
-#: portato/gui/windows/main.py:830 portato/gui/windows/plugin.py:27
+#: portato/gui/windows/main.py:843 portato/gui/windows/plugin.py:27
 msgid "Enabled"
 msgstr ""
 
@@ -284,16 +284,11 @@ msgid ""
 "what did you do to hit the bug?"
 msgstr ""
 
-#: portato/gui/templates/MailInfoWindow.ui:138
-msgid "Attach _Logfile"
+#: portato/gui/templates/MailInfoWindow.ui:160
+msgid "These files will be sent:"
 msgstr ""
 
-#: portato/gui/templates/MailInfoWindow.ui:142
-msgid ""
-"Attaches the logfile to the mail. This log only contains debug information."
-msgstr ""
-
-#: portato/gui/templates/MailInfoWindow.ui:206
+#: portato/gui/templates/MailInfoWindow.ui:220
 msgid "_Send"
 msgstr ""
 
@@ -337,7 +332,7 @@ msgstr ""
 msgid "<b>Homepage:</b>"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.ui:462 portato/gui/windows/main.py:831
+#: portato/gui/templates/MainWindow.ui:462 portato/gui/windows/main.py:844
 msgid "Installed"
 msgstr ""
 
@@ -387,12 +382,12 @@ msgstr ""
 msgid "Remove the selected package from the queue"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.ui:782 portato/gui/windows/main.py:611
+#: portato/gui/templates/MainWindow.ui:782 portato/gui/windows/main.py:620
 msgid "Queue"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.ui:806 portato/gui/windows/main.py:1240
-#: portato/gui/windows/main.py:1242
+#: portato/gui/templates/MainWindow.ui:806 portato/gui/windows/main.py:1253
+#: portato/gui/windows/main.py:1255
 msgid "Console"
 msgstr ""
 
@@ -485,7 +480,7 @@ msgid ""
 "Please run <i>emerge --sync &amp;&amp; layman -S</i>."
 msgstr ""
 
-#: portato/gui/dialogs.py:123 portato/gui/windows/main.py:1289
+#: portato/gui/dialogs.py:123 portato/gui/windows/main.py:1302
 #, python-format
 msgid "No versions of package '%s' found!"
 msgstr ""
@@ -573,14 +568,15 @@ msgstr ""
 msgid "World Packages"
 msgstr ""
 
-#: portato/gui/windows/mailinfo.py:83
+#: portato/gui/windows/mailinfo.py:144
 #, python-format
 msgid ""
 "An error occurred while sending. I think we were greylisted. The error: %s"
 msgstr ""
 
-#: portato/gui/windows/mailinfo.py:84
-msgid "Retrying after waiting 60 seconds."
+#: portato/gui/windows/mailinfo.py:145
+#, python-format
+msgid "Retrying after waiting %d seconds."
 msgstr ""
 
 #: portato/gui/windows/splash.py:35
@@ -608,7 +604,7 @@ msgstr ""
 msgid "Package Set"
 msgstr ""
 
-#: portato/gui/windows/preference.py:259 portato/gui/windows/main.py:833
+#: portato/gui/windows/preference.py:259 portato/gui/windows/main.py:846
 #: portato/db/database.py:49 portato/db/database.py:50
 msgid "Description"
 msgstr ""
@@ -634,90 +630,90 @@ msgstr ""
 msgid "Masked by user"
 msgstr ""
 
-#: portato/gui/windows/main.py:455
+#: portato/gui/windows/main.py:464
 msgid "Loading Config"
 msgstr ""
 
-#: portato/gui/windows/main.py:467
+#: portato/gui/windows/main.py:476
 msgid "Creating Database"
 msgstr ""
 
-#: portato/gui/windows/main.py:471
+#: portato/gui/windows/main.py:480
 msgid "Loading Plugins"
 msgstr ""
 
-#: portato/gui/windows/main.py:479
+#: portato/gui/windows/main.py:488
 msgid "Building frontend"
 msgstr ""
 
-#: portato/gui/windows/main.py:545
+#: portato/gui/windows/main.py:554
 msgid "Restoring Session"
 msgstr ""
 
-#: portato/gui/windows/main.py:555
+#: portato/gui/windows/main.py:564
 msgid "Loading Plugin Widgets"
 msgstr ""
 
-#: portato/gui/windows/main.py:558
+#: portato/gui/windows/main.py:567
 msgid "Finishing startup"
 msgstr ""
 
-#: portato/gui/windows/main.py:614
+#: portato/gui/windows/main.py:623
 msgid "Options"
 msgstr ""
 
-#: portato/gui/windows/main.py:630
+#: portato/gui/windows/main.py:639
 msgid "Categories"
 msgstr ""
 
-#: portato/gui/windows/main.py:689
+#: portato/gui/windows/main.py:698
 msgid "Packages"
 msgstr ""
 
-#: portato/gui/windows/main.py:724
+#: portato/gui/windows/main.py:733
 #, python-format
 msgid "Package '%s/%s' is disabled."
 msgstr ""
 
-#: portato/gui/windows/main.py:741
+#: portato/gui/windows/main.py:750
 msgid "Versions"
 msgstr ""
 
-#: portato/gui/windows/main.py:744
+#: portato/gui/windows/main.py:753
 msgid "Slot"
 msgstr ""
 
-#: portato/gui/windows/main.py:832
+#: portato/gui/windows/main.py:845
 msgid "Flag"
 msgstr ""
 
-#: portato/gui/windows/main.py:856
+#: portato/gui/windows/main.py:869
 msgid "This is an expanded use flag and cannot be selected"
 msgstr ""
 
-#: portato/gui/windows/main.py:914
+#: portato/gui/windows/main.py:927
 #, python-format
 msgid "Translating session from version %d to %d."
 msgstr ""
 
-#: portato/gui/windows/main.py:917
+#: portato/gui/windows/main.py:930
 #, python-format
 msgid "Cannot translate session from version %d to %d."
 msgstr ""
 
-#: portato/gui/windows/main.py:1425
+#: portato/gui/windows/main.py:1438
 msgid "use flags"
 msgstr ""
 
-#: portato/gui/windows/main.py:1437
+#: portato/gui/windows/main.py:1450
 msgid "masking keywords"
 msgstr ""
 
-#: portato/gui/windows/main.py:1838
+#: portato/gui/windows/main.py:1851
 msgid "The portage tree is not existing."
 msgstr ""
 
-#: portato/gui/windows/main.py:1842
+#: portato/gui/windows/main.py:1855
 msgid "The portage tree seems to be empty."
 msgstr ""
 
@@ -920,22 +916,22 @@ msgstr ""
 msgid "Populating database..."
 msgstr ""
 
-#: portato/session.py:67
+#: portato/session.py:69
 #, python-format
 msgid "Loading '%s' session from %s."
 msgstr ""
 
-#: portato/session.py:69
+#: portato/session.py:71
 #, python-format
 msgid "Loading session from %s."
 msgstr ""
 
-#: portato/session.py:141
+#: portato/session.py:139
 #, python-format
 msgid "Saving '%s' session to %s."
 msgstr ""
 
-#: portato/session.py:143
+#: portato/session.py:141
 #, python-format
 msgid "Saving session to %s."
 msgstr ""
