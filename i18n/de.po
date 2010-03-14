@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-14 20:01+0100\n"
-"PO-Revision-Date: 2010-03-14 20:01+0100\n"
+"POT-Creation-Date: 2010-03-14 21:03+0100\n"
+"PO-Revision-Date: 2010-03-14 21:04+0100\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -426,49 +426,63 @@ msgid "The error was: %s"
 msgstr "Der Fehler war: %s"
 
 #: portato/gui/dialogs.py:24
+msgid "No email address given"
+msgstr "Keine Email-Adresse gegeben"
+
+#: portato/gui/dialogs.py:25
+msgid ""
+"You haven't specified an email address. Without it, it will not be possible for the developers to contact you for questions and thus it might be harder to fix the bug.\n"
+"\n"
+"Do you want to proceed nevertheless?"
+msgstr ""
+"Du hast keine Email-Adresse angegeben. Daher ist es nicht möglich, dass die Entwickler dich kontaktieren können und es kann daher sein, dass der Bug schwerer zu beseitigen ist.\n"
+"\n"
+"Trotzdem fortfahren?"
+
+#: portato/gui/dialogs.py:31
 msgid "Do you really want to quit?"
 msgstr "Wirklich beenden?"
 
-#: portato/gui/dialogs.py:25
+#: portato/gui/dialogs.py:32
 msgid "There are some packages in the emerge queue and/or an emerge process is running."
 msgstr "Es sind noch Pakete in der Emerge-Queue und/oder emerge läuft noch."
 
-#: portato/gui/dialogs.py:43
+#: portato/gui/dialogs.py:50
 #, python-format
 msgid "%(blocked)s is blocked by %(blocks)s."
 msgstr "%(blocks)s blockiert %(blocked)s."
 
-#: portato/gui/dialogs.py:44
+#: portato/gui/dialogs.py:51
 msgid "Please unmerge the blocking package."
 msgstr "Bitte deinstalliere das blockierende Paket."
 
-#: portato/gui/dialogs.py:50
+#: portato/gui/dialogs.py:57
 msgid "You are not root."
 msgstr "Du bist nicht root."
 
-#: portato/gui/dialogs.py:56
+#: portato/gui/dialogs.py:63
 #, python-format
 msgid "%s seems to be masked."
 msgstr "%s scheint maskiert zu sein."
 
-#: portato/gui/dialogs.py:57
+#: portato/gui/dialogs.py:64
 msgid "Do you want to unmask it and its dependencies?"
 msgstr "Soll das Paket und seine Abhängigkeiten demaskiert werden?"
 
-#: portato/gui/dialogs.py:63
+#: portato/gui/dialogs.py:70
 msgid "Package not found!"
 msgstr "Paket nicht gefunden!"
 
-#: portato/gui/dialogs.py:69
+#: portato/gui/dialogs.py:76
 msgid "Do not show this dialog again."
 msgstr "Diesen Dialog nicht wieder anzeigen."
 
-#: portato/gui/dialogs.py:70
+#: portato/gui/dialogs.py:77
 #, python-format
 msgid "Changed %s"
 msgstr "%s wurde geändert"
 
-#: portato/gui/dialogs.py:71
+#: portato/gui/dialogs.py:78
 msgid ""
 "Portato will write these changes into the appropriate files.\n"
 "Please backup them if you think it is necessary."
@@ -476,11 +490,11 @@ msgstr ""
 "Portato wird diese Änderungen speichern.\n"
 "Bitte sichere die entsprechenden Dateien, wenn du es als notwendig erachtest."
 
-#: portato/gui/dialogs.py:80
+#: portato/gui/dialogs.py:87
 msgid "You cannot remove dependencies. :)"
 msgstr "Du kannst keine Abhängigkeiten löschen ;)."
 
-#: portato/gui/dialogs.py:86
+#: portato/gui/dialogs.py:93
 msgid ""
 "This is the updates queue. You cannot remove single elements.\n"
 "Do you want to clear the whole queue instead?"
@@ -488,15 +502,15 @@ msgstr ""
 "Das ist die Update-Queue. Aus dieser können keine einzelnen Pakete entfernt werden.\n"
 "Soll stattdessen die komplette Queue entfernt werden?"
 
-#: portato/gui/dialogs.py:92
+#: portato/gui/dialogs.py:99
 msgid "Do you really want to clear the whole queue?"
 msgstr "Wirklich die gesamte Queue löschen?"
 
-#: portato/gui/dialogs.py:111
+#: portato/gui/dialogs.py:118
 msgid "A prerequisite for starting Portato was not matched."
 msgstr "Eine Vorbedingung um Portato zu starten ist nicht erfüllt."
 
-#: portato/gui/dialogs.py:115
+#: portato/gui/dialogs.py:122
 msgid ""
 "<b>Note</b>: On fresh Sabayon installs or its LiveDVD/-CD, there is no portage tree existing per default.\n"
 "Please run <i>emerge --sync &amp;&amp; layman -S</i>."
@@ -504,7 +518,7 @@ msgstr ""
 "<b>Hinweis</b>: Auf frisch installierten Sabayon-Systemen bzw. der Sabayon LiveDVD/-CD existiert standardmäßig kein Portage-Tree.\n"
 "Bitte führe <i>emerge --sync &amp;&amp; layman -S</i> aus."
 
-#: portato/gui/dialogs.py:123
+#: portato/gui/dialogs.py:130
 #: portato/gui/windows/main.py:1302
 #, python-format
 msgid "No versions of package '%s' found!"
@@ -588,12 +602,12 @@ msgstr "Pakete mit Updates"
 msgid "World Packages"
 msgstr "Pakete in \"World\""
 
-#: portato/gui/windows/mailinfo.py:144
+#: portato/gui/windows/mailinfo.py:145
 #, python-format
 msgid "An error occurred while sending. I think we were greylisted. The error: %s"
 msgstr "Während des Sendes trat ein Fehler auf. Wahrscheinlich wurden wir ge-greylistet. Der Fehler: %s"
 
-#: portato/gui/windows/mailinfo.py:145
+#: portato/gui/windows/mailinfo.py:146
 #, python-format
 msgid "Retrying after waiting %d seconds."
 msgstr "Wiederhole den Versuch nach einer %ds Pause."

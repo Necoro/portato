@@ -20,6 +20,13 @@ def mail_failure_dialog(e):
     dialog.destroy()
     return ret
 
+def no_email_dialog(p):
+    dialog = gtk.MessageDialog(p, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK_CANCEL, _("No email address given"))
+    dialog.format_secondary_text(_("You haven't specified an email address. Without it, it will not be possible for the developers to contact you for questions and thus it might be harder to fix the bug.\n\nDo you want to proceed nevertheless?"))
+    ret = dialog.run()
+    dialog.destroy()
+    return ret
+
 def queue_not_empty_dialog():
     dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, _("Do you really want to quit?"))
     dialog.format_secondary_text(_("There are some packages in the emerge queue and/or an emerge process is running."))

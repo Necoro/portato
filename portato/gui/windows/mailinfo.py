@@ -21,7 +21,7 @@ from os.path import basename
 
 from .basic import AbstractDialog
 from ..utils import GtkThread
-from ..dialogs import mail_failure_dialog
+from ..dialogs import mail_failure_dialog, no_email_dialog
 from ...helper import debug, info
 from ...constants import VERSION, CONFIG_LOCATION
 from ...log import LOGFILE
@@ -61,6 +61,7 @@ class MailInfoWindow (AbstractDialog):
         self.fileList = self.tree.get_widget("fileList")
         self.build_file_list()
         
+        self.mailEntry = self.tree.get_widget("mailEntry")
         self.tb = tb
         self.window.show_all()
 
@@ -99,7 +100,7 @@ class MailInfoWindow (AbstractDialog):
         
         # TO and FROM        
         name = self.tree.get_widget("nameEntry").get_text()
-        self.addr = self.tree.get_widget("mailEntry").get_text()
+        self.addr = self.mailEntry.get_text()
 
         if not self.addr:
             self.addr = self.TO
@@ -157,7 +158,12 @@ class MailInfoWindow (AbstractDialog):
         return True
 
     def cb_send_clicked (self, *args):
-        self.set_data()
-        GtkThread(target = self.send, name = "Mail Send Thread").start()
-        self.close()
+        if self.mailEntry.get_text() or no_email_dialog(self.window) == gtk.RESPONSE_OK:
+            self.set_data()
+            GtkThread(target = self.send, name = "Mail Send Thread").start()
+            self.close()
+        else:
+            self.window.present()
+            self.mailEntry.grab_focus()
+
         return True
