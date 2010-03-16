@@ -16,6 +16,8 @@ from threading import RLock
 from functools import wraps
 from ..helper import warning
 
+from .exceptions import UnsupportedSearchTypeError
+
 class UnsupportedSearchTypeError(Exception):
     pass
 

@@ -99,7 +99,7 @@ def convert (version):
 def get_version_infos():
     from ..constants import VERSION, REVISION
     from ..backend import system
-    from ..db import _TYPE as db_type
+    from ..db import Database
     
     if REVISION:
         VERSION = "%s (git: %s)" % (VERSION, REVISION)
@@ -109,7 +109,7 @@ def get_version_infos():
         "System: %s" % " ".join(get_runsystem()),
         "Python version: %s" % sys.version,
         "Used backend: %s" % system.get_version(),
-        "Used database type: %s" % db_type,
+        "Used database type: %s" % Database.DB_TYPE,
         "pygtk: %s (using GTK+: %s)" % (convert(gtk.pygtk_version), convert(gtk.gtk_version)),
         "pygobject: %s (using GLib: %s)" % (convert(gobject.pygobject_version), convert(gobject.glib_version))))
 

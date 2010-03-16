@@ -120,7 +120,7 @@ class SQLDatabase (Database):
             os.remove(dbpath)
             db_existed = False
 
-        self.session["pickle"] = True # no need for a certain value
+        self.session["pickle"] = "1" # no need for a certain value
 
         if db_existed:
             debug("portdirs.db already existant")
