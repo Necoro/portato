@@ -14,18 +14,22 @@ from __future__ import absolute_import, with_statement
 
 import smtplib, socket
 import time
-import gtk, pango
+import gtk, pango, gobject
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from os.path import basename
 
 from .basic import AbstractDialog
 from ..utils import GtkThread
-from ..dialogs import mail_failure_dialog, no_email_dialog
+from .. import dialogs
 from ...helper import debug, info
 from ...constants import VERSION, CONFIG_LOCATION
 from ...log import LOGFILE
 from ... import session
+
+def mail_failure_dialog(*a):
+    dialogs.mail_failure_dialog(*a)
+    return False
 
 class ShowDialog (gtk.Dialog):
 
@@ -51,7 +55,7 @@ class ShowDialog (gtk.Dialog):
         self.vbox.show_all()
 
 class MailInfoWindow (AbstractDialog):
-    TO = "bugs@portato.necoro.net"
+    TO = "bugs@necoro.eu"
 
     def __init__ (self, parent, tb):
 
@@ -97,6 +101,7 @@ class MailInfoWindow (AbstractDialog):
         self.message = MIMEMultipart()
         self.message["Subject"] = "[Bug Report] Bug in Portato %s" % VERSION
         self.message["To"] = self.TO
+        self.message["X-Portato-Version"] = VERSION
         
         # TO and FROM        
         name = self.tree.get_widget("nameEntry").get_text()
@@ -134,31 +139,44 @@ class MailInfoWindow (AbstractDialog):
 
     def send (self):
         try:
-            debug("Connecting to server")
-            server = smtplib.SMTP("mail.necoro.eu")
-            debug("Sending mail")
-            try:
-                for i in range(5): # try 5 times at max
-                    try:
-                        server.sendmail(self.addr, self.TO, self.message.as_string())
-                    except smtplib.SMTPRecipientsRefused, e:
+            for i in range(5): # try 5 times at max
+                if i > 0:
+                    info(_("Retrying after waiting %d seconds."), 300)
+                    time.sleep(300)
+                try:
+                    debug("Connecting to server")
+                    server = smtplib.SMTP("mail.necoro.eu")
+                    debug("Sending mail")
+                    
+                    if smtplib._have_ssl: server.starttls()
+                    else: debug("TLS not supported in Python. Continuing without it.")
+
+                    server.sendmail(self.addr, self.TO, self.message.as_string())
+                except smtplib.SMTPRecipientsRefused, e:
+                    if e.recipients[self.TO][0] < 500:
                         info(_("An error occurred while sending. I think we were greylisted. The error: %s") % e)
-                        info(_("Retrying after waiting %d seconds."), 30)
-                        time.sleep(30)
-                    else:
-                        debug("Sent")
-                        break
-            finally:
-                server.quit()
+                    else: raise
+                else:
+                    debug("Sent")
+                    break
+                finally:
+                    try:
+                        server.quit()
+                    except smtplib.SMTPServerDisconnected:
+                        pass # ignore this
         except socket.error, e:
-            mail_failure_dialog("%s (Code: %s)" % (e.args[1], e.args[0]))
+            gobject.idle_add(mail_failure_dialog, "%s (Code: %s)" % (e.args[1], e.args[0]))
+        except smtplib.SMTPResponseException, e:
+            gobject.idle_add(mail_failure_dialog, "%s (Code: %s)" % (e.smtp_error, e.smtp_code))
+        except smtplib.SMTPException, e:
+            gobject.idle_add(mail_failure_dialog, e.args)
         
     def cb_cancel_clicked (self, *args):
         self.close()
         return True
 
     def cb_send_clicked (self, *args):
-        if self.mailEntry.get_text() or no_email_dialog(self.window) == gtk.RESPONSE_OK:
+        if self.mailEntry.get_text() or dialogs.no_email_dialog(self.window) == gtk.RESPONSE_OK:
             self.set_data()
             GtkThread(target = self.send, name = "Mail Send Thread").start()
             self.close()
