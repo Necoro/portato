@@ -1,4 +1,4 @@
-next:
+0.14:
 
 - allow eix as backend DB
 - use an internal messagequeue module instead of external shm
@@ -6,6 +6,7 @@ next:
 - allow to search descriptions
 - add an icon to signal the 'best' version for a package
 - added Italian translation (thx to Ponsi)
+- fix bugmail sending
 
 0.13.1:
 - fix segfault in GLib
