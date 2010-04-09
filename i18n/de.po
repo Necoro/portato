@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-14 21:03+0100\n"
-"PO-Revision-Date: 2010-03-26 22:31+0100\n"
+"POT-Creation-Date: 2010-04-09 23:55+0200\n"
+"PO-Revision-Date: 2010-04-10 00:06+0100\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -416,6 +416,79 @@ msgstr "Konsole"
 msgid "Log"
 msgstr "Log"
 
+#: portato/gui/templates/MainWindow.menu:9
+#: portato/gui/templates/MainWindow.menu:161
+msgid "Plu_gins"
+msgstr "_Plugins"
+
+#: portato/gui/templates/MainWindow.menu:19
+msgid "_General"
+msgstr "All_gemein"
+
+#: portato/gui/templates/MainWindow.menu:26
+msgid "_Preferences"
+msgstr "_Einstellungen"
+
+#: portato/gui/templates/MainWindow.menu:35
+msgid "Re_load Portage"
+msgstr "_Aktualisiere Portage-Cache"
+
+#: portato/gui/templates/MainWindow.menu:51
+msgid "_Emerge"
+msgstr "_Emerge"
+
+#: portato/gui/templates/MainWindow.menu:58
+msgid "_Install"
+msgstr "_Installieren"
+
+#: portato/gui/templates/MainWindow.menu:67
+msgid "_Uninstall"
+msgstr "_Deinstallieren"
+
+#: portato/gui/templates/MainWindow.menu:75
+msgid "Up_date World"
+msgstr "Update _World"
+
+#: portato/gui/templates/MainWindow.menu:82
+msgid "Show Updatable P_ackages"
+msgstr "Zeige Pakete mit _Updates"
+
+#: portato/gui/templates/MainWindow.menu:89
+msgid "Show _World Packages"
+msgstr "Zeige _Pakete in \"World\""
+
+#: portato/gui/templates/MainWindow.menu:96
+msgid "Show _Only Installed Packages"
+msgstr "_Zeige nur installierte Pakete"
+
+#: portato/gui/templates/MainWindow.menu:105
+msgid "_Sync"
+msgstr "_Sync"
+
+#: portato/gui/templates/MainWindow.menu:114
+msgid "Save _Flags"
+msgstr "Speichere _Flags"
+
+#: portato/gui/templates/MainWindow.menu:121
+msgid "Emerge _Paused"
+msgstr "Emerge _angehalten"
+
+#: portato/gui/templates/MainWindow.menu:130
+msgid "_Kill Emerge"
+msgstr "_Kill Emerge"
+
+#: portato/gui/templates/MainWindow.menu:139
+msgid "_Copy"
+msgstr "_Kopieren"
+
+#: portato/gui/templates/MainWindow.menu:146
+msgid "_?"
+msgstr "_?"
+
+#: portato/gui/templates/MainWindow.menu:153
+msgid "_About"
+msgstr "_Über"
+
 #: portato/gui/dialogs.py:17
 msgid "Mail could not be sent"
 msgstr "Mail konnte nicht gesendet werden"
@@ -474,6 +547,7 @@ msgid "Package not found!"
 msgstr "Paket nicht gefunden!"
 
 #: portato/gui/dialogs.py:76
+#: portato/gui/dialogs.py:87
 msgid "Do not show this dialog again."
 msgstr "Diesen Dialog nicht wieder anzeigen."
 
@@ -490,11 +564,23 @@ msgstr ""
 "Portato wird diese Änderungen speichern.\n"
 "Bitte sichere die entsprechenden Dateien, wenn du es als notwendig erachtest."
 
-#: portato/gui/dialogs.py:87
+#: portato/gui/dialogs.py:88
+msgid "'Update World' may be giving errors"
+msgstr "'Update World' kann fehlerhaft sein"
+
+#: portato/gui/dialogs.py:89
+msgid ""
+"Due to the fast changing portage, 'update world' might not work correctly or even throw errors.\n"
+"This will be fixed (hopefully) in the next release."
+msgstr ""
+"Da sich Portage sehr schnell ändert, kann es sein, dass 'update world' nicht korrekt funktioniert. Es können sogar Fehler auftreten.\n"
+"Das wird hoffentlich mit dem nächsten Release besser."
+
+#: portato/gui/dialogs.py:98
 msgid "You cannot remove dependencies. :)"
 msgstr "Du kannst keine Abhängigkeiten löschen ;)."
 
-#: portato/gui/dialogs.py:93
+#: portato/gui/dialogs.py:104
 msgid ""
 "This is the updates queue. You cannot remove single elements.\n"
 "Do you want to clear the whole queue instead?"
@@ -502,15 +588,15 @@ msgstr ""
 "Das ist die Update-Queue. Aus dieser können keine einzelnen Pakete entfernt werden.\n"
 "Soll stattdessen die komplette Queue entfernt werden?"
 
-#: portato/gui/dialogs.py:99
+#: portato/gui/dialogs.py:110
 msgid "Do you really want to clear the whole queue?"
 msgstr "Wirklich die gesamte Queue löschen?"
 
-#: portato/gui/dialogs.py:118
+#: portato/gui/dialogs.py:129
 msgid "A prerequisite for starting Portato was not matched."
 msgstr "Eine Vorbedingung um Portato zu starten ist nicht erfüllt."
 
-#: portato/gui/dialogs.py:122
+#: portato/gui/dialogs.py:133
 msgid ""
 "<b>Note</b>: On fresh Sabayon installs or its LiveDVD/-CD, there is no portage tree existing per default.\n"
 "Please run <i>emerge --sync &amp;&amp; layman -S</i>."
@@ -518,7 +604,7 @@ msgstr ""
 "<b>Hinweis</b>: Auf frisch installierten Sabayon-Systemen bzw. der Sabayon LiveDVD/-CD existiert standardmäßig kein Portage-Tree.\n"
 "Bitte führe <i>emerge --sync &amp;&amp; layman -S</i> aus."
 
-#: portato/gui/dialogs.py:130
+#: portato/gui/dialogs.py:141
 #: portato/gui/windows/main.py:1302
 #, python-format
 msgid "No versions of package '%s' found!"
@@ -602,15 +688,15 @@ msgstr "Pakete mit Updates"
 msgid "World Packages"
 msgstr "Pakete in \"World\""
 
-#: portato/gui/windows/mailinfo.py:145
-#, python-format
-msgid "An error occurred while sending. I think we were greylisted. The error: %s"
-msgstr "Während des Sendes trat ein Fehler auf. Wahrscheinlich wurden wir ge-greylistet. Der Fehler: %s"
-
-#: portato/gui/windows/mailinfo.py:146
+#: portato/gui/windows/mailinfo.py:144
 #, python-format
 msgid "Retrying after waiting %d seconds."
 msgstr "Wiederhole den Versuch nach einer %ds Pause."
+
+#: portato/gui/windows/mailinfo.py:157
+#, python-format
+msgid "An error occurred while sending. I think we were greylisted. The error: %s"
+msgstr "Während des Sendes trat ein Fehler auf. Wahrscheinlich wurden wir ge-greylistet. Der Fehler: %s"
 
 #: portato/gui/windows/splash.py:35
 #, python-format
@@ -639,8 +725,8 @@ msgstr "Paket-Set"
 
 #: portato/gui/windows/preference.py:259
 #: portato/gui/windows/main.py:846
-#: portato/db/database.py:49
-#: portato/db/database.py:50
+#: portato/db/database.py:51
+#: portato/db/database.py:52
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -745,11 +831,11 @@ msgstr "Use Flags"
 msgid "masking keywords"
 msgstr "Masking Keywords"
 
-#: portato/gui/windows/main.py:1851
+#: portato/gui/windows/main.py:1858
 msgid "The portage tree is not existing."
 msgstr "Der Portage-Tree existiert nicht."
 
-#: portato/gui/windows/main.py:1855
+#: portato/gui/windows/main.py:1862
 msgid "The portage tree seems to be empty."
 msgstr "Der Portage-Tree scheint leer zu sein."
 
@@ -872,11 +958,11 @@ msgstr "Kein valides 'su'-Kommande entdeckt. Breche ab..."
 msgid "Invalid dependency string"
 msgstr "Ungültiger Dependency-String."
 
-#: portato/db/__init__.py:27
+#: portato/db/__init__.py:21
 msgid "SQLite"
 msgstr "SQLite"
 
-#: portato/db/__init__.py:27
+#: portato/db/__init__.py:21
 msgid ""
 "Uses an SQLite-database to store package information.\n"
 "May take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data."
@@ -884,11 +970,11 @@ msgstr ""
 "Verwendet eine SQLite-Datenbank um die Paketdaten zu speichern.\n"
 "Es mag länger dauern, um die Datenbank das erste Mal zu erstellen - es zeigt seine Stärken, wenn Portato neugestartet wird, ohne dass sich der Portage-Tree verändert hat. Außerdem verwendet es schnelle SQL-Queries."
 
-#: portato/db/__init__.py:28
+#: portato/db/__init__.py:22
 msgid "Hashmap"
 msgstr "Hashtabelle"
 
-#: portato/db/__init__.py:28
+#: portato/db/__init__.py:22
 msgid ""
 "Uses an in-memory hashmap to store package information.\n"
 "Has been used since at least version 0.3.3, but all information has to be regenerated on each startup."
@@ -896,11 +982,11 @@ msgstr ""
 "Verwendet eine Hashtabelle, welche im Arbeitsspeicher liegt, um die Paketdaten zu speichern.\n"
 "Wurde in allen Portato-Versionen seit 0.3.3 benutzt, aber alle Daten müssen bei jedem Start neu erzeugt werden."
 
-#: portato/db/__init__.py:29
+#: portato/db/__init__.py:23
 msgid "eix + SQLite"
 msgstr "eix + SQLite"
 
-#: portato/db/__init__.py:29
+#: portato/db/__init__.py:23
 msgid ""
 "Similar to SQLite, but now uses the eix database to get the package information.\n"
 "This should be much faster on startup, but requires that your eix database is always up-to-date.\n"
@@ -910,13 +996,13 @@ msgstr ""
 "Das ist bei weitem schneller beim Starten, setzt aber vorraus, dass die eix-Datenbank immer aktuell ist.\n"
 "Außerdem ist das der einzige Datenbanktyp der auch das Suchen in den Beschreibungen erlaubt."
 
-#: portato/db/__init__.py:53
-#: portato/db/__init__.py:68
+#: portato/db/__init__.py:51
+#: portato/db/__init__.py:66
 #, python-format
 msgid "Cannot load %s."
 msgstr "Kann %s nicht laden."
 
-#: portato/db/__init__.py:74
+#: portato/db/__init__.py:72
 #, python-format
 msgid "Unknown database type: %s"
 msgstr "Unbekannter Datenbanktyp: %s"
@@ -936,39 +1022,39 @@ msgstr "Fehler beim erstellen des Suchausdrucks: '%s'."
 msgid "Cache file '%s' does not exist. Using default instead."
 msgstr "Cache '%s' existiert nicht, stattdessen wird die Vorgabe benutzt."
 
-#: portato/db/database.py:42
+#: portato/db/database.py:44
 msgid "ALL"
 msgstr "ALLE"
 
-#: portato/db/database.py:48
 #: portato/db/database.py:50
+#: portato/db/database.py:52
 msgid "Name"
 msgstr "Name"
 
-#: portato/db/sql.py:80
+#: portato/db/sql.py:82
 msgid "Cleaning database..."
 msgstr "Leere Datenbank..."
 
-#: portato/db/sql.py:82
+#: portato/db/sql.py:84
 msgid "Populating database..."
 msgstr "Fülle Datenbank..."
 
-#: portato/session.py:69
+#: portato/session.py:66
 #, python-format
 msgid "Loading '%s' session from %s."
 msgstr "Lade '%s'-Session von %s."
 
-#: portato/session.py:71
+#: portato/session.py:68
 #, python-format
 msgid "Loading session from %s."
 msgstr "Lade Session von %s."
 
-#: portato/session.py:139
+#: portato/session.py:136
 #, python-format
 msgid "Saving '%s' session to %s."
 msgstr "Schreibe '%s'-Session nach %s."
 
-#: portato/session.py:141
+#: portato/session.py:138
 #, python-format
 msgid "Saving session to %s."
 msgstr "Schreibe Session nach %s."
@@ -1134,38 +1220,8 @@ msgstr "Fehler-Code: %d"
 #~ msgstr ""
 #~ "Hängt die Logdatei an die Mail an. In der Datei sind nur Debug-"
 #~ "Informationen enthalten."
-#~ msgid "Plu_gins"
-#~ msgstr "Plu_gins"
 #~ msgid "_File"
 #~ msgstr "_Datei"
-#~ msgid "_Preferences"
-#~ msgstr "_Einstellungen"
-#~ msgid "Re_load Portage"
-#~ msgstr "Aktua_lisiere Portage-Cache"
-#~ msgid "_Emerge"
-#~ msgstr "_Emerge"
-#~ msgid "_Install"
-#~ msgstr "_Installieren"
-#~ msgid "_Uninstall"
-#~ msgstr "_Deinstallieren"
-#~ msgid "Show Updatable P_ackages"
-#~ msgstr "Zeige Pakete mit _Updates"
-#~ msgid "Show _Only Installed Packages"
-#~ msgstr "_Zeige nur installierte Pakete"
-#~ msgid "_Sync"
-#~ msgstr "_Sync"
-#~ msgid "Save _Flags"
-#~ msgstr "Speichere _Flags"
-#~ msgid "Emerge _Paused"
-#~ msgstr "Emerge _angehalten"
-#~ msgid "_Kill Emerge"
-#~ msgstr "_Kill Emerge"
-#~ msgid "_Copy"
-#~ msgstr "_Kopieren"
-#~ msgid "_?"
-#~ msgstr "_?"
-#~ msgid "_About"
-#~ msgstr "_Über"
 #~ msgid "_Plugins"
 #~ msgstr "_Plugins"
 #~ msgid "-L is deprecated"
