@@ -12,16 +12,10 @@
 
 from __future__ import absolute_import
 
+from . import database as db
+from .exceptions import UnknownDatabaseTypeError, DatabaseInstantiationError
 from ..session import Session, SectionDict
 from ..helper import debug, warning, error
-
-class UnknownDatabaseTypeError (Exception):
-    pass
-
-_SESSION = None
-_TYPE = None
-_DEFAULT = "dict"
-_DATABASE = None
 
 types = {
         "sql": (_("SQLite"), _("Uses an SQLite-database to store package information.\nMay take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data.")),
@@ -29,49 +23,55 @@ types = {
         "eixsql" : (_("eix + SQLite"), _("Similar to SQLite, but now uses the eix database to get the package information.\nThis should be much faster on startup, but requires that your eix database is always up-to-date.\nAdditionally, this is the only database allowing searching in descriptions."))
         }
 
-def Database(type = None):
-    global _SESSION, _TYPE, _DATABASE
+class Database(db.Database):
+    DEFAULT = "dict"
 
-    if type is None:
-        if _DATABASE is None:
+    def __new__ (cls, type = None):
+        if not '_the_instance' in cls.__dict__:
+            dbcls = cls._generate(type)
+            cls._the_instance = dbcls(cls._get_session())
+        elif type is not None:
+            raise DatabaseInstantiationError("Database instantiation called with 'type' argument multiple times.")
+        return cls._the_instance
+    
+    @classmethod
+    def _generate(cls, type):
+
+        if type is None:
             warning("No database type specified! Falling back to default.")
-            return Database(_DEFAULT)
+            type = cls.DEFAULT
+        
+        cls.DB_TYPE = type
+
+        if type == "sql":
+            debug("Using SQLDatabase")
+            try:
+                from .sql import SQLDatabase
+            except ImportError:
+                warning(_("Cannot load %s."), "SQLDatabase")
+                return cls._generate("dict")
+            else:
+                return SQLDatabase
+
+        elif type == "dict":
+            debug("Using HashDatabase")
+            from .hash import HashDatabase
+            return HashDatabase
+        
+        elif type == "eixsql":
+            debug("Using EixSQLDatabase")
+            try:
+                from .eix_sql import EixSQLDatabase
+            except ImportError:
+                warning(_("Cannot load %s."), "EixSQLDatabase.")
+                return cls._generate("sql")
+            else:
+                return EixSQLDatabase
+
         else:
-            return _DATABASE
-    
-    if _SESSION is None:
-        _SESSION = Session("db.session", name = "DB", oldfiles = ["db.cfg"])
-        _SESSION.load()
+            error(_("Unknown database type: %s"), type)
+            raise UnknownDatabaseTypeError, type
 
-    _TYPE = type
-
-    if type == "sql":
-        debug("Using SQLDatabase")
-        try:
-            from .sql import SQLDatabase
-        except ImportError:
-            warning(_("Cannot load %s."), "SQLDatabase")
-            _DATABASE = Database("dict")
-        else:
-            _DATABASE = SQLDatabase(SectionDict(_SESSION, type))
-
-    elif type == "dict":
-        debug("Using HashDatabase")
-        from .hash import HashDatabase
-        _DATABASE = HashDatabase(SectionDict(_SESSION, type))
-    
-    elif type == "eixsql":
-        debug("Using EixSQLDatabase")
-        try:
-            from .eix_sql import EixSQLDatabase
-        except ImportError:
-            warning(_("Cannot load %s."), "EixSQLDatabase.")
-            _DATABASE = Database("sql")
-        else:
-            _DATABASE = EixSQLDatabase(SectionDict(_SESSION, type))
-
-    else:
-        error(_("Unknown database type: %s"), type)
-        raise UnknownDatabaseTypeError, type
-
-    return _DATABASE
+    @classmethod
+    def _get_session(cls):
+        return SectionDict(Session("db.session", name = "DB", oldfiles = ["db.cfg"]), cls.DB_TYPE)

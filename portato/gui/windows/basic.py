@@ -151,6 +151,9 @@ class AbstractDialog (Window):
         self.window.set_transient_for(parent)
         self.parent = parent
         
+        # type hint
+        self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+
         # catch the ESC-key
         self.window.connect("key-press-event", self.cb_key_pressed)
 

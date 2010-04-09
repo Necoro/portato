@@ -3,6 +3,9 @@ next:
 - allow eix as backend DB
 - use an internal messagequeue module instead of external shm
 - show the list of world packages
+- allow to search descriptions
+- add an icon to signal the 'best' version for a package
+- added Italian translation (thx to Ponsi)
 
 0.13.1:
 - fix segfault in GLib

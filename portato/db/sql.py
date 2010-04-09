@@ -47,6 +47,7 @@ class SQLDatabase (Database):
         
         updateFormat = False
         if "format" not in session or session["format"] != self.FORMAT:
+            debug("Need to update database format from '%s' to '%s'", session["format"], self.FORMAT)
             session["format"] = self.FORMAT
             updateFormat = True
 
@@ -61,6 +62,7 @@ class SQLDatabase (Database):
         pkg_conn = sql.connect(pkgdb)
         pkg_conn.row_factory = sql.Row
         if pkgdb_existed and updateFormat:
+            debug("Dropping old table")
             pkg_conn.execute("DROP TABLE packages")
 
         pkg_conn.execute("""
@@ -118,7 +120,7 @@ class SQLDatabase (Database):
             os.remove(dbpath)
             db_existed = False
 
-        self.session["pickle"] = True # no need for a certain value
+        self.session["pickle"] = "1" # no need for a certain value
 
         if db_existed:
             debug("portdirs.db already existant")

@@ -28,9 +28,6 @@ class Session (object):
     A small class allowing to save certain states of a program.
     This class works in a quite abstract manner, as it works with handlers, which
     define what options to use out of the config file and how to apply them to the program.
-
-    Note: This class currently does not work with boolean config options. If you
-    want to define boolean values, use 0 and 1. This is future proof.
     """
 
     # the current session format version
@@ -158,6 +155,15 @@ class Session (object):
         try:
             return self._cfg.get(section, key)
         except NoSuchThing:
+            return None
+
+    def get_bool (self, key, section = None):
+        if section is None: section = self._name
+        section = section.upper()
+
+        try:
+            return self._cfg.getboolean(section, key)
+        except NoSuchThing, ValueError:
             return None
     
     def remove (self, key, section = None):

@@ -1434,8 +1434,8 @@ class MainWindow (Window):
         """Execute the current queue."""
         
         if len(flags.newUseFlags) > 0:
-            if not self.session.get_boolean("useflags", "dialogs"):
-                self.session.set("useflags", dialogs.changed_flags_dialog(_("use flags"))[1], "dialogs")
+            if not self.session.get_bool("useflags", "dialogs"):
+                self.session.set("useflags", str(dialogs.changed_flags_dialog(_("use flags"))[1]), "dialogs")
             try:
                 flags.write_use_flags()
             except IOError, e:
@@ -1446,8 +1446,8 @@ class MainWindow (Window):
             debug("new masked: %s",flags.new_masked)
             debug("new unmasked: %s", flags.new_unmasked)
             debug("new testing: %s", flags.newTesting)
-            if not self.session.get_boolean("keywords", "dialogs"):
-                self.session.set("keywords", dialogs.changed_flags_dialog(_("masking keywords"))[1], "dialogs")
+            if not self.session.get_bool("keywords", "dialogs"):
+                self.session.set("keywords", str(dialogs.changed_flags_dialog(_("masking keywords"))[1]), "dialogs")
             try:
                 flags.write_masked()
                 flags.write_testing()
@@ -1511,8 +1511,15 @@ class MainWindow (Window):
                 gobject.idle_add(cb_idle_append, updating)
             finally:
                 self.window.window.set_cursor(None)
-            
-        GtkThread(name="Update-Thread", target=__update).start()
+        
+        # for some reason, I have to create the thread before displaying the dialog
+        # else the GUI hangs
+        t = GtkThread(name="Update-Thread", target=__update)
+
+        if not self.session.get_bool("update_world_warning", "dialogs"):
+            self.session.set("update_world_warning", str(dialogs.update_world_warning_dialog()[1]), "dialogs")
+
+        t.start()
         
         return True
 

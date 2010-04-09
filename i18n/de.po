@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-05 21:26+0100\n"
-"PO-Revision-Date: 2010-03-05 21:27+0100\n"
+"POT-Creation-Date: 2010-03-14 21:03+0100\n"
+"PO-Revision-Date: 2010-03-26 22:31+0100\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -243,7 +243,7 @@ msgstr "<b>Autor:</b>"
 
 #: portato/gui/templates/PluginWindow.ui:141
 #: portato/gui/windows/pkglist.py:59
-#: portato/gui/windows/main.py:830
+#: portato/gui/windows/main.py:843
 #: portato/gui/windows/plugin.py:27
 msgid "Enabled"
 msgstr "Aktiviert"
@@ -297,15 +297,11 @@ msgstr ""
 "Kommentare /\n"
 "Vorgehensweise um den Bug zu erzeugen?"
 
-#: portato/gui/templates/MailInfoWindow.ui:138
-msgid "Attach _Logfile"
-msgstr "Hänge _Logdatei an"
+#: portato/gui/templates/MailInfoWindow.ui:160
+msgid "These files will be sent:"
+msgstr "Die folgenden Dateien werden geschickt:"
 
-#: portato/gui/templates/MailInfoWindow.ui:142
-msgid "Attaches the logfile to the mail. This log only contains debug information."
-msgstr "Hängt die Logdatei an die Mail an. In der Datei sind nur Debug-Informationen enthalten."
-
-#: portato/gui/templates/MailInfoWindow.ui:206
+#: portato/gui/templates/MailInfoWindow.ui:220
 msgid "_Send"
 msgstr "_Send"
 
@@ -350,7 +346,7 @@ msgid "<b>Homepage:</b>"
 msgstr "<b>Homepage:</b>"
 
 #: portato/gui/templates/MainWindow.ui:462
-#: portato/gui/windows/main.py:831
+#: portato/gui/windows/main.py:844
 msgid "Installed"
 msgstr "Installiert"
 
@@ -406,13 +402,13 @@ msgid "Remove the selected package from the queue"
 msgstr "Löscht das gewählte Paket aus der Queue"
 
 #: portato/gui/templates/MainWindow.ui:782
-#: portato/gui/windows/main.py:611
+#: portato/gui/windows/main.py:620
 msgid "Queue"
 msgstr "Queue"
 
 #: portato/gui/templates/MainWindow.ui:806
-#: portato/gui/windows/main.py:1240
-#: portato/gui/windows/main.py:1242
+#: portato/gui/windows/main.py:1253
+#: portato/gui/windows/main.py:1255
 msgid "Console"
 msgstr "Konsole"
 
@@ -422,7 +418,7 @@ msgstr "Log"
 
 #: portato/gui/dialogs.py:17
 msgid "Mail could not be sent"
-msgstr "Mail konnte nicht gesendet werden: %s"
+msgstr "Mail konnte nicht gesendet werden"
 
 #: portato/gui/dialogs.py:18
 #, python-format
@@ -430,49 +426,63 @@ msgid "The error was: %s"
 msgstr "Der Fehler war: %s"
 
 #: portato/gui/dialogs.py:24
+msgid "No email address given"
+msgstr "Keine Email-Adresse gegeben"
+
+#: portato/gui/dialogs.py:25
+msgid ""
+"You haven't specified an email address. Without it, it will not be possible for the developers to contact you for questions and thus it might be harder to fix the bug.\n"
+"\n"
+"Do you want to proceed nevertheless?"
+msgstr ""
+"Du hast keine Email-Adresse angegeben. Daher ist es nicht möglich, dass die Entwickler dich kontaktieren können und es kann daher sein, dass der Bug schwerer zu beseitigen ist.\n"
+"\n"
+"Trotzdem fortfahren?"
+
+#: portato/gui/dialogs.py:31
 msgid "Do you really want to quit?"
 msgstr "Wirklich beenden?"
 
-#: portato/gui/dialogs.py:25
+#: portato/gui/dialogs.py:32
 msgid "There are some packages in the emerge queue and/or an emerge process is running."
 msgstr "Es sind noch Pakete in der Emerge-Queue und/oder emerge läuft noch."
 
-#: portato/gui/dialogs.py:43
+#: portato/gui/dialogs.py:50
 #, python-format
 msgid "%(blocked)s is blocked by %(blocks)s."
 msgstr "%(blocks)s blockiert %(blocked)s."
 
-#: portato/gui/dialogs.py:44
+#: portato/gui/dialogs.py:51
 msgid "Please unmerge the blocking package."
 msgstr "Bitte deinstalliere das blockierende Paket."
 
-#: portato/gui/dialogs.py:50
+#: portato/gui/dialogs.py:57
 msgid "You are not root."
 msgstr "Du bist nicht root."
 
-#: portato/gui/dialogs.py:56
+#: portato/gui/dialogs.py:63
 #, python-format
 msgid "%s seems to be masked."
 msgstr "%s scheint maskiert zu sein."
 
-#: portato/gui/dialogs.py:57
+#: portato/gui/dialogs.py:64
 msgid "Do you want to unmask it and its dependencies?"
 msgstr "Soll das Paket und seine Abhängigkeiten demaskiert werden?"
 
-#: portato/gui/dialogs.py:63
+#: portato/gui/dialogs.py:70
 msgid "Package not found!"
 msgstr "Paket nicht gefunden!"
 
-#: portato/gui/dialogs.py:69
+#: portato/gui/dialogs.py:76
 msgid "Do not show this dialog again."
 msgstr "Diesen Dialog nicht wieder anzeigen."
 
-#: portato/gui/dialogs.py:70
+#: portato/gui/dialogs.py:77
 #, python-format
 msgid "Changed %s"
 msgstr "%s wurde geändert"
 
-#: portato/gui/dialogs.py:71
+#: portato/gui/dialogs.py:78
 msgid ""
 "Portato will write these changes into the appropriate files.\n"
 "Please backup them if you think it is necessary."
@@ -480,11 +490,11 @@ msgstr ""
 "Portato wird diese Änderungen speichern.\n"
 "Bitte sichere die entsprechenden Dateien, wenn du es als notwendig erachtest."
 
-#: portato/gui/dialogs.py:80
+#: portato/gui/dialogs.py:87
 msgid "You cannot remove dependencies. :)"
 msgstr "Du kannst keine Abhängigkeiten löschen ;)."
 
-#: portato/gui/dialogs.py:86
+#: portato/gui/dialogs.py:93
 msgid ""
 "This is the updates queue. You cannot remove single elements.\n"
 "Do you want to clear the whole queue instead?"
@@ -492,15 +502,15 @@ msgstr ""
 "Das ist die Update-Queue. Aus dieser können keine einzelnen Pakete entfernt werden.\n"
 "Soll stattdessen die komplette Queue entfernt werden?"
 
-#: portato/gui/dialogs.py:92
+#: portato/gui/dialogs.py:99
 msgid "Do you really want to clear the whole queue?"
 msgstr "Wirklich die gesamte Queue löschen?"
 
-#: portato/gui/dialogs.py:111
+#: portato/gui/dialogs.py:118
 msgid "A prerequisite for starting Portato was not matched."
 msgstr "Eine Vorbedingung um Portato zu starten ist nicht erfüllt."
 
-#: portato/gui/dialogs.py:115
+#: portato/gui/dialogs.py:122
 msgid ""
 "<b>Note</b>: On fresh Sabayon installs or its LiveDVD/-CD, there is no portage tree existing per default.\n"
 "Please run <i>emerge --sync &amp;&amp; layman -S</i>."
@@ -508,8 +518,8 @@ msgstr ""
 "<b>Hinweis</b>: Auf frisch installierten Sabayon-Systemen bzw. der Sabayon LiveDVD/-CD existiert standardmäßig kein Portage-Tree.\n"
 "Bitte führe <i>emerge --sync &amp;&amp; layman -S</i> aus."
 
-#: portato/gui/dialogs.py:123
-#: portato/gui/windows/main.py:1289
+#: portato/gui/dialogs.py:130
+#: portato/gui/windows/main.py:1302
 #, python-format
 msgid "No versions of package '%s' found!"
 msgstr "Keine Version vom Paket '%s' gefunden!"
@@ -592,14 +602,15 @@ msgstr "Pakete mit Updates"
 msgid "World Packages"
 msgstr "Pakete in \"World\""
 
-#: portato/gui/windows/mailinfo.py:83
+#: portato/gui/windows/mailinfo.py:145
 #, python-format
 msgid "An error occurred while sending. I think we were greylisted. The error: %s"
 msgstr "Während des Sendes trat ein Fehler auf. Wahrscheinlich wurden wir ge-greylistet. Der Fehler: %s"
 
-#: portato/gui/windows/mailinfo.py:84
-msgid "Retrying after waiting 60 seconds."
-msgstr "Wiederhole den Versuch nach einer 60s Pause."
+#: portato/gui/windows/mailinfo.py:146
+#, python-format
+msgid "Retrying after waiting %d seconds."
+msgstr "Wiederhole den Versuch nach einer %ds Pause."
 
 #: portato/gui/windows/splash.py:35
 #, python-format
@@ -627,7 +638,7 @@ msgid "Package Set"
 msgstr "Paket-Set"
 
 #: portato/gui/windows/preference.py:259
-#: portato/gui/windows/main.py:833
+#: portato/gui/windows/main.py:846
 #: portato/db/database.py:49
 #: portato/db/database.py:50
 msgid "Description"
@@ -655,90 +666,90 @@ msgstr "Paket konnte nicht gefunden werden: %s"
 msgid "Masked by user"
 msgstr "Vom Benutzer maskiert"
 
-#: portato/gui/windows/main.py:455
+#: portato/gui/windows/main.py:464
 msgid "Loading Config"
 msgstr "Lade Konfiguration"
 
-#: portato/gui/windows/main.py:467
+#: portato/gui/windows/main.py:476
 msgid "Creating Database"
 msgstr "Erstelle Datenbank"
 
-#: portato/gui/windows/main.py:471
+#: portato/gui/windows/main.py:480
 msgid "Loading Plugins"
 msgstr "Lade Plugins"
 
-#: portato/gui/windows/main.py:479
+#: portato/gui/windows/main.py:488
 msgid "Building frontend"
 msgstr "Erstelle Oberfläche"
 
-#: portato/gui/windows/main.py:545
+#: portato/gui/windows/main.py:554
 msgid "Restoring Session"
 msgstr "Lade Session"
 
-#: portato/gui/windows/main.py:555
+#: portato/gui/windows/main.py:564
 msgid "Loading Plugin Widgets"
 msgstr "Lade GUI-Elemente der Plugins"
 
-#: portato/gui/windows/main.py:558
+#: portato/gui/windows/main.py:567
 msgid "Finishing startup"
 msgstr "Erledige letzte Handgriffe :)"
 
-#: portato/gui/windows/main.py:614
+#: portato/gui/windows/main.py:623
 msgid "Options"
 msgstr "Optionen"
 
-#: portato/gui/windows/main.py:630
+#: portato/gui/windows/main.py:639
 msgid "Categories"
 msgstr "Kategorien"
 
-#: portato/gui/windows/main.py:689
+#: portato/gui/windows/main.py:698
 msgid "Packages"
 msgstr "Pakete"
 
-#: portato/gui/windows/main.py:724
+#: portato/gui/windows/main.py:733
 #, python-format
 msgid "Package '%s/%s' is disabled."
 msgstr "Paket '%s/%s' wurde deaktiviert."
 
-#: portato/gui/windows/main.py:741
+#: portato/gui/windows/main.py:750
 msgid "Versions"
 msgstr "Versionen"
 
-#: portato/gui/windows/main.py:744
+#: portato/gui/windows/main.py:753
 msgid "Slot"
 msgstr "Slot"
 
-#: portato/gui/windows/main.py:832
+#: portato/gui/windows/main.py:845
 msgid "Flag"
 msgstr "Flag"
 
-#: portato/gui/windows/main.py:856
+#: portato/gui/windows/main.py:869
 msgid "This is an expanded use flag and cannot be selected"
 msgstr "Dies ist ein \"Expanded Use Flag\" und kann daher nicht ausgewählt werden."
 
-#: portato/gui/windows/main.py:914
+#: portato/gui/windows/main.py:927
 #, python-format
 msgid "Translating session from version %d to %d."
 msgstr "Upgrade Session von Version %d auf Version %d."
 
-#: portato/gui/windows/main.py:917
+#: portato/gui/windows/main.py:930
 #, python-format
 msgid "Cannot translate session from version %d to %d."
 msgstr "Kann Session nicht von Version %d nach %d upgraden."
 
-#: portato/gui/windows/main.py:1425
+#: portato/gui/windows/main.py:1438
 msgid "use flags"
 msgstr "Use Flags"
 
-#: portato/gui/windows/main.py:1437
+#: portato/gui/windows/main.py:1450
 msgid "masking keywords"
 msgstr "Masking Keywords"
 
-#: portato/gui/windows/main.py:1838
+#: portato/gui/windows/main.py:1851
 msgid "The portage tree is not existing."
 msgstr "Der Portage-Tree existiert nicht."
 
-#: portato/gui/windows/main.py:1842
+#: portato/gui/windows/main.py:1855
 msgid "The portage tree seems to be empty."
 msgstr "Der Portage-Tree scheint leer zu sein."
 
@@ -942,22 +953,22 @@ msgstr "Leere Datenbank..."
 msgid "Populating database..."
 msgstr "Fülle Datenbank..."
 
-#: portato/session.py:67
+#: portato/session.py:69
 #, python-format
 msgid "Loading '%s' session from %s."
 msgstr "Lade '%s'-Session von %s."
 
-#: portato/session.py:69
+#: portato/session.py:71
 #, python-format
 msgid "Loading session from %s."
 msgstr "Lade Session von %s."
 
-#: portato/session.py:141
+#: portato/session.py:139
 #, python-format
 msgid "Saving '%s' session to %s."
 msgstr "Schreibe '%s'-Session nach %s."
 
-#: portato/session.py:143
+#: portato/session.py:141
 #, python-format
 msgid "Saving session to %s."
 msgstr "Schreibe Session nach %s."
@@ -1115,6 +1126,14 @@ msgstr "Emerge fehlgeschlagen!"
 msgid "Error Code: %d"
 msgstr "Fehler-Code: %d"
 
+#~ msgid "Attach _Logfile"
+#~ msgstr "Hänge _Logdatei an"
+#~ msgid ""
+#~ "Attaches the logfile to the mail. This log only contains debug "
+#~ "information."
+#~ msgstr ""
+#~ "Hängt die Logdatei an die Mail an. In der Datei sind nur Debug-"
+#~ "Informationen enthalten."
 #~ msgid "Plu_gins"
 #~ msgstr "Plu_gins"
 #~ msgid "_File"
