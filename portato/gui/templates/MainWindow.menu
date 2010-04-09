@@ -177,6 +177,7 @@
           <menuitem name="emergeMenuItem" action="emergeAction"/>
           <menuitem name="unmergeMenuItem" action="unmergeAction"/>
           <menuitem name="updateMenuItem" action="updateAction"/>
+          <separator/>
           <menuitem name="showUpdatesMenuItem" action="showUpdatesAction"/>
           <menuitem name="showWorldPkgsMenuItem" action="showWorldPkgsAction" />
           <menuitem name="showInstalledMenuItem" action="showInstalledAction"/>
