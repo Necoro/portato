@@ -1512,7 +1512,14 @@ class MainWindow (Window):
             finally:
                 self.window.window.set_cursor(None)
         
-        GtkThread(name="Update-Thread", target=__update).start()
+        # for some reason, I have to create the thread before displaying the dialog
+        # else the GUI hangs
+        t = GtkThread(name="Update-Thread", target=__update)
+
+        if not self.session.get_bool("update_world_warning", "dialogs"):
+            self.session.set("update_world_warning", str(dialogs.update_world_warning_dialog()[1]), "dialogs")
+
+        t.start()
         
         return True
 

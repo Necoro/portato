@@ -83,6 +83,17 @@ def changed_flags_dialog (what = "flags"):
 
     return ret, check.get_active()
 
+def update_world_warning_dialog ():
+    check = gtk.CheckButton(_("Do not show this dialog again."))
+    hintMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, _("'Update World' may be giving errors"))
+    hintMB.format_secondary_text(_("Due to the fast changing portage, 'update world' might not work correctly or even throw errors.\nThis will be fixed (hopefully) in the next release."))
+    hintMB.vbox.add(check)
+    hintMB.vbox.show_all()
+    ret = hintMB.run()
+    hintMB.destroy()
+
+    return ret, check.get_active()
+
 def remove_deps_dialog ():
     infoMB = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("You cannot remove dependencies. :)"))
     ret = infoMB.run()
