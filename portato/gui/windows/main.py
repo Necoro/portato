@@ -1434,7 +1434,7 @@ class MainWindow (Window):
         """Execute the current queue."""
         
         if len(flags.newUseFlags) > 0:
-            if not bool(self.session.get("useflags", "dialogs")):
+            if not self.session.get_bool("useflags", "dialogs"):
                 self.session.set("useflags", str(dialogs.changed_flags_dialog(_("use flags"))[1]), "dialogs")
             try:
                 flags.write_use_flags()
@@ -1446,7 +1446,7 @@ class MainWindow (Window):
             debug("new masked: %s",flags.new_masked)
             debug("new unmasked: %s", flags.new_unmasked)
             debug("new testing: %s", flags.newTesting)
-            if not bool(self.session.get("keywords", "dialogs")):
+            if not self.session.get_bool("keywords", "dialogs"):
                 self.session.set("keywords", str(dialogs.changed_flags_dialog(_("masking keywords"))[1]), "dialogs")
             try:
                 flags.write_masked()
@@ -1511,7 +1511,7 @@ class MainWindow (Window):
                 gobject.idle_add(cb_idle_append, updating)
             finally:
                 self.window.window.set_cursor(None)
-            
+        
         GtkThread(name="Update-Thread", target=__update).start()
         
         return True
