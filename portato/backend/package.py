@@ -155,7 +155,7 @@ class Package (_Package):
         @returns: category/package.
         @rtype: string"""
         
-        return "/".join(self.get_category(), self.get_name())
+        return "/".join((self.get_category(), self.get_name()))
 
     def get_slot (self):
         """Returns the slot.
@@ -174,7 +174,7 @@ class Package (_Package):
         @returns: cp:slot
         @rtype: string"""
 
-        return ":".join(self.get_cp(), self.get_slot())
+        return ":".join((self.get_cp(), self.get_slot()))
 
     def get_package_path(self):
         """Returns the path to where the ChangeLog, Manifest, .ebuild files reside.

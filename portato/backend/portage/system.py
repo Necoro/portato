@@ -213,6 +213,8 @@ class PortageSystem (SystemInterface):
 
         if (not only_cpv) and with_version:
             result = map(self.new_package, result)
+        else:
+            result = list(result)
         
         return result
 
