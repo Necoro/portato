@@ -299,5 +299,5 @@ class PortagePackage (Package):
 
     def matches (self, criterion):
         # cpv_matches needs explicit slot info
-        scpv = "%s:%s" % (self.get_cpv(), self.get_package_settings("SLOT"))
+        scpv = ":".join(self.get_cpv(), self.get_slot())
         return system.cpv_matches(scpv, criterion)

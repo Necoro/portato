@@ -782,7 +782,7 @@ class MainWindow (Window):
         # to not query the package with info, we do not need
         if self.cfg.get_boolean("showSlots", "GUI"):
             def get_slot(pkg):
-                return pkg.get_package_settings("SLOT")
+                return pkg.get_slot()
             
             self.slotcol.set_visible(True)
         
