@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
+
 
 import gtk, gobject
 import pango
@@ -126,7 +126,7 @@ class HighlightView (gtksourceview2.View, LazyView):
         try:
             with open(self.get_fn(self.pkg)) as f:
                 return f.readlines()
-        except IOError, e:
+        except IOError as e:
             return _("Error: %s") % e.strerror
     
 class LogView (logging.Handler):

@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
+from future_builtins import map, filter, zip
 
 import re
 import itertools as itt
@@ -33,7 +33,7 @@ class Set(object):
         try:
             t = self.get_pkgs(key, is_regexp, masked, with_version, only_cpv)
         # catch the "ambigous package" Exception
-        except ValueError, e:
+        except ValueError as e:
             if isinstance(e[0], list):
                 t = set()
                 for cp in e[0]:
@@ -97,7 +97,7 @@ class InstalledSet (Set):
                 t = system.settings.vartree.dbapi.cp_all()
 
             if key:
-                t = filter(lambda x: re.search(key, x, re.I), t)
+                t = [x for x in t if re.search(key, x, re.I)]
 
         else:
             t = system.settings.vartree.dbapi.match(key)
@@ -116,7 +116,7 @@ class TreeSet (Set):
                 t = system.settings.porttree.dbapi.cp_all()
 
             if key:
-                t = filter(lambda x: re.search(key, x, re.I), t)
+                t = [x for x in t if re.search(key, x, re.I)]
 
             return set(t)
 

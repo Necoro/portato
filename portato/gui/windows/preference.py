@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+from future_builtins import map, filter, zip
 
 import gtk
 
@@ -111,14 +111,14 @@ class PreferenceWindow (AbstractDialog):
         hintEB.modify_bg(gtk.STATE_NORMAL, get_color(self.cfg, "prefhint"))
 
         # the checkboxes
-        for box, val in self.checkboxes.iteritems():
+        for box, val in self.checkboxes.items():
             if isinstance(val, tuple):
                 self.tree.get_widget(box).set_active(self.cfg.get_boolean(val[0], section = val[1]))
             else:
                 self.tree.get_widget(box).set_active(self.cfg.get_boolean(val))
 
         # the edits
-        for edit, val in self.edits.iteritems():
+        for edit, val in self.edits.items():
             if isinstance(val,tuple):
                 self.tree.get_widget(edit).set_text(self.cfg.get(val[0], section = val[1]))
             else:
@@ -170,7 +170,7 @@ class PreferenceWindow (AbstractDialog):
 
         ctr = 0
         active = 0
-        for k, (name, desc) in db.types.iteritems():
+        for k, (name, desc) in db.types.items():
             if k == dbtype:
                 active = ctr
 
@@ -191,13 +191,13 @@ class PreferenceWindow (AbstractDialog):
     def _save(self):
         """Sets all options in the Config-instance."""
         
-        for box, val in self.checkboxes.iteritems():
+        for box, val in self.checkboxes.items():
             if isinstance(val, tuple):
                 self.cfg.set(val[0], self.tree.get_widget(box).get_active(), section = val[1])
             else:
                 self.cfg.set(val, self.tree.get_widget(box).get_active())
 
-        for edit, val in self.edits.iteritems():
+        for edit, val in self.edits.items():
             if isinstance(val,tuple):
                 self.cfg.set(val[0], self.tree.get_widget(edit).get_text(), section = val[1])
             else:
@@ -218,7 +218,7 @@ class PreferenceWindow (AbstractDialog):
         self.cfg.set("packageTabPos", str(pkgPos), section = "GUI")
         self.cfg.set("systemTabPos", str(sysPos), section = "GUI")
 
-        self.tabpos_fn(map(self.tabpos.get, (pkgPos, sysPos)))
+        self.tabpos_fn(list(map(self.tabpos.get, (pkgPos, sysPos))))
         
         self.linkbtn_fn(self.cfg.get("browserCmd", section="GUI"))
 
@@ -272,7 +272,7 @@ class PreferenceWindow (AbstractDialog):
         self._save()
         try:
             self.cfg.write()
-        except IOError, e:
+        except IOError as e:
             io_ex_dialog(e)
 
         self.window.destroy()

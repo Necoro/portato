@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+from future_builtins import map, filter, zip
 
 import gtk
 
@@ -40,8 +40,8 @@ class PluginWindow (AbstractDialog):
         self.inst = []
         self.ninst = []
 
-        self.buttons = map(self.tree.get_widget, ("disabledRB", "tempEnabledRB", "enabledRB", "tempDisabledRB"))
-        map(lambda b: b.set_mode(False), self.buttons)
+        self.buttons = list(map(self.tree.get_widget, ("disabledRB", "tempEnabledRB", "enabledRB", "tempDisabledRB")))
+        list(map(lambda b: b.set_mode(False), self.buttons))
 
         self.descrLabel = self.tree.get_widget("descrLabel")
         self.authorLabel = self.tree.get_widget("authorLabel")
@@ -108,7 +108,7 @@ class PluginWindow (AbstractDialog):
             debug("new changed plugins: %s => %d", plugin.name, state)
 
     def cb_ok_clicked (self, btn):
-        for plugin, val in self.changedPlugins.iteritems():
+        for plugin, val in self.changedPlugins.items():
             plugin.status = val
 
         self.close()
@@ -164,10 +164,10 @@ class PluginWindow (AbstractDialog):
             try:
                 try:
                     self.queue.append(pkg, type = "install")
-                except PackageNotFoundException, e:
+                except PackageNotFoundException as e:
                     if unmask_dialog(e[0]) == gtk.RESPONSE_YES:
                         self.queue.append(pkg, type = "install", unmask = True)
-            except BlockedException, e:
+            except BlockedException as e:
                 blocked_dialog(e[0], e[1])
 
         return True

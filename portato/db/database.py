@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
+
 
 from threading import RLock
 from functools import wraps
@@ -77,7 +77,7 @@ class Database (object):
 
     def set_type (self, type):
         if type & self.search_types() != type:
-            raise UnsupportedSearchTypeError, type
+            raise UnsupportedSearchTypeError(type)
 
         self._type = type
 

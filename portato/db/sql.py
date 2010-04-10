@@ -10,8 +10,6 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
-
 try:
     import sqlite3 as sql
 except ImportError:
@@ -136,7 +134,7 @@ class SQLDatabase (Database):
                 debug("Overlay '%s' has been removed", key)
                 changed = True
             
-            for key in hashes.iterkeys():
+            for key in hashes.keys():
 
                 if key not in db:
                     debug("Overlay '%s' has been added.", key)

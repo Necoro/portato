@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
+
 
 import smtplib, socket
 import time
@@ -152,7 +152,7 @@ class MailInfoWindow (AbstractDialog):
                     else: debug("TLS not supported in Python. Continuing without it.")
 
                     server.sendmail(self.addr, self.TO, self.message.as_string())
-                except smtplib.SMTPRecipientsRefused, e:
+                except smtplib.SMTPRecipientsRefused as e:
                     if e.recipients[self.TO][0] < 500:
                         info(_("An error occurred while sending. I think we were greylisted. The error: %s") % e)
                     else: raise
@@ -164,11 +164,11 @@ class MailInfoWindow (AbstractDialog):
                         server.quit()
                     except smtplib.SMTPServerDisconnected:
                         pass # ignore this
-        except socket.error, e:
+        except socket.error as e:
             gobject.idle_add(mail_failure_dialog, "%s (Code: %s)" % (e.args[1], e.args[0]))
-        except smtplib.SMTPResponseException, e:
+        except smtplib.SMTPResponseException as e:
             gobject.idle_add(mail_failure_dialog, "%s (Code: %s)" % (e.smtp_error, e.smtp_code))
-        except smtplib.SMTPException, e:
+        except smtplib.SMTPException as e:
             gobject.idle_add(mail_failure_dialog, e.args)
         
     def cb_cancel_clicked (self, *args):

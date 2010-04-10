@@ -10,8 +10,6 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
-
 import logging
 import sys
 import os
@@ -41,7 +39,7 @@ class OutputFormatter (logging.Formatter):
     def __init__(self, *args, **kwargs):
         logging.Formatter.__init__(self, *args, **kwargs)
 
-        for key, value in self.colors.iteritems():
+        for key, value in self.colors.items():
             self.colors[key] = "\x1b[01;%02dm*\x1b[39;49;00m" % value
 
         if hasattr(sys.stderr, "fileno"):

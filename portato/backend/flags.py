@@ -10,8 +10,6 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
-
 import os
 import itertools as itt
 from subprocess import Popen, PIPE # needed for grep
@@ -134,7 +132,7 @@ def set_config (cfg):
 
     for i in CONFIG.keys():
         if not i in cfg:
-            raise KeyError, "Missing keyword in config: "+i
+            raise KeyError("Missing keyword in config: "+i)
 
     for i in CONFIG:
         CONFIG[i] = cfg[i]
@@ -583,31 +581,29 @@ def write_masked ():
                 list = system.split_cpv(cpv)
                 msg += "%s/%s\n" % (list[0],list[1])
             if not file in file_cache:
-                f = open(file, "a")
-                f.write(msg)
-                f.close()
+                with open(file, "a") as f:
+                    f.write(msg)
             else:
                 file_cache[file].append(msg)
         # change a line
         else:
             if not file in file_cache:
                 # read file
-                f = open(file, "r")
-                lines = []
-                i = 1
-                while i < line: # stop at the given line
-                    lines.append(f.readline())
-                    i = i+1
-                # delete
-                l = f.readline()
-                l = "#"+l[:-1]+" # removed by portato\n"
-                lines.append(l)
+                with open(file, "r") as f:
+                    lines = []
+                    i = 1
+                    while i < line: # stop at the given line
+                        lines.append(f.readline())
+                        i = i+1
+                    # delete
+                    l = f.readline()
+                    l = "#"+l[:-1]+" # removed by portato\n"
+                    lines.append(l)
                 
-                # read the rest
-                lines.extend(f.readlines())
+                    # read the rest
+                    lines.extend(f.readlines())
                 
-                file_cache[file] = lines
-                f.close()
+                    file_cache[file] = lines
             else: # in cache
                 l = file_cache[file][line-1]
                 # delete:
@@ -719,31 +715,29 @@ def write_testing ():
                     list = system.split_cpv(cpv)
                     msg += "%s/%s ~%s\n" % (list[0],list[1],arch)
                 if not file in file_cache:
-                    f = open(file, "a")
-                    f.write(msg)
-                    f.close()
+                    with open(file, "a") as f:
+                        f.write(msg)
                 else:
                     file_cache[file].append(msg)
             # change a line
             else:
                 if not file in file_cache:
                     # read file
-                    f = open(file, "r")
-                    lines = []
-                    i = 1
-                    while i < line: # stop at the given line
-                        lines.append(f.readline())
-                        i = i+1
-                    # delete
-                    l = f.readline()
-                    l = "#"+l[:-1]+" # removed by portato\n"
-                    lines.append(l)
-                    
-                    # read the rest
-                    lines.extend(f.readlines())
-                    
-                    file_cache[file] = lines
-                    f.close()
+                    with open(file, "r") as f:
+                        lines = []
+                        i = 1
+                        while i < line: # stop at the given line
+                            lines.append(f.readline())
+                            i = i+1
+                        # delete
+                        l = f.readline()
+                        l = "#"+l[:-1]+" # removed by portato\n"
+                        lines.append(l)
+                        
+                        # read the rest
+                        lines.extend(f.readlines())
+                        
+                        file_cache[file] = lines
                 else: # in cache
                     l = file_cache[file][line-1]
                     # delete:
@@ -752,9 +746,8 @@ def write_testing ():
     
     # write to disk
     for file in file_cache.keys():
-        f = open(file, "w")
-        f.writelines(file_cache[file])
-        f.close()
+        with open(file, "w") as f:
+            f.writelines(file_cache[file])
     # reset
     newTesting = {}
     system.reload_settings()

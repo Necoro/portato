@@ -14,7 +14,7 @@
 Different exceptions used in the eix module.
 """
 
-from __future__ import absolute_import, with_statement
+
 __docformat__ = "restructuredtext"
 
 class EixError (Exception):

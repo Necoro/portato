@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
+from future_builtins import map, filter, zip
 
 # gtk stuff
 import gtk
@@ -199,15 +199,15 @@ class PackageTable:
             try:
                 try:
                     self.queue.append(self.pkg.get_cpv(), type = type, update = update)
-                except PackageNotFoundException, e:
+                except PackageNotFoundException as e:
                     if dialogs.unmask_dialog(e[0]) == gtk.RESPONSE_YES:
                         self.queue.append(self.pkg.get_cpv(), type = type, unmask = True, update = update)
-            except BlockedException, e:
+            except BlockedException as e:
                 dialogs.blocked_dialog(e[0], e[1])
         else:
             try:
                 self.queue.append(self.pkg.get_cpv(), type = "uninstall")
-            except PackageNotFoundException, e:
+            except PackageNotFoundException as e:
                 error(_("Package could not be found: %s"), e[0])
                 #masked_dialog(e[0])
 
@@ -464,7 +464,7 @@ class MainWindow (Window):
         splash(_("Loading Config"))
         try:
             self.cfg = Config(CONFIG_LOCATION)
-        except IOError, e:
+        except IOError as e:
             dialogs.io_ex_dialog(e)
             raise
 
@@ -521,7 +521,7 @@ class MainWindow (Window):
         # notebooks
         self.sysNotebook = self.tree.get_widget("systemNotebook")
         self.pkgNotebook = self.tree.get_widget("packageNotebook")
-        self.set_notebook_tabpos(map(PreferenceWindow.tabpos.get, map(int, (self.cfg.get("packageTabPos", "GUI"), self.cfg.get("systemTabPos", "GUI")))))
+        self.set_notebook_tabpos(list(map(PreferenceWindow.tabpos.get, list(map(int, (self.cfg.get("packageTabPos", "GUI"), self.cfg.get("systemTabPos", "GUI")))))))
         slots.NotebookSlot(self.pkgNotebook, gtk.Widget, "Package Notebook")
         
         # the useScroll
@@ -555,9 +555,9 @@ class MainWindow (Window):
         try:
             try:
                 self.load_session()
-            except OldSessionException, e:
+            except OldSessionException as e:
                 self.load_session(e)
-        except SessionException, e:
+        except SessionException as e:
             warning(str(e))
             self.load_session(defaults_only = True) # last ressort
 
@@ -891,7 +891,7 @@ class MainWindow (Window):
 
     def build_type_combo (self):
         model = gtk.ListStore(int, str)
-        for k,v in self.db.TYPES.iteritems():
+        for k,v in self.db.TYPES.items():
             model.append((k,v))
 
         self.typeCombo.set_model(model)
@@ -915,7 +915,7 @@ class MainWindow (Window):
         """
         try:
             self.session = Session("gui.cfg", name="GUI", oldfiles=["gtk_session.cfg"])
-        except (OSError, IOError), e:
+        except (OSError, IOError) as e:
             dialogs.io_ex_dialog(e)
             return
 
@@ -953,7 +953,7 @@ class MainWindow (Window):
 
         # PANED
         def load_paned (*pos):
-            pos = map(int, pos)
+            pos = list(map(int, pos))
             [x.set_position(p) for x,p in zip((self.vpaned, self.hpaned), pos)]
 
         def save_paned ():
@@ -1056,7 +1056,7 @@ class MainWindow (Window):
                 self.session.add_handler(value)
 
         # set the simple ones :)
-        map(_add,[
+        list(map(_add,[
             ([("gtksessionversion", "session")], load_session_version, lambda: SESSION_VERSION),
             (["width", "height"], lambda w,h: self.window.resize(int(w), int(h)), self.window.get_size),
             (["vpanedpos", "hpanedpos"], load_paned, save_paned),
@@ -1064,7 +1064,7 @@ class MainWindow (Window):
             (["pkgsel"], load_pkg_selection, save_pkg_selection, ["portato@0"]),
             (["searchtype"], load_search_type, lambda: self.db.type)
             #([("merge", "queue"), ("unmerge", "queue"), ("oneshot", "queue")], load_queue, save_queue),
-            ])
+            ]))
 
         # set the plugins
         queue = plugin.get_plugin_queue()
@@ -1073,7 +1073,8 @@ class MainWindow (Window):
                 self.session.add_handler(([(p.name.replace(" ","_").replace(":","_"), "plugins")], load_plugin(p), save_plugin(p)))
 
         # the other things
-        def load_cfg ((name, cat)):
+        def load_cfg (pkg):
+            (name, cat) = pkg
             def load (v):
                 self.cfg.set_session(name, cat, v)
 
@@ -1086,7 +1087,7 @@ class MainWindow (Window):
 
             self.session.add_handler(([(name, cat)], load, save))
 
-        map(load_cfg, [("prefheight", "GUI"), ("prefwidth", "GUI")])
+        list(map(load_cfg, [("prefheight", "GUI"), ("prefwidth", "GUI")]))
 
         # now we have the handlers -> load
         self.session.load(defaults_only)
@@ -1298,7 +1299,7 @@ class MainWindow (Window):
             self.selCP = "%s/%s" % (store.get_value(it, 2), store.get_value(it, 1))
             try:
                 self.fill_version_list(self.selCP)
-            except VersionsNotFoundException, e:
+            except VersionsNotFoundException as e:
                 warning(_("No versions of package '%s' found!") % self.selCP)
                 dialogs.no_versions_dialog(self.selCP)
                 self.db.disable(self.selCP)
@@ -1438,7 +1439,7 @@ class MainWindow (Window):
                 self.session.set("useflags", str(dialogs.changed_flags_dialog(_("use flags"))[1]), "dialogs")
             try:
                 flags.write_use_flags()
-            except IOError, e:
+            except IOError as e:
                 dialogs.io_ex_dialog(e)
                 return True
         
@@ -1451,7 +1452,7 @@ class MainWindow (Window):
             try:
                 flags.write_masked()
                 flags.write_testing()
-            except IOError, e:
+            except IOError as e:
                 dialogs.io_ex_dialog(e)
                 return True
             else:
@@ -1485,12 +1486,12 @@ class MainWindow (Window):
                     try:
                         for pkg, old_pkg in updating:
                             self.queue.append(pkg.get_cpv(), type = "update", unmask = False)
-                    except PackageNotFoundException, e:
+                    except PackageNotFoundException as e:
                         if dialogs.unmask_dialog(e[0]) == gtk.RESPONSE_YES:
                             for pkg, old_pkg in updating:
                                 self.queue.append(pkg.get_cpv(), type = "update", unmask = True)
 
-                except BlockedException, e:
+                except BlockedException as e:
                     dialogs.blocked_dialog(e[0], e[1])
                     self.queue.remove_children(self.queueTree.get_update_it())
                 
@@ -1567,7 +1568,7 @@ class MainWindow (Window):
             flags.write_use_flags()
             flags.write_testing()
             flags.write_masked()
-        except IOError, e:
+        except IOError as e:
             dialogs.io_ex_dialog(e)
 
     @Window.watch_cursor

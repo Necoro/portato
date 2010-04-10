@@ -10,8 +10,6 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
-
 from . import database as db
 from .exceptions import UnknownDatabaseTypeError, DatabaseInstantiationError
 from ..session import Session, SectionDict
@@ -70,7 +68,7 @@ class Database(db.Database):
 
         else:
             error(_("Unknown database type: %s"), type)
-            raise UnknownDatabaseTypeError, type
+            raise UnknownDatabaseTypeError(type)
 
     @classmethod
     def _get_session(cls):

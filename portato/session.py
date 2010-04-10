@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
+from future_builtins import map, filter, zip
 
 import os
 from UserDict import DictMixin
@@ -75,16 +75,16 @@ class Session (object):
         # add version check
         self.add_handler(([("version", "session")], self.check_version, lambda: self.VERSION))
 
-    def add_handler (self, (options, load_fn, save_fn), default = None):
+    def add_handler (self, handler, default = None):
         """
         Adds a handler to this session. A handler is a three-tuple consisting of:
             - a list of (key,section) values
             - a function getting number of option arguments and applying them to the program
             - a function returning the number of option return values - getting them out of the program
         """
-
-        convert = lambda (x,y): (unicode(y).upper(), unicode(x).lower())
-        options = map(lambda x: (self._name, unicode(x).lower()) if not hasattr(x, "__iter__") else convert(x), options)
+        (options, load_fn, save_fn) = handler
+        convert = lambda x_y: (unicode(x_y[1]).upper(), unicode(x_y[0]).lower())
+        options = [(self._name, unicode(x).lower()) if not hasattr(x, "__iter__") else convert(x) for x in options]
         self._handlers.append((options, load_fn, save_fn, default))
 
     def load (self, defaults_only = False):
@@ -124,7 +124,7 @@ class Session (object):
             debug("Saving %s with values %s", options, vals)
 
             for value, (section, option) in zip(vals, options):
-                self.set(option, str(value), section)
+                self.set(option, unicode(value), section)
         
         with open(self._file, "w") as f:
             self._cfg.write(f)
@@ -163,7 +163,7 @@ class Session (object):
 
         try:
             return self._cfg.getboolean(section, key)
-        except NoSuchThing, ValueError:
+        except NoSuchThing as ValueError:
             return None
     
     def remove (self, key, section = None):
@@ -209,7 +209,7 @@ class SectionDict (DictMixin):
         item = self._session.get(name, section = self._section)
 
         if item is None:
-            raise KeyError, "%s not in section %s" % (name, self._section)
+            raise KeyError("%s not in section %s" % (name, self._section))
         return item
 
     def __setitem__ (self, name, value):

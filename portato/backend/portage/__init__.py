@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+from future_builtins import map, filter, zip
 
 from ...helper import debug
 from portage import VERSION as PV

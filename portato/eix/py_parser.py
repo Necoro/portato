@@ -17,7 +17,7 @@ In this module (nearly) all of these types have a corresponding function.
 For the exact way all the functions work, have a look at the eix format description.
 """
 
-from __future__ import absolute_import, with_statement
+
 __docformat__ = "restructuredtext"
 
 import os
@@ -53,7 +53,7 @@ def _get_bytes (file, length, expect_list = False):
     s = file.read(length)
 
     if len(s) != length:
-        raise EndOfFileException, file.name
+        raise EndOfFileException(file.name)
 
     if length == 1 and not expect_list:
         return ord(s) # is faster than unpack and we have a scalar
@@ -187,7 +187,7 @@ def string (file, skip = False):
         s = file.read(nelems)
 
     if len(s) != nelems:
-        raise EndOfFileException, file.name
+        raise EndOfFileException(file.name)
 
     return s
 

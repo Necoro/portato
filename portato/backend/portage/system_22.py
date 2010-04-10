@@ -10,8 +10,6 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
-
 import os
 import portage
 
@@ -46,7 +44,7 @@ class PortageSystem_22 (PortageSystem):
 
     def get_sets (self, description = False):
         if description:
-            return ((name, set.description) for name, set in self.settings.setsconfig.getSets().iteritems())
+            return ((name, set.description) for name, set in self.settings.setsconfig.getSets().items())
         else:
             return tuple(self.settings.setsconfig.getSets())
 

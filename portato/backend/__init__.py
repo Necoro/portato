@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+
 
 from ..helper import debug
 from .system_interface import SystemInterface
@@ -21,7 +21,7 @@ class _Package (object):
     whether an object is a package. It cannot use the normal Package class as this results in cyclic dependencies."""
 
     def __init__ (self):
-        raise TypeError, "Calling __init__ on portato.backend._Package objects is not allowed."
+        raise TypeError("Calling __init__ on portato.backend._Package objects is not allowed.")
 
 def is_package(what):
     return isinstance(what, _Package)
@@ -65,6 +65,6 @@ class SystemWrapper (SystemInterface):
             from .portage import PortageSystem
             cls.__wrapped_sys = PortageSystem ()
         else:
-            raise InvalidSystemError, cls.__system
+            raise InvalidSystemError(cls.__system)
 
 system = SystemWrapper()

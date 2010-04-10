@@ -10,8 +10,6 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
-
 from ..package import Package
 from .. import flags
 from .. import system
@@ -184,7 +182,7 @@ class PortagePackage (Package):
             return []
 
         if deps[0] == 0: # error
-            raise DependencyCalcError, deps[1]
+            raise DependencyCalcError(deps[1])
         
         deps = deps[1]
 
@@ -206,7 +204,7 @@ class PortagePackage (Package):
             return []
 
         if deps[0] == 0: # error
-            raise DependencyCalcError, deps[1]
+            raise DependencyCalcError(deps[1])
         
         deps = deps[1]
 
@@ -234,7 +232,7 @@ class PortagePackage (Package):
                     else:
                         dep_pkgs.append(dep)
                 elif blocked:
-                    raise BlockedException, (self.get_cpv(), blocked[0].get_cpv())
+                    raise BlockedException((self.get_cpv(), blocked[0].get_cpv()))
                 
                 continue # finished with the blocking one -> next
 
@@ -242,7 +240,7 @@ class PortagePackage (Package):
             if not pkg: # try to find masked ones
                 pkgs = system.find_packages(dep, masked = True)
                 if not pkgs:
-                    raise PackageNotFoundException, dep
+                    raise PackageNotFoundException(dep)
 
                 pkgs = system.sort_package_list(pkgs)
                 pkgs.reverse()

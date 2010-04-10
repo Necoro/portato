@@ -10,8 +10,6 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
-
 # some stuff needed
 import sys
 import logging
@@ -45,7 +43,7 @@ class GtkThread (Thread):
             try:
                 sys.excepthook(type, val, tb, thread = self.getName())
             except TypeError:
-                raise type, val, tb # let normal thread handle it
+                raise type(val).with_traceback(tb) # let normal thread handle it
             finally:
                 del type, val, tb
 

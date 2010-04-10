@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+
 
 import os
 from subprocess import Popen
@@ -90,7 +90,7 @@ class Listener (object):
     def __send (self, string):
         try:
             self.mq.send(string)
-        except ipc.MessageQueueError, e:
+        except ipc.MessageQueueError as e:
             error(_("An exception occured while accessing the message queue: %s"), e)
 
     def send_notify (self, base = "", descr = "", icon = "", urgency = None):

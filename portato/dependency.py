@@ -14,7 +14,7 @@
 Provides classes for the presentation of dependencies.
 """
 
-from __future__ import absolute_import, with_statement
+
 __docformat__ = "restructuredtext"
 
 from collections import defaultdict
@@ -165,14 +165,14 @@ class DependencyTree (object):
             # use
             if dep[-1] == "?":
                 ntree = self.add_flag(dep[:-1])
-                n = it.next()
+                n = next(it)
                 if not hasattr(n, "__iter__"):
                     n = [n]
                 ntree.parse(n)
             
             # or
             elif dep == "||":
-                n = it.next() # skip
+                n = next(it) # skip
                 if not hasattr(n, "__iter__"):
                     n = [n]
                 

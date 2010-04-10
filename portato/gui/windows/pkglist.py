@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+
 
 import gtk
 from .basic import AbstractDialog
@@ -107,11 +107,11 @@ class PkgListWindow (AbstractDialog):
                 try:
                     try:
                         self.queue.append(item, "install", oneshot = True)
-                    except PackageNotFoundException, e:
+                    except PackageNotFoundException as e:
                         if unmask_dialog(e[0]) == gtk.RESPONSE_YES :
                             self.queue.append(item, "install", unmask = True, oneshot = True)
 
-                except BlockedException, e:
+                except BlockedException as e:
                     blocked_dialog(e[0], e[1])
         else:
             for item in items:

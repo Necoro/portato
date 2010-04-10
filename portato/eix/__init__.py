@@ -14,7 +14,6 @@
 A module to parse the eix-cache files.
 """
 
-from __future__ import absolute_import, with_statement
 __docformat__ = "restructuredtext"
 
 from . import parser

@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
+
 
 import re
 from collections import defaultdict
@@ -102,7 +102,7 @@ class HashDatabase (Database):
             if installed:
                 cats = self.inst_cats
             else:
-                cats = self._db.iterkeys()
+                cats = iter(self._db.keys())
 
         else:
             if installed:
@@ -124,7 +124,7 @@ class HashDatabase (Database):
             except KeyError: # not in inst_cats - can be ignored
                 pass
             
-            self._db[self.ALL] = filter(lambda x: x.cat != cat, self._db[self.ALL])
+            self._db[self.ALL] = [x for x in self._db[self.ALL] if x.cat != cat]
             self.populate(cat+"/*")
         else:
             self.__initialize()
@@ -148,7 +148,7 @@ class HashDatabase (Database):
         else:
             try:
                 regex = re.compile(restrict, re.I)
-            except re.error, e:
+            except re.error as e:
                 info(_("Error while compiling search expression: '%s'."), str(e))
             else: # only set self._restrict if no error occurred
                 self._restrict = regex

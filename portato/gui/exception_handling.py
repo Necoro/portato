@@ -11,12 +11,12 @@
 #
 # Written by René 'Necoro' Neumann
 
-from __future__ import absolute_import, with_statement
+from future_builtins import map, filter, zip
 
 import gtk, pango, gobject
 import sys, traceback
 
-from StringIO import StringIO
+from cStringIO import StringIO
 
 from ..helper import debug, error, get_runsystem
 from .dialogs import file_chooser_dialog, io_ex_dialog
@@ -78,7 +78,7 @@ class UncaughtExceptionDialog(gtk.MessageDialog):
                     try:
                         with open(file, "w") as f:
                             f.writelines(self.text)
-                    except IOError, e:
+                    except IOError as e:
                         io_ex_dialog(e)
 
                 else:

@@ -13,14 +13,12 @@
 """
 A module managing the plugins for Portato.
 """
-
-from __future__ import absolute_import
 __docformat__ = "restructuredtext"
 
 import os
 import os.path as osp
 import traceback
-from collections import defaultdict
+from collections import defaultdict, Callable
 from functools import wraps
 
 from . import helper
@@ -329,7 +327,7 @@ class WidgetPlugin (Plugin):
         """
 
         if not slot in WidgetSlot.slots:
-            raise PluginLoadException, "Could not find specified widget slot: %s" % slot
+            raise PluginLoadException("Could not find specified widget slot: %s" % slot)
         
         self.__widgets.append(Widget(slot, widget))
 
@@ -352,14 +350,14 @@ class WidgetPlugin (Plugin):
         try:
             widget = WidgetSlot.slots[slot].widget
         except KeyError:
-            raise PluginLoadException, "Could not find specified widget slot: %s" % slot
+            raise PluginLoadException("Could not find specified widget slot: %s" % slot)
 
         if not hasattr(args, "__iter__"):
             w = widget(args)
         else:
             w = widget(*args)
 
-        for k,v in kwargs.iteritems():
+        for k,v in kwargs.items():
             w.connect(k, v)
 
         self.add_widget(slot, w)
@@ -441,8 +439,8 @@ class PluginQueue (object):
 
         for p in plugins: # import them
             try:
-                exec "from portato.plugins import %s" % p in {}
-            except PluginLoadException, e:
+                exec("from portato.plugins import %s" % p, {})
+            except PluginLoadException as e:
                 error(_("Loading plugin module '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : e})
             except:
                 tb = traceback.format_exc()
@@ -455,7 +453,7 @@ class PluginQueue (object):
             if isinstance(p, WidgetPlugin):
                 try:
                     p._widget_init(window)
-                except PluginLoadException, e:
+                except PluginLoadException as e:
                     error(_("Loading widgets plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : e})
                 except:
                     tb = traceback.format_exc()
@@ -480,14 +478,14 @@ class PluginQueue (object):
         :raise PluginLoadException: passed plugin is not of class `Plugin`
         """
 
-        if callable(plugin) and issubclass(plugin, Plugin):
+        if isinstance(plugin, Callable) and issubclass(plugin, Plugin):
             p = plugin(disable = disable) # need an instance and not the class
         elif isinstance(plugin, Plugin):
             p = plugin
             if disable:
                 p.status = p.STAT_HARD_DISABLED
         else:
-            raise PluginLoadException, "Is neither a subclass nor an instance of Plugin."
+            raise PluginLoadException("Is neither a subclass nor an instance of Plugin.")
 
         p._init()
 
@@ -606,10 +604,10 @@ class PluginQueue (object):
         
         self._resolve_unresolved(unresolved_before, unresolved_after)
 
-        for hook, calls in star_before.iteritems():
+        for hook, calls in star_before.items():
             self.hooks[hook].before.extend(calls) # append the list
 
-        for hook, calls in star_after.iteritems():
+        for hook, calls in star_after.items():
             self.hooks[hook].after.extend(calls) # append the list
 
     def _resolve_unresolved (self, before, after):
@@ -700,7 +698,7 @@ def register (plugin, disable = False):
     if __plugins is not None:
         try:
             __plugins.add(plugin, disable)
-        except PluginLoadException, e:
+        except PluginLoadException as e:
             error(_("Registrating plugin '%(plugin)s' failed: %(error)s"), {"plugin" : plugin, "error" : e})
         except:
             tb = traceback.format_exc()

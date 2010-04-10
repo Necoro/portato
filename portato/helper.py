@@ -13,7 +13,7 @@
 """
 Some nice functions used in the program.
 """
-from __future__ import absolute_import, with_statement
+
 
 import os, logging
 
@@ -74,11 +74,11 @@ def paren_reduce(mystr):
             subsec,tail = paren_reduce(subsec)
         else:
             subsec,tail = mystr.split(")",1)
-            subsec = filter(None, subsec.split(" "))
+            subsec = [_f for _f in subsec.split(" ") if _f]
             return [mylist+subsec,tail]
         mystr = tail
         if freesec:
-            mylist = mylist + filter(None, freesec.split(" "))
+            mylist = mylist + [_f for _f in freesec.split(" ") if _f]
         if subsec is not None:
             mylist = mylist + [subsec]
     return mylist

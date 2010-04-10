@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+
 
 from ..backend import system
 
@@ -43,7 +43,7 @@ d"""
         """
         
         if not issubclass(threadClass, threading.Thread):
-            raise ValueError, "Only subclasses of threading.Thread are allowed."
+            raise ValueError("Only subclasses of threading.Thread are allowed.")
 
         self.queue = queue
         self.iterators = iterators

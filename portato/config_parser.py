@@ -37,8 +37,10 @@ Thus it keeps comments and structuring of the file.
         Regular expression defining a normal option-value pair.
 """
 
-from __future__ import absolute_import, with_statement
+
 __docformat__ = "restructuredtext"
+
+from future_builtins import map, filter, zip
 
 import re
 from threading import Lock
@@ -181,7 +183,7 @@ class ConfigParser:
                 "yes"    : "no",
                 "ja"    : "nein",
                 "wahr"    : "falsch"}
-    true_false.update(zip(true_false.values(), true_false.keys()))
+    true_false.update(list(zip(list(true_false.values()), list(true_false.keys()))))
 
     def __init__ (self, file):
         """
@@ -348,7 +350,7 @@ class ConfigParser:
         if val.is_bool():
             return val.boolean
 
-        raise ValueError, "\"%s\" is not a boolean. (%s)" % (key, val.value)
+        raise ValueError("\"%s\" is not a boolean. (%s)" % (key, val.value))
 
     def set (self, key, value, section = "MAIN"):
         """
@@ -382,7 +384,7 @@ class ConfigParser:
                     val.boolean = value
                     val.value = self._invert(val.value)
             else:
-                raise ValueError, "\"%s\" is not a boolean." % key
+                raise ValueError("\"%s\" is not a boolean." % key)
 
     def add_section (self, section, comment = None, with_blankline = True):
         """
@@ -405,7 +407,7 @@ class ConfigParser:
             self.cache.append("\n")
 
         if comment:
-            if isinstance(comment, basestring):
+            if isinstance(comment, str):
                 comment = comment.split("\n")
             
             # add newlines to comment at the beginning and the end
@@ -450,7 +452,7 @@ class ConfigParser:
         
         # find line# to add
         if self.vars[section]:
-            mline = max((x.line for x in self.vars[section].itervalues())) + 1
+            mline = max((x.line for x in self.vars[section].values())) + 1
         else: # no value inside the section at the moment
             mline = self.sections[section] + 1
 
@@ -459,7 +461,7 @@ class ConfigParser:
             mline += 1
 
         if comment:
-            if isinstance(comment, basestring):
+            if isinstance(comment, str):
                 comment = comment.split("\n")
             
             for c in comment:
@@ -479,8 +481,8 @@ class ConfigParser:
             return
 
         with self.writelock:
-            for sec in self.vars.itervalues():
-                for val in sec.itervalues():
+            for sec in self.vars.values():
+                for val in sec.values():
                     if val.changed:
                         part1 = self.cache[val.line][:self.pos[val.line][0]]     # key+DELIMITER
                         part2 = val.value                                        # value

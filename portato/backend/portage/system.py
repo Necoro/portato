@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import, with_statement
+from future_builtins import map, filter, zip
 
 import re, os
 import portage
@@ -212,7 +212,7 @@ class PortageSystem (SystemInterface):
         result = self._get_set(pkgSet).find(key, masked, with_version, only_cpv)
 
         if (not only_cpv) and with_version:
-            result = map(self.new_package, result)
+            result = list(map(self.new_package, result))
         else:
             result = list(result)
         
@@ -220,7 +220,7 @@ class PortageSystem (SystemInterface):
 
     def list_categories (self, name = None):
         categories = self.settings.global_settings.categories
-        return filter(self.find_lambda(name), categories)
+        return list(filter(self.find_lambda(name), categories))
 
     def split_cpv (self, cpv):
         cpv = portage.dep_getcpv(cpv)
@@ -292,7 +292,7 @@ class PortageSystem (SystemInterface):
 
     def update_world (self, sets = ("world", "system"), newuse = False, deep = False):
         packages = set()
-        map(packages.add, itt.chain(*[self.find_packages(pkgSet = s, with_version = False) for s in sets]))
+        list(map(packages.add, itt.chain(*[self.find_packages(pkgSet = s, with_version = False) for s in sets])))
 
         states = [(["RDEPEND", "PDEPEND"], True)]
         if self.with_bdeps():

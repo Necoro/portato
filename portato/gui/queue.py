@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+from future_builtins import map, filter, zip
 
 # some stuff needed
 import os, pty
@@ -61,7 +61,7 @@ class EmergeQueue:
         
         # member vars
         self.tree = tree
-        if self.tree and not isinstance(self.tree, GtkTree): raise TypeError, "tree passed is not a GtkTree-object"
+        if self.tree and not isinstance(self.tree, GtkTree): raise TypeError("tree passed is not a GtkTree-object")
         
         self.console = console
         
@@ -170,7 +170,7 @@ class EmergeQueue:
                 for i in new_iuse.difference(old_iuse):
                     changedUse.append("+"+i)
 
-        except backend.PackageNotFoundException, e: # package not found / package is masked -> delete current tree and re-raise the exception
+        except backend.PackageNotFoundException as e: # package not found / package is masked -> delete current tree and re-raise the exception
             if type == "update": # remove complete tree
                 self.remove_with_children(self.tree.first_iter(it), removeNewFlags = False)
             
@@ -321,7 +321,7 @@ class EmergeQueue:
     def doEmerge (self, options, packages, its, *args, **kwargs):
         top = None
         if self.tree and its:
-            for v in its.itervalues():
+            for v in its.values():
                 self.tree.set_in_progress(v)
                 top = self.tree.first_iter(v)
                 break
@@ -361,7 +361,7 @@ class EmergeQueue:
                     os.dup2(self.pty[1], 2)
 
             # get all categories that are being touched during the emerge process
-            cats = set(x.split("/")[0] for x in its.iterkeys())
+            cats = set(x.split("/")[0] for x in its.keys())
 
             # start emerge
             self.process = Popen(command+options+packages, shell = False, env = system.get_environment(), preexec_fn = pre)
@@ -642,7 +642,7 @@ class EmergeQueue:
             elif self.tree.is_in_unmerge(it): # in Unmerge
                 try:
                     del self.iters["uninstall"][cpv]
-                except KeyError, e: # this is just for debugging
+                except KeyError as e: # this is just for debugging
                     error("'%s' not in self.iters[\"uninstall\"] for some reason", cpv)
                     debug("self.iters: %s", self.iters)
                     raise
@@ -661,4 +661,4 @@ class EmergeQueue:
         @returns: True if everything is empty and the process is not running.
         @rtype: bool"""
 
-        return not (self.process or any(map(len, self.iters.itervalues())))
+        return not (self.process or any(map(len, self.iters.values())))

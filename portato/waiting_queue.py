@@ -10,8 +10,6 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
-
 from threading import Thread, Event
 from Queue import Queue
 
@@ -19,7 +17,7 @@ class WaitingQueue (Queue):
 
     def __init__ (self, setTrue = True, threadClass = Thread):
         if not issubclass(threadClass, Thread):
-            raise ValueError, "Only subclasses of threading.Thread are allowed."
+            raise ValueError("Only subclasses of threading.Thread are allowed.")
         
         Queue.__init__(self)
         self.event = Event()

@@ -10,7 +10,7 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from __future__ import absolute_import
+
 
 from ..helper import error
 from .exception_handling import register_ex_handler
@@ -31,7 +31,7 @@ def run ():
         del s
         
         m.main()
-    except PreReqError, e:
+    except PreReqError as e:
         error("Prerequisite not matched. Aborting.")
         prereq_error_dialog(e)
         s.destroy()
