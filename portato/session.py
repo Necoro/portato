@@ -83,8 +83,8 @@ class Session (object):
             - a function returning the number of option return values - getting them out of the program
         """
 
-        convert = lambda (x,y): (y.upper(), x.lower())
-        options = map(lambda x: (self._name, x.lower()) if not hasattr(x, "__iter__") else convert(x), options)
+        convert = lambda (x,y): (unicode(y).upper(), unicode(x).lower())
+        options = map(lambda x: (self._name, unicode(x).lower()) if not hasattr(x, "__iter__") else convert(x), options)
         self._handlers.append((options, load_fn, save_fn, default))
 
     def load (self, defaults_only = False):
@@ -140,7 +140,7 @@ class Session (object):
 
     def set (self, key, value, section = None):
         if section is None: section = self._name
-        section = section.upper()
+        section = unicode(section).upper()
 
         try:
             self._cfg.set(section, key, value)
@@ -150,7 +150,7 @@ class Session (object):
     
     def get (self, key, section = None):
         if section is None: section = self._name
-        section = section.upper()
+        section = unicode(section).upper()
 
         try:
             return self._cfg.get(section, key)
@@ -159,7 +159,7 @@ class Session (object):
 
     def get_bool (self, key, section = None):
         if section is None: section = self._name
-        section = section.upper()
+        section = unicode(section).upper()
 
         try:
             return self._cfg.getboolean(section, key)
@@ -168,17 +168,17 @@ class Session (object):
     
     def remove (self, key, section = None):
         if section is None: section = self._name
-        section = section.upper()
+        section = unicode(section).upper()
 
         self._cfg.remove_option(section, key)
 
     def remove_section (self, section):
-        section = section.upper()
+        section = unicode(section).upper()
         self._cfg.remove_section(section)
 
     def rename (self, old, new, section = None):
         if section is None: section = self._name
-        section = section.upper()
+        section = unicode(section).upper()
 
         val = self.get(old, section)
 
@@ -187,7 +187,7 @@ class Session (object):
             self.set(new, val, section)
 
     def rename_section (self, old, new):
-        new = new.upper()
+        new = unicode(new).upper()
 
         values = self._cfg.items(old)
         self.remove_section(old)
@@ -202,7 +202,7 @@ class SectionDict (DictMixin):
     """A class, which maps a specific section of a session to a dictionary."""
 
     def __init__ (self, session, section):
-        self._section = section.upper()
+        self._section = unicode(section).upper()
         self._session = session
 
     def __getitem__ (self, name):
