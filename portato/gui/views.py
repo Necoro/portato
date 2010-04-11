@@ -108,7 +108,7 @@ class HighlightView (gtksourceview2.View, LazyView):
                 old_lang = lang
 
         if not language and old_lang:
-            warning(_("No %(old)s language file installed. Disable highlighting."), {"old" : old_lang})
+            warning(_("No %(old)s language file installed. Disabling highlighting."), {"old" : old_lang})
 
         buf = gtksourceview2.Buffer()
         buf.set_language(language)
