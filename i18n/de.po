@@ -505,7 +505,7 @@ msgid ""
 "\n"
 "Do you want to proceed nevertheless?"
 msgstr ""
-"Du hast keine Email-Adresse angegeben, so dass dich die Entwickler nicht fü Rückfragen kontaktieren können. Der Bug könnte dadurch schwieriger zu beseitigen sein.\n"
+"Du hast keine Email-Adresse angegeben, so dass dich die Entwickler nicht für Rückfragen kontaktieren können. Der Bug könnte dadurch schwieriger zu beseitigen sein.\n"
 "Trotzdem fortfahren?"
 
 #: portato/gui/dialogs.py:31
