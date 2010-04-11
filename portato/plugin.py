@@ -443,10 +443,10 @@ class PluginQueue (object):
             try:
                 exec "from portato.plugins import %s" % p in {}
             except PluginLoadException, e:
-                error(_("Loading plugin module '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : e})
+                error(_("Loading plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : e})
             except:
                 tb = traceback.format_exc()
-                error(_("Loading plugin module '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : tb})
+                error(_("Loading plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : tb})
 
         self._organize()
 
@@ -456,7 +456,7 @@ class PluginQueue (object):
                 try:
                     p._widget_init(window)
                 except PluginLoadException, e:
-                    error(_("Loading widgets plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : e})
+                    error(_("Loading plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : e})
                 except:
                     tb = traceback.format_exc()
                     error(_("Loading widgets of plugin '%(plugin)s' failed: %(error)s"), {"plugin" : p, "error" : tb})

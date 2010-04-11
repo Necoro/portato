@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: portato-0.14\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-09 23:55+0200\n"
-"PO-Revision-Date: 2010-04-10 14:30+0200\n"
-"Last-Translator: Gürkan Gür <seqizz@gmail.com>\n"
+"POT-Creation-Date: 2010-04-11 15:59+0200\n"
+"PO-Revision-Date: 2010-04-11 15:59+0100\n"
+"Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -152,10 +152,6 @@ msgstr "<u><i>Maskeleme Anahtarları</i></u>"
 msgid "<b>Use Flag and Keyword Options</b>"
 msgstr "<u><i>Use Bayrakları ve Anahtar Ayarları</i></u>"
 
-#: portato/gui/templates/PreferenceWindow.ui:625
-msgid "Portage"
-msgstr "Portage"
-
 #: portato/gui/templates/PreferenceWindow.ui:663
 msgid "Enable systray"
 msgstr "Sistem çekmecesine yerleş"
@@ -201,7 +197,7 @@ msgid "Console Font"
 msgstr "Konsol yazı tipi"
 
 #: portato/gui/templates/PreferenceWindow.ui:934
-msgid "Chose a console font"
+msgid "Choose a console font"
 msgstr "Konsol yazı tipi seç"
 
 #: portato/gui/templates/PreferenceWindow.ui:955
@@ -381,7 +377,7 @@ msgid "Use List"
 msgstr "Use Listesi"
 
 #: portato/gui/templates/MainWindow.ui:647
-msgid "Execute the current selected queue"
+msgid "Execute the currently selected queue"
 msgstr "Geçerli kuyruğu uygula"
 
 #: portato/gui/templates/MainWindow.ui:668
@@ -624,7 +620,7 @@ msgstr "Hiç %(old)s dil dosyası yüklenmedi. %(new)s dosyasına geri dönülü
 
 #: portato/gui/views.py:111
 #, python-format
-msgid "No %(old)s language file installed. Disable highlighting."
+msgid "No %(old)s language file installed. Disabling highlighting."
 msgstr "Hiç %(old)s dil dosyası yüklenmedi. Vurguyu etkisizleştir."
 
 #: portato/gui/views.py:130
@@ -1078,13 +1074,9 @@ msgstr "Mesaj kuyruğuna ulaşılırken bir istisna oluştu: %s"
 
 #: portato/plugin.py:446
 #: portato/plugin.py:449
-#, fuzzy, python-format
-msgid "Loading plugin module '%(plugin)s' failed: %(error)s"
-msgstr "'%(plugin)s' eklentisi yüklenemedi: %(error)s"
-
 #: portato/plugin.py:459
 #, fuzzy, python-format
-msgid "Loading widgets plugin '%(plugin)s' failed: %(error)s"
+msgid "Loading plugin '%(plugin)s' failed: %(error)s"
 msgstr "'%(plugin)s' eklentisi yüklenemedi: %(error)s"
 
 #: portato/plugin.py:462
@@ -1215,32 +1207,31 @@ msgstr "Emerge başarısız!"
 msgid "Error Code: %d"
 msgstr "Hata Kodu: %d"
 
+#, fuzzy
+#~ msgid "Loading widgets plugin '%(plugin)s' failed: %(error)s"
+#~ msgstr "'%(plugin)s' eklentisi yüklenemedi: %(error)s"
+#~ msgid "Portage"
+#~ msgstr "Portage"
 #~ msgid ""
 #~ "Attaches the logfile to the mail. This log only contains debug "
 #~ "information."
 #~ msgstr ""
 #~ "E-postaya programın günlük kaydını da ekler. Bu kayıt sadece hata "
 #~ "ayıklama bilgisi içerir."
-
 #~ msgid "Attach _Logfile"
 #~ msgstr "Kayıt Dosyasını Ek_le"
-
 #~ msgid "_File"
 #~ msgstr "_Dosya"
-
 #~ msgid "_Plugins"
 #~ msgstr "Eklen_tiler"
-
 #~ msgid "-L is deprecated"
 #~ msgstr "-L kullanılmıyor"
-
 #~ msgid ""
 #~ "This software is licensed under the terms of the GPLv2.\n"
 #~ "Copyright (C) 2006-2008 René 'Necoro' Neumann <necoro@necoro.net>"
 #~ msgstr ""
 #~ "Bu yazılım GPLv2 lisansı altında dağıtılmaktadır.\n"
 #~ "Copyright (C) 2006-2007 René 'Necoro' Neumann <necoro@necoro.net>"
-
 #~ msgid ""
 #~ "Update the package list with the current search results while you are "
 #~ "typing.\n"
@@ -1248,7 +1239,6 @@ msgstr "Hata Kodu: %d"
 #~ msgstr ""
 #~ "Siz yazarken aramayı başlatır ve bunu sonuçlara yansıtır.\n"
 #~ "<b>Not</b>: Bu özellik yazma işleminizi yavaşlatacaktır."
-
 #~ msgid ""
 #~ "Organize the categories in a tree. Thereby collapse categories with the "
 #~ "same prefix:\n"
@@ -1261,53 +1251,40 @@ msgstr "Hata Kodu: %d"
 #~ "Örneğin: <i>app-admin</i>, <i>app-emacs</i>, ve <i>app-vim</i> "
 #~ "kategorileri <i><b>app</b></i> altında <i>admin</i>, <i>emacs</i>, ve "
 #~ "<i>vim</i> olarak katlanabilecek."
-
 #~ msgid "Oneshot"
 #~ msgstr "Oneshot"
-
 #~ msgid ""
 #~ "Exception in thread \"%(thread)s\":\n"
 #~ "%(trace)s"
 #~ msgstr ""
 #~ "Beklenmeyen bir durum oluştu \"%(thread)s\":\n"
 #~ "%(trace)s"
-
 #~ msgid ""
 #~ "Exception:\n"
 #~ "%s"
 #~ msgstr ""
 #~ "istisna:\n"
 #~ "%s"
-
 #~ msgid "Resume-loop called while process is still running!"
 #~ msgstr "Devam et çağrısı, işlem devam ederken geldi!"
-
 #~ msgid "Plugin"
 #~ msgstr "Eklenti"
-
 #~ msgid "Authors"
 #~ msgstr "Üreticiler"
-
 #~ msgid "Status"
 #~ msgstr "Durum"
-
 #~ msgid "%s cannot be imported."
 #~ msgstr "%s içe aktarılamadı."
-
 #~ msgid "Loading plugin '%s' failed. Invalid XML syntax."
 #~ msgstr "'%s' eklentisi yüklenemedi. XML sözdizimi hatası."
-
 #~ msgid "Loading plugin '%s' failed. Plugin does not comply with schema."
 #~ msgstr "'%s' eklentisi yüklenemedi. Eklenti şemaya uymuyor."
-
 #~ msgid "validates the given plugin xml instead of launching Portato"
 #~ msgstr "Portato'yu başlatmaz, verilen eklenti xml dosyasını tanıtır"
-
 #~ msgid "Validation failed. XML syntax error: %s."
 #~ msgstr "Geçerli değil. XML sözdizimi hatası: %s."
-
 #~ msgid "Validation failed. Does not comply with schema."
 #~ msgstr "Geçerli değil. Şemaya uymuyor."
-
 #~ msgid "Validation succeeded."
 #~ msgstr "Geçerli."
+

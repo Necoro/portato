@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-09 23:55+0200\n"
-"PO-Revision-Date: 2010-04-10 00:06+0100\n"
+"POT-Creation-Date: 2010-04-11 15:59+0200\n"
+"PO-Revision-Date: 2010-04-11 15:59+0100\n"
 "Last-Translator: René 'Necoro' Neumann <necoro@necoro.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: German\n"
 "X-Poedit-Country: GERMANY\n"
+"X-Poedit-Language: German\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
 #: portato/gui/templates/PkgListWindow.ui:48
@@ -24,11 +24,11 @@ msgstr "_Alles auswählen"
 
 #: portato/gui/templates/PkgListWindow.ui:80
 msgid "_Install Selected"
-msgstr "_Installiere ausgewählte"
+msgstr "Ausgewählte _installieren"
 
 #: portato/gui/templates/PkgListWindow.ui:96
 msgid "_Uninstall Selected"
-msgstr "_Deinstalliere ausgewählte"
+msgstr "Ausgewählte _deinstallieren"
 
 #: portato/gui/templates/PreferenceWindow.ui:12
 msgid "Preferences"
@@ -40,7 +40,7 @@ msgstr "Debug"
 
 #: portato/gui/templates/PreferenceWindow.ui:64
 msgid "Search while typing"
-msgstr "Suche während des Tippens"
+msgstr "Beim Tippen suchen"
 
 #: portato/gui/templates/PreferenceWindow.ui:84
 msgid "Browser command: "
@@ -53,7 +53,7 @@ msgstr "<b>Allgemeine Optionen</b>"
 
 #: portato/gui/templates/PreferenceWindow.ui:146
 msgid "Used database type"
-msgstr "Benutzter Datenbank-Typ"
+msgstr "Verwendeter Datenbank-Typ"
 
 #: portato/gui/templates/PreferenceWindow.ui:182
 #: portato/gui/templates/PluginWindow.ui:97
@@ -63,7 +63,7 @@ msgstr "Benutzter Datenbank-Typ"
 #: portato/gui/templates/MainWindow.ui:417
 #: portato/gui/templates/MainWindow.ui:432
 msgid "label"
-msgstr ""
+msgstr "label"
 
 #: portato/gui/templates/PreferenceWindow.ui:192
 msgid "<b>Description</b>"
@@ -96,11 +96,11 @@ msgstr "<b>Syncoptionen</b>"
 
 #: portato/gui/templates/PreferenceWindow.ui:419
 msgid "File name to use, if package.use is a directory: "
-msgstr "Zu benutzender Dateiname, wenn package.use ein Verzeichnis ist:"
+msgstr "Zu benutzender Dateiname, wenn package.use ein Verzeichnis ist: "
 
 #: portato/gui/templates/PreferenceWindow.ui:429
 msgid "Add only exact version to package.use"
-msgstr "Füge nur die exakte Paketversion zu package.keywords hinzu"
+msgstr "Füge nur die exakte Paketversion zu package.use hinzu"
 
 #: portato/gui/templates/PreferenceWindow.ui:443
 msgid "Add only exact version to package.keywords"
@@ -108,11 +108,11 @@ msgstr "Füge nur die exakte Paketversion zu package.keywords hinzu"
 
 #: portato/gui/templates/PreferenceWindow.ui:459
 msgid "File name to use, if package.keywords is a directory: "
-msgstr "Zu benutzender Dateiname, wenn package.keywords ein Verzeichnis ist:"
+msgstr "Zu benutzender Dateiname, wenn package.keywords ein Verzeichnis ist: "
 
 #: portato/gui/templates/PreferenceWindow.ui:493
 msgid "File name to use, if package.mask/package.unmask is a directory: "
-msgstr "Zu benutzender Dateiname, wenn package.mask/package.unmask ein Verzeichnis ist:"
+msgstr "Zu benutzender Dateiname, wenn package.mask/package.unmask ein Verzeichnis ist: "
 
 #: portato/gui/templates/PreferenceWindow.ui:503
 msgid "Add only exact version to package.mask/package.unmask"
@@ -131,7 +131,8 @@ msgstr ""
 "\n"
 "<i>$(pkg)</i>: Paketname\n"
 "<i>$(cat)</i>: Kategorie\n"
-"<i>$(cat-1)/$(cat-2)</i>: erster/zweiter Teil der Kategorie<i>$(version)</i>: Paketversion"
+"<i>$(cat-1)/$(cat-2)</i>: erster/zweiter Teil der Kategorie\n"
+"<i>$(version)</i>: Paketversion"
 
 #: portato/gui/templates/PreferenceWindow.ui:551
 msgid "<u><i>Use-Flags</i></u>"
@@ -148,10 +149,6 @@ msgstr "<u><i>Masking Keywords</i></u>"
 #: portato/gui/templates/PreferenceWindow.ui:607
 msgid "<b>Use Flag and Keyword Options</b>"
 msgstr "<b>Use-Flag- und Keyword-Optionen</b>"
-
-#: portato/gui/templates/PreferenceWindow.ui:625
-msgid "Portage"
-msgstr "Portage"
 
 #: portato/gui/templates/PreferenceWindow.ui:663
 msgid "Enable systray"
@@ -198,8 +195,8 @@ msgid "Console Font"
 msgstr "Schriftart in Konsole"
 
 #: portato/gui/templates/PreferenceWindow.ui:934
-msgid "Chose a console font"
-msgstr "Wähle eine Schriftart"
+msgid "Choose a console font"
+msgstr "Wähle eine Schriftart für die Konsole"
 
 #: portato/gui/templates/PreferenceWindow.ui:955
 msgid "Maximum length of the console title"
@@ -231,7 +228,7 @@ msgstr "Plugins"
 
 #: portato/gui/templates/PluginWindow.ui:53
 msgid "_Install dependencies"
-msgstr "_Installiere Abhängigkeiten"
+msgstr "Abhängigkeiten _installieren"
 
 #: portato/gui/templates/PluginWindow.ui:83
 msgid "Needed dependencies"
@@ -299,11 +296,11 @@ msgstr ""
 
 #: portato/gui/templates/MailInfoWindow.ui:160
 msgid "These files will be sent:"
-msgstr "Die folgenden Dateien werden geschickt:"
+msgstr "Die folgenden Dateien werden versendet:"
 
 #: portato/gui/templates/MailInfoWindow.ui:220
 msgid "_Send"
-msgstr "_Send"
+msgstr "Ab_senden"
 
 #: portato/gui/templates/SearchWindow.ui:8
 msgid "Search Results"
@@ -378,8 +375,8 @@ msgid "Use List"
 msgstr "Use-Flag-Liste"
 
 #: portato/gui/templates/MainWindow.ui:647
-msgid "Execute the current selected queue"
-msgstr "Führe die aktuell gewählte Queue aus"
+msgid "Execute the currently selected queue"
+msgstr "Führe die aktuell ausgewählte Queue aus"
 
 #: portato/gui/templates/MainWindow.ui:668
 msgid "E_xecute"
@@ -391,7 +388,7 @@ msgstr "Update _World"
 
 #: portato/gui/templates/MainWindow.ui:691
 msgid "Calculate the packages which will be installed during an \"update world\""
-msgstr "Berechnet die Pakete, welche während eines \"update world\" installiert werden würden"
+msgstr "Berechne die Pakete, welche während eines \"update world\" installiert werden würden"
 
 #: portato/gui/templates/MainWindow.ui:703
 msgid "_Remove"
@@ -399,7 +396,7 @@ msgstr "_Löschen"
 
 #: portato/gui/templates/MainWindow.ui:707
 msgid "Remove the selected package from the queue"
-msgstr "Löscht das gewählte Paket aus der Queue"
+msgstr "Lösche das gewählte Paket aus der Queue"
 
 #: portato/gui/templates/MainWindow.ui:782
 #: portato/gui/windows/main.py:620
@@ -431,7 +428,7 @@ msgstr "_Einstellungen"
 
 #: portato/gui/templates/MainWindow.menu:35
 msgid "Re_load Portage"
-msgstr "_Aktualisiere Portage-Cache"
+msgstr "Portage-Cache _aktualisieren"
 
 #: portato/gui/templates/MainWindow.menu:51
 msgid "_Emerge"
@@ -508,8 +505,7 @@ msgid ""
 "\n"
 "Do you want to proceed nevertheless?"
 msgstr ""
-"Du hast keine Email-Adresse angegeben. Daher ist es nicht möglich, dass die Entwickler dich kontaktieren können und es kann daher sein, dass der Bug schwerer zu beseitigen ist.\n"
-"\n"
+"Du hast keine Email-Adresse angegeben, so dass dich die Entwickler nicht fü Rückfragen kontaktieren können. Der Bug könnte dadurch schwieriger zu beseitigen sein.\n"
 "Trotzdem fortfahren?"
 
 #: portato/gui/dialogs.py:31
@@ -540,7 +536,7 @@ msgstr "%s scheint maskiert zu sein."
 
 #: portato/gui/dialogs.py:64
 msgid "Do you want to unmask it and its dependencies?"
-msgstr "Soll das Paket und seine Abhängigkeiten demaskiert werden?"
+msgstr "Sollen das Paket und seine Abhängigkeiten demaskiert werden?"
 
 #: portato/gui/dialogs.py:70
 msgid "Package not found!"
@@ -621,7 +617,7 @@ msgstr "Keine \"%(old)s\" Syntaxdatei gefunden. Benutze \"%(new)s\"-Syntax."
 
 #: portato/gui/views.py:111
 #, python-format
-msgid "No %(old)s language file installed. Disable highlighting."
+msgid "No %(old)s language file installed. Disabling highlighting."
 msgstr "Keine \"%(old)s\" Syntaxdatei gefunden. Deaktiviere Hervorhebung."
 
 #: portato/gui/views.py:130
@@ -920,7 +916,7 @@ msgstr "Konflikt beim Masking-Status: %s"
 #: portato/backend/flags.py:690
 #, python-format
 msgid "Line %(line)s in file %(file)s misses a keyword (e.g. '~x86')."
-msgstr "In Zeile %(line)s in der Dateil %(file) fehlt ein Keyword (z.B. '~x86')."
+msgstr "In Zeile %(line)s in der Datei %(file)s fehlt ein Keyword (z.B. '~x86')."
 
 #: portato/backend/portage/system.py:280
 #, python-format
@@ -952,7 +948,7 @@ msgstr "Starte Portato"
 
 #: portato/__init__.py:125
 msgid "No valid su command detected. Aborting."
-msgstr "Kein valides 'su'-Kommande entdeckt. Breche ab..."
+msgstr "Kein valides 'su'-Kommando entdeckt. Breche ab..."
 
 #: portato/helper.py:70
 msgid "Invalid dependency string"
@@ -992,9 +988,9 @@ msgid ""
 "This should be much faster on startup, but requires that your eix database is always up-to-date.\n"
 "Additionally, this is the only database allowing searching in descriptions."
 msgstr ""
-"Diese Datenbank ist ähnlich wie die normale SQLite-Datenbank, aber benutzt nun eix um an die Paketinformationen zu kommen.\n"
-"Das ist bei weitem schneller beim Starten, setzt aber vorraus, dass die eix-Datenbank immer aktuell ist.\n"
-"Außerdem ist das der einzige Datenbanktyp der auch das Suchen in den Beschreibungen erlaubt."
+"Diese Datenbank ähnelt der normalen SQLite-Datenbank, aber benutzt nun eix um die Paketinformationen zu erhalten.\n"
+"Dies erlaubt einen wesentlich schnelleren Programmstart, setzt aber voraus, dass die eix-Datenbank immer aktuell ist.\n"
+"Außerdem ist dies der einzige Datenbanktyp, der auch das Suchen in den Beschreibungen erlaubt."
 
 #: portato/db/__init__.py:51
 #: portato/db/__init__.py:66
@@ -1075,19 +1071,15 @@ msgstr "Beim Zugriff auf die Message-Queue trat ein Fehler auf: %s"
 
 #: portato/plugin.py:446
 #: portato/plugin.py:449
-#, python-format
-msgid "Loading plugin module '%(plugin)s' failed: %(error)s"
-msgstr "Laden des Plugins '%(plugin)s' fehlgeschlagen: %(error)s"
-
 #: portato/plugin.py:459
 #, python-format
-msgid "Loading widgets plugin '%(plugin)s' failed: %(error)s"
-msgstr "Laden des Widget-Plugins '%(plugin)s' fehlgeschlagen: %(error)s"
+msgid "Loading plugin '%(plugin)s' failed: %(error)s"
+msgstr "Laden des Plugins '%(plugin)s' fehlgeschlagen: %(error)s"
 
 #: portato/plugin.py:462
 #, python-format
 msgid "Loading widgets of plugin '%(plugin)s' failed: %(error)s"
-msgstr "Laden der Widgets vom Plugin '%(plugin)s' fehlgeschlagen: %(error)s"
+msgstr "Laden der GUI-Elemente vom Plugin '%(plugin)s' fehlgeschlagen: %(error)s"
 
 #: portato/plugin.py:466
 #, python-format
@@ -1115,7 +1107,7 @@ msgstr "Überschreibe den Hook '%(hook)s' mit Plugin '%(plugin)s'."
 #: portato/plugin.py:601
 #, python-format
 msgid "For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"
-msgstr "Das Plugin '%(plugin)s' definiert bereits einen \"Override\" fürr den Hook '%(hook)s'!"
+msgstr "Das Plugin '%(plugin)s' definiert bereits einen \"Override\" für den Hook '%(hook)s'!"
 
 #: portato/plugin.py:602
 #, python-format
@@ -1212,6 +1204,18 @@ msgstr "Emerge fehlgeschlagen!"
 msgid "Error Code: %d"
 msgstr "Fehler-Code: %d"
 
+#~ msgid "Loading plugin module '%(plugin)s' failed: %(error)s"
+#~ msgstr "Laden des Plugins '%(plugin)s' fehlgeschlagen: %(error)s"
+#~ msgid "Portage"
+#~ msgstr "Portage"
+#~ msgid "Loading widgets plugin '%(plugin)s' failed: %(error)s"
+#~ msgstr "Laden des Widget-Plugins '%(plugin)s' fehlgeschlagen: %(error)s"
+#~ msgid "_File"
+#~ msgstr "_Datei"
+#~ msgid "_Plugins"
+#~ msgstr "_Plugins"
+#~ msgid "-L is deprecated"
+#~ msgstr "-L ist veraltet"
 #~ msgid "Attach _Logfile"
 #~ msgstr "Hänge _Logdatei an"
 #~ msgid ""
@@ -1220,12 +1224,6 @@ msgstr "Fehler-Code: %d"
 #~ msgstr ""
 #~ "Hängt die Logdatei an die Mail an. In der Datei sind nur Debug-"
 #~ "Informationen enthalten."
-#~ msgid "_File"
-#~ msgstr "_Datei"
-#~ msgid "_Plugins"
-#~ msgstr "_Plugins"
-#~ msgid "-L is deprecated"
-#~ msgstr "-L ist veraltet"
 #~ msgid ""
 #~ "This software is licensed under the terms of the GPLv2.\n"
 #~ "Copyright (C) 2006-2008 René 'Necoro' Neumann <necoro@necoro.net>"
