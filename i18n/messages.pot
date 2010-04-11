@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-09 23:55+0200\n"
+"POT-Creation-Date: 2010-04-11 14:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -144,10 +144,6 @@ msgstr ""
 
 #: portato/gui/templates/PreferenceWindow.ui:607
 msgid "<b>Use Flag and Keyword Options</b>"
-msgstr ""
-
-#: portato/gui/templates/PreferenceWindow.ui:625
-msgid "Portage"
 msgstr ""
 
 #: portato/gui/templates/PreferenceWindow.ui:663
