@@ -1125,6 +1125,9 @@ class MainWindow (Window):
         col = 1
         model = self.pkgList.get_model()
 
+        if not len(model): # model is no real list, so "not model" won't work
+            return
+
         if name:
             if self._jump_check_search(model, pos, lambda r: r[col] != name):
                 debug("Pkg path does not match. Searching...")
@@ -1143,6 +1146,9 @@ class MainWindow (Window):
         
         col = 0
         model = self.catList.get_model()
+
+        if not len(model): # model is no real list, so "not model" won't work
+            return
 
         if name:
             if self.cfg.get_boolean("collapseCats", "GUI"):
@@ -1171,6 +1177,8 @@ class MainWindow (Window):
                         if r[col] == sname[0]:
                             row = r
                             break
+                    else:
+                        row = model[0]
                 else:
                     row = model[p]
 
@@ -1181,7 +1189,8 @@ class MainWindow (Window):
                             pos = ":".join(map(str,path))
                             break
                 
-                self.catList.expand_to_path(pos)
+                if ":" in pos:
+                    self.catList.expand_to_path(pos)
 
         debug("Selecting cat path '%s'. Value: '%s'", pos, model[pos][col])
         self.catList.get_selection().select_path(pos)
@@ -1581,11 +1590,11 @@ class MainWindow (Window):
     def cb_search_clicked (self, entry):
         """Do a search."""
         text = entry.get_text()
-        if text != "":
-            if not "*" in text:
-                text = ".*%s.*" % text
-
-            packages = system.find_packages(text, with_version = False)
+        if text:
+            oldr = self.db.restrict
+            self.db.restrict = text
+            packages = list("/".join((p.cat,p.pkg)) for p in self.db.get_cat())
+            self.db._restrict = oldr # don't do the rewriting again
 
             if packages == []:
                 dialogs.nothing_found_dialog()
@@ -1612,8 +1621,8 @@ class MainWindow (Window):
                 if txt or self.db.restrict:
                     self.db.restrict = txt
 
-                self.refresh_stores()
-                self.catList.get_selection().select_path("0") # XXX make this smarter
+                    self.refresh_stores()
+                    self.catList.get_selection().select_path("0") # XXX make this smarter
 
                 return False # not again ;)
 
@@ -1624,6 +1633,7 @@ class MainWindow (Window):
         active = self.typeCombo.get_active()
 
         self.db.type = model[active][0]
+        self.cb_search_changed()
 
     def cb_delete_search_clicked (self, *args):
         self.searchEntry.set_text("")
