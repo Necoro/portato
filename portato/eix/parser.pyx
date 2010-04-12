@@ -279,7 +279,7 @@ cdef class package:
         after_offset = ftell(cfile)
         
         self.name = string(file)
-        self.description = string(file)
+        self.description = unicode(string(file))
 
         # skip the rest, as it is currently unneeded
         #self.provide = vector(file, number)

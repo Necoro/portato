@@ -45,7 +45,7 @@ class SQLDatabase (Database):
         
         updateFormat = False
         if "format" not in session or session["format"] != self.FORMAT:
-            debug("Need to update database format from '%s' to '%s'", session["format"], self.FORMAT)
+            debug("Need to update database format from '%s' to '%s'", session.get("format", "undefined"), self.FORMAT)
             session["format"] = self.FORMAT
             updateFormat = True
 
