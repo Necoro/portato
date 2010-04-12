@@ -7,6 +7,7 @@
 - add an icon to signal the 'best' version for a package
 - added Italian translation (thx to Ponsi)
 - fix bugmail sending
+- added French translation (thx to Clément 'moonpyk' Bourgeois)
 
 0.13.1:
 - fix segfault in GLib
