@@ -46,7 +46,7 @@ class EixSQLDatabase (SQLDatabase):
 
     def updated (self):
         mtime = os.stat(self.cache).st_mtime
-        old = self.session.get("mtime", 0)
+        old = float(self.session.get("mtime", 0))
         
         self.session["mtime"] = str(mtime)
 
