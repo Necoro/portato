@@ -1620,8 +1620,8 @@ class MainWindow (Window):
                 if txt or self.db.restrict:
                     self.db.restrict = txt
 
-                self.refresh_stores()
-                self.catList.get_selection().select_path("0") # XXX make this smarter
+                    self.refresh_stores()
+                    self.catList.get_selection().select_path("0") # XXX make this smarter
 
                 return False # not again ;)
 
@@ -1632,6 +1632,7 @@ class MainWindow (Window):
         active = self.typeCombo.get_active()
 
         self.db.type = model[active][0]
+        self.cb_search_changed()
 
     def cb_delete_search_clicked (self, *args):
         self.searchEntry.set_text("")
