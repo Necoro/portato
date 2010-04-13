@@ -191,10 +191,11 @@ class PortageSystem (SystemInterface):
 
         t = self.find_packages(search_key, pkgSet = pkgSet, masked = masked, with_version = True, only_cpv = True)
         
-        if VERSION >= (2,1,5):
-            t += [pkg.get_cpv() for pkg in self.find_packages(search_key, self.SET_INSTALLED) if not (pkg.is_testing(True) or pkg.is_masked())]
-        elif not only_installed: # no need to run twice
-            t += self.find_packages(search_key, self.SET_INSTALLED, only_cpv=True)
+        if not only_installed:
+            if VERSION >= (2,1,5):
+                t += [pkg.get_cpv() for pkg in self.find_packages(search_key, self.SET_INSTALLED) if not (pkg.is_testing(True) or pkg.is_masked())]
+            else: # no need to run twice
+                t += self.find_packages(search_key, self.SET_INSTALLED, only_cpv=True)
 
         if t:
             t = list(set(t))

@@ -43,68 +43,34 @@ class Set(object):
 
         return t
 
-class FilterSet (Set):
-
-    def get_list(self):
-        raise NotImplementedError
-    
-    def get_pkgs (self, key, is_regexp, masked, with_version, only_cpv):
-        t = set()
-        for pkg in self.get_list():
-            if is_regexp and key:
-                if not re.search(key, pkg, re.I): continue
-
-            if not with_version:
-                t.add(portage.dep.dep_getkey(pkg))
-            else:
-                t.add(system.find_best_match(pkg, only_cpv = True))
-
-        return t
-
-class PortageSet (FilterSet):
-    def __init__ (self, name):
-        debug("Loading portage set '%s'", name)
-        self.name = name
-
-    def get_list(self):
-        return itt.imap(str, system.settings.setsconfig.getSetAtoms(self.name))
-
-class SystemSet (FilterSet):
-
-    def get_list(self):
-        for cp in system.settings.global_settings.packages:
-            if cp[0] == "*": yield cp[1:]
-
-class WorldSet (FilterSet):
-
-    def get_list(self):
-        with open(portage.WORLD_FILE) as f:
-            for cp in f:
-                cp = cp.strip()
-                if cp and cp[0] != "#":
-                    yield cp
-
 class InstalledSet (Set):
     """For the moment do not use the portage-2.2 @installed set.
     It only contains the current slot-cps - and to get the cpvs
     via the PortageSet results in an infinite recursion :(."""
 
+    def _get_regexp (self, key, with_version):
+        if with_version:
+            t = system.settings.vartree.dbapi.cpv_all()
+        else:
+            t = system.settings.vartree.dbapi.cp_all()
+
+        if key:
+            t = [x for x in t if re.search(key, x, re.I)]
+
+        return t
+
+    def _get_by_key (self, key, with_version):
+        t = system.settings.vartree.dbapi.match(key)
+        if not with_version:
+            t = itt.imap(portage.cpv_getkey, t)
+
+        return t
+
     def get_pkgs (self, key, is_regexp, masked, with_version, only_cpv):
         if is_regexp:
-            if with_version:
-                t = system.settings.vartree.dbapi.cpv_all()
-            else:
-                t = system.settings.vartree.dbapi.cp_all()
-
-            if key:
-                t = [x for x in t if re.search(key, x, re.I)]
-
+            return set(self._get_regexp(key, with_version))
         else:
-            t = system.settings.vartree.dbapi.match(key)
-            if not with_version:
-                t = itt.imap(portage.cpv_getkey, t)
-
-        return set(t)
+            return set(self._get_by_key(key, with_version))
 
 class TreeSet (Set):
 
@@ -149,4 +115,45 @@ class UninstalledSet (Set):
 
     def find (self, *args, **kwargs):
         return self.all.find(*args, **kwargs) - self.installed.find(*args, **kwargs)
+
+class FilterSet (InstalledSet):
+
+    def get_list(self):
+        raise NotImplementedError
+    
+    def get_pkgs (self, key, is_regexp, masked, with_version, only_cpv):
+        t = set()
+        for pkg in self.get_list():
+            if is_regexp and key:
+                if not re.search(key, pkg, re.I): continue
+
+            if not with_version:
+                t.add(portage.dep.dep_getkey(pkg))
+            else:
+                t.update(self._get_by_key(pkg, with_version))
+
+        return t
+
+class PortageSet (FilterSet):
+    def __init__ (self, name):
+        debug("Loading portage set '%s'", name)
+        self.name = name
+
+    def get_list(self):
+        return itt.imap(str, system.settings.setsconfig.getSetAtoms(self.name))
+
+class SystemSet (FilterSet):
+
+    def get_list(self):
+        for cp in system.settings.global_settings.packages:
+            if cp[0] == "*": yield cp[1:]
+
+class WorldSet (FilterSet):
+
+    def get_list(self):
+        with open(portage.WORLD_FILE) as f:
+            for cp in f:
+                cp = cp.strip()
+                if cp and cp[0] != "#":
+                    yield cp
 
