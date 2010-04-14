@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# File: portato/eix/_parser.pyx
+# File: portato/eix/parser.pyx
 # This file is part of the Portato-Project, a graphical portage-frontend.
 #
 # Copyright (C) 2006-2010 René 'Necoro' Neumann
@@ -20,12 +20,12 @@ For the exact way all the functions work, have a look at the eix format descript
 __docformat__ = "restructuredtext"
 
 cdef extern from "stdio.h":
-    ctypedef struct FILE:
-        pass
+    ctypedef struct FILE
 
     int fgetc(FILE* stream)
     long ftell(FILE* stream)
     int fseek(FILE* stream, long offset, int whence)
+    int fread(void* ptr, int size, int n, FILE* stream)
     
     int EOF
     int SEEK_CUR
@@ -35,6 +35,11 @@ cdef extern from "Python.h":
 
 ctypedef unsigned char UChar
 ctypedef long long LLong
+
+from python_unicode cimport PyUnicode_DecodeUTF8
+from python_mem cimport PyMem_Malloc, PyMem_Free
+from python_exc cimport PyErr_NoMemory
+from python_string cimport PyString_FromStringAndSize
 
 from portato.eix.exceptions import EndOfFileException
 
@@ -54,7 +59,15 @@ cdef int _get_byte (FILE* file) except -1:
 # Base Types
 #
 
-cdef LLong _number (object pfile):
+cpdef LLong number (object pfile):
+    """
+    Returns a number.
+
+    :param file: The file to read from
+    :type file: file
+    :rtype: int
+    """
+    
     cdef UChar n
     cdef LLong value
     cdef int i
@@ -84,18 +97,7 @@ cdef LLong _number (object pfile):
         
     return value
 
-def number (file):
-    """
-    Returns a number.
-
-    :param file: The file to read from
-    :type file: file
-    :rtype: int
-    """
-
-    return _number(file)
-
-def vector (file, get_type, nelems = None):
+cpdef object vector (object file, object get_type, object nelems = None):
     """
     Returns a vector of elements.
 
@@ -118,28 +120,44 @@ def vector (file, get_type, nelems = None):
     cdef LLong i
 
     if nelems is None:
-        n = _number(file)
+        n = number(file)
     else:
         n = nelems
     
     return [get_type(file) for i in range(n)]
 
-def string (file):
+cpdef object string (object pfile, bint unicode = False):
     """
     Returns a string.
 
-    :param file: The file to read from
-    :type file: file
-    :rtype: str
+    :param pfile: The file to read from
+    :type pfile: file
+    :param unicode: Return unicode
+    :type unicode: bool
+    :rtype: str or unicode
     """
-    nelems = _number(file)
+    cdef LLong nelems = number(pfile)
+    cdef FILE* file = PyFile_AsFile(pfile)
+    cdef char* s
 
-    s = file.read(nelems)
+    s = <char*>PyMem_Malloc((nelems + 1) * sizeof(char))
 
-    if len(s) != nelems:
-        raise EndOfFileException, file.name
+    if s is NULL:
+        PyErr_NoMemory()
 
-    return s
+    try:
+        if fread(s, sizeof(char), nelems, file) < nelems:
+            raise EndOfFileException, pfile.name
+
+        s[nelems] = '\0'
+
+        if unicode:
+            return PyUnicode_DecodeUTF8(s, nelems, 'replace')
+        else: # simple string, implicitly copied
+            return PyString_FromStringAndSize(s, nelems)
+
+    finally:
+        PyMem_Free(s)
 
 #
 # Complex Types
@@ -220,8 +238,8 @@ cdef class header:
         :param file: The file to read from
         :type file: file
         """
-        self.version = _number(file)
-        self.ncats = _number(file)
+        self.version = number(file)
+        self.ncats = number(file)
         self.overlays = vector(file, overlay)
         self.provide = vector(file, string)
         self.licenses = vector(file, string)
@@ -274,12 +292,12 @@ cdef class package:
         cdef FILE* cfile = PyFile_AsFile(file)
         cdef long after_offset
         
-        self._offset = _number(file)
+        self._offset = number(file)
         
         after_offset = ftell(cfile)
         
         self.name = string(file)
-        self.description = unicode(string(file))
+        self.description = string(file, True)
 
         # skip the rest, as it is currently unneeded
         #self.provide = vector(file, number)

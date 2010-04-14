@@ -461,7 +461,7 @@ class PluginQueue (object):
                 else:
                     for w in p.widgets:
                         WidgetSlot.slots[w.slot].add_widget(w)
-                    info(_("Widgets of plugin '%s' loaded."), p.name)
+                    debug("Widgets of plugin '%s' loaded.", p.name)
 
     def add (self, plugin, disable = False):
         """
@@ -538,7 +538,7 @@ class PluginQueue (object):
                     call.call(*hargs, **hkwargs)
                 
                 if active.override: # override
-                    info(_("Overriding hook '%(hook)s' with plugin '%(plugin)s'."), {"hook": hook, "plugin": active.override.plugin.name})
+                    debug("Overriding hook '%(hook)s' with plugin '%(plugin)s'.", {"hook": hook, "plugin": active.override.plugin.name})
                     ret = active.override.call(*hargs, **hkwargs)
                 else: # normal
                     ret = func(*args, **kwargs)
@@ -630,7 +630,7 @@ class PluginQueue (object):
 
             for l in list:
                 callList.append(l)
-                info(_("Dependant '%(dep)s' for '%(hook)s' in plugin '%(plugin)s' not found! Adding nevertheless."), {"hook": hook, "plugin": l.plugin.name, "dep": l.dep})
+                debug("Dependant '%(dep)s' for '%(hook)s' in plugin '%(plugin)s' not found! Adding nevertheless.", {"hook": hook, "plugin": l.plugin.name, "dep": l.dep})
 
         for hook in before:
             resolve(hook, before[hook], "before", 0)

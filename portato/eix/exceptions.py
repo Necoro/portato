@@ -23,7 +23,14 @@ class EixError (Exception):
 
     :ivar message: The error message
     """
+
     message = _("Unknown error.")
+    
+    def __init__ (self, msg = None):
+        Exception.__init__(self)
+        
+        if msg:
+            self.message = msg
 
     def __str__ (self):
         return self.message
@@ -34,7 +41,7 @@ class EndOfFileException (EixError):
     """
 
     def __init__ (self, filename):
-        self.message = _("End of file reached though it was not expected: '%s'") % filename
+        EixError.__init__(self,  _("End of file reached though it was not expected: '%s'") % filename)
 
 class UnsupportedVersionError (EixError):
     """
@@ -42,4 +49,4 @@ class UnsupportedVersionError (EixError):
     """
 
     def __init__ (self, version):
-        self.message = _("Version '%s' is not supported.") % version
+        EixError.__init__(self, _("Version '%s' is not supported.") % version)
