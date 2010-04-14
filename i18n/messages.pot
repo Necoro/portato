@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-11 15:59+0200\n"
+"POT-Creation-Date: 2010-04-14 22:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -382,8 +382,8 @@ msgstr ""
 msgid "Queue"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.ui:806 portato/gui/windows/main.py:1253
-#: portato/gui/windows/main.py:1255
+#: portato/gui/templates/MainWindow.ui:806 portato/gui/windows/main.py:1262
+#: portato/gui/windows/main.py:1264
 msgid "Console"
 msgstr ""
 
@@ -573,7 +573,7 @@ msgid ""
 "Please run <i>emerge --sync &amp;&amp; layman -S</i>."
 msgstr ""
 
-#: portato/gui/dialogs.py:141 portato/gui/windows/main.py:1302
+#: portato/gui/dialogs.py:141 portato/gui/windows/main.py:1311
 #, python-format
 msgid "No versions of package '%s' found!"
 msgstr ""
@@ -794,19 +794,19 @@ msgstr ""
 msgid "Cannot translate session from version %d to %d."
 msgstr ""
 
-#: portato/gui/windows/main.py:1438
+#: portato/gui/windows/main.py:1447
 msgid "use flags"
 msgstr ""
 
-#: portato/gui/windows/main.py:1450
+#: portato/gui/windows/main.py:1459
 msgid "masking keywords"
 msgstr ""
 
-#: portato/gui/windows/main.py:1858
+#: portato/gui/windows/main.py:1868
 msgid "The portage tree is not existing."
 msgstr ""
 
-#: portato/gui/windows/main.py:1862
+#: portato/gui/windows/main.py:1872
 msgid "The portage tree seems to be empty."
 msgstr ""
 
@@ -869,16 +869,16 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-#: portato/eix/exceptions.py:26
+#: portato/eix/exceptions.py:27
 msgid "Unknown error."
 msgstr ""
 
-#: portato/eix/exceptions.py:37
+#: portato/eix/exceptions.py:44
 #, python-format
 msgid "End of file reached though it was not expected: '%s'"
 msgstr ""
 
-#: portato/eix/exceptions.py:45
+#: portato/eix/exceptions.py:52
 #, python-format
 msgid "Version '%s' is not supported."
 msgstr ""
@@ -893,17 +893,17 @@ msgstr ""
 msgid "Line %(line)s in file %(file)s misses a keyword (e.g. '~x86')."
 msgstr ""
 
-#: portato/backend/portage/system.py:280
+#: portato/backend/portage/system.py:281
 #, python-format
 msgid "No best match for %s. It seems not to be in the tree anymore."
 msgstr ""
 
-#: portato/backend/portage/system.py:338
+#: portato/backend/portage/system.py:339
 #, python-format
 msgid "Found a not installed dependency: %s."
 msgstr ""
 
-#: portato/backend/portage/system.py:380
+#: portato/backend/portage/system.py:381
 #, python-format
 msgid ""
 "Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
@@ -1053,11 +1053,6 @@ msgstr ""
 msgid "Loading widgets of plugin '%(plugin)s' failed: %(error)s"
 msgstr ""
 
-#: portato/plugin.py:466
-#, python-format
-msgid "Widgets of plugin '%s' loaded."
-msgstr ""
-
 #: portato/plugin.py:497
 msgid "Plugin is disabled!"
 msgstr ""
@@ -1071,11 +1066,6 @@ msgstr ""
 msgid "Plugin '%s' loaded."
 msgstr ""
 
-#: portato/plugin.py:543
-#, python-format
-msgid "Overriding hook '%(hook)s' with plugin '%(plugin)s'."
-msgstr ""
-
 #: portato/plugin.py:601
 #, python-format
 msgid ""
@@ -1085,13 +1075,6 @@ msgstr ""
 #: portato/plugin.py:602
 #, python-format
 msgid "It is now replaced by the one from plugin '%s'!"
-msgstr ""
-
-#: portato/plugin.py:635
-#, python-format
-msgid ""
-"Dependant '%(dep)s' for '%(hook)s' in plugin '%(plugin)s' not found! Adding "
-"nevertheless."
 msgstr ""
 
 #: portato/plugin.py:704 portato/plugin.py:707
