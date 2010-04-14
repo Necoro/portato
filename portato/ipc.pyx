@@ -70,7 +70,7 @@ cdef class MessageQueue (object):
             elif errno == ENOENT:
                 raise MessageQueueError("Queue does not exist and 'create' is not set.")
             elif errno == ENOMEM or errno == ENOSPC:
-                raise MemoryError("Insufficient ressources.")
+                PyErr_NoMemory()
             else:
                 raise OSError(errno, strerror(errno))
 
@@ -111,7 +111,7 @@ cdef class MessageQueue (object):
         msg = <msg_data*>PyMem_Malloc(sizeof(msg_data) + size)
 
         if msg is NULL:
-            raise MemoryError("Out of memory")
+            PyErr_NoMemory()
 
         memcpy(msg.mtext, <char*>message, size)
         msg.mtype = type
@@ -119,18 +119,17 @@ cdef class MessageQueue (object):
         with nogil:
             ret = msgsnd(self.msgid, msg, size, 0)
 
-        try:
-            if ret == -1:
-                if errno == EIDRM or errno == EINVAL:
-                    raise MessageQueueRemovedError("Queue was removed.")
-                elif errno == EINTR:
-                    raise MessageQueueError("Signaled while waiting.")
-                elif errno == EACCES:
-                    raise MessageQueueError("Permission denied.")
-                else:
-                    raise OSError(errno, strerror(errno))
-        finally:
-            PyMem_Free(msg)
+        PyMem_Free(msg)
+        
+        if ret == -1:
+            if errno == EIDRM or errno == EINVAL:
+                raise MessageQueueRemovedError("Queue was removed.")
+            elif errno == EINTR:
+                raise MessageQueueError("Signaled while waiting.")
+            elif errno == EACCES:
+                raise MessageQueueError("Permission denied.")
+            else:
+                raise OSError(errno, strerror(errno))
 
     def receive (self):
         """
@@ -145,7 +144,7 @@ cdef class MessageQueue (object):
         msg = <msg_data*>PyMem_Malloc(sizeof(msg_data) + MAX_MESSAGE_SIZE)
 
         if msg is NULL:
-            raise MemoryError("Out of memory")
+            PyErr_NoMemory()
 
         msg.mtype = 0
 
@@ -162,12 +161,11 @@ cdef class MessageQueue (object):
                     raise MessageQueueError("Permission denied.")
                 else:
                     raise OSError(errno, strerror(errno))
-
-            retTuple = (PyString_FromStringAndSize(msg.mtext, ret), msg.mtype)
+            else:
+                return (PyString_FromStringAndSize(msg.mtext, ret), msg.mtype)
+        
         finally:
             PyMem_Free(msg)
-
-        return retTuple
 
     cdef inline key_t random_key (self):
         return <int>(<double>rand() / (<double>RAND_MAX + 1) * INT_MAX)
