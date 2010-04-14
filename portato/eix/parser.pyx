@@ -33,6 +33,8 @@ cdef extern from "stdio.h":
 cdef extern from "Python.h":
     FILE* PyFile_AsFile(object)
 
+cimport python_unicode
+
 ctypedef unsigned char UChar
 ctypedef long long LLong
 
@@ -54,7 +56,15 @@ cdef int _get_byte (FILE* file) except -1:
 # Base Types
 #
 
-cdef LLong _number (object pfile):
+cpdef LLong number (object pfile):
+    """
+    Returns a number.
+
+    :param file: The file to read from
+    :type file: file
+    :rtype: int
+    """
+    
     cdef UChar n
     cdef LLong value
     cdef int i
@@ -84,18 +94,7 @@ cdef LLong _number (object pfile):
         
     return value
 
-def number (file):
-    """
-    Returns a number.
-
-    :param file: The file to read from
-    :type file: file
-    :rtype: int
-    """
-
-    return _number(file)
-
-def vector (file, get_type, nelems = None):
+cpdef object vector (object file, object get_type, object nelems = None):
     """
     Returns a vector of elements.
 
@@ -118,13 +117,13 @@ def vector (file, get_type, nelems = None):
     cdef LLong i
 
     if nelems is None:
-        n = _number(file)
+        n = number(file)
     else:
         n = nelems
     
     return [get_type(file) for i in range(n)]
 
-def string (file):
+cpdef object string (object file, char u = 0):
     """
     Returns a string.
 
@@ -132,12 +131,15 @@ def string (file):
     :type file: file
     :rtype: str
     """
-    nelems = _number(file)
+    cdef LLong nelems = number(file)
 
     s = file.read(nelems)
 
     if len(s) != nelems:
         raise EndOfFileException, file.name
+
+    if u:
+        return python_unicode.PyUnicode_DecodeUTF8(s, nelems, 'replace')
 
     return s
 
@@ -220,8 +222,8 @@ cdef class header:
         :param file: The file to read from
         :type file: file
         """
-        self.version = _number(file)
-        self.ncats = _number(file)
+        self.version = number(file)
+        self.ncats = number(file)
         self.overlays = vector(file, overlay)
         self.provide = vector(file, string)
         self.licenses = vector(file, string)
@@ -274,12 +276,12 @@ cdef class package:
         cdef FILE* cfile = PyFile_AsFile(file)
         cdef long after_offset
         
-        self._offset = _number(file)
+        self._offset = number(file)
         
         after_offset = ftell(cfile)
         
         self.name = string(file)
-        self.description = unicode(string(file))
+        self.description = string(file,1)
 
         # skip the rest, as it is currently unneeded
         #self.provide = vector(file, number)
