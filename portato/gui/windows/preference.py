@@ -170,7 +170,7 @@ class PreferenceWindow (AbstractDialog):
 
         ctr = 0
         active = 0
-        for k, (name, desc) in db.types.iteritems():
+        for k, name, desc in db.types:
             if k == dbtype:
                 active = ctr
 
