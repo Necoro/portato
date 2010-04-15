@@ -128,7 +128,7 @@ def file_chooser_dialog (title, parent):
 def prereq_error_dialog (e):
     dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, _("A prerequisite for starting Portato was not matched."))
     
-    msg = e.message
+    msg = e.args[0]
     if get_runsystem()[0] == "Sabayon":
         msg += "\n\n"+_("<b>Note</b>: On fresh Sabayon installs or its LiveDVD/-CD, there is no portage tree existing per default.\nPlease run <i>emerge --sync &amp;&amp; layman -S</i>.")
 
