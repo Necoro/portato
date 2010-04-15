@@ -1872,7 +1872,7 @@ class MainWindow (Window):
             fail(_("The portage tree seems to be empty."))
 
         if 'sqlite' in system.settings.settings.modules['user'].get('portdbapi.auxdbmodule', ''):
-            fail(_("The sqlite cache backend of portato is not supported at the moment. See https://bugs.launchpad.net/portato/+bug/564292."))
+            fail(_("The sqlite cache backend of portage is not supported at the moment. See https://bugs.launchpad.net/portato/+bug/564292."))
 
         debug("All prereqs matched. Fine :)")
 
