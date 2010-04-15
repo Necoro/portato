@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-14 22:21+0200\n"
+"POT-Creation-Date: 2010-04-15 03:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -966,12 +966,17 @@ msgid ""
 "Additionally, this is the only database allowing searching in descriptions."
 msgstr ""
 
-#: portato/db/__init__.py:51 portato/db/__init__.py:66
+#: portato/db/__init__.py:45
+#, python-format
+msgid "Using database type '%s'"
+msgstr ""
+
+#: portato/db/__init__.py:52 portato/db/__init__.py:67
 #, python-format
 msgid "Cannot load %s."
 msgstr ""
 
-#: portato/db/__init__.py:72
+#: portato/db/__init__.py:73
 #, python-format
 msgid "Unknown database type: %s"
 msgstr ""

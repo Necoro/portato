@@ -15,7 +15,7 @@ from __future__ import absolute_import
 from . import database as db
 from .exceptions import UnknownDatabaseTypeError, DatabaseInstantiationError
 from ..session import Session, SectionDict
-from ..helper import debug, warning, error
+from ..helper import debug, warning, error, info
 
 types = {
         "sql": (_("SQLite"), _("Uses an SQLite-database to store package information.\nMay take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data.")),
@@ -42,9 +42,10 @@ class Database(db.Database):
             type = cls.DEFAULT
         
         cls.DB_TYPE = type
+        msg = _("Using database type '%s'")
 
         if type == "sql":
-            debug("Using SQLDatabase")
+            info(msg, "SQLDatabase")
             try:
                 from .sql import SQLDatabase
             except ImportError:
@@ -54,12 +55,12 @@ class Database(db.Database):
                 return SQLDatabase
 
         elif type == "dict":
-            debug("Using HashDatabase")
+            info(msg, "HashDatabase")
             from .hash import HashDatabase
             return HashDatabase
         
         elif type == "eixsql":
-            debug("Using EixSQLDatabase")
+            info(msg,"EixSQLDatabase")
             try:
                 from .eix_sql import EixSQLDatabase
             except ImportError:
