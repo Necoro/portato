@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-15 03:44+0200\n"
+"POT-Creation-Date: 2010-04-16 01:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -810,6 +810,12 @@ msgstr ""
 msgid "The portage tree seems to be empty."
 msgstr ""
 
+#: portato/gui/windows/main.py:1875
+msgid ""
+"The sqlite cache backend of portage is not supported at the moment. See "
+"https://bugs.launchpad.net/portato/+bug/564292."
+msgstr ""
+
 #: portato/gui/session.py:21
 msgid "Version mismatch."
 msgstr ""
@@ -931,10 +937,23 @@ msgid "Invalid dependency string"
 msgstr ""
 
 #: portato/db/__init__.py:21
-msgid "SQLite"
+msgid "eix + SQLite"
 msgstr ""
 
 #: portato/db/__init__.py:21
+msgid ""
+"Similar to SQLite, but now uses the eix database to get the package "
+"information.\n"
+"This should be much faster on startup, but requires that your eix database "
+"is always up-to-date.\n"
+"Additionally, this is the only database allowing searching in descriptions."
+msgstr ""
+
+#: portato/db/__init__.py:22
+msgid "SQLite"
+msgstr ""
+
+#: portato/db/__init__.py:22
 msgid ""
 "Uses an SQLite-database to store package information.\n"
 "May take longer to generate at the first time, but has advantages if portato "
@@ -942,28 +961,15 @@ msgid ""
 "fast SQL expressions for fetching the data."
 msgstr ""
 
-#: portato/db/__init__.py:22
+#: portato/db/__init__.py:23
 msgid "Hashmap"
 msgstr ""
 
-#: portato/db/__init__.py:22
+#: portato/db/__init__.py:23
 msgid ""
 "Uses an in-memory hashmap to store package information.\n"
 "Has been used since at least version 0.3.3, but all information has to be "
 "regenerated on each startup."
-msgstr ""
-
-#: portato/db/__init__.py:23
-msgid "eix + SQLite"
-msgstr ""
-
-#: portato/db/__init__.py:23
-msgid ""
-"Similar to SQLite, but now uses the eix database to get the package "
-"information.\n"
-"This should be much faster on startup, but requires that your eix database "
-"is always up-to-date.\n"
-"Additionally, this is the only database allowing searching in descriptions."
 msgstr ""
 
 #: portato/db/__init__.py:45
