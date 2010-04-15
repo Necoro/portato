@@ -13,13 +13,13 @@
 from . import database as db
 from .exceptions import UnknownDatabaseTypeError, DatabaseInstantiationError
 from ..session import Session, SectionDict
-from ..helper import debug, warning, error
+from ..helper import debug, warning, error, info
 
-types = {
-        "sql": (_("SQLite"), _("Uses an SQLite-database to store package information.\nMay take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data.")),
-        "dict": (_("Hashmap"), _("Uses an in-memory hashmap to store package information.\nHas been used since at least version 0.3.3, but all information has to be regenerated on each startup.")),
-        "eixsql" : (_("eix + SQLite"), _("Similar to SQLite, but now uses the eix database to get the package information.\nThis should be much faster on startup, but requires that your eix database is always up-to-date.\nAdditionally, this is the only database allowing searching in descriptions."))
-        }
+types = (
+        ("eixsql", _("eix + SQLite"), _("Similar to SQLite, but now uses the eix database to get the package information.\nThis should be much faster on startup, but requires that your eix database is always up-to-date.\nAdditionally, this is the only database allowing searching in descriptions.")),
+        ("sql", _("SQLite"), _("Uses an SQLite-database to store package information.\nMay take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data.")),
+        ("dict", _("Hashmap"), _("Uses an in-memory hashmap to store package information.\nHas been used since at least version 0.3.3, but all information has to be regenerated on each startup."))
+        )
 
 class Database(db.Database):
     DEFAULT = "dict"
@@ -40,9 +40,10 @@ class Database(db.Database):
             type = cls.DEFAULT
         
         cls.DB_TYPE = type
+        msg = _("Using database type '%s'")
 
         if type == "sql":
-            debug("Using SQLDatabase")
+            info(msg, "SQLDatabase")
             try:
                 from .sql import SQLDatabase
             except ImportError:
@@ -52,12 +53,12 @@ class Database(db.Database):
                 return SQLDatabase
 
         elif type == "dict":
-            debug("Using HashDatabase")
+            info(msg, "HashDatabase")
             from .hash import HashDatabase
             return HashDatabase
         
         elif type == "eixsql":
-            debug("Using EixSQLDatabase")
+            info(msg,"EixSQLDatabase")
             try:
                 from .eix_sql import EixSQLDatabase
             except ImportError:

@@ -24,7 +24,7 @@ class NewVersionFinder(WidgetPlugin):
     Checks for a new version of portato every 30 minutes and on startup.
     """
     __author__ = "René 'Necoro' Neumann"
-    __dependency__ = ["dev-util/git"]
+    __dependency__ = ["dev-vcs/git", "dev-python/notify-python"]
 
     def init (self):
         self.add_call("main", self.run)
