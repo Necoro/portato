@@ -72,7 +72,7 @@ class WrappedTree (object):
             error("UIItem '%s' of UIManager '%s' could not be found in class '%s'.", name, ui, self.klass)
         return w
 
-class UIBuilder (object):
+class Window (object):
 
     def __init__ (self, connector = None):
         if not hasattr(self, "__file__"):
@@ -85,15 +85,18 @@ class UIBuilder (object):
         
         self.tree = WrappedTree(self.__class__.__name__, self._builder)
 
+        if not hasattr(self, "__window__"):
+            self.__window__ = self.__class__.__name__
+
+        self.window = self.tree.get_widget(self.__window__)
+
         # load menu if existing
         menufile = os.path.join(TEMPLATE_DIR, self.__file__+".menu")
         if os.path.exists(menufile):
             debug("There is a menu-file for '%s'. Trying to load it.", self.__file__)
             barbox = self.tree.get_widget("menubar_box")
             if barbox is not None:
-                self._builder.add_from_file(menufile)
-                bar = self.tree.get_ui("menubar")
-                barbox.pack_start(bar, expand = False, fill = False)
+                self._add_menu(menufile, barbox)
         
         # signal connections
         if connector is None: connector = self
@@ -104,15 +107,16 @@ class UIBuilder (object):
             for uc in set(unconnected):
                 error("Signal '%s' not connected in class '%s'.", uc, self.__class__.__name__)
 
-class Window (UIBuilder):
-    def __init__ (self):
+    def _add_menu (self, menufile, barbox):
+        # add menubar
+        self._builder.add_from_file(menufile)
+        bar = self.tree.get_ui("menubar")
+        barbox.pack_start(bar, expand = False, fill = False)
 
-        UIBuilder.__init__(self)
-
-        if not hasattr(self, "__window__"):
-            self.__window__ = self.__class__.__name__
-
-        self.window = self.tree.get_widget(self.__window__)
+        # connect accelerators
+        for ui in self._builder.get_objects():
+            if isinstance(ui, gtk.UIManager):
+                self.window.add_accel_group(ui.get_accel_group())
 
     @staticmethod
     def watch_cursor (func):
