@@ -106,7 +106,7 @@ import warnings
 def showwarnings(msg, cat, filename, lineno, file = None, line = None):
     msg = warnings.formatwarning(msg, cat, filename, lineno, line)
 
-    record = logging.LogRecord("portatoLogger", logging.WARNING, filename, lineno, "Portage Warning: %s", (msg,), None)
+    record = logging.LogRecord("portatoLogger", logging.WARNING, filename, lineno, "External Warning: %s", (msg,), None)
     logging.getLogger("portatoLogger").handle(record)
 
 warnings.showwarning = showwarnings
