@@ -637,7 +637,7 @@ class EmergeQueue:
                     try:
                         self.oneshotmerge.remove(cpv)
                     except ValueError:
-                        debug("Catched ValueError => %s seems not to be in merge-queue. Should be no harm.", cpv)
+                        debug("Catched ValueError => %s seems not to be in merge-queue. This probably means it is a dependency.", cpv)
             
             elif self.tree.is_in_unmerge(it): # in Unmerge
                 try:
