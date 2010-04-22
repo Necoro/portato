@@ -263,7 +263,7 @@ class SQLDatabase (Database):
 
             if self._type & self.SEARCH_NAME:
                 if "/" in restrict:
-                    rest = "(name LIKE '%s%%' AND cat LIKE '%s')" % (pkg, cat)
+                    rest = "(name LIKE '%s%%' AND cat LIKE '%s')" % restrict.split("/",1)
                 else:
                     rest = "(name LIKE '%%%(restrict)s%%' OR cat LIKE '%(restrict)s%%')" % {"restrict":restrict}
             
