@@ -50,6 +50,10 @@ These should be set during the installation.
 import os
 from os.path import join as pjoin
 
+# ktsuss does not reset this correctly
+if os.getuid() == 0:
+    os.environ["HOME"] = "/root"
+
 # icons
 ICON_DIR = "icons/"
 APP_ICON = pjoin(ICON_DIR, "portato-icon.png")

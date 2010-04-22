@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Portato\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-14 05:04+0200\n"
-"PO-Revision-Date: 2010-04-14 05:22+0100\n"
+"POT-Creation-Date: 2010-04-22 00:29+0200\n"
+"PO-Revision-Date: 2010-04-22 16:50+0100\n"
 "Last-Translator: Clément Bourgeois <moonpyk@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -168,8 +168,8 @@ msgid "Queue"
 msgstr "File d'attente"
 
 #: portato/gui/templates/MainWindow.ui:806
-#: portato/gui/windows/main.py:1263
-#: portato/gui/windows/main.py:1265
+#: portato/gui/windows/main.py:1262
+#: portato/gui/windows/main.py:1264
 msgid "Console"
 msgstr "Console"
 
@@ -571,77 +571,62 @@ msgstr "Tous les suivants"
 msgid "Can't display dependencies: This package has an unsupported dependency string."
 msgstr "Impossible d'afficher les dépendances : ce paquetage comporte une chaîne de dépendance non supportée."
 
-#: portato/plugin.py:444
-#: portato/plugin.py:447
-#: portato/plugin.py:457
+#: portato/plugin.py:446
+#: portato/plugin.py:449
+#: portato/plugin.py:459
 #, python-format
 msgid "Loading plugin '%(plugin)s' failed: %(error)s"
 msgstr "Enregistrement du greffon '%(plugin)s' échoué : %(error)s"
 
-#: portato/plugin.py:460
+#: portato/plugin.py:462
 #, python-format
 msgid "Loading widgets of plugin '%(plugin)s' failed: %(error)s"
 msgstr "Chargement des widgets du greffon '%(plugin)s' impossible : %(error)s"
 
-#: portato/plugin.py:464
-#, python-format
-msgid "Widgets of plugin '%s' loaded."
-msgstr "Widgets du greffon '%s' chargés."
-
-#: portato/plugin.py:495
+#: portato/plugin.py:497
 msgid "Plugin is disabled!"
 msgstr "Le greffon est désactivé !"
 
-#: portato/plugin.py:497
+#: portato/plugin.py:499
 msgid "Plugin has unresolved dependencies - disabled!"
 msgstr "Le greffon a des dépendances non résolues - désactivé !"
 
-#: portato/plugin.py:501
+#: portato/plugin.py:503
 #, python-format
 msgid "Plugin '%s' loaded."
 msgstr "Greffon '%s' chargé."
 
-#: portato/plugin.py:541
-#, python-format
-msgid "Overriding hook '%(hook)s' with plugin '%(plugin)s'."
-msgstr "Surcharge du hook '%(hook)s' avec le greffon '%(plugin)s'."
-
-#: portato/plugin.py:599
+#: portato/plugin.py:601
 #, python-format
 msgid "For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"
 msgstr "Une surcharge est déjà définie pour le hook '%(hook)s'  par le greffon '%(plugin)s'!"
 
-#: portato/plugin.py:600
+#: portato/plugin.py:602
 #, python-format
 msgid "It is now replaced by the one from plugin '%s'!"
 msgstr "Il est maintenant remplacé par celui du greffon '%s' !"
 
-#: portato/plugin.py:633
-#, python-format
-msgid "Dependant '%(dep)s' for '%(hook)s' in plugin '%(plugin)s' not found! Adding nevertheless."
-msgstr "Le dépendant '%(dep)s' pour le hook '%(hook)s' du greffon '%(plugin)s'  trouvé ! Ajouté quand même."
-
-#: portato/plugin.py:702
-#: portato/plugin.py:705
+#: portato/plugin.py:704
+#: portato/plugin.py:707
 #, python-format
 msgid "Registrating plugin '%(plugin)s' failed: %(error)s"
 msgstr "Enregistrement du greffon '%(plugin)s' échoué : %(error)s"
 
-#: portato/eix/exceptions.py:26
+#: portato/eix/exceptions.py:27
 msgid "Unknown error."
 msgstr "Erreur inconnue."
 
-#: portato/eix/exceptions.py:37
+#: portato/eix/exceptions.py:44
 #, python-format
 msgid "End of file reached though it was not expected: '%s'"
 msgstr "Fin de fichier atteinte de façon inattendue : '%s'"
 
-#: portato/eix/exceptions.py:45
+#: portato/eix/exceptions.py:52
 #, python-format
 msgid "Version '%s' is not supported."
 msgstr "La version '%s' n'est pas supportée."
 
-#: portato/config_parser.py:268
+#: portato/config_parser.py:266
 #, python-format
 msgid "Unrecognized line in configuration: %s"
 msgstr "Ligne non reconnue dans la configuration : %s"
@@ -699,45 +684,45 @@ msgstr "Envoyer..."
 msgid "Save traceback..."
 msgstr "Sauvegarder la trace..."
 
-#: portato/gui/utils.py:187
+#: portato/gui/utils.py:189
 msgid "oneshot"
 msgstr "oneshot"
 
-#: portato/gui/utils.py:192
+#: portato/gui/utils.py:194
 #, python-format
 msgid "updating from version %s"
 msgstr "mise-à-jour depuis la version %s."
 
-#: portato/gui/utils.py:194
+#: portato/gui/utils.py:196
 msgid "updating"
 msgstr "mise à jour"
 
-#: portato/gui/utils.py:199
+#: portato/gui/utils.py:201
 #, python-format
 msgid "downgrading from version %s"
 msgstr "rétrogradation depuis la version %s"
 
-#: portato/gui/utils.py:201
+#: portato/gui/utils.py:203
 msgid "downgrading"
 msgstr "rétrogradation"
 
-#: portato/gui/utils.py:205
+#: portato/gui/utils.py:207
 msgid "IUSE changes:"
 msgstr "Changements IUSE :"
 
-#: portato/gui/utils.py:223
+#: portato/gui/utils.py:225
 msgid "(In Progress)"
 msgstr "(En cours)"
 
-#: portato/gui/utils.py:248
+#: portato/gui/utils.py:250
 msgid "Install"
 msgstr "Installer"
 
-#: portato/gui/utils.py:259
+#: portato/gui/utils.py:261
 msgid "Uninstall"
 msgstr "Désinstaller"
 
-#: portato/gui/utils.py:271
+#: portato/gui/utils.py:273
 msgid "Update"
 msgstr "Mettre à jour"
 
@@ -898,7 +883,7 @@ msgstr ""
 "Veuillez exécuter <i>emerge --sync &amp;&amp; layman -S</i>."
 
 #: portato/gui/dialogs.py:141
-#: portato/gui/windows/main.py:1312
+#: portato/gui/windows/main.py:1311
 #, python-format
 msgid "No versions of package '%s' found!"
 msgstr "Aucune version du paquetage '%s' trouvée !"
@@ -1058,21 +1043,25 @@ msgstr "Traduction de la session de la version %d vers %d."
 msgid "Cannot translate session from version %d to %d."
 msgstr "Impossible de traduire la session de la version %d vers %d."
 
-#: portato/gui/windows/main.py:1448
+#: portato/gui/windows/main.py:1447
 msgid "use flags"
 msgstr "flags use"
 
-#: portato/gui/windows/main.py:1460
+#: portato/gui/windows/main.py:1459
 msgid "masking keywords"
 msgstr "keywords masquants"
 
-#: portato/gui/windows/main.py:1869
+#: portato/gui/windows/main.py:1868
 msgid "The portage tree is not existing."
 msgstr "L'arbre portage n'existe pas."
 
-#: portato/gui/windows/main.py:1873
+#: portato/gui/windows/main.py:1872
 msgid "The portage tree seems to be empty."
 msgstr "L'arbre portage semble être vide."
+
+#: portato/gui/windows/main.py:1875
+msgid "The sqlite cache backend of portage is not supported at the moment. See https://bugs.launchpad.net/portato/+bug/564292."
+msgstr "Le backend de cache sqlite pour portage n'est plus supporté pour le moment. Referez vous à : https://bugs.launchpad.net/portato/+bug/564292."
 
 #: portato/gui/__init__.py:22
 msgid "Loading Backend"
@@ -1092,11 +1081,11 @@ msgstr "KeyError détectée => %s ne semble pas être une catégorie disponible.
 msgid "Error while compiling search expression: '%s'."
 msgstr "Erreur pendant la compilation de l'expression de recherche : '%s'."
 
-#: portato/db/sql.py:80
+#: portato/db/sql.py:82
 msgid "Cleaning database..."
 msgstr "Nettoyage de la base de données..."
 
-#: portato/db/sql.py:82
+#: portato/db/sql.py:84
 msgid "Populating database..."
 msgstr "Remplissage de la base de données..."
 
@@ -1104,30 +1093,6 @@ msgstr "Remplissage de la base de données..."
 #, python-format
 msgid "Cache file '%s' does not exist. Using default instead."
 msgstr "Le fichier de cache '%s' n'existe pas. Utilisation du cache par défaut."
-
-#: portato/db/__init__.py:19
-msgid "SQLite"
-msgstr "SQLite"
-
-#: portato/db/__init__.py:19
-msgid ""
-"Uses an SQLite-database to store package information.\n"
-"May take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data."
-msgstr ""
-"Utilise une base de données SQLite pour enregistrer les informations sur les paquetages.\n"
-"Ce système peut prendre plus de temps pour la première utilisation mais dispose d'avantages si portato est redémarré sans changements apportés à l'arbre portage. De plus, il permet l'utilisation d'expression SQL rapides pour récupérer les données."
-
-#: portato/db/__init__.py:20
-msgid "Hashmap"
-msgstr "Hashmap"
-
-#: portato/db/__init__.py:20
-msgid ""
-"Uses an in-memory hashmap to store package information.\n"
-"Has been used since at least version 0.3.3, but all information has to be regenerated on each startup."
-msgstr ""
-"Utilise une table de hashage gardée en mémoire pour stocker les informations des paquetages.\n"
-"Ce procédé existe depuis la version 0.3.3, mais la table doit être régénérée à chaque démarrage."
 
 #: portato/db/__init__.py:21
 msgid "eix + SQLite"
@@ -1143,13 +1108,42 @@ msgstr ""
 "Ce mode est normalement plus rapide au démarrage, mais nécessite que votre base de données eix soit toujours à jour.\n"
 "De plus, ce système est le seul à permettre de faire des recherches dans les descriptions des paquets."
 
-#: portato/db/__init__.py:49
-#: portato/db/__init__.py:64
+#: portato/db/__init__.py:22
+msgid "SQLite"
+msgstr "SQLite"
+
+#: portato/db/__init__.py:22
+msgid ""
+"Uses an SQLite-database to store package information.\n"
+"May take longer to generate at the first time, but has advantages if portato is re-started with an unchanged portage tree. Additionally it allows to use fast SQL expressions for fetching the data."
+msgstr ""
+"Utilise une base de données SQLite pour enregistrer les informations sur les paquetages.\n"
+"Ce système peut prendre plus de temps pour la première utilisation mais dispose d'avantages si portato est redémarré sans changements apportés à l'arbre portage. De plus, il permet l'utilisation d'expression SQL rapides pour récupérer les données."
+
+#: portato/db/__init__.py:23
+msgid "Hashmap"
+msgstr "Hashmap"
+
+#: portato/db/__init__.py:23
+msgid ""
+"Uses an in-memory hashmap to store package information.\n"
+"Has been used since at least version 0.3.3, but all information has to be regenerated on each startup."
+msgstr ""
+"Utilise une table de hashage gardée en mémoire pour stocker les informations des paquetages.\n"
+"Ce procédé existe depuis la version 0.3.3, mais la table doit être régénérée à chaque démarrage."
+
+#: portato/db/__init__.py:45
+#, python-format
+msgid "Using database type '%s'"
+msgstr "Utilisation d'une base de données de type '%s'"
+
+#: portato/db/__init__.py:52
+#: portato/db/__init__.py:67
 #, python-format
 msgid "Cannot load %s."
 msgstr "Impossible de charger %s."
 
-#: portato/db/__init__.py:70
+#: portato/db/__init__.py:73
 #, python-format
 msgid "Unknown database type: %s"
 msgstr "Type de base de données inconnue : %s"
@@ -1176,35 +1170,48 @@ msgstr "Démarrage de Portato"
 msgid "No valid su command detected. Aborting."
 msgstr "Aucune commande su valide détectée. Annulation."
 
-#: portato/backend/flags.py:525
+#: portato/backend/flags.py:527
 #, python-format
 msgid "Conflicting values for masking status: %s"
 msgstr "Valeurs entrant en conflit pour le statuts de masquage : %s"
 
-#: portato/backend/flags.py:686
+#: portato/backend/flags.py:690
 #, python-format
 msgid "Line %(line)s in file %(file)s misses a keyword (e.g. '~x86')."
 msgstr "La ligne %(line)s dans le fichier %(file)s n'a pas de keyword (par exemple '~x86')."
 
-#: portato/backend/portage/system.py:270
+#: portato/backend/portage/system.py:281
 #, python-format
 msgid "No best match for %s. It seems not to be in the tree anymore."
 msgstr "Pas de meilleure correspondance pour %s trouvée. Il semble qu'elle n'existe plus dans l'arbre à présent."
 
-#: portato/backend/portage/system.py:328
+#: portato/backend/portage/system.py:339
 #, python-format
 msgid "Found a not installed dependency: %s."
 msgstr "Dépendance non installée trouvée : %s."
 
-#: portato/backend/portage/system.py:370
+#: portato/backend/portage/system.py:381
 #, python-format
 msgid "Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
 msgstr "Bogue ? Aucune meilleure solution trouvée pour '%(package)s', qui est nécessaire à : '%(cpv)s'."
 
-#: portato/backend/portage/package.py:127
+#: portato/backend/portage/package.py:129
 #, python-format
 msgid "BUG in flags.new_masking_status. It returns '%s'"
 msgstr "Bogue dans flags.new_masking_status. Renvoie '%s'"
+
+#~ msgid "Widgets of plugin '%s' loaded."
+#~ msgstr "Widgets du greffon '%s' chargés."
+
+#~ msgid "Overriding hook '%(hook)s' with plugin '%(plugin)s'."
+#~ msgstr "Surcharge du hook '%(hook)s' avec le greffon '%(plugin)s'."
+
+#~ msgid ""
+#~ "Dependant '%(dep)s' for '%(hook)s' in plugin '%(plugin)s' not found! "
+#~ "Adding nevertheless."
+#~ msgstr ""
+#~ "Le dépendant '%(dep)s' pour le hook '%(hook)s' du greffon '%(plugin)s'  "
+#~ "trouvé ! Ajouté quand même."
 
 #~ msgid "Portage"
 #~ msgstr "Portage"
