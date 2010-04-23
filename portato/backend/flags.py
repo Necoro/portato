@@ -13,6 +13,7 @@
 import os
 import itertools as itt
 from subprocess import Popen, PIPE # needed for grep
+from collections import namedtuple
 
 from . import system, is_package
 from ..helper import debug, error, warning
@@ -26,56 +27,29 @@ CONFIG = {
         "testingPerVersion" : True
         }
 
-class Constants:
+class Constants(object):
+
+    pfile = namedtuple('PackageFile', 'path isdir')
 
     def __init__ (self):
         self.clear()
     
     def clear (self):
-        self._use_path = None
-        self._mask_path = None
-        self._unmask_path = None
-        self._testing_path = None
-        self._use_path_is_dir = None
-        self._mask_path_is_dir = None
-        self._unmask_path_is_dir = None
-        self._testing_path_is_dir = None
+        self.paths = {}
 
-    def __get (self, name, path):
-        if self.__dict__[name] is None:
-            self.__dict__[name] = os.path.join(system.get_config_path(), path)
+    def _lookup (self, path):
+        try:
+            return self.paths[path]
+        except KeyError:
+            p = os.path.join(system.get_config_path(), path)
+            self.paths[path] = self.pfile(p, os.path.isdir(p))
+            return self.paths[path]
 
-        return self.__dict__[name]
-
-    def __is_dir(self, path):
-        name = "_" + path + "_is_dir"
-        if self.__dict__[name] is None:
-            self.__dict__[name] = os.path.isdir(self.__class__.__dict__[path](self))
-        return self.__dict__[name]
-    
-    def use_path (self):
-        return self.__get("_use_path", "package.use")
-
-    def use_path_is_dir (self):
-        return self.__is_dir("use_path")
-
-    def mask_path (self):
-        return self.__get("_mask_path", "package.mask")
-
-    def mask_path_is_dir (self):
-        return self.__is_dir("mask_path")
-
-    def unmask_path (self):
-        return self.__get("_unmask_path", "package.unmask")
-
-    def unmask_path_is_dir (self):
-        return self.__is_dir("unmask_path")
-
-    def testing_path (self):
-        return self.__get("_testing_path", "package.keywords")
-
-    def testing_path_is_dir (self):
-        return self.__is_dir("testing_path")
+    def __getattribute__ (self, name):
+        try:
+            return object.__getattribute__(self, name)
+        except AttributeError:
+            return self._lookup("package."+name)
 
 CONST = Constants()
 
@@ -244,7 +218,7 @@ def set_use_flag (pkg, flag):
     # if not saved in useFlags, get it by calling get_data() which calls grep()
     data = None
     if not cpv in useFlags:
-        data = get_data(pkg, CONST.use_path())
+        data = get_data(pkg, CONST.use.path)
         useFlags[cpv] = data
     else:
         data = useFlags[cpv]
@@ -288,9 +262,9 @@ def set_use_flag (pkg, flag):
     
     # create a new line
     if not added:
-        path = CONST.use_path()
-        if CONST.use_path_is_dir():
-            path = os.path.join(CONST.use_path(), generate_path(cpv, CONFIG["usefile"]))
+        path = CONST.use.path
+        if CONST.use.path.isdir:
+            path = os.path.join(CONST.use.path, generate_path(cpv, CONFIG["usefile"]))
         try:
             newUseFlags[cpv].remove((path, -1, invFlag, False))
         except ValueError: # not in UseFlags
@@ -453,11 +427,11 @@ def set_masked (pkg, masked = True):
     if masked:
         link_neq = new_masked
         link_eq = new_unmasked
-        path = CONST.unmask_path()
+        path = CONST.unmask.path
     else:
         link_neq = new_unmasked
         link_eq = new_masked
-        path = CONST.mask_path()
+        path = CONST.mask.path
 
     copy = link_eq[cpv][:]
     for file, line in copy:
@@ -483,16 +457,14 @@ def set_masked (pkg, masked = True):
     if done: return
 
     if masked:
-        is_dir = CONST.mask_path_is_dir()
-        path = CONST.mask_path()
+        pfile = CONST.mask
     else:
-        is_dir = CONST.unmask_path_is_dir()
-        path = CONST.unmask_path()
+        pfile = CONST.unmask
 
-    if is_dir:
-        file = os.path.join(path, generate_path(cpv, CONFIG["maskfile"]))
+    if pfile.isdir:
+        file = os.path.join(pfile.path, generate_path(cpv, CONFIG["maskfile"]))
     else:
-        file = path
+        file = pfile.path
     
     link_neq[cpv].append((file, "-1"))
     link_neq[cpv] = list(set(link_neq[cpv]))
@@ -556,7 +528,7 @@ def is_locally_masked (pkg, changes = True):
         if new_masking_status(pkg) == "unmasked": # we unmasked it
             return False
     
-    list = get_data(pkg, CONST.mask_path())
+    list = get_data(pkg, CONST.mask.path)
 
     if not list: return False
 
@@ -677,7 +649,7 @@ def set_testing (pkg, enable):
         return
 
     if not enable:
-        test = get_data(pkg, CONST.testing_path())
+        test = get_data(pkg, CONST.keywords.path)
         debug("data (test): %s", str(test))
         for file, line, crit, flags in test:
             try:
@@ -690,10 +662,10 @@ def set_testing (pkg, enable):
             if pkg.matches(crit) and flagMatches:
                 newTesting[cpv].append((file, line))
     else:
-        if CONST.testing_path_is_dir():
-            file = os.path.join(CONST.testing_path(), generate_path(cpv, CONFIG["testingfile"]))
+        if CONST.keywords.path.isdir:
+            file = os.path.join(CONST.kewyords.path, generate_path(cpv, CONFIG["testingfile"]))
         else:
-            file = CONST.testing_path()
+            file = CONST.keyword.path
         newTesting[cpv].append((file, "-1"))
 
     newTesting[cpv] = list(set(newTesting[cpv]))
