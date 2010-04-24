@@ -1200,21 +1200,3 @@ msgstr "Bogue ? Aucune meilleure solution trouvée pour '%(package)s', qui est n
 msgid "BUG in flags.new_masking_status. It returns '%s'"
 msgstr "Bogue dans flags.new_masking_status. Renvoie '%s'"
 
-#~ msgid "Widgets of plugin '%s' loaded."
-#~ msgstr "Widgets du greffon '%s' chargés."
-
-#~ msgid "Overriding hook '%(hook)s' with plugin '%(plugin)s'."
-#~ msgstr "Surcharge du hook '%(hook)s' avec le greffon '%(plugin)s'."
-
-#~ msgid ""
-#~ "Dependant '%(dep)s' for '%(hook)s' in plugin '%(plugin)s' not found! "
-#~ "Adding nevertheless."
-#~ msgstr ""
-#~ "Le dépendant '%(dep)s' pour le hook '%(hook)s' du greffon '%(plugin)s'  "
-#~ "trouvé ! Ajouté quand même."
-
-#~ msgid "Portage"
-#~ msgstr "Portage"
-
-#~ msgid "Attach _Logfile"
-#~ msgstr "Attacher le fichier de _log"
