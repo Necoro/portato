@@ -42,17 +42,22 @@ data_files = [
 cmdclass = {'build_manpage': build_manpage}
 
 # remove useless options / they are the default
-for o in ("cython", "eix"):
+for o in (
+        "eix",
+        "cython", #!REMOVE
+        ):
     try:
         sys.argv.remove("--enable-"+o)
     except ValueError:
         pass
 
 # extension stuff
-if "--disable-cython" in sys.argv:
-    sys.argv.remove("--disable-cython")
+#!INSERT if not "--enable-cython" in sys.argv:
+if "--disable-cython" in sys.argv: #!REMOVE
+    sys.argv.remove("--disable-cython") #!REMOVE
     ext = "c"
 else:
+    #!INSERT sys.argv.remove("--enable-cython")
     from Cython.Distutils import build_ext
     cmdclass['build_ext'] = build_ext
     ext = "pyx"
