@@ -28,7 +28,8 @@ find -name '*.pyx' | xargs cython || fail "Cython" 1
 echo ">>> Patching constants.py"
 replace_by VERSION "'$ver'"
 replace_by ROOT_DIR "'/'"
-replace_by TEMPLATE_DIR "pjoin(ROOT_DIR, '/usr/share/locale')"
+replace_by LOCALE_DIR "pjoin(ROOT_DIR, '/usr/share/locale')"
+replace_by TEMPLATE_DIR "pjoin(ROOT_DIR, DATA_DIR, 'templates')"
 replace_by DATA_DIR "'/usr/share/portato/'"
 
 echo ">>> Patching setup.py."
