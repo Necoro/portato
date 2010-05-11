@@ -26,13 +26,16 @@ These should be set during the installation.
 @var CONFIG_LOCATION: L{CONFIG_DIR} plus name of the config file.
 @type CONFIG_LOCATION: string
 
+@var ROOT_DIR: Overall root -- normally just '/'.
+@type ROOT_DIR: string
+@var DATA_DIR: Directory which contains all shared files.
+@type DATA_DIR: string
+
 @var ICON_DIR: directory containing the icons
 @type ICON_DIR: string
 @var APP_ICON: the path of the application icon
 @type APP_ICON: string
 
-@var DATA_DIR: Directory which contains all shared files.
-@type DATA_DIR: string
 @var LOCALE_DIR: the path to the directory where the locale files (*.mo) are stored.
 @type LOCALE_DIR: string
 @var PLUGIN_DIR: Directory containing the plugin xmls.
@@ -54,8 +57,11 @@ from os.path import join as pjoin
 if os.getuid() == 0:
     os.environ["HOME"] = "/root"
 
+ROOT_DIR = ""
+DATA_DIR = "./"
+
 # icons
-ICON_DIR = "icons/"
+ICON_DIR = pjoin(ROOT_DIR, DATA_DIR, "icons/")
 APP_ICON = pjoin(ICON_DIR, "portato-icon.png")
 
 # general
@@ -64,14 +70,13 @@ VERSION = "9999"
 HOME = os.environ["HOME"]
 
 # config
-CONFIG_DIR = "etc/"
+CONFIG_DIR = pjoin(ROOT_DIR, "etc/")
 CONFIG_LOCATION = pjoin(CONFIG_DIR, "portato.cfg")
 SESSION_DIR = pjoin(os.environ["HOME"], ".portato")
 
 # misc dirs
-DATA_DIR = "./"
 LOCALE_DIR = "i18n/"
-PLUGIN_DIR = pjoin(DATA_DIR, "plugins/")
+PLUGIN_DIR = pjoin(ROOT_DIR, DATA_DIR, "plugins/")
 SETTINGS_DIR = pjoin(HOME, "."+APP)
 TEMPLATE_DIR = "portato/gui/templates/"
 
