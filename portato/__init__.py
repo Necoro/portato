@@ -17,7 +17,7 @@ import sys, os
 from optparse import OptionParser, SUPPRESS_HELP
 
 from .log import start as logstart
-from .constants import LOCALE_DIR, APP, VERSION, REVISION
+from .constants import LOCALE_DIR, APP, VERSION, REVISION, PLUGIN_DIR
 from .helper import debug, info, error
 
 # set better version info
@@ -53,6 +53,9 @@ def get_parser (use_ = False):
     parser.add_option("-F", "--no-fork", action = "store_true", dest = "nofork", default = False,
             help = _("do not fork off as root"))
 
+    parser.add_option("--plugin-dir", action = "store_true", dest = "pdir", default = False,
+            help = _("print the directory the plugins are located in"))
+
     return parser
 
 def _sub_start ():
@@ -70,6 +73,11 @@ def start():
 
     # run parser
     (options, args) = get_parser().parse_args()
+
+    # plugin dir
+    if options.pdir:
+        print PLUGIN_DIR
+        return
 
     if options.nofork or os.getuid() == 0: # start GUI
         
