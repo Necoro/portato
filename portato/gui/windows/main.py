@@ -175,7 +175,7 @@ class PackageTable:
                 ftexts.append(t)
 
         for t in ftexts:
-            link = gtk.LinkButton(t)
+            link = gtk.LinkButton(uri = t, label = t)
             link.set_alignment(0.0, 0.5)
             link.set_border_width(0)
             self.linkBox.add(link)
