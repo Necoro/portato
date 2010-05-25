@@ -159,11 +159,17 @@ def generate_path (cpv, exp):
         cat, pkg, ver, rev = system.split_cpv(cpv)
         if rev != "r0":
             ver = "%s-%s" % (ver, rev)
+
         exp = exp.replace("$(cat)",cat).\
                 replace("$(pkg)",pkg).\
                 replace("$(cat-1)",cat.split("-")[0]).\
-                replace("$(cat-2)",cat.split("-")[1]).\
                 replace("$(version)",ver)
+
+        try:
+            exp = exp.replace("$(cat-2)",cat.split("-")[1])
+        except IndexError: # category only consists of one part -- ignore
+            pass
+
     return exp
 
 ### USE FLAG PART ###
