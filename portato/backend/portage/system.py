@@ -235,7 +235,11 @@ class PortageSystem (SystemInterface):
         return filter(self.find_lambda(name), categories)
 
     def split_cpv (self, cpv):
-        cpv = portage.dep_getcpv(cpv)
+        try:
+            cpv = portage.dep_getcpv(cpv)
+        except portage.exception.InvalidAtom:
+            pass
+
         return portage.catpkgsplit(cpv)
 
     def sort_package_list(self, pkglist, only_cpv = False):
