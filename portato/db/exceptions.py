@@ -22,3 +22,5 @@ class DatabaseInstantiationError (DatabaseError):
 class UnsupportedSearchTypeError(DatabaseError):
     pass
 
+class DatabaseInitError (DatabaseError):
+    pass

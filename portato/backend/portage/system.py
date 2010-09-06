@@ -224,7 +224,11 @@ class PortageSystem (SystemInterface):
         return list(filter(self.find_lambda(name), categories))
 
     def split_cpv (self, cpv):
-        cpv = portage.dep_getcpv(cpv)
+        try:
+            cpv = portage.dep_getcpv(cpv)
+        except portage.exception.InvalidAtom:
+            pass
+
         return portage.catpkgsplit(cpv)
 
     def sort_package_list(self, pkglist, only_cpv = False):
@@ -274,12 +278,15 @@ class PortageSystem (SystemInterface):
 
             if len(inst) > 1:
                 myslots = set()
+                splitp = p.split('[', 1) # split away the useflags
                 for i in inst: # get the slots of the installed packages
                     myslots.add(i.get_slot())
 
                 myslots.add(best_p.get_slot()) # add the slot of the best package in portage
                 for slot in myslots:
-                    crit = "%s:%s" % (p, slot)
+                    crit = splitp[:]
+                    crit[0] = "%s:%s" % (crit[0], slot)
+                    crit = "[".join(crit) # re-add possible useflags
                     append(crit, self.find_best_match(crit), inst)
             else:
                 append(p, best_p, inst)

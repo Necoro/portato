@@ -20,9 +20,13 @@ except ImportError:
 import os
 
 from .sql import SQLDatabase
+from .exceptions import DatabaseInitError
 from ..eix import EixReader
 from ..helper import debug, warning
 from ..backend import system
+
+class EixInitError (DatabaseInitError):
+    pass
 
 class EixSQLDatabase (SQLDatabase):
 
@@ -34,6 +38,9 @@ class EixSQLDatabase (SQLDatabase):
         if not os.path.exists(self.cache):
             warning(_("Cache file '%s' does not exist. Using default instead."), self.cache)
             self.cache = self.CACHE_FILE
+
+        if not os.path.exists(self.cache):
+            raise EixInitError(_("Cache file '%s' does not exist.") % self.cache)
 
         debug("Using '%s' as eix cache file.", self.cache)
         

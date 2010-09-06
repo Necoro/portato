@@ -17,7 +17,7 @@ from portage import VERSION as PV
 
 VERSION = tuple(map(int, (x.split("_")[0] for x in PV.split("."))))
 
-if VERSION >= (2, 2):
+if VERSION >= (2, 2) or VERSION >= (2, 1, 8):
     debug("Using portage-2.2")
     from .system_22 import PortageSystem_22 as PortageSystem
     from .package_22 import PortagePackage_22 as PortagePackage

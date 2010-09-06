@@ -168,14 +168,12 @@ class PreferenceWindow (AbstractDialog):
         self.databaseCombo = self.tree.get_widget("databaseCombo")
         model = gtk.ListStore(str, str, str)
 
-        ctr = 0
         active = 0
-        for k, name, desc in db.types:
-            if k == dbtype:
+        for ctr, (key, t) in enumerate(db.types.iteritems()):
+            if key == dbtype:
                 active = ctr
 
-            model.append([name, desc, k])
-            ctr += 1
+            model.append([t.name, t.descr, key])
 
         self.databaseCombo.set_model(model)
         self.databaseCombo.set_active(active)

@@ -12,7 +12,11 @@
 
 
 
-import portage.sets
+try:
+    import portage.sets as psets
+except ImportError:
+    import portage._sets as psets
+
 from .settings import PortageSettings
 
 class PortageSettings_22 (PortageSettings):
@@ -24,4 +28,4 @@ class PortageSettings_22 (PortageSettings):
     def load (self):
         PortageSettings.load(self)
 
-        self.setsconfig = portage.sets.load_default_config(self.settings, self.trees[self.settings["ROOT"]])
+        self.setsconfig = psets.load_default_config(self.settings, self.trees[self.settings["ROOT"]])
