@@ -36,10 +36,10 @@ cdef extern from "Python.h":
 ctypedef unsigned char UChar
 ctypedef long long LLong
 
-from python_unicode cimport PyUnicode_DecodeUTF8
-from python_mem cimport PyMem_Malloc, PyMem_Free
-from python_exc cimport PyErr_NoMemory
-from python_string cimport PyString_FromStringAndSize
+from cpython.unicode cimport PyUnicode_DecodeUTF8
+from cpython.mem cimport PyMem_Malloc, PyMem_Free
+from cpython.exc cimport PyErr_NoMemory
+from cpython.string cimport PyString_FromStringAndSize
 
 from portato.eix.exceptions import EndOfFileException
 

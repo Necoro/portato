@@ -10,9 +10,9 @@
 #
 # Written by René 'Necoro' Neumann <necoro@necoro.net>
 
-from python_string cimport *
-from python_mem cimport PyMem_Malloc, PyMem_Free
-from python_exc cimport PyErr_NoMemory
+from cpython.string cimport *
+from cpython.mem cimport PyMem_Malloc, PyMem_Free
+from cpython.exc cimport PyErr_NoMemory
 
 cdef extern from "errno.h":
     int errno
