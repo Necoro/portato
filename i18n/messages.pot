@@ -8,29 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-16 01:31+0200\n"
+"POT-Creation-Date: 2011-07-18 20:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: portato/gui/templates/PkgListWindow.ui:48
-msgid "_Close"
-msgstr ""
-
-#: portato/gui/templates/PkgListWindow.ui:64 portato/gui/windows/pkglist.py:35
-msgid "Select _All"
-msgstr ""
-
-#: portato/gui/templates/PkgListWindow.ui:80
-msgid "_Install Selected"
-msgstr ""
-
-#: portato/gui/templates/PkgListWindow.ui:96
-msgid "_Uninstall Selected"
-msgstr ""
 
 #: portato/gui/templates/PreferenceWindow.ui:12
 msgid "Preferences"
@@ -218,41 +203,20 @@ msgstr ""
 msgid "Visual"
 msgstr ""
 
-#: portato/gui/templates/PluginWindow.ui:8
-msgid "Plugins"
+#: portato/gui/templates/PkgListWindow.ui:48
+msgid "_Close"
 msgstr ""
 
-#: portato/gui/templates/PluginWindow.ui:53
-msgid "_Install dependencies"
+#: portato/gui/templates/PkgListWindow.ui:64 portato/gui/windows/pkglist.py:35
+msgid "Select _All"
 msgstr ""
 
-#: portato/gui/templates/PluginWindow.ui:83
-msgid "Needed dependencies"
+#: portato/gui/templates/PkgListWindow.ui:80
+msgid "_Install Selected"
 msgstr ""
 
-#: portato/gui/templates/PluginWindow.ui:108
-msgid "<b>Author:</b>"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.ui:141 portato/gui/windows/pkglist.py:59
-#: portato/gui/windows/main.py:843 portato/gui/windows/plugin.py:27
-msgid "Enabled"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.ui:157 portato/gui/windows/plugin.py:27
-msgid "Temporarily enabled"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.ui:172 portato/gui/windows/plugin.py:27
-msgid "Temporarily disabled"
-msgstr ""
-
-#: portato/gui/templates/PluginWindow.ui:188 portato/gui/windows/plugin.py:27
-msgid "Disabled"
-msgstr ""
-
-#: portato/gui/templates/AboutWindow.ui:8
-msgid "About Portato"
+#: portato/gui/templates/PkgListWindow.ui:96
+msgid "_Uninstall Selected"
 msgstr ""
 
 #: portato/gui/templates/MailInfoWindow.ui:6
@@ -290,6 +254,39 @@ msgstr ""
 
 #: portato/gui/templates/SearchWindow.ui:8
 msgid "Search Results"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.ui:8
+msgid "Plugins"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.ui:53
+msgid "_Install dependencies"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.ui:83
+msgid "Needed dependencies"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.ui:108
+msgid "<b>Author:</b>"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.ui:141 portato/gui/windows/main.py:843
+#: portato/gui/windows/pkglist.py:59 portato/gui/windows/plugin.py:27
+msgid "Enabled"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.ui:157 portato/gui/windows/plugin.py:27
+msgid "Temporarily enabled"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.ui:172 portato/gui/windows/plugin.py:27
+msgid "Temporarily disabled"
+msgstr ""
+
+#: portato/gui/templates/PluginWindow.ui:188 portato/gui/windows/plugin.py:27
+msgid "Disabled"
 msgstr ""
 
 #: portato/gui/templates/MainWindow.ui:204
@@ -382,13 +379,17 @@ msgstr ""
 msgid "Queue"
 msgstr ""
 
-#: portato/gui/templates/MainWindow.ui:806 portato/gui/windows/main.py:1262
-#: portato/gui/windows/main.py:1264
+#: portato/gui/templates/MainWindow.ui:806 portato/gui/windows/main.py:1263
+#: portato/gui/windows/main.py:1265
 msgid "Console"
 msgstr ""
 
 #: portato/gui/templates/MainWindow.ui:840
 msgid "Log"
+msgstr ""
+
+#: portato/gui/templates/AboutWindow.ui:8
+msgid "About Portato"
 msgstr ""
 
 #: portato/gui/templates/MainWindow.menu:9
@@ -462,6 +463,454 @@ msgstr ""
 
 #: portato/gui/templates/MainWindow.menu:153
 msgid "_About"
+msgstr ""
+
+#: portato/backend/portage/package.py:127
+#, python-format
+msgid "BUG in flags.new_masking_status. It returns '%s'"
+msgstr ""
+
+#: portato/backend/portage/system.py:274
+#, python-format
+msgid "No best match for %s. It seems not to be in the tree anymore."
+msgstr ""
+
+#: portato/backend/portage/system.py:335
+#, python-format
+msgid "Found a not installed dependency: %s."
+msgstr ""
+
+#: portato/backend/portage/system.py:377
+#, python-format
+msgid ""
+"Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
+msgstr ""
+
+#: portato/backend/flags.py:531
+#, python-format
+msgid "Conflicting values for masking status: %s"
+msgstr ""
+
+#: portato/backend/flags.py:692
+#, python-format
+msgid "Line %(line)s in file %(file)s misses a keyword (e.g. '~x86')."
+msgstr ""
+
+#: portato/db/hash.py:97
+#, python-format
+msgid ""
+"Catched KeyError => %s seems not to be an available category. Have you "
+"played with rsync-excludes?"
+msgstr ""
+
+#: portato/db/hash.py:152
+#, python-format
+msgid "Error while compiling search expression: '%s'."
+msgstr ""
+
+#: portato/db/sql.py:80
+msgid "Cleaning database..."
+msgstr ""
+
+#: portato/db/sql.py:82
+msgid "Populating database..."
+msgstr ""
+
+#: portato/db/database.py:44
+msgid "ALL"
+msgstr ""
+
+#: portato/db/database.py:50 portato/db/database.py:52
+msgid "Name"
+msgstr ""
+
+#: portato/db/database.py:51 portato/db/database.py:52
+#: portato/gui/windows/main.py:846 portato/gui/windows/preference.py:257
+msgid "Description"
+msgstr ""
+
+#: portato/db/__init__.py:26
+msgid "eix + SQLite"
+msgstr ""
+
+#: portato/db/__init__.py:27
+msgid ""
+"Similar to SQLite, but now uses the eix database to get the package "
+"information.\n"
+"This should be much faster on startup, but requires that your eix database "
+"is always up-to-date.\n"
+"Additionally, this is the only database allowing searching in descriptions."
+msgstr ""
+
+#: portato/db/__init__.py:32
+msgid "SQLite"
+msgstr ""
+
+#: portato/db/__init__.py:33
+msgid ""
+"Uses an SQLite-database to store package information.\n"
+"May take longer to generate at the first time, but has advantages if portato "
+"is re-started with an unchanged portage tree. Additionally it allows to use "
+"fast SQL expressions for fetching the data."
+msgstr ""
+
+#: portato/db/__init__.py:38
+msgid "Hashmap"
+msgstr ""
+
+#: portato/db/__init__.py:39
+msgid ""
+"Uses an in-memory hashmap to store package information.\n"
+"Has been used since at least version 0.3.3, but all information has to be "
+"regenerated on each startup."
+msgstr ""
+
+#: portato/db/__init__.py:58
+#, python-format
+msgid "Cannot load %s."
+msgstr ""
+
+#: portato/db/__init__.py:59 portato/gui/views.py:130
+#: plugins/package_details.py:108
+#, python-format
+msgid "Error: %s"
+msgstr ""
+
+#: portato/db/__init__.py:64
+msgid "No alternative database given. Aborting."
+msgstr ""
+
+#: portato/db/__init__.py:78
+#, python-format
+msgid "Unknown database type: %s"
+msgstr ""
+
+#: portato/db/__init__.py:82
+#, python-format
+msgid "Using database type '%s'"
+msgstr ""
+
+#: portato/db/eix_sql.py:39
+#, python-format
+msgid "Cache file '%s' does not exist. Using default instead."
+msgstr ""
+
+#: portato/db/eix_sql.py:43
+#, python-format
+msgid "Cache file '%s' does not exist."
+msgstr ""
+
+#: portato/session.py:66
+#, python-format
+msgid "Loading '%s' session from %s."
+msgstr ""
+
+#: portato/session.py:68
+#, python-format
+msgid "Loading session from %s."
+msgstr ""
+
+#: portato/session.py:136
+#, python-format
+msgid "Saving '%s' session to %s."
+msgstr ""
+
+#: portato/session.py:138
+#, python-format
+msgid "Saving session to %s."
+msgstr ""
+
+#: portato/config_parser.py:268
+#, python-format
+msgid "Unrecognized line in configuration: %s"
+msgstr ""
+
+#: portato/gui/session.py:21
+msgid "Version mismatch."
+msgstr ""
+
+#: portato/gui/session.py:27
+#, python-format
+msgid "Got '%d' - expected '%d'."
+msgstr ""
+
+#: portato/gui/session.py:30
+msgid "Current session format is too old."
+msgstr ""
+
+#: portato/gui/session.py:33
+msgid "Current session format is newer than this version supports."
+msgstr ""
+
+#: portato/gui/views.py:85
+msgid "Package is not installed"
+msgstr ""
+
+#: portato/gui/views.py:102
+#, python-format
+msgid "No %(old)s language file installed. Falling back to %(new)s."
+msgstr ""
+
+#: portato/gui/views.py:111
+#, python-format
+msgid "No %(old)s language file installed. Disabling highlighting."
+msgstr ""
+
+#: portato/gui/updater.py:100
+#, python-format
+msgid ""
+"No unmasked version of package '%s' found. Trying masked ones. This normally "
+"should not happen..."
+msgstr ""
+
+#: portato/gui/updater.py:104
+#, python-format
+msgid ""
+"Trying to remove package '%s' from queue which does not exist in system."
+msgstr ""
+
+#: portato/gui/utils.py:187
+msgid "oneshot"
+msgstr ""
+
+#: portato/gui/utils.py:192
+#, python-format
+msgid "updating from version %s"
+msgstr ""
+
+#: portato/gui/utils.py:194
+msgid "updating"
+msgstr ""
+
+#: portato/gui/utils.py:199
+#, python-format
+msgid "downgrading from version %s"
+msgstr ""
+
+#: portato/gui/utils.py:201
+msgid "downgrading"
+msgstr ""
+
+#: portato/gui/utils.py:205
+msgid "IUSE changes:"
+msgstr ""
+
+#: portato/gui/utils.py:223
+msgid "(In Progress)"
+msgstr ""
+
+#: portato/gui/utils.py:248
+msgid "Install"
+msgstr ""
+
+#: portato/gui/utils.py:259
+msgid "Uninstall"
+msgstr ""
+
+#: portato/gui/utils.py:271
+msgid "Update"
+msgstr ""
+
+#: portato/gui/exception_handling.py:30
+msgid ""
+"A programming error has been detected during the execution of this program."
+msgstr ""
+
+#: portato/gui/exception_handling.py:31
+msgid "Bug Detected"
+msgstr ""
+
+#: portato/gui/exception_handling.py:32
+msgid ""
+"It probably isn't fatal, but should be reported to the developers "
+"nonetheless."
+msgstr ""
+
+#: portato/gui/exception_handling.py:34
+msgid "Show Details"
+msgstr ""
+
+#: portato/gui/exception_handling.py:35
+msgid "Send..."
+msgstr ""
+
+#: portato/gui/exception_handling.py:74
+msgid "Save traceback..."
+msgstr ""
+
+#: portato/gui/windows/mailinfo.py:144
+#, python-format
+msgid "Retrying after waiting %d seconds."
+msgstr ""
+
+#: portato/gui/windows/mailinfo.py:157
+#, python-format
+msgid ""
+"An error occurred while sending. I think we were greylisted. The error: %s"
+msgstr ""
+
+#: portato/gui/windows/main.py:142
+msgid "<no description>"
+msgstr ""
+
+#: portato/gui/windows/main.py:168
+msgid "The first homepage part does not start with 'http' or 'ftp'."
+msgstr ""
+
+#: portato/gui/windows/main.py:172
+msgid "Blank inside homepage."
+msgstr ""
+
+#: portato/gui/windows/main.py:211
+#, python-format
+msgid "Package could not be found: %s"
+msgstr ""
+
+#: portato/gui/windows/main.py:265 portato/gui/windows/main.py:364
+msgid "Masked by user"
+msgstr ""
+
+#: portato/gui/windows/main.py:464
+msgid "Loading Config"
+msgstr ""
+
+#: portato/gui/windows/main.py:476
+msgid "Creating Database"
+msgstr ""
+
+#: portato/gui/windows/main.py:480
+msgid "Loading Plugins"
+msgstr ""
+
+#: portato/gui/windows/main.py:488
+msgid "Building frontend"
+msgstr ""
+
+#: portato/gui/windows/main.py:554
+msgid "Restoring Session"
+msgstr ""
+
+#: portato/gui/windows/main.py:564
+msgid "Loading Plugin Widgets"
+msgstr ""
+
+#: portato/gui/windows/main.py:567
+msgid "Finishing startup"
+msgstr ""
+
+#: portato/gui/windows/main.py:623
+msgid "Options"
+msgstr ""
+
+#: portato/gui/windows/main.py:639
+msgid "Categories"
+msgstr ""
+
+#: portato/gui/windows/main.py:698
+msgid "Packages"
+msgstr ""
+
+#: portato/gui/windows/main.py:733
+#, python-format
+msgid "Package '%s/%s' is disabled."
+msgstr ""
+
+#: portato/gui/windows/main.py:750
+msgid "Versions"
+msgstr ""
+
+#: portato/gui/windows/main.py:753
+msgid "Slot"
+msgstr ""
+
+#: portato/gui/windows/main.py:845
+msgid "Flag"
+msgstr ""
+
+#: portato/gui/windows/main.py:869
+msgid "This is an expanded use flag and cannot be selected"
+msgstr ""
+
+#: portato/gui/windows/main.py:927
+#, python-format
+msgid "Translating session from version %d to %d."
+msgstr ""
+
+#: portato/gui/windows/main.py:930
+#, python-format
+msgid "Cannot translate session from version %d to %d."
+msgstr ""
+
+#: portato/gui/windows/main.py:1312 portato/gui/dialogs.py:141
+#, python-format
+msgid "No versions of package '%s' found!"
+msgstr ""
+
+#: portato/gui/windows/main.py:1448
+msgid "use flags"
+msgstr ""
+
+#: portato/gui/windows/main.py:1460
+msgid "masking keywords"
+msgstr ""
+
+#: portato/gui/windows/main.py:1869
+msgid "The portage tree is not existing."
+msgstr ""
+
+#: portato/gui/windows/main.py:1873
+msgid "The portage tree seems to be empty."
+msgstr ""
+
+#: portato/gui/windows/main.py:1876
+msgid ""
+"The sqlite cache backend of portage is not supported at the moment. See "
+"https://bugs.launchpad.net/portato/+bug/564292."
+msgstr ""
+
+#: portato/gui/windows/search.py:57
+msgid "Results"
+msgstr ""
+
+#: portato/gui/windows/splash.py:35
+#, python-format
+msgid "... is starting up: %s"
+msgstr ""
+
+#: portato/gui/windows/pkglist.py:36
+msgid "Unselect _All"
+msgstr ""
+
+#: portato/gui/windows/pkglist.py:60
+msgid "Package"
+msgstr ""
+
+#: portato/gui/windows/pkglist.py:147
+msgid "Updatable Packages"
+msgstr ""
+
+#: portato/gui/windows/pkglist.py:151
+msgid "World Packages"
+msgstr ""
+
+#: portato/gui/windows/preference.py:154
+msgid "Top"
+msgstr ""
+
+#: portato/gui/windows/preference.py:154
+msgid "Bottom"
+msgstr ""
+
+#: portato/gui/windows/preference.py:154
+msgid "Left"
+msgstr ""
+
+#: portato/gui/windows/preference.py:154
+msgid "Right"
+msgstr ""
+
+#: portato/gui/windows/preference.py:252
+msgid "Package Set"
 msgstr ""
 
 #: portato/gui/dialogs.py:17
@@ -573,306 +1022,8 @@ msgid ""
 "Please run <i>emerge --sync &amp;&amp; layman -S</i>."
 msgstr ""
 
-#: portato/gui/dialogs.py:141 portato/gui/windows/main.py:1311
-#, python-format
-msgid "No versions of package '%s' found!"
-msgstr ""
-
-#: portato/gui/views.py:85
-msgid "Package is not installed"
-msgstr ""
-
-#: portato/gui/views.py:102
-#, python-format
-msgid "No %(old)s language file installed. Falling back to %(new)s."
-msgstr ""
-
-#: portato/gui/views.py:111
-#, python-format
-msgid "No %(old)s language file installed. Disabling highlighting."
-msgstr ""
-
-#: portato/gui/views.py:130 plugins/package_details.py:108
-#, python-format
-msgid "Error: %s"
-msgstr ""
-
-#: portato/gui/updater.py:100
-#, python-format
-msgid ""
-"No unmasked version of package '%s' found. Trying masked ones. This normally "
-"should not happen..."
-msgstr ""
-
-#: portato/gui/updater.py:104
-#, python-format
-msgid ""
-"Trying to remove package '%s' from queue which does not exist in system."
-msgstr ""
-
-#: portato/gui/exception_handling.py:30
-msgid ""
-"A programming error has been detected during the execution of this program."
-msgstr ""
-
-#: portato/gui/exception_handling.py:31
-msgid "Bug Detected"
-msgstr ""
-
-#: portato/gui/exception_handling.py:32
-msgid ""
-"It probably isn't fatal, but should be reported to the developers "
-"nonetheless."
-msgstr ""
-
-#: portato/gui/exception_handling.py:34
-msgid "Show Details"
-msgstr ""
-
-#: portato/gui/exception_handling.py:35
-msgid "Send..."
-msgstr ""
-
-#: portato/gui/exception_handling.py:74
-msgid "Save traceback..."
-msgstr ""
-
 #: portato/gui/__init__.py:22
 msgid "Loading Backend"
-msgstr ""
-
-#: portato/gui/windows/search.py:57
-msgid "Results"
-msgstr ""
-
-#: portato/gui/windows/pkglist.py:36
-msgid "Unselect _All"
-msgstr ""
-
-#: portato/gui/windows/pkglist.py:60
-msgid "Package"
-msgstr ""
-
-#: portato/gui/windows/pkglist.py:147
-msgid "Updatable Packages"
-msgstr ""
-
-#: portato/gui/windows/pkglist.py:151
-msgid "World Packages"
-msgstr ""
-
-#: portato/gui/windows/mailinfo.py:144
-#, python-format
-msgid "Retrying after waiting %d seconds."
-msgstr ""
-
-#: portato/gui/windows/mailinfo.py:157
-#, python-format
-msgid ""
-"An error occurred while sending. I think we were greylisted. The error: %s"
-msgstr ""
-
-#: portato/gui/windows/splash.py:35
-#, python-format
-msgid "... is starting up: %s"
-msgstr ""
-
-#: portato/gui/windows/preference.py:154
-msgid "Top"
-msgstr ""
-
-#: portato/gui/windows/preference.py:154
-msgid "Bottom"
-msgstr ""
-
-#: portato/gui/windows/preference.py:154
-msgid "Left"
-msgstr ""
-
-#: portato/gui/windows/preference.py:154
-msgid "Right"
-msgstr ""
-
-#: portato/gui/windows/preference.py:254
-msgid "Package Set"
-msgstr ""
-
-#: portato/gui/windows/preference.py:259 portato/gui/windows/main.py:846
-#: portato/db/database.py:51 portato/db/database.py:52
-msgid "Description"
-msgstr ""
-
-#: portato/gui/windows/main.py:142
-msgid "<no description>"
-msgstr ""
-
-#: portato/gui/windows/main.py:168
-msgid "The first homepage part does not start with 'http' or 'ftp'."
-msgstr ""
-
-#: portato/gui/windows/main.py:172
-msgid "Blank inside homepage."
-msgstr ""
-
-#: portato/gui/windows/main.py:211
-#, python-format
-msgid "Package could not be found: %s"
-msgstr ""
-
-#: portato/gui/windows/main.py:265 portato/gui/windows/main.py:364
-msgid "Masked by user"
-msgstr ""
-
-#: portato/gui/windows/main.py:464
-msgid "Loading Config"
-msgstr ""
-
-#: portato/gui/windows/main.py:476
-msgid "Creating Database"
-msgstr ""
-
-#: portato/gui/windows/main.py:480
-msgid "Loading Plugins"
-msgstr ""
-
-#: portato/gui/windows/main.py:488
-msgid "Building frontend"
-msgstr ""
-
-#: portato/gui/windows/main.py:554
-msgid "Restoring Session"
-msgstr ""
-
-#: portato/gui/windows/main.py:564
-msgid "Loading Plugin Widgets"
-msgstr ""
-
-#: portato/gui/windows/main.py:567
-msgid "Finishing startup"
-msgstr ""
-
-#: portato/gui/windows/main.py:623
-msgid "Options"
-msgstr ""
-
-#: portato/gui/windows/main.py:639
-msgid "Categories"
-msgstr ""
-
-#: portato/gui/windows/main.py:698
-msgid "Packages"
-msgstr ""
-
-#: portato/gui/windows/main.py:733
-#, python-format
-msgid "Package '%s/%s' is disabled."
-msgstr ""
-
-#: portato/gui/windows/main.py:750
-msgid "Versions"
-msgstr ""
-
-#: portato/gui/windows/main.py:753
-msgid "Slot"
-msgstr ""
-
-#: portato/gui/windows/main.py:845
-msgid "Flag"
-msgstr ""
-
-#: portato/gui/windows/main.py:869
-msgid "This is an expanded use flag and cannot be selected"
-msgstr ""
-
-#: portato/gui/windows/main.py:927
-#, python-format
-msgid "Translating session from version %d to %d."
-msgstr ""
-
-#: portato/gui/windows/main.py:930
-#, python-format
-msgid "Cannot translate session from version %d to %d."
-msgstr ""
-
-#: portato/gui/windows/main.py:1447
-msgid "use flags"
-msgstr ""
-
-#: portato/gui/windows/main.py:1459
-msgid "masking keywords"
-msgstr ""
-
-#: portato/gui/windows/main.py:1868
-msgid "The portage tree is not existing."
-msgstr ""
-
-#: portato/gui/windows/main.py:1872
-msgid "The portage tree seems to be empty."
-msgstr ""
-
-#: portato/gui/windows/main.py:1875
-msgid ""
-"The sqlite cache backend of portage is not supported at the moment. See "
-"https://bugs.launchpad.net/portato/+bug/564292."
-msgstr ""
-
-#: portato/gui/session.py:21
-msgid "Version mismatch."
-msgstr ""
-
-#: portato/gui/session.py:27
-#, python-format
-msgid "Got '%d' - expected '%d'."
-msgstr ""
-
-#: portato/gui/session.py:30
-msgid "Current session format is too old."
-msgstr ""
-
-#: portato/gui/session.py:33
-msgid "Current session format is newer than this version supports."
-msgstr ""
-
-#: portato/gui/utils.py:189
-msgid "oneshot"
-msgstr ""
-
-#: portato/gui/utils.py:194
-#, python-format
-msgid "updating from version %s"
-msgstr ""
-
-#: portato/gui/utils.py:196
-msgid "updating"
-msgstr ""
-
-#: portato/gui/utils.py:201
-#, python-format
-msgid "downgrading from version %s"
-msgstr ""
-
-#: portato/gui/utils.py:203
-msgid "downgrading"
-msgstr ""
-
-#: portato/gui/utils.py:207
-msgid "IUSE changes:"
-msgstr ""
-
-#: portato/gui/utils.py:225
-msgid "(In Progress)"
-msgstr ""
-
-#: portato/gui/utils.py:250
-msgid "Install"
-msgstr ""
-
-#: portato/gui/utils.py:261
-msgid "Uninstall"
-msgstr ""
-
-#: portato/gui/utils.py:273
-msgid "Update"
 msgstr ""
 
 #: portato/eix/exceptions.py:27
@@ -889,160 +1040,63 @@ msgstr ""
 msgid "Version '%s' is not supported."
 msgstr ""
 
-#: portato/backend/flags.py:527
-#, python-format
-msgid "Conflicting values for masking status: %s"
-msgstr ""
-
-#: portato/backend/flags.py:690
-#, python-format
-msgid "Line %(line)s in file %(file)s misses a keyword (e.g. '~x86')."
-msgstr ""
-
-#: portato/backend/portage/system.py:281
-#, python-format
-msgid "No best match for %s. It seems not to be in the tree anymore."
-msgstr ""
-
-#: portato/backend/portage/system.py:339
-#, python-format
-msgid "Found a not installed dependency: %s."
-msgstr ""
-
-#: portato/backend/portage/system.py:381
-#, python-format
-msgid ""
-"Bug? No best match could be found for '%(package)s'. Needed by: '%(cpv)s'."
-msgstr ""
-
-#: portato/backend/portage/package.py:129
-#, python-format
-msgid "BUG in flags.new_masking_status. It returns '%s'"
-msgstr ""
-
 #: portato/__init__.py:54
 msgid "do not fork off as root"
 msgstr ""
 
-#: portato/__init__.py:83
+#: portato/__init__.py:57
+msgid "print the directory the plugins are located in"
+msgstr ""
+
+#: portato/__init__.py:91
 msgid "Starting Portato"
 msgstr ""
 
-#: portato/__init__.py:125
+#: portato/__init__.py:133
 msgid "No valid su command detected. Aborting."
+msgstr ""
+
+#: portato/plugin.py:444 portato/plugin.py:447 portato/plugin.py:457
+#, python-format
+msgid "Loading plugin '%(plugin)s' failed: %(error)s"
+msgstr ""
+
+#: portato/plugin.py:460
+#, python-format
+msgid "Loading widgets of plugin '%(plugin)s' failed: %(error)s"
+msgstr ""
+
+#: portato/plugin.py:495
+msgid "Plugin is disabled!"
+msgstr ""
+
+#: portato/plugin.py:497
+msgid "Plugin has unresolved dependencies - disabled!"
+msgstr ""
+
+#: portato/plugin.py:501
+#, python-format
+msgid "Plugin '%s' loaded."
+msgstr ""
+
+#: portato/plugin.py:599
+#, python-format
+msgid ""
+"For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"
+msgstr ""
+
+#: portato/plugin.py:600
+#, python-format
+msgid "It is now replaced by the one from plugin '%s'!"
+msgstr ""
+
+#: portato/plugin.py:702 portato/plugin.py:705
+#, python-format
+msgid "Registrating plugin '%(plugin)s' failed: %(error)s"
 msgstr ""
 
 #: portato/helper.py:70
 msgid "Invalid dependency string"
-msgstr ""
-
-#: portato/db/__init__.py:21
-msgid "eix + SQLite"
-msgstr ""
-
-#: portato/db/__init__.py:21
-msgid ""
-"Similar to SQLite, but now uses the eix database to get the package "
-"information.\n"
-"This should be much faster on startup, but requires that your eix database "
-"is always up-to-date.\n"
-"Additionally, this is the only database allowing searching in descriptions."
-msgstr ""
-
-#: portato/db/__init__.py:22
-msgid "SQLite"
-msgstr ""
-
-#: portato/db/__init__.py:22
-msgid ""
-"Uses an SQLite-database to store package information.\n"
-"May take longer to generate at the first time, but has advantages if portato "
-"is re-started with an unchanged portage tree. Additionally it allows to use "
-"fast SQL expressions for fetching the data."
-msgstr ""
-
-#: portato/db/__init__.py:23
-msgid "Hashmap"
-msgstr ""
-
-#: portato/db/__init__.py:23
-msgid ""
-"Uses an in-memory hashmap to store package information.\n"
-"Has been used since at least version 0.3.3, but all information has to be "
-"regenerated on each startup."
-msgstr ""
-
-#: portato/db/__init__.py:45
-#, python-format
-msgid "Using database type '%s'"
-msgstr ""
-
-#: portato/db/__init__.py:52 portato/db/__init__.py:67
-#, python-format
-msgid "Cannot load %s."
-msgstr ""
-
-#: portato/db/__init__.py:73
-#, python-format
-msgid "Unknown database type: %s"
-msgstr ""
-
-#: portato/db/hash.py:97
-#, python-format
-msgid ""
-"Catched KeyError => %s seems not to be an available category. Have you "
-"played with rsync-excludes?"
-msgstr ""
-
-#: portato/db/hash.py:152
-#, python-format
-msgid "Error while compiling search expression: '%s'."
-msgstr ""
-
-#: portato/db/eix_sql.py:35
-#, python-format
-msgid "Cache file '%s' does not exist. Using default instead."
-msgstr ""
-
-#: portato/db/database.py:44
-msgid "ALL"
-msgstr ""
-
-#: portato/db/database.py:50 portato/db/database.py:52
-msgid "Name"
-msgstr ""
-
-#: portato/db/sql.py:82
-msgid "Cleaning database..."
-msgstr ""
-
-#: portato/db/sql.py:84
-msgid "Populating database..."
-msgstr ""
-
-#: portato/session.py:66
-#, python-format
-msgid "Loading '%s' session from %s."
-msgstr ""
-
-#: portato/session.py:68
-#, python-format
-msgid "Loading session from %s."
-msgstr ""
-
-#: portato/session.py:136
-#, python-format
-msgid "Saving '%s' session to %s."
-msgstr ""
-
-#: portato/session.py:138
-#, python-format
-msgid "Saving session to %s."
-msgstr ""
-
-#: portato/config_parser.py:266
-#, python-format
-msgid "Unrecognized line in configuration: %s"
 msgstr ""
 
 #: portato/listener.py:85
@@ -1054,47 +1108,25 @@ msgstr ""
 msgid "An exception occured while accessing the message queue: %s"
 msgstr ""
 
-#: portato/plugin.py:446 portato/plugin.py:449 portato/plugin.py:459
+#: plugins/notify.py:23
+msgid "Cannot import 'pynotify'."
+msgstr ""
+
+#: plugins/notify.py:35
+msgid "Notify called while process is still running!"
+msgstr ""
+
+#: plugins/notify.py:39
+msgid "Emerge finished!"
+msgstr ""
+
+#: plugins/notify.py:43
+msgid "Emerge failed!"
+msgstr ""
+
+#: plugins/notify.py:44
 #, python-format
-msgid "Loading plugin '%(plugin)s' failed: %(error)s"
-msgstr ""
-
-#: portato/plugin.py:462
-#, python-format
-msgid "Loading widgets of plugin '%(plugin)s' failed: %(error)s"
-msgstr ""
-
-#: portato/plugin.py:497
-msgid "Plugin is disabled!"
-msgstr ""
-
-#: portato/plugin.py:499
-msgid "Plugin has unresolved dependencies - disabled!"
-msgstr ""
-
-#: portato/plugin.py:503
-#, python-format
-msgid "Plugin '%s' loaded."
-msgstr ""
-
-#: portato/plugin.py:601
-#, python-format
-msgid ""
-"For hook '%(hook)s' an override is already defined by plugin '%(plugin)s'!"
-msgstr ""
-
-#: portato/plugin.py:602
-#, python-format
-msgid "It is now replaced by the one from plugin '%s'!"
-msgstr ""
-
-#: portato/plugin.py:704 portato/plugin.py:707
-#, python-format
-msgid "Registrating plugin '%(plugin)s' failed: %(error)s"
-msgstr ""
-
-#: plugins/etc_proposals.py:32
-msgid "Cannot start etc-proposals. Not root!"
+msgid "Error Code: %d"
 msgstr ""
 
 #: plugins/package_details.py:73
@@ -1153,23 +1185,6 @@ msgid ""
 "string."
 msgstr ""
 
-#: plugins/notify.py:23
-msgid "Cannot import 'pynotify'."
-msgstr ""
-
-#: plugins/notify.py:35
-msgid "Notify called while process is still running!"
-msgstr ""
-
-#: plugins/notify.py:39
-msgid "Emerge finished!"
-msgstr ""
-
-#: plugins/notify.py:43
-msgid "Emerge failed!"
-msgstr ""
-
-#: plugins/notify.py:44
-#, python-format
-msgid "Error Code: %d"
+#: plugins/etc_proposals.py:32
+msgid "Cannot start etc-proposals. Not root!"
 msgstr ""
